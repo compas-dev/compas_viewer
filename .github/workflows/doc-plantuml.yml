@@ -1,0 +1,24 @@
+
+name: update plantuml
+
+on:
+  push:
+    paths: [ "docs/_images/generated/**", ".github/workflows/doc-plantuml.yml" ]
+
+jobs:
+  plantuml:
+    runs-on: ubuntu-latest
+    name: plantuml
+    steps:
+    - name: checkout
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 1
+    - name: plantuml
+      id: plantuml
+      uses: grassedge/generate-plantuml-action@v1.5
+      with:
+        path: docs/_images/generated
+        message: "update plantUML files"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

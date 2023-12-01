@@ -1,0 +1,157 @@
+@startuml
+title compas_viewer
+left to right direction
+' skinparam linetype line
+' Horizontal lines: -->, <--, <-->
+' Vertical lines: ->, <-, <->
+
+
+map MOUSE_KEY_INPUTS{
+}
+map VISUALIZATION{
+}
+map COMPAS_GEOMETRIES {
+
+}
+package compas_viewer{
+    class Viewer{
+        draw()
+    }
+    note top of Viewer : The main entry class
+
+    package views{
+        abstract class View{
+        }
+        package 3d_view{
+            class 3DView{
+                camera
+                matrices
+            }
+        }
+        package data_view{
+            class DataView{
+
+            }
+
+        }
+        package flow_view{
+            class FlowView{
+                node()
+                values()
+                weights()
+            }
+        }
+        View --|> 3DView
+        View --|> DataView
+        View --|> FlowView
+    }
+
+    package controller{
+        class Controller{
+            mouse_key_actions()
+            pan()
+            rotate()
+            box_selection()
+            box_deselectin()
+            selection_mouse()
+            multi_selection()
+            deselection()
+        }
+        class Action{
+            view_front()
+            view_capture()
+            zoom_selected()
+            ...()
+        }
+        note top of Action : extendable
+        class Selector{
+        }
+
+        class Mouse{
+            pos
+            buttons
+        }
+        class Key{
+            supported_keys
+        }
+
+    }
+
+    package ui{
+        abstract class Form{
+            select()
+            slider()
+            checklist()
+            radio()
+            button()
+            plot()
+            ...()
+
+        }
+        Form --|> SceneForm
+        Form --|> PropertyForm
+        Form --|> TreeForm
+        Form --|> TabsForm
+        Form --|> SideBar
+        Form --|> SideDock
+    }
+
+    package objects {
+        class TextObject
+        class LineObject
+        class FrameObject
+        class xxxObject
+        package shaders{
+            object text
+            object line
+            object frame
+            object grid
+            object xxx
+        }
+        text --> TextObject
+        line --> LineObject
+        frame --> FrameObject
+        xxx --> xxxObject
+    }
+
+    package scene {
+        class Scene {
+
+        }
+        note top of Scene : Managing and distributing scene data
+        class Worker
+        class Timer
+    }
+
+}
+' MOUSE_KEY_INPUTS --> Viewer
+' COMPAS_GEOMETRIES --> Viewer
+Viewer --> VISUALIZATION
+MOUSE_KEY_INPUTS .. Controller
+MOUSE_KEY_INPUTS .. ui
+COMPAS_GEOMETRIES .. objects
+views .. VISUALIZATION
+
+' Viewer --> Scene
+
+' Viewer --> Controller
+Controller <--> Action
+Controller <--> Selector
+Controller <--> Mouse
+Controller <--> Key
+
+Controller --> Scene
+Scene <--> Worker
+Scene <--> Timer
+
+
+' Viewer --> objects
+objects <--Scene
+
+Scene --> views
+views --> Viewer
+
+' Viewer -> ui
+ui --> Scene
+
+@enduml
