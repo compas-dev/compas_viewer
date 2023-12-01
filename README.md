@@ -1,4 +1,4 @@
-# compas_viewer
+# COMPAS VIEWER
 
 Standalone viewer for COMPAS
 
