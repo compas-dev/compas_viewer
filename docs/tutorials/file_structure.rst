@@ -2,14 +2,14 @@
 File Structure
 ********************************************************************************
 
-`compas_viewer` reads its customized `.viewer`` file. The file architecture is designed for better data exchange, collaboration, and communication.
+::`compas_viewer` reads its customized ::`.viewer` file. The file architecture is designed for better data exchange, collaboration, and communication.
 
 Concept
 ===========
 
-1. **Folder-based** :  `.viewer` file is a `.zip` based folder that collect rich format of files.
+1. **Folder-based** :  ::`.viewer` file is a `.zip` folder (archive) that contains files in various formats.
 
-2. **Extendability** :  `.viewer` file could contain any type of files. The core functions of viewer are `.json` based and the invoking functions are dictionary-find based, meaning that only missing parameters will cause the loading failure while redundant parameters will only be ignored.
+2. **Extendability** :  ::`.viewer` file could contain any type of files. The core functions of viewer are `.json` based and the invoking functions are dictionary-find based, meaning that only missing parameters will cause the loading failure while redundant parameters will only be ignored.
 
 Quick Look
 ==========
@@ -22,7 +22,7 @@ Quick Look
 Structure
 =========
 
-- **FILENAME.viewer**:  `.viewer` file is a `.zip` based folder that collect rich format of files ...
+- **FILENAME.viewer**:  ::`.viewer` file is a `.zip` based folder that collect rich format of files ...
 
   - **viewer.json**: The viewer.json contains all the settings about the viewer application it self: with, height, fullscreen, ...
 
@@ -77,7 +77,7 @@ Structure
         - **text**: The sidebar item name displayed on the sidebar. | *str* | `"text": "Slide Point"`
         - **...**: Other keys depending on the type.
 
-    - **sidedocks**: `compas_viewer` provides sidedocks as the addition to the sidebar. Every single sidedock in this *list* of dideocks follow the basic configuration rule of the sidebar | *list* |
+    - **sidedocks**: ::`compas_viewer` provides sidedocks as the addition to the sidebar. Every single sidedock in this *list* of dideocks follow the basic configuration rule of the sidebar | *list* |
 
   - **controller.json**: The controller.json contains all the settings about controlling the viewer: mouse, keys, ...
 
