@@ -18,7 +18,6 @@ package compas_viewer{
         draw()
     }
     note top of Viewer : The main entry class
-
     package views{
         abstract class View{
         }
@@ -74,7 +73,6 @@ package compas_viewer{
         class Key{
             supported_keys
         }
-
     }
 
     package ui{

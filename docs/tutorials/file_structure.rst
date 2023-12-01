@@ -14,7 +14,7 @@ Concept
 Quick Look
 ==========
 
-.. figure::  _images/generated/file_structure.svg
+.. figure::  _images/diagrams/generated/file_structure.svg
     :figclass: figure
     :class: figure-img img-fluid
 
