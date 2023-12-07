@@ -10,12 +10,12 @@ class MouseConfigData(TypedDict):
     The type template for the mouse only.
     """
 
-    zoom: dict[str, str]
-    pan: dict[str, str]
-    rotate: dict[str, str]
-    box_selection: dict[str, str]
-    box_deselection: dict[str, str]
-    selection: dict[str, str]
+    zoom: dict
+    pan: dict
+    rotate: dict
+    box_selection: dict
+    box_deselection: dict
+    selection: dict
 
 
 class KeyConfigData(TypedDict):
