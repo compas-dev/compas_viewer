@@ -1,37 +1,40 @@
-from compas.data import Data
+from pathlib import Path
+from typing import TypedDict
+
+from compas_viewer import DATA
+from compas_viewer.configurations import Config
 
 
-class ViewerConfig(Data):
+class ViewerConfigData(TypedDict):
+    """
+    The type template for the `viewer.json`.
+    """
+
+    about: str
+    title: str
+    width: int
+    height: int
+    full_screen: bool
+
+
+class ViewerConfig(Config):
     """
     The class representation for the `viewer.json`.
     The viewer.json contains all the settings about the viewer application it self: with, height, full_screen, ...
 
     """
 
-    DATASCHEMA = {
-        "type": "object",
-        "description": "description",
-        "properties": {
-            "about": {"type": "string", "description": "description"},
-            "title": {"type": "string", "description": "description"},
-            "width": {"type": "number", "description": "description"},
-            "height": {"type": "number", "description": "description"},
-            "full_screen": {"type": "boolean", "description": "description"},
-        },
-    }
-
-    def __init__(self, about: str, title: str, width: int, height: int, full_screen: bool) -> None:
-        super(ViewerConfig, self).__init__()
-        self.about = about
-        self.title = title
-        self.width = width
-        self.height = height
-        self.full_screen = full_screen
-
-    @property
-    def data(self):  # -> dict[str, Any]:
-        return {"about": self.about, "title": self.title, "width": self.width, "height": self.height, "full_screen": self.full_screen}
+    def __init__(self, config: ViewerConfigData) -> None:
+        super(ViewerConfig, self).__init__(config)
+        self.about = config["about"]
+        self.title = config["title"]
+        self.width = config["width"]
+        self.height = config["height"]
+        self.full_screen = config["full_screen"]
 
     @classmethod
-    def from_data(cls, data):
-        return cls(about=data["about"], title=data["title"], width=data["width"], height=data["height"], full_screen=data["full_screen"])
+    def from_default(cls):
+        """
+        Load the default configuration.
+        """
+        return Config.from_json(Path(DATA, "default_config", "viewer.json"))
