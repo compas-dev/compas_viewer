@@ -1,2 +1,2 @@
-compas
+compas @ git+https://compas.dev/compas@main
 
