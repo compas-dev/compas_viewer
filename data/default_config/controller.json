@@ -1,0 +1,20 @@
+{
+    "dtype": "compas_viewer.configurations/ControllerConfig",
+    "data": {
+        "mouse": {
+            "zoom": { "mouse": "scroll", "key": "" },
+            "pan": { "mouse": "right", "key": "shift" },
+            "rotate": { "mouse": "right", "key": "" },
+            "box_selection": { "mouse": "left", "key": "" },
+            "box_deselection": { "mouse": "left", "key": "control" },
+            "selection": { "mouse": "left", "multi_selection": "shift", "deselection": "control" }
+        },
+        "keys": [
+            {
+                "name": "zoom_selected",
+                "keys": ["f"]
+            }
+        ]
+    },
+    "guid": "5088a780-910d-4df3-a1b3-d389e0e9c7f2"
+}

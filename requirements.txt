@@ -1,0 +1,2 @@
+compas @ git+https://github.com/compas-dev/compas@main
+
