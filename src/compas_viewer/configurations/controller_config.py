@@ -1,4 +1,6 @@
 from pathlib import Path
+from typing import Dict
+from typing import List
 from typing import TypedDict
 
 from compas_viewer import DATA
@@ -10,12 +12,12 @@ class MouseConfigData(TypedDict):
     The type template for the mouse only.
     """
 
-    zoom: dict
-    pan: dict
-    rotate: dict
-    box_selection: dict
-    box_deselection: dict
-    selection: dict
+    zoom: Dict[str, str]
+    pan: Dict[str, str]
+    rotate: Dict[str, str]
+    box_selection: Dict[str, str]
+    box_deselection: Dict[str, str]
+    selection: Dict[str, str]
 
 
 class KeyConfigData(TypedDict):
@@ -24,7 +26,7 @@ class KeyConfigData(TypedDict):
     """
 
     name: str
-    keys: list[str]
+    keys: List[str]
 
 
 class ControllerConfigData(TypedDict):
@@ -33,7 +35,7 @@ class ControllerConfigData(TypedDict):
     """
 
     mouse: MouseConfigData
-    keys: list[KeyConfigData]
+    keys: List[KeyConfigData]
 
 
 class KeyConfig(Config):
