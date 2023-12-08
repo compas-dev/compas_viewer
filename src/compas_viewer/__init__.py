@@ -13,6 +13,7 @@ compas_viewer
 """
 
 from __future__ import print_function
+from .viewer import Viewer # noqa: F401
 
 import os
 

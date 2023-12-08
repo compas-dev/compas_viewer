@@ -34,6 +34,7 @@ if latest_version == "Unreleased":
     version = "latest"
 else:
     release = latest_version
+    assert isinstance(release, str)
     version = ".".join(release.split(".")[0:2])
 
 master_doc = "index"

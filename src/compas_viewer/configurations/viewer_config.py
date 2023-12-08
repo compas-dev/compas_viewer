@@ -22,6 +22,15 @@ class ViewerConfig(Config):
     The class representation for the `viewer.json`.
     The viewer.json contains all the settings about the viewer application it self: with, height, full_screen, ...
 
+    Parameters
+    ----------
+    config : ViewerConfigData
+        A TypedDict with the following keys:
+            about: str
+            title: str
+            width: int
+            height: int
+            full_screen: bool
     """
 
     def __init__(self, config: ViewerConfigData) -> None:

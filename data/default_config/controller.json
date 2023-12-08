@@ -2,7 +2,7 @@
     "dtype": "compas_viewer.configurations/ControllerConfig",
     "data": {
         "mouse": {
-            "zoom": { "mouse": "scroll", "key": "" },
+            "zoom": { "mouse": "wheel", "key": "" },
             "pan": { "mouse": "right", "key": "shift" },
             "rotate": { "mouse": "right", "key": "" },
             "box_selection": { "mouse": "left", "key": "" },

@@ -42,6 +42,12 @@ class KeyConfig(Config):
     """
     The class representation for the key only.
 
+    Parameters
+    ----------------
+    config : KeyConfigData
+        A TypedDict with the following keys:
+            name: str
+            keys: List[str]
     """
 
     def __init__(self, config: KeyConfigData) -> None:
@@ -54,6 +60,14 @@ class ControllerConfig(Config):
     """
     The class representation for the `controller.json`.
     The controller.json contains all the settings about controlling the viewer: mouse, keys, ...
+
+    Parameters
+    ----------------
+    config : ControllerConfigData
+        A TypedDict with the following keys:
+            mouse: MouseConfigData
+            keys: List[KeyConfigData]
+
     """
 
     def __init__(self, config: ControllerConfigData) -> None:
