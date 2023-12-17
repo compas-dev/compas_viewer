@@ -27,12 +27,8 @@ class ViewerConfig(Config):
     Parameters
     ----------
     config : ViewerConfigData
-        A TypedDict with the following keys:
-            about: str
-            title: str
-            width: int
-            height: int
-            full_screen: bool
+        A TypedDict with defined keys and types.
+
     """
 
     def __init__(self, config: ViewerConfigData) -> None:

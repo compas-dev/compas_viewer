@@ -45,9 +45,7 @@ class KeyConfig(Config):
     Parameters
     ----------------
     config : KeyConfigData
-        A TypedDict with the following keys:
-            name: str
-            keys: List[str]
+        A TypedDict with defined keys and types.
     """
 
     def __init__(self, config: KeyConfigData) -> None:
@@ -87,4 +85,4 @@ class ControllerConfig(Config):
         """
         Load the default configuration.
         """
-        return Config.from_json(Path(DATA, "default_config", "controller.json"))
+        return ControllerConfig.from_json(Path(DATA, "default_config", "controller.json"))
