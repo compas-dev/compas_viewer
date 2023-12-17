@@ -148,6 +148,7 @@ class Viewer(ViewerConfig):
     # ==========================================================================
     # Messages
     # ==========================================================================
+
     def _about(self) -> None:
         """Display the about message as defined in the config file.
 
