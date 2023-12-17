@@ -43,7 +43,7 @@ class KeyConfig(Config):
     The class representation for the key only.
 
     Parameters
-    ----------------
+    ----------
     config : KeyConfigData
         A TypedDict with defined keys and types.
     """
@@ -60,12 +60,9 @@ class ControllerConfig(Config):
     The controller.json contains all the settings about controlling the viewer: mouse, keys, ...
 
     Parameters
-    ----------------
+    ----------
     config : ControllerConfigData
-        A TypedDict with the following keys:
-            mouse: MouseConfigData
-            keys: List[KeyConfigData]
-
+        A TypedDict with defined keys and types.
     """
 
     def __init__(self, config: ControllerConfigData) -> None:
@@ -82,7 +79,4 @@ class ControllerConfig(Config):
 
     @classmethod
     def from_default(cls):
-        """
-        Load the default configuration.
-        """
         return ControllerConfig.from_json(Path(DATA, "default_config", "controller.json"))

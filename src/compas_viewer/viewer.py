@@ -37,7 +37,7 @@ class Viewer(ViewerConfig):
         In `ghosted` mode, all objects have a default opacity of 0.7.
     show_grid : bool, optional
         Show the XY plane. It will override the value in the config file.
-    config : ViewerConfigData
+    config : ViewerConfigData, optional
         The configuration data for the viewer.
 
     Attributes
@@ -52,12 +52,10 @@ class Viewer(ViewerConfig):
     The menubar provides access to all supported 'actions'.
     The toolbar is meant to be a 'quicknav' to a selected set of actions.
     The viewer supports rotate/pan/zoom, and object selection via picking or box selections.
-
     Currently the viewer uses OpenGL 2.2 and GLSL 120 with a 'compatibility' profile.
 
-
     Examples
-    --------
+    -------
     >>> from compas_viewer import Viewer
     >>> viewer = Viewer()
     >>> viewer.show()
@@ -76,7 +74,7 @@ class Viewer(ViewerConfig):
         config: Optional[ViewerConfigData] = None,
     ) -> None:
         # custom or default config
-        config = config or Viewer.from_default().data
+        config = config or ViewerConfig.from_default().data
         #  in-code config
         if title is not None:
             config["title"] = title
@@ -94,7 +92,7 @@ class Viewer(ViewerConfig):
     # Init functions
     # ==========================================================================
 
-    def _init(self):
+    def _init(self) -> None:
         """Initialize the components of the user interface."""
         self._glFormat = QtGui.QSurfaceFormat()
         self._glFormat.setVersion(2, 1)
@@ -116,7 +114,7 @@ class Viewer(ViewerConfig):
         self._window.resize(self.width, self.height)
         self._init_statusbar()
 
-    def _init_statusbar(self):
+    def _init_statusbar(self) -> None:
         self.statusbar = self._window.statusBar()
         self.statusbar.setContentsMargins(0, 0, 0, 0)
         self.statusText = QtWidgets.QLabel(self.statusbar_text)
@@ -288,7 +286,7 @@ class Viewer(ViewerConfig):
     # Runtime
     # ==========================================================================
 
-    def show(self):
+    def show(self) -> None:
         """Show the viewer window.
 
         Returns
