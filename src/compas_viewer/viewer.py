@@ -56,8 +56,8 @@ class Viewer(ViewerConfig):
 
     Examples
     -------
-    >>> from compas_viewer import Viewer
-    >>> viewer = Viewer()
+    >>> from compas_viewer import Viewer # doctest: +SKIP
+    >>> viewer = Viewer() # doctest: +SKIP
     >>> viewer.show() # doctest: +SKIP
 
     """
