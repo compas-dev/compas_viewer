@@ -13,7 +13,6 @@ compas_viewer
 """
 
 from __future__ import print_function
-from .viewer import Viewer # noqa: F401
 
 import os
 
@@ -34,3 +33,6 @@ TEMP = os.path.abspath(os.path.join(HOME, "temp"))
 
 
 __all__ = ["HOME", "DATA", "DOCS", "TEMP"]
+
+# Putting imports here to avoid circular imports
+from .viewer import Viewer  # noqa: F401, E402

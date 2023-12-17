@@ -1,1 +1,1 @@
-from .object import ViewerObject # noqa: F401
+from .object import ViewerObject  # noqa: F401

@@ -1,4 +1,4 @@
-from tkinter import N
+
 from compas.scene.sceneobject import SceneObject
 
 

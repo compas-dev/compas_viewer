@@ -15,6 +15,8 @@ class ViewerConfigData(TypedDict):
     width: int
     height: int
     full_screen: bool
+    statusbar_text: str
+    show_fps: bool
 
 
 class ViewerConfig(Config):
@@ -34,16 +36,18 @@ class ViewerConfig(Config):
     """
 
     def __init__(self, config: ViewerConfigData) -> None:
-        super(ViewerConfig, self).__init__(config)
+        super().__init__(config)
         self.about = config["about"]
         self.title = config["title"]
         self.width = config["width"]
         self.height = config["height"]
         self.full_screen = config["full_screen"]
+        self.statusbar_text = config["statusbar_text"]
+        self.show_fps = config["show_fps"]
 
     @classmethod
     def from_default(cls):
         """
         Load the default configuration.
         """
-        return Config.from_json(Path(DATA, "default_config", "viewer.json"))
+        return ViewerConfig.from_json(Path(DATA, "default_config", "viewer.json"))
