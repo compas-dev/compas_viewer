@@ -39,4 +39,3 @@ def test_custom_config():
     assert viewer.full_screen == config["full_screen"]
     assert viewer.statusbar_text == config["statusbar_text"]
     assert viewer.show_fps == config["show_fps"]
-
