@@ -54,12 +54,6 @@ class Viewer(ViewerConfig):
     The viewer supports rotate/pan/zoom, and object selection via picking or box selections.
     Currently the viewer uses OpenGL 2.2 and GLSL 120 with a 'compatibility' profile.
 
-    Examples
-    -------
-    >>> from compas_viewer import Viewer
-    >>> viewer = Viewer()
-    >>> viewer.show()
-
     """
 
     def __init__(
