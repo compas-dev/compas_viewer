@@ -16,7 +16,7 @@ from .configurations import ViewerConfigData
 ICONS = Path(Path(__file__).parent, "_static", "icons")
 
 
-class Viewer(ViewerConfig):
+class Viewer:
     """
     The Viewer class is the main entry of `compas_viewer`. It organizes the scene and create the GUI application.
 
@@ -42,8 +42,8 @@ class Viewer(ViewerConfig):
 
     Attributes
     ----------
-    config : ViewerConfigData
-        The configuration data for the viewer.
+    config : ViewerConfig
+        The configuration for the viewer.
 
     Notes
     -----
@@ -74,17 +74,20 @@ class Viewer(ViewerConfig):
         config: Optional[ViewerConfigData] = None,
     ) -> None:
         # custom or default config
-        config = config or ViewerConfig.from_default().data
+        if config is None:
+            self.config = ViewerConfig.from_default()
+        else:
+            self.config = ViewerConfig.from_data(config)
+
         #  in-code config
         if title is not None:
-            config["title"] = title
+            self.config.title = title
         if fullscreen is not None:
-            config["full_screen"] = fullscreen
+            self.config.full_screen = fullscreen
         if width is not None:
-            config["width"] = width
+            self.config.width = width
         if height is not None:
-            config["height"] = height
-        super().__init__(config)  # type: ignore
+            self.config.height = height
 
         self._init()
 
@@ -108,10 +111,10 @@ class Viewer(ViewerConfig):
         self._window = QtWidgets.QMainWindow()
         self._icon = QIcon(path.join(ICONS, "compas_icon_white.png"))
         self._app.setWindowIcon(self._icon)  # type: ignore
-        self._app.setApplicationName(self.title)
+        self._app.setApplicationName(self.config.title)
         self._window.setContentsMargins(0, 0, 0, 0)
         self._app.references.add(self._window)  # type: ignore
-        self._window.resize(self.width, self.height)
+        self._window.resize(self.config.width, self.config.height)
         self._init_statusbar()
 
     def _init_statusbar(self) -> None:
