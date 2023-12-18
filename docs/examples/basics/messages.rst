@@ -29,7 +29,7 @@ To display "about" message from the configuration file:
 
 .. code-block:: python
 
-    viewer._about()
+    viewer.about()
 
 .. image:: ../../_images/about.jpg
 
