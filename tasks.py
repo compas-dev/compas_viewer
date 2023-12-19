@@ -6,7 +6,7 @@ from compas_invocations import build
 from compas_invocations import docs
 from compas_invocations import style
 from compas_invocations import tests
-from invoke import Collection
+from invoke.collection import Collection
 
 ns = Collection(
     docs.help,
