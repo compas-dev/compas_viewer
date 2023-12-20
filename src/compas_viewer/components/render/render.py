@@ -353,7 +353,7 @@ class Render(QtWidgets.QOpenGLWidget):  # type: ignore
 
     # def paint(self):
     #     viewworld = self.camera.viewworld()
-    #     if self.current != self.VIEWPORTS["perspective"]:
+    #     if self.current != self."perspective"]:
     #         self.update_projection()
 
     #     # Draw instance maps
