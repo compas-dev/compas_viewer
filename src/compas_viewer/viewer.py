@@ -309,6 +309,7 @@ class Viewer:
 
         self.started = True
         self._window.show()
+        # stop point of the main thread:
         self._app.exec_()
 
 

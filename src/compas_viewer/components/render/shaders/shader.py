@@ -167,8 +167,8 @@ class Shader:
 
 
 def make_shader_program(name: str):
-    vsource = Path(Path(__file__), f"{name}.vert")
-    fsource = Path(Path(__file__), f"{name}.frag")
+    vsource = Path(Path(__file__).parent, f"{name}.vert")
+    fsource = Path(Path(__file__).parent, f"{name}.frag")
 
     with open(vsource, "r") as f:
         vertex = compile_vertex_shader(f.read())
