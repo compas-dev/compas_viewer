@@ -56,7 +56,7 @@ class KeyConfig(Config):
 
 class ControllerConfig(Config):
     """
-    The class representation for the `controller.json`.
+    The class representation for the `controller.json` of the class : :class:`compas_viewer.controller.Render`
     The controller.json contains all the settings about controlling the viewer: mouse, keys, ...
 
     Parameters
@@ -78,5 +78,13 @@ class ControllerConfig(Config):
             setattr(self, key["name"], KeyConfig(key))
 
     @classmethod
-    def from_default(cls):
-        return ControllerConfig.from_json(Path(DATA, "default_config", "controller.json"))
+    def from_default(cls) -> "ControllerConfig":
+        controller_config = ControllerConfig.from_json(Path(DATA, "default_config", "controller.json"))
+        assert isinstance(controller_config, ControllerConfig)
+        return controller_config
+
+    @classmethod
+    def from_json(cls, filepath) -> "ControllerConfig":
+        controller_config = super().from_json(filepath)
+        assert isinstance(controller_config, ControllerConfig)
+        return controller_config

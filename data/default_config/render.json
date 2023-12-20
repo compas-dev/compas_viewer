@@ -1,0 +1,28 @@
+{
+    "dtype": "compas_viewer.configurations/RenderConfig",
+    "data": {
+        "show_grid": true,
+        "grid_size": [1, 10, 10],
+        "viewmode": "perspective",
+        "rendermode": "wireframe",
+        "background_color": [1, 1, 1, 1],
+        "selection_color": [1, 1, 0],
+        "ghost_opacity": 0.7,
+        "camera": {
+            "dtype": "compas_viewer.configurations/CameraConfig",
+            "data": {
+                "fov": 45,
+                "near": 0.1,
+                "far": 1000,
+                "position": [1, 1, 1],
+                "target": [0, 0, 0],
+                "scale": 1.0,
+                "zoom_delta": 0.05,
+                "rotation_delta": 0.01,
+                "pan_delta": 0.05
+            },
+            "guid": "3c423548-1706-47f3-a576-81df929a5ac9"
+        }
+    },
+    "guid": "4ffff417-3578-4260-aef6-45ea7a400ff9"
+}

@@ -4,14 +4,15 @@ from pathlib import Path
 from typing import Literal
 from typing import Optional
 
+from qtpy import QtCore
 from qtpy import QtGui
 from qtpy import QtWidgets
 from qtpy.QtCore import QCoreApplication  # type: ignore
 from qtpy.QtGui import QIcon
 
-# from .components.renderer import Render
-from .configurations import ViewerConfig
-from .configurations import ViewerConfigData
+from compas_viewer.components import Render
+from compas_viewer.configurations import RenderConfig
+from compas_viewer.configurations import ViewerConfig
 
 ICONS = Path(Path(__file__).parent, "_static", "icons")
 
@@ -37,8 +38,8 @@ class Viewer:
         In `ghosted` mode, all objects have a default opacity of 0.7.
     show_grid : bool, optional
         Show the XY plane. It will override the value in the config file.
-    config : ViewerConfigData, optional
-        The configuration data for the viewer.
+    config_path : str, optional
+        The path to the config folder.
 
     Attributes
     ----------
@@ -71,13 +72,16 @@ class Viewer:
         viewmode: Optional[Literal["wireframe", "shaded", "ghosted", "lighted"]] = None,
         viewport: Optional[Literal["front", "right", "top", "perspective"]] = None,
         show_grid: Optional[bool] = None,
-        config: Optional[ViewerConfigData] = None,
+        config_path: Optional[str] = None,
     ) -> None:
         # custom or default config
-        if config is None:
-            self.config = ViewerConfig.from_default()
+        if config_path is None:
+            self.config = ViewerConfig.from_default()  # type: ignore
+            render_config = RenderConfig.from_default()  # type: ignore
         else:
-            self.config = ViewerConfig.from_data(config)
+            # TODO
+            self.config = ViewerConfig.from_json(Path(config_path, "viewer.json"))
+            render_config = RenderConfig.from_json(Path(config_path, "render.json"))
 
         #  in-code config
         if title is not None:
@@ -89,13 +93,13 @@ class Viewer:
         if height is not None:
             self.config.height = height
 
-        self._init()
+        self._init(render_config)
 
     # ==========================================================================
     # Init functions
     # ==========================================================================
 
-    def _init(self) -> None:
+    def _init(self, render_config) -> None:
         """Initialize the components of the user interface."""
         self._glFormat = QtGui.QSurfaceFormat()
         self._glFormat.setVersion(2, 1)
@@ -112,17 +116,21 @@ class Viewer:
         self._icon = QIcon(path.join(ICONS, "compas_icon_white.png"))
         self._app.setWindowIcon(self._icon)  # type: ignore
         self._app.setApplicationName(self.config.title)
+        self.render = Render(self, render_config)
+        self._window.setCentralWidget(self.render)
         self._window.setContentsMargins(0, 0, 0, 0)
         self._app.references.add(self._window)  # type: ignore
         self._window.resize(self.config.width, self.config.height)
+        if self.config.full_screen:
+            self._window.setWindowState(self._window.windowState() | QtCore.Qt.WindowMaximized)  # type: ignore
         self._init_statusbar()
 
     def _init_statusbar(self) -> None:
         self.statusbar = self._window.statusBar()
         self.statusbar.setContentsMargins(0, 0, 0, 0)
-        self.statusText = QtWidgets.QLabel(self.statusbar_text)
+        self.statusText = QtWidgets.QLabel(self.config.statusbar_text)
         self.statusbar.addWidget(self.statusText, 1)
-        if self.show_fps:
+        if self.config.show_fps:
             self.statusFps = QtWidgets.QLabel("fps: ")
             self.statusbar.addWidget
 
@@ -160,7 +168,7 @@ class Viewer:
         None
 
         """
-        QtWidgets.QMessageBox.about(self._window, "About", self.about)
+        QtWidgets.QMessageBox.about(self._window, "About", self.config.about)
 
     def info(self, message: str) -> None:
         """Display info.
@@ -298,7 +306,10 @@ class Viewer:
         None
 
         """
-        self._init()
+
         self.started = True
         self._window.show()
         self._app.exec_()
+
+
+ViewerType = type(Viewer)
