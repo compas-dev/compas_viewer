@@ -101,6 +101,7 @@ class Render(QtWidgets.QOpenGLWidget):
     # ==========================================================================
     # gl
     # ==========================================================================
+
     def clear(self) -> None:
         """Clear the view."""
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)  # type: ignore
@@ -251,6 +252,7 @@ class Render(QtWidgets.QOpenGLWidget):
     # ==========================================================================
     # view
     # ==========================================================================
+
     def init(self) -> None:
         """Initialize the render."""
 
