@@ -53,7 +53,7 @@ class Render(QtWidgets.QOpenGLWidget):
         self._rendermode = self.config.rendermode
         self._opacity = 1.0
         self._frames = 0
-        self._now: float = time.time()
+        self._now = time.time()
         self._shader_model = None
 
         self.camera = Camera(self)
@@ -115,6 +115,7 @@ class Render(QtWidgets.QOpenGLWidget):
     def opacity(self) -> float:
         """
         The opacity of the view.
+
         Returns
         -------
         float
@@ -131,7 +132,8 @@ class Render(QtWidgets.QOpenGLWidget):
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)  # type: ignore
 
     def initializeGL(self):
-        """Initialize the OpenGL canvas.
+        """
+        Initialize the OpenGL canvas.
 
         Notes
         -----
@@ -159,7 +161,8 @@ class Render(QtWidgets.QOpenGLWidget):
         self.init()
 
     def resizeGL(self, w: int, h: int):
-        """Resize the OpenGL canvas.
+        """
+        Resize the OpenGL canvas.
 
         Parameters
         ----------
@@ -211,7 +214,8 @@ class Render(QtWidgets.QOpenGLWidget):
     # ==========================================================================
 
     def mouseMoveEvent(self, event):
-        """Callback for the mouse move event.
+        """
+        Callback for the mouse move event.
 
         This method registers selections, if the left button is pressed,
         and modifies the view (pan/rotate), if the right button is pressed.
@@ -224,7 +228,8 @@ class Render(QtWidgets.QOpenGLWidget):
         pass
 
     def mousePressEvent(self, event):
-        """Callback for the mouse press event.
+        """
+        Callback for the mouse press event.
 
         Parameters
         ----------
@@ -234,7 +239,8 @@ class Render(QtWidgets.QOpenGLWidget):
         pass
 
     def mouseReleaseEvent(self, event):
-        """Callback for the release press event.
+        """
+        Callback for the release press event.
 
         Parameters
         ----------
@@ -244,7 +250,8 @@ class Render(QtWidgets.QOpenGLWidget):
         pass
 
     def wheelEvent(self, event):
-        """Callback for the mouse wheel event.
+        """
+        Callback for the mouse wheel event.
 
         Parameters
         ----------
@@ -254,7 +261,8 @@ class Render(QtWidgets.QOpenGLWidget):
         pass
 
     def keyPressEvent(self, event):
-        """Callback for the key press event.
+        """
+        Callback for the key press event.
 
         Parameters
         ----------
@@ -264,7 +272,8 @@ class Render(QtWidgets.QOpenGLWidget):
         pass
 
     def keyReleaseEvent(self, event):
-        """Callback for the key release event.
+        """
+        Callback for the key release event.
 
         Parameters
         ----------
@@ -277,7 +286,7 @@ class Render(QtWidgets.QOpenGLWidget):
     # view
     # ==========================================================================
 
-    def init(self) -> None:
+    def init(self):
         """Initialize the render."""
 
         # TODO self.grid.init()
@@ -342,7 +351,7 @@ class Render(QtWidgets.QOpenGLWidget):
 
         Returns
         -------
-        buffer_dict : Dict[str, Any]
+        buffer_dict : dict
             A dict with created buffer indexes
         """
         positions, colors, elements = data
@@ -433,6 +442,9 @@ class Render(QtWidgets.QOpenGLWidget):
         return opaque_objects + list(transparent_objects)
 
     def paint(self):
+        """
+        Paint all the items in the render.
+        """
         viewworld = self.camera.viewworld()
         if self.viewmode != "perspective":
             self.update_projection()
