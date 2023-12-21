@@ -77,7 +77,7 @@ class Camera:
 
     Parameters
     ----------
-    render: :class:`compas_viewer.components.Render`,
+    render : :class:`compas_viewer.components.Render`,
         The parent render of the camera.
 
     Attributes
@@ -236,7 +236,7 @@ class Camera:
         dx : float
             Number of rotation increments around the Z axis, with each increment the size
             of :attr:`Camera.rotation_delta`.
-        dy: float
+        dy : float
             Number of rotation increments around the X axis, with each increment the size
             of :attr:`Camera.rotation_delta`.
 

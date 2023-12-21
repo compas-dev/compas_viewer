@@ -37,12 +37,10 @@ class Render(QtWidgets.QOpenGLWidget):
 
     Parameters
     ---------------
-    viewer : :class:Viewer
+    viewer : :class:`Viewer`
         The viewer instance.
-    config : :class:RenderConfigType
-        A TypedDict with defined keys and types.
-
-
+    config : :class:`RenderConfig`
+        The render configuration.
     """
 
     def __init__(self, viewer: "Viewer", config: RenderConfig) -> None:
