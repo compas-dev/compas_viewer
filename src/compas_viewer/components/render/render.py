@@ -107,7 +107,9 @@ class Render(QtWidgets.QOpenGLWidget):
         self.config.viewmode = viewmode
         if self.shader_model:
             self.shader_model.bind()
-            # self.shader_model.uniform4x4("projection", self.camera.projection(self.app.width, self.app.height))
+            self.shader_model.uniform4x4(
+                "projection", self.camera.projection(self.viewer.config.width, self.viewer.config.height)
+            )
             self.shader_model.release()
             self.update()
 
