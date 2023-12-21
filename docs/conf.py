@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sphinx_compas2_theme
+
 from sphinx.writers import html
 from sphinx.writers import html5
 
@@ -31,7 +32,7 @@ else:
 
 # -- Extension configuration ------------------------------------------------
 
-extensions = sphinx_compas2_theme.default_extensions.append("sphinx_qt_documentation")
+extensions = sphinx_compas2_theme.default_extensions
 
 # numpydoc options
 
@@ -80,7 +81,6 @@ plot_formats = ["png"]
 intersphinx_mapping = {
     "python": ("https://docs.python.org/", None),
     "compas": ("https://compas.dev/compas/latest/", None),
-    "qtpy": ("https://wiki.python.org/moin/PyQt", None),
 }
 
 # linkcode
