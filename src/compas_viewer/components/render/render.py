@@ -2,6 +2,7 @@ import time
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import Dict
+from typing import Type
 
 from compas.geometry import transform_points_numpy
 from compas.utilities import flatten
@@ -14,7 +15,7 @@ from OpenGL import GL
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 
-from compas_viewer.configurations import RenderConfig
+from compas_viewer.configurations import RenderConfig, RenderConfigType
 
 from .camera import Camera
 from .gl import make_index_buffer
@@ -35,9 +36,9 @@ class Render(QtWidgets.QOpenGLWidget):
 
     Parameters
     ---------------
-    viewer : Viewer
+    viewer : :class:Viewer
         The viewer instance.
-    config : RenderConfigData
+    config : :class:RenderConfigType
         A TypedDict with defined keys and types.
 
 
@@ -62,41 +63,41 @@ class Render(QtWidgets.QOpenGLWidget):
 
         self.setFocusPolicy(QtCore.Qt.StrongFocus)  # type: ignore
 
-    @property
-    def rendermode(self):
-        return self._rendermode
+        @property
+        def rendermode(self) -> RenderConfigType["show_grid"]:
+            return self._rendermode
 
-    @rendermode.setter
-    def rendermode(self, rendermode):
-        self._rendermode = rendermode
-        self.config.rendermode = rendermode
-        if rendermode == "ghosted":
-            self._opacity = self.config.ghost_opacity
-        else:
-            self._opacity = 1.0
-        if self._shader_model:
-            self._shader_model.bind()
-            self._shader_model.uniform1f("opacity", self._opacity)
-            self._shader_model.release()
-            self.update()
+        @rendermode.setter
+        def rendermode(self, rendermode):
+            self._rendermode = rendermode
+            self.config.rendermode = rendermode
+            if rendermode == "ghosted":
+                self._opacity = self.config.ghost_opacity
+            else:
+                self._opacity = 1.0
+            if self._shader_model:
+                self._shader_model.bind()
+                self._shader_model.uniform1f("opacity", self._opacity)
+                self._shader_model.release()
+                self.update()
 
-    @property
-    def viewmode(self):
-        return self._viewmode
+        @property
+        def viewmode(self):
+            return self._viewmode
 
-    @viewmode.setter
-    def viewmode(self, viewmode):
-        self._viewmode = viewmode
-        self.config.viewmode = viewmode
-        if self.shader_model:
-            self.shader_model.bind()
-            # self.shader_model.uniform4x4("projection", self.camera.projection(self.app.width, self.app.height))
-            self.shader_model.release()
-            self.update()
+        @viewmode.setter
+        def viewmode(self, viewmode):
+            self._viewmode = viewmode
+            self.config.viewmode = viewmode
+            if self.shader_model:
+                self.shader_model.bind()
+                # self.shader_model.uniform4x4("projection", self.camera.projection(self.app.width, self.app.height))
+                self.shader_model.release()
+                self.update()
 
-    @property
-    def opacity(self):
-        return self._opacity
+        @property
+        def opacity(self):
+            return self._opacity
 
     # ==========================================================================
     # gl

@@ -7,7 +7,7 @@ from compas_viewer import DATA
 from compas_viewer.configurations import Config
 
 
-class MouseConfigData(TypedDict):
+class MouseConfigType(TypedDict):
     """
     The type template for the mouse only.
     """
@@ -20,7 +20,7 @@ class MouseConfigData(TypedDict):
     selection: Dict[str, str]
 
 
-class KeyConfigData(TypedDict):
+class KeyConfigType(TypedDict):
     """
     The type template for the key only.
     """
@@ -29,13 +29,13 @@ class KeyConfigData(TypedDict):
     keys: List[str]
 
 
-class ControllerConfigData(TypedDict):
+class ControllerConfigType(TypedDict):
     """
     The type template for the `controller.json`.
     """
 
-    mouse: MouseConfigData
-    keys: List[KeyConfigData]
+    mouse: MouseConfigType
+    keys: List[KeyConfigType]
 
 
 class KeyConfig(Config):
@@ -44,11 +44,11 @@ class KeyConfig(Config):
 
     Parameters
     ----------
-    config : KeyConfigData
+    config : KeyConfigType
         A TypedDict with defined keys and types.
     """
 
-    def __init__(self, config: KeyConfigData) -> None:
+    def __init__(self, config: KeyConfigType) -> None:
         super(KeyConfig, self).__init__(config)
         self.name = config["name"]
         self.keys = config["keys"]
@@ -61,11 +61,11 @@ class ControllerConfig(Config):
 
     Parameters
     ----------
-    config : ControllerConfigData
+    config : ControllerConfigType
         A TypedDict with defined keys and types.
     """
 
-    def __init__(self, config: ControllerConfigData) -> None:
+    def __init__(self, config: ControllerConfigType) -> None:
         super(ControllerConfig, self).__init__(config)
         self.pan = config["mouse"]["pan"]
         self.zoom = config["mouse"]["zoom"]

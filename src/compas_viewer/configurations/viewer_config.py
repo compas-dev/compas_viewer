@@ -5,7 +5,7 @@ from compas_viewer import DATA
 from compas_viewer.configurations import Config
 
 
-class ViewerConfigData(TypedDict):
+class ViewerConfigType(TypedDict):
     """
     The type template for the `viewer.json`.
     """
@@ -26,12 +26,12 @@ class ViewerConfig(Config):
 
     Parameters
     ----------
-    config : ViewerConfigData
+    config : ViewerConfigType
         A TypedDict with defined keys and types.
 
     """
 
-    def __init__(self, config: ViewerConfigData) -> None:
+    def __init__(self, config: ViewerConfigType) -> None:
         super().__init__(config)
         self.about = config["about"]
         self.title = config["title"]

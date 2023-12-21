@@ -1,13 +1,14 @@
 from pathlib import Path
 from typing import Literal
 from typing import Tuple
+from typing import TypeAlias
 from typing import TypedDict
 
 from compas_viewer import DATA
 from compas_viewer.configurations import Config
 
 
-class CameraConfigData(TypedDict):
+class CameraConfigType(TypedDict):
     fov: float
     near: float
     far: float
@@ -26,12 +27,12 @@ class CameraConfig(Config):
 
     Parameters
     ----------
-    config : CameraConfigData
+    config : CameraConfigType
         A TypedDict with defined keys and types.
 
     """
 
-    def __init__(self, config: CameraConfigData) -> None:
+    def __init__(self, config: CameraConfigType) -> None:
         super().__init__(config)
         self.fov = config["fov"]
         self.near = config["near"]
@@ -50,7 +51,10 @@ class CameraConfig(Config):
         return camera_config
 
 
-class RenderConfigData(TypedDict):
+KindOfShape: TypeAlias = Literal["square", "circle"]
+
+
+class RenderConfigType(TypedDict):
     show_grid: bool
     grid_size: Tuple[float, float, int, int]
     viewmode: Literal["front", "right", "top", "perspective"]
@@ -68,12 +72,12 @@ class RenderConfig(Config):
 
     Parameters
     ----------
-    config : RenderConfigData
+    config : RenderConfigType
         A TypedDict with defined keys and types.
 
     """
 
-    def __init__(self, config: RenderConfigData) -> None:
+    def __init__(self, config: RenderConfigType) -> None:
         super().__init__(config)
         self.show_grid = config["show_grid"]
         self.grid_size = config["grid_size"]
