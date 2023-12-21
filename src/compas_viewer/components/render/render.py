@@ -56,6 +56,12 @@ class Render(QtWidgets.QOpenGLWidget):
         self._now = time.time()
         self._shader_model = None
 
+        self.shader_model: Shader
+        self.shader_text: Shader
+        self.shader_arrow: Shader
+        self.shader_instance: Shader
+        self.shader_grid: Shader
+
         self.camera = Camera(self)
         # self.grid = Grid(self.config.gridsize)
         # self.selector = Selector(self)
