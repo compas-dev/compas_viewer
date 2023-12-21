@@ -1,20 +1,18 @@
 import abc
-import numpy as np
 import inspect
+from typing import Dict
+from typing import Union
 
-from compas.geometry import Transformation
-from compas.geometry import Translation
-from compas.geometry import Rotation
-from compas.geometry import Scale
-from compas.geometry import decompose_matrix
-from compas.geometry import identity_matrix
+import numpy as np
 from compas.colors import Color
 from compas.data import Data
-
-from typing import Dict, Union
-
-
-ABC = abc.ABCMeta("ABC", (object,), {"__slots__": ()})
+from compas.geometry import Rotation
+from compas.geometry import Scale
+from compas.geometry import Transformation
+from compas.geometry import Translation
+from compas.geometry import decompose_matrix
+from compas.geometry import identity_matrix
+from compas.scene import SceneObject
 
 DATA_OBJECT = {}
 
@@ -35,12 +33,12 @@ def _get_object_cls(data):
     return cls
 
 
-class Object(ABC):
-    """Base object for compas_view2
+class Object(SceneObject):
+    """Base class for all Viewer scene objects.
 
     Parameters
     ----------
-    data: :class:`compas.data.Data`
+    data : :class:`compas.data.Data`
         A COMPAS data object.
     is_selected : bool, optional
         Whether the object is selected.

@@ -73,7 +73,7 @@ class RenderConfig(Config):
 
     Parameters
     ----------
-    config : RenderConfigType
+    config : :class:`RenderConfigType`
         A TypedDict with defined keys and types.
 
     """

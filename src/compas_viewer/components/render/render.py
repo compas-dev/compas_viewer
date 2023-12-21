@@ -17,11 +17,11 @@ from PyQt5 import QtWidgets
 from compas_viewer.configurations import RenderConfig
 from compas_viewer.configurations import RenderModeType
 from compas_viewer.configurations import ViewModeType
+from compas_viewer.scene.bufferobject import BufferObject
 
 from .camera import Camera
 from .gl import make_index_buffer
 from .gl import make_vertex_buffer
-from .objects.bufferobject import BufferObject
 from .shaders import Shader
 
 if TYPE_CHECKING:

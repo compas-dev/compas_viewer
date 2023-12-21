@@ -8,7 +8,7 @@ from compas_viewer.components.render.gl import make_vertex_buffer
 from compas_viewer.components.render.gl import update_vertex_buffer
 from compas_viewer.components.render.gl import update_index_buffer
 
-from .object import Object
+from .sceneobject import Object
 
 
 class BufferObject(Object):
