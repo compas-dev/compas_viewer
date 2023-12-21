@@ -356,6 +356,16 @@ class Render(QtWidgets.QOpenGLWidget):
         }
 
     def update_projection(self, w=None, h=None):
+        """
+        Update the projection matrix.
+
+        Parameters
+        ----------
+        w : int, optional
+            The width of the render, by default None.
+        h : int, optional
+            The height of the render, by default None.
+        """
         w = w or self.viewer.config.width
         h = h or self.viewer.config.height
 
@@ -382,6 +392,16 @@ class Render(QtWidgets.QOpenGLWidget):
         self.shader_grid.release()
 
     def resize(self, w: int, h: int):
+        """
+        Resize the render.
+
+        Parameters
+        ----------
+        w : int
+            The width of the render.
+        h : int
+            The height of the render.
+        """
         self.update_projection(w, h)
 
     def sort_objects_from_viewworld(self, viewworld: NDArray[float32]):
