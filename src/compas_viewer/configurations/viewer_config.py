@@ -14,15 +14,15 @@ class ViewerConfigType(TypedDict):
     title: str
     width: int
     height: int
-    full_screen: bool
-    statusbar_text: str
-    show_fps: bool
+    fullscreen: bool
+    statusbartext: str
+    showfps: bool
 
 
 class ViewerConfig(Config):
     """
     The class representation for the `viewer.json` of the class : :class:`compas_viewer.Viewer`
-    The viewer.json contains all the settings about the viewer application it self: width, height, full_screen, ...
+    The viewer.json contains all the settings about the viewer application it self: width, height, fullscreen, ...
 
     Parameters
     ----------
@@ -37,9 +37,9 @@ class ViewerConfig(Config):
         self.title = config["title"]
         self.width = config["width"]
         self.height = config["height"]
-        self.full_screen = config["full_screen"]
-        self.statusbar_text = config["statusbar_text"]
-        self.show_fps = config["show_fps"]
+        self.fullscreen = config["fullscreen"]
+        self.statusbartext = config["statusbartext"]
+        self.showfps = config["showfps"]
 
     @classmethod
     def from_default(cls) -> "ViewerConfig":

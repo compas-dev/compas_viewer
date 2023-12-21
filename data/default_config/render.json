@@ -1,13 +1,13 @@
 {
     "dtype": "compas_viewer.configurations/RenderConfig",
     "data": {
-        "show_grid": true,
-        "grid_size": [1, 10, 10],
+        "showgrid": true,
+        "gridsize": [1, 10, 10],
         "viewmode": "perspective",
         "rendermode": "wireframe",
-        "background_color": [1, 1, 1, 1],
-        "selection_color": [1, 1, 0],
-        "ghost_opacity": 0.7,
+        "backgroundcolor": [1, 1, 1, 1],
+        "selectioncolor": [1, 1, 0],
+        "ghostopacity": 0.7,
         "camera": {
             "dtype": "compas_viewer.configurations/CameraConfig",
             "data": {

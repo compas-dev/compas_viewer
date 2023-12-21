@@ -15,7 +15,7 @@ class MouseConfigType(TypedDict):
     zoom: Dict[str, str]
     pan: Dict[str, str]
     rotate: Dict[str, str]
-    box_selection: Dict[str, str]
+    boxselection: Dict[str, str]
     box_deselection: Dict[str, str]
     selection: Dict[str, str]
 
@@ -70,9 +70,9 @@ class ControllerConfig(Config):
         self.pan = config["mouse"]["pan"]
         self.zoom = config["mouse"]["zoom"]
         self.rotate = config["mouse"]["rotate"]
-        self.box_selection = config["mouse"]["box_selection"]
+        self.boxselection = config["mouse"]["boxselection"]
         self.selection: str = config["mouse"]["selection"]["mouse"]
-        self.multi_selection: str = config["mouse"]["selection"]["multi_selection"]
+        self.multiselection: str = config["mouse"]["selection"]["multiselection"]
         self.deletion: str = config["mouse"]["selection"]["deselection"]
         for key in config["keys"]:
             setattr(self, key["name"], KeyConfig(key))

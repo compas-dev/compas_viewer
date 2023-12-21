@@ -2,7 +2,6 @@ import time
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import Dict
-from typing import Type
 
 from compas.geometry import transform_points_numpy
 from compas.utilities import flatten
@@ -15,7 +14,9 @@ from OpenGL import GL
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 
-from compas_viewer.configurations import RenderConfig, RenderConfigType
+from compas_viewer.configurations import RenderConfig
+from compas_viewer.configurations import RenderModeType
+from compas_viewer.configurations import ViewModeType
 
 from .camera import Camera
 from .gl import make_index_buffer
@@ -51,63 +52,87 @@ class Render(QtWidgets.QOpenGLWidget):
         self.viewer = viewer
 
         self._viewmode = self.config.viewmode
+        self._rendermode = self.config.rendermode
         self._opacity = 1.0
         self._frames = 0
         self._now: float = time.time()
         self._shader_model = None
 
         self.camera = Camera(self)
-        # self.grid = Grid(self.config.grid_size)
+        # self.grid = Grid(self.config.gridsize)
         # self.selector = Selector(self)
         self.objects: Dict[str, BufferObject] = {}
 
-        self.setFocusPolicy(QtCore.Qt.StrongFocus)  # type: ignore
+        self.setFocusPolicy(QtCore.Qt.StrongFocus)
 
-        @property
-        def rendermode(self) -> RenderConfigType["show_grid"]:
-            return self._rendermode
+    @property
+    def rendermode(self) -> RenderModeType:
+        """
+        The render mode of the view.
 
-        @rendermode.setter
-        def rendermode(self, rendermode):
-            self._rendermode = rendermode
-            self.config.rendermode = rendermode
-            if rendermode == "ghosted":
-                self._opacity = self.config.ghost_opacity
-            else:
-                self._opacity = 1.0
-            if self._shader_model:
-                self._shader_model.bind()
-                self._shader_model.uniform1f("opacity", self._opacity)
-                self._shader_model.release()
-                self.update()
+        Returns
+        -------
+        :class:`RenderModeType`
+            The render mode of the view.
+        """
+        return self._rendermode
 
-        @property
-        def viewmode(self):
-            return self._viewmode
+    @rendermode.setter
+    def rendermode(self, rendermode):
+        self._rendermode = rendermode
+        self.config.rendermode = rendermode
+        if rendermode == "ghosted":
+            self._opacity = self.config.ghostopacity
+        else:
+            self._opacity = 1.0
+        if self._shader_model:
+            self._shader_model.bind()
+            self._shader_model.uniform1f("opacity", self._opacity)
+            self._shader_model.release()
+            self.update()
 
-        @viewmode.setter
-        def viewmode(self, viewmode):
-            self._viewmode = viewmode
-            self.config.viewmode = viewmode
-            if self.shader_model:
-                self.shader_model.bind()
-                # self.shader_model.uniform4x4("projection", self.camera.projection(self.app.width, self.app.height))
-                self.shader_model.release()
-                self.update()
+    @property
+    def viewmode(self) -> ViewModeType:
+        """
+        The view mode of the view.
 
-        @property
-        def opacity(self):
-            return self._opacity
+        Returns
+        -------
+        :class:`ViewModeType`
+            The view mode of the view.
+        """
+        return self._viewmode
+
+    @viewmode.setter
+    def viewmode(self, viewmode):
+        self._viewmode = viewmode
+        self.config.viewmode = viewmode
+        if self.shader_model:
+            self.shader_model.bind()
+            # self.shader_model.uniform4x4("projection", self.camera.projection(self.app.width, self.app.height))
+            self.shader_model.release()
+            self.update()
+
+    @property
+    def opacity(self) -> float:
+        """
+        The opacity of the view.
+        Returns
+        -------
+        float
+            The opacity of the view.
+        """
+        return self._opacity
 
     # ==========================================================================
     # gl
     # ==========================================================================
 
-    def clear(self) -> None:
+    def clear(self):
         """Clear the view."""
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)  # type: ignore
 
-    def initializeGL(self) -> None:
+    def initializeGL(self):
         """Initialize the OpenGL canvas.
 
         Notes
@@ -121,7 +146,7 @@ class Render(QtWidgets.QOpenGLWidget):
         ---------------
         .. [1] https://doc.qt.io/qtforpython-5.12/PySide2/QtWidgets/QOpenGLWidget.html#PySide2.QtWidgets.PySide2.QtWidgets.QOpenGLWidget.initializeGL # noqa: E501
         """
-        GL.glClearColor(*self.config.background_color)
+        GL.glClearColor(*self.config.backgroundcolor)
         GL.glPolygonOffset(1.0, 1.0)
         GL.glEnable(GL.GL_POLYGON_OFFSET_FILL)
         GL.glEnable(GL.GL_CULL_FACE)
@@ -135,20 +160,20 @@ class Render(QtWidgets.QOpenGLWidget):
         GL.glEnable(GL.GL_FRAMEBUFFER_SRGB)
         self.init()
 
-    def resizeGL(self, w: int, h: int) -> None:
+    def resizeGL(self, w: int, h: int):
         """Resize the OpenGL canvas.
+
+        Parameters
+        ----------
+        w : int
+            The width of the canvas.
+        h : int
+            The height of the canvas.
 
         Notes
         -----
         This implements the virtual function of the OpenGL widget.
         See the PySide2 docs [1]_ for more info.
-
-        Parameters
-        ----------
-        w: int
-            The width of the canvas.
-        h: int
-            The height of the canvas.
 
         References
         ----------
@@ -160,7 +185,7 @@ class Render(QtWidgets.QOpenGLWidget):
         GL.glViewport(0, 0, w, h)
         self.resize(w, h)
 
-    def paintGL(self) -> None:
+    def paintGL(self):
         """Paint the OpenGL canvas.
 
         Notes
@@ -267,6 +292,7 @@ class Render(QtWidgets.QOpenGLWidget):
         viewworld = self.camera.viewworld()
         transform = identity(4)
         # create the program
+
         self.shader_model = Shader(name="model")
         self.shader_model.bind()
         self.shader_model.uniform4x4("projection", projection)
@@ -274,7 +300,7 @@ class Render(QtWidgets.QOpenGLWidget):
         self.shader_model.uniform4x4("transform", transform)
         self.shader_model.uniform1i("is_selected", 0)
         self.shader_model.uniform1f("opacity", self.opacity)
-        self.shader_model.uniform3f("selection_color", self.config.selection_color)
+        self.shader_model.uniform3f("selection_color", self.config.selectioncolor)
         self.shader_model.release()
 
         self.shader_text = Shader(name="text")
@@ -309,17 +335,16 @@ class Render(QtWidgets.QOpenGLWidget):
         self.shader_grid.release()
 
     def make_buffer_from_data(self, data) -> Dict[str, Any]:
-        # TODO
         """Create buffers from point/line/face data.
 
         Parameters
         ----------
-        data: tuple
+        data : tuple
             Contains positions, colors, elements for the buffer
 
         Returns
         -------
-        buffer_dict
+        buffer_dict : Dict[str, Any]
             A dict with created buffer indexes
         """
         positions, colors, elements = data
@@ -360,7 +385,18 @@ class Render(QtWidgets.QOpenGLWidget):
         self.update_projection(w, h)
 
     def sort_objects_from_viewworld(self, viewworld: NDArray[float32]):
-        """Sort objects by the distances from their bounding box centers to camera location"""
+        """Sort objects by the distances from their bounding box centers to camera location
+
+        Parameters
+        ----------
+        viewworld : NDArray[float32]
+            The viewworld matrix.
+
+        Returns
+        -------
+        list
+            A list of sorted objects.
+        """
         opaque_objects = []
         transparent_objects = []
         centers = []
@@ -402,7 +438,7 @@ class Render(QtWidgets.QOpenGLWidget):
         # if self.app.selector.wait_for_selection_on_plane:
         #     self.app.selector.uv_plane_map = self.paint_plane()
         #     self.clear()
-        # if self.show_grid:
+        # if self.showgrid:
         #     self.grid.draw(self.shader_grid)
         # self.shader_grid.release()
 
@@ -439,6 +475,19 @@ class Render(QtWidgets.QOpenGLWidget):
         #     self.shader_model.draw_2d_box(self.app.selector.box_select_coords, self.app.width, self.app.height)
 
     def paint_instances(self, cropped_box=None):
+        """
+        Paint the instance map for the selection.
+
+        Parameters
+        ----------
+        cropped_box : tuple, optional
+            The cropped box, by default None
+
+        Returns
+        -------
+        instance_map : numpy.ndarray
+            The instance map.
+        """
         GL.glDisable(GL.GL_POINT_SMOOTH)
         GL.glDisable(GL.GL_LINE_SMOOTH)
         if cropped_box is None:
@@ -462,6 +511,15 @@ class Render(QtWidgets.QOpenGLWidget):
         return instance_map
 
     def paint_plane(self):
+        """
+        Paint the plane for the selection.
+
+        Returns
+        -------
+        plane_uv_map : numpy.ndarray
+            The plane uv map.
+
+        """
         x, y, width, height = 0, 0, self.viewer.config.width, self.viewer.config.height
         # self.grid.draw_plane(self.shader_grid)
         r = self.devicePixelRatio()

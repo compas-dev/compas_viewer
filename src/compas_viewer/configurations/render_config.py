@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Literal
 from typing import Tuple
-from typing import TypeAlias
+from typing import Type
 from typing import TypedDict
 
 from compas_viewer import DATA
@@ -51,17 +51,18 @@ class CameraConfig(Config):
         return camera_config
 
 
-KindOfShape: TypeAlias = Literal["square", "circle"]
+RenderModeType = Type[Literal["wireframe", "shaded", "ghosted", "lighted"]]
+ViewModeType = Type[Literal["front", "right", "top", "perspective"]]
 
 
 class RenderConfigType(TypedDict):
-    show_grid: bool
-    grid_size: Tuple[float, float, int, int]
-    viewmode: Literal["front", "right", "top", "perspective"]
-    rendermode: Literal["wireframe", "shaded", "ghosted", "lighted"]
-    background_color: Tuple[float, float, float, float]
-    selection_color: Tuple[float, float, float, float]
-    ghost_opacity: float
+    showgrid: bool
+    gridsize: Tuple[float, float, int, int]
+    viewmode: ViewModeType
+    rendermode: RenderModeType
+    backgroundcolor: Tuple[float, float, float, float]
+    selectioncolor: Tuple[float, float, float, float]
+    ghostopacity: float
     camera: CameraConfig
 
 
@@ -77,15 +78,15 @@ class RenderConfig(Config):
 
     """
 
-    def __init__(self, config: RenderConfigType) -> None:
+    def __init__(self, config: RenderConfigType):
         super().__init__(config)
-        self.show_grid = config["show_grid"]
-        self.grid_size = config["grid_size"]
+        self.showgrid = config["showgrid"]
+        self.gridsize = config["gridsize"]
         self.viewmode = config["viewmode"]
         self.rendermode = config["rendermode"]
-        self.background_color = config["background_color"]
-        self.selection_color = config["selection_color"]
-        self.ghost_opacity = config["ghost_opacity"]
+        self.backgroundcolor = config["backgroundcolor"]
+        self.selectioncolor = config["selectioncolor"]
+        self.ghostopacity = config["ghostopacity"]
         self.camera = config["camera"]
 
     @classmethod

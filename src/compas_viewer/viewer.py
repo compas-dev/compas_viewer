@@ -7,7 +7,7 @@ from typing import Optional
 from PyQt5 import QtCore
 from PyQt5 import QtGui
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import QCoreApplication  # type: ignore
+from PyQt5.QtCore import QCoreApplication
 from PyQt5.QtGui import QIcon
 
 from compas_viewer.components import Render
@@ -36,9 +36,9 @@ class Viewer:
     viewport : {'front', 'right', 'top', 'perspective'}, optional
         The viewport of the OpenGL view. It will override the value in the config file.
         In `ghosted` mode, all objects have a default opacity of 0.7.
-    show_grid : bool, optional
+    showgrid : bool, optional
         Show the XY plane. It will override the value in the config file.
-    config_path : str, optional
+    configpath : str, optional
         The path to the config folder.
 
     Attributes
@@ -71,23 +71,23 @@ class Viewer:
         height: Optional[int] = None,
         viewmode: Optional[Literal["wireframe", "shaded", "ghosted", "lighted"]] = None,
         viewport: Optional[Literal["front", "right", "top", "perspective"]] = None,
-        show_grid: Optional[bool] = None,
-        config_path: Optional[str] = None,
+        showgrid: Optional[bool] = None,
+        configpath: Optional[str] = None,
     ) -> None:
         # custom or default config
-        if config_path is None:
-            self.config = ViewerConfig.from_default()  # type: ignore
-            render_config = RenderConfig.from_default()  # type: ignore
+        if configpath is None:
+            self.config = ViewerConfig.from_default()
+            render_config = RenderConfig.from_default()
         else:
             # TODO
-            self.config = ViewerConfig.from_json(Path(config_path, "viewer.json"))
-            render_config = RenderConfig.from_json(Path(config_path, "render.json"))
+            self.config = ViewerConfig.from_json(Path(configpath, "viewer.json"))
+            render_config = RenderConfig.from_json(Path(configpath, "render.json"))
 
         #  in-code config
         if title is not None:
             self.config.title = title
         if fullscreen is not None:
-            self.config.full_screen = fullscreen
+            self.config.fullscreen = fullscreen
         if width is not None:
             self.config.width = width
         if height is not None:
@@ -117,16 +117,16 @@ class Viewer:
         self._window.setContentsMargins(0, 0, 0, 0)
         self._app.references.add(self._window)  # type: ignore
         self._window.resize(self.config.width, self.config.height)
-        if self.config.full_screen:
-            self._window.setWindowState(self._window.windowState() | QtCore.Qt.WindowMaximized)  # type: ignore
+        if self.config.fullscreen:
+            self._window.setWindowState(self._window.windowState() | QtCore.Qt.WindowMaximized)
         self._init_statusbar()
 
     def _init_statusbar(self) -> None:
         self.statusbar = self._window.statusBar()
         self.statusbar.setContentsMargins(0, 0, 0, 0)
-        self.statusText = QtWidgets.QLabel(self.config.statusbar_text)
+        self.statusText = QtWidgets.QLabel(self.config.statusbartext)
         self.statusbar.addWidget(self.statusText, 1)
-        if self.config.show_fps:
+        if self.config.showfps:
             self.statusFps = QtWidgets.QLabel("fps: ")
             self.statusbar.addWidget
 
@@ -257,7 +257,7 @@ class Viewer:
         """
         flags = QtWidgets.QMessageBox.StandardButton.Ok
         flags |= QtWidgets.QMessageBox.StandardButton.Cancel
-        response = QtWidgets.QMessageBox.warning(self._window, "Confirmation", message, flags)  # type: ignore
+        response = QtWidgets.QMessageBox.warning(self._window, "Confirmation", message, flags)
         if response == QtWidgets.QMessageBox.StandardButton.Ok:
             return True
         return False
