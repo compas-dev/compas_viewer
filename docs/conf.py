@@ -1,8 +1,9 @@
 # flake8: noqa
 # -*- coding: utf-8 -*-
 
-from sphinx.writers import html, html5
 import sphinx_compas2_theme
+from sphinx.writers import html
+from sphinx.writers import html5
 
 # -- General configuration ------------------------------------------------
 
@@ -30,7 +31,7 @@ else:
 
 # -- Extension configuration ------------------------------------------------
 
-extensions = sphinx_compas2_theme.default_extensions
+extensions = sphinx_compas2_theme.default_extensions.append("sphinx_qt_documentation")
 
 # numpydoc options
 
