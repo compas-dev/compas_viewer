@@ -3,8 +3,6 @@ from typing import Literal
 from typing import Tuple
 from typing import TypedDict
 
-from graphviz import render
-
 from compas_viewer import DATA
 from compas_viewer.configurations import Config
 
@@ -100,4 +98,3 @@ class RenderConfig(Config):
         render_config = super().from_json(filepath)
         assert isinstance(render_config, RenderConfig)
         return render_config
-

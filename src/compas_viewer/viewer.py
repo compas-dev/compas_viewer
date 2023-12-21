@@ -4,11 +4,11 @@ from pathlib import Path
 from typing import Literal
 from typing import Optional
 
-from qtpy import QtCore
-from qtpy import QtGui
-from qtpy import QtWidgets
-from qtpy.QtCore import QCoreApplication  # type: ignore
-from qtpy.QtGui import QIcon
+from PyQt5 import QtCore
+from PyQt5 import QtGui
+from PyQt5 import QtWidgets
+from PyQt5.QtCore import QCoreApplication  # type: ignore
+from PyQt5.QtGui import QIcon
 
 from compas_viewer.components import Render
 from compas_viewer.configurations import RenderConfig
@@ -106,12 +106,8 @@ class Viewer:
         self._glFormat.setProfile(QtGui.QSurfaceFormat.CompatibilityProfile)
         self._glFormat.setDefaultFormat(self._glFormat)
         QtGui.QSurfaceFormat.setDefaultFormat(self._glFormat)
-
-        self._app = QCoreApplication.instance()
-        if self._app is None:
-            self._app = QtWidgets.QApplication(sys.argv)
+        self._app = QCoreApplication.instance() or QtWidgets.QApplication(sys.argv)
         self._app.references = set()  # type: ignore
-
         self._window = QtWidgets.QMainWindow()
         self._icon = QIcon(path.join(ICONS, "compas_icon_white.png"))
         self._app.setWindowIcon(self._icon)  # type: ignore
@@ -155,6 +151,8 @@ class Viewer:
         x = int(0.5 * (rect.width() - width))
         y = int(0.5 * (rect.height() - height))
         self._window.setGeometry(x, y, width, height)
+        self.config.width = width
+        self.config.height = height
 
     # ==========================================================================
     # Messages

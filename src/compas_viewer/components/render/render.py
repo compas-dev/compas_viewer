@@ -1,33 +1,33 @@
 import time
 from typing import TYPE_CHECKING
+from typing import Any
 from typing import Dict
-from typing import List
-from typing import Tuple
 
 from compas.geometry import transform_points_numpy
+from compas.utilities import flatten
+from numpy import float32
+from numpy import frombuffer
+from numpy import identity
+from numpy import uint8
+from numpy.typing import NDArray
 from OpenGL import GL
-from qtpy import QtCore
-from qtpy import QtWidgets
-from qtpy.QtGui import QKeyEvent
-from qtpy.QtGui import QMouseEvent
+from PyQt5 import QtCore
+from PyQt5 import QtWidgets
+
+from compas_viewer.configurations import RenderConfig
+
+from .camera import Camera
+from .gl import make_index_buffer
+from .gl import make_vertex_buffer
+from .objects.bufferobject import BufferObject
+from .shaders import Shader
 
 if TYPE_CHECKING:
     # https://peps.python.org/pep-0484/#runtime-or-type-checking
     from compas_viewer import Viewer
 
-from compas_viewer.configurations import RenderConfig
 
-# from .camera import Camera
-
-# from .grid import Grid
-# from .objects import BufferObject
-from .objects import ViewerObject
-
-# from .selector import Selector
-from .shaders import Shader
-
-
-class Render(QtWidgets.QOpenGLWidget):  # type: ignore
+class Render(QtWidgets.QOpenGLWidget):
     """
     Render class for 3D rendering of COMPAS geometry.
     We constantly use OpenGL version 2.1 and GLSL 120 with a Compatibility Profile at the moment.
@@ -55,10 +55,10 @@ class Render(QtWidgets.QOpenGLWidget):  # type: ignore
         self._now: float = time.time()
         self._shader_model = None
 
-        # self.camera = Camera(self)
+        self.camera = Camera(self)
         # self.grid = Grid(self.config.grid_size)
         # self.selector = Selector(self)
-        self.objects: Dict[str, ViewerObject] = {}
+        self.objects: Dict[str, BufferObject] = {}
 
         self.setFocusPolicy(QtCore.Qt.StrongFocus)  # type: ignore
 
@@ -69,6 +69,7 @@ class Render(QtWidgets.QOpenGLWidget):  # type: ignore
     @rendermode.setter
     def rendermode(self, rendermode):
         self._rendermode = rendermode
+        self.config.rendermode = rendermode
         if rendermode == "ghosted":
             self._opacity = self.config.ghost_opacity
         else:
@@ -86,6 +87,7 @@ class Render(QtWidgets.QOpenGLWidget):  # type: ignore
     @viewmode.setter
     def viewmode(self, viewmode):
         self._viewmode = viewmode
+        self.config.viewmode = viewmode
         if self.shader_model:
             self.shader_model.bind()
             # self.shader_model.uniform4x4("projection", self.camera.projection(self.app.width, self.app.height))
@@ -115,7 +117,7 @@ class Render(QtWidgets.QOpenGLWidget):  # type: ignore
 
         References
         ---------------
-        .. [1] https://doc.qt.io/qtforpython-5.12/PySide2/QtWidgets/QOpenGLWidget.html#PySide2.QtWidgets.PySide2.QtWidgets.QOpenGLWidget.initializeGL
+        .. [1] https://doc.qt.io/qtforpython-5.12/PySide2/QtWidgets/QOpenGLWidget.html#PySide2.QtWidgets.PySide2.QtWidgets.QOpenGLWidget.initializeGL # noqa: E501
         """
         GL.glClearColor(*self.config.background_color)
         GL.glPolygonOffset(1.0, 1.0)
@@ -131,7 +133,7 @@ class Render(QtWidgets.QOpenGLWidget):  # type: ignore
         GL.glEnable(GL.GL_FRAMEBUFFER_SRGB)
         self.init()
 
-    def resizeGL(self, w, h) -> None:
+    def resizeGL(self, w: int, h: int) -> None:
         """Resize the OpenGL canvas.
 
         Notes
@@ -141,19 +143,20 @@ class Render(QtWidgets.QOpenGLWidget):  # type: ignore
 
         Parameters
         ----------
-        w: float
+        w: int
             The width of the canvas.
-        h: float
+        h: int
             The height of the canvas.
 
         References
         ----------
-        .. [1] https://doc.qt.io/qtforpython-5.12/PySide2/QtWidgets/QOpenGLWidget.html#PySide2.QtWidgets.PySide2.QtWidgets.QOpenGLWidget.resizeGL
+        .. [1] https://doc.qt.io/qtforpython-5.12/PySide2/QtWidgets/QOpenGLWidget.html#PySide2.QtWidgets.PySide2.QtWidgets.QOpenGLWidget.resizeGL # noqa: E501
 
         """
-        self.width = w
-        self.height = h
+        self.viewer.config.width = w
+        self.viewer.config.height = h
         GL.glViewport(0, 0, w, h)
+        self.resize(w, h)
 
     def paintGL(self) -> None:
         """Paint the OpenGL canvas.
@@ -167,10 +170,11 @@ class Render(QtWidgets.QOpenGLWidget):  # type: ignore
 
         References
         ----------
-        .. [1] https://doc.qt.io/qtforpython-5.12/PySide2/QtWidgets/QOpenGLWidget.html#PySide2.QtWidgets.PySide2.QtWidgets.QOpenGLWidget.paintGL
+        .. [1] https://doc.qt.io/qtforpython-5.12/PySide2/QtWidgets/QOpenGLWidget.html#PySide2.QtWidgets.PySide2.QtWidgets.QOpenGLWidget.paintGL # noqa: E501
 
         """
         self.clear()
+        self.paint()
         self._frames += 1
         if time.time() - self._now > 1:
             self._now = time.time()
@@ -250,17 +254,16 @@ class Render(QtWidgets.QOpenGLWidget):  # type: ignore
     def init(self) -> None:
         """Initialize the render."""
 
-        # self.grid.init()
-        projection = self.camera.projection(self.viewer.config.width, self.viewer.config.height)
-        viewworld = self.camera.viewworld()
-
+        # TODO self.grid.init()
         # init the buffers
         for guid in self.objects:
             obj = self.objects[guid]
             obj.init()
 
-        transform = [[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]]
-
+        projection = self.camera.projection(self.viewer.config.width, self.viewer.config.height)
+        viewworld = self.camera.viewworld()
+        transform = identity(4)
+        # create the program
         self.shader_model = Shader(name="model")
         self.shader_model.bind()
         self.shader_model.uniform4x4("projection", projection)
@@ -301,3 +304,165 @@ class Render(QtWidgets.QOpenGLWidget):  # type: ignore
         self.shader_grid.uniform4x4("viewworld", viewworld)
         self.shader_grid.uniform4x4("transform", transform)
         self.shader_grid.release()
+
+    def make_buffer_from_data(self, data) -> Dict[str, Any]:
+        # TODO
+        """Create buffers from point/line/face data.
+
+        Parameters
+        ----------
+        data: tuple
+            Contains positions, colors, elements for the buffer
+
+        Returns
+        -------
+        buffer_dict
+            A dict with created buffer indexes
+        """
+        positions, colors, elements = data
+        return {
+            "positions": make_vertex_buffer(list(flatten(positions))),
+            "colors": make_vertex_buffer(list(flatten(colors))),
+            "elements": make_index_buffer(list(flatten(elements))),
+            "n": len(list(flatten(elements))),
+        }
+
+    def update_projection(self, w=None, h=None):
+        w = w or self.viewer.config.width
+        h = h or self.viewer.config.height
+
+        projection = self.camera.projection(w, h)
+        self.shader_model.bind()
+        self.shader_model.uniform4x4("projection", projection)
+        self.shader_model.release()
+
+        self.shader_text.bind()
+        self.shader_text.uniform4x4("projection", projection)
+        self.shader_text.release()
+
+        self.shader_arrow.bind()
+        self.shader_arrow.uniform4x4("projection", projection)
+        self.shader_arrow.uniform1f("aspect", w / h)
+        self.shader_arrow.release()
+
+        self.shader_instance.bind()
+        self.shader_instance.uniform4x4("projection", projection)
+        self.shader_instance.release()
+
+        self.shader_grid.bind()
+        self.shader_grid.uniform4x4("projection", projection)
+        self.shader_grid.release()
+
+    def resize(self, w: int, h: int):
+        self.update_projection(w, h)
+
+    def sort_objects_from_viewworld(self, viewworld: NDArray[float32]):
+        """Sort objects by the distances from their bounding box centers to camera location"""
+        opaque_objects = []
+        transparent_objects = []
+        centers = []
+        for guid in self.objects:
+            obj = self.objects[guid]
+            if isinstance(obj, BufferObject):
+                if obj.opacity * self.opacity < 1 and obj.bounding_box_center is not None:
+                    transparent_objects.append(obj)
+                    centers.append(transform_points_numpy([obj.bounding_box_center], obj.matrix)[0])
+                else:
+                    opaque_objects.append(obj)
+        if transparent_objects:
+            centers = transform_points_numpy(centers, viewworld)
+            transparent_objects = sorted(zip(transparent_objects, centers), key=lambda pair: pair[1][2])
+            transparent_objects, _ = zip(*transparent_objects)
+        return opaque_objects + list(transparent_objects)
+
+    def paint(self):
+        viewworld = self.camera.viewworld()
+        if self.viewmode != "perspective":
+            self.update_projection()
+
+        # Draw instance maps
+        # if self.app.selector.enabled:
+        #     self.shader_instance.bind()
+        #     # set projection matrix
+        #     self.shader_instance.uniform4x4("viewworld", viewworld)
+        #     if self.app.selector.select_from == "pixel":
+        #         self.app.selector.instance_map = self.paint_instances()
+        #     if self.app.selector.select_from == "box":
+        #         self.app.selector.instance_map = self.paint_instances(self.app.selector.box_select_coords)
+        #     self.app.selector.enabled = False
+        #     self.clear()
+        #     self.shader_instance.release()
+
+        # Draw grid
+        # self.shader_grid.bind()
+        # self.shader_grid.uniform4x4("viewworld", viewworld)
+        # if self.app.selector.wait_for_selection_on_plane:
+        #     self.app.selector.uv_plane_map = self.paint_plane()
+        #     self.clear()
+        # if self.show_grid:
+        #     self.grid.draw(self.shader_grid)
+        # self.shader_grid.release()
+
+        # Draw model objects in the scene
+        self.shader_model.bind()
+        self.shader_model.uniform4x4("viewworld", viewworld)
+        for obj in self.sort_objects_from_viewworld(viewworld):
+            if obj.is_visible:
+                obj.draw(self.shader_model, self.viewmode == "wireframe", self.viewmode == "lighted")
+        self.shader_model.release()
+
+        # # draw arrow sprites
+        # self.shader_arrow.bind()
+        # self.shader_arrow.uniform4x4("viewworld", viewworld)
+        # for guid in self.objects:
+        #     obj = self.objects[guid]
+        #     if isinstance(obj, VectorObject):
+        #         if obj.is_visible:
+        #             obj.draw(self.shader_arrow)
+        # self.shader_arrow.release()
+
+        # # draw text sprites
+        # self.shader_text.bind()
+        # self.shader_text.uniform4x4("viewworld", viewworld)
+        # for guid in self.objects:
+        #     obj = self.objects[guid]
+        #     if isinstance(obj, TextObject):
+        #         if obj.is_visible:
+        #             obj.draw(self.shader_text, self.camera.position)
+        # self.shader_text.release()
+
+        # # draw 2D box for multi-selection
+        # if self.app.selector.select_from == "box":
+        #     self.shader_model.draw_2d_box(self.app.selector.box_select_coords, self.app.width, self.app.height)
+
+    def paint_instances(self, cropped_box=None):
+        GL.glDisable(GL.GL_POINT_SMOOTH)
+        GL.glDisable(GL.GL_LINE_SMOOTH)
+        if cropped_box is None:
+            x, y, width, height = 0, 0, self.viewer.config.width, self.viewer.config.height
+        else:
+            x1, y1, x2, y2 = cropped_box
+            x, y = min(x1, x2), self.viewer.config.height - max(y1, y2)
+            width, height = abs(x1 - x2), abs(y1 - y2)
+        for guid in self.objects:
+            obj = self.objects[guid]
+            if hasattr(obj, "draw_instance"):
+                if obj.is_visible:
+                    obj.draw_instance(self.shader_instance, self.viewmode == "wireframe")
+        # create map
+        r = self.devicePixelRatio()
+        instance_buffer = GL.glReadPixels(x * r, y * r, width * r, height * r, GL.GL_RGB, GL.GL_UNSIGNED_BYTE)
+        instance_map = frombuffer(instance_buffer, dtype=uint8).reshape(height * r, width * r, 3)
+        instance_map = instance_map[::-r, ::r, :]
+        GL.glEnable(GL.GL_POINT_SMOOTH)
+        GL.glEnable(GL.GL_LINE_SMOOTH)
+        return instance_map
+
+    def paint_plane(self):
+        x, y, width, height = 0, 0, self.viewer.config.width, self.viewer.config.height
+        # self.grid.draw_plane(self.shader_grid)
+        r = self.devicePixelRatio()
+        plane_uv_map = GL.glReadPixels(x * r, y * r, width * r, height * r, GL.GL_RGB, GL.GL_FLOAT)
+        plane_uv_map = plane_uv_map.reshape(height * r, width * r, 3)  # type: ignore
+        plane_uv_map = plane_uv_map[::-r, ::r, :]
+        return plane_uv_map
