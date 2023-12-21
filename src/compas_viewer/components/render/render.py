@@ -470,7 +470,7 @@ class Render(QtWidgets.QOpenGLWidget):
         # if self.app.selector.wait_for_selection_on_plane:
         #     self.app.selector.uv_plane_map = self.paint_plane()
         #     self.clear()
-        # if self.showgrid:
+        # if self.show_grid:
         #     self.grid.draw(self.shader_grid)
         # self.shader_grid.release()
 

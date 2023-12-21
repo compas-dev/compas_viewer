@@ -36,7 +36,7 @@ class Viewer:
     viewport : {'front', 'right', 'top', 'perspective'}, optional
         The viewport of the OpenGL view. It will override the value in the config file.
         In `ghosted` mode, all objects have a default opacity of 0.7.
-    showgrid : bool, optional
+    show_grid : bool, optional
         Show the XY plane. It will override the value in the config file.
     configpath : str, optional
         The path to the config folder.
@@ -71,7 +71,7 @@ class Viewer:
         height: Optional[int] = None,
         viewmode: Optional[Literal["wireframe", "shaded", "ghosted", "lighted"]] = None,
         viewport: Optional[Literal["front", "right", "top", "perspective"]] = None,
-        showgrid: Optional[bool] = None,
+        show_grid: Optional[bool] = None,
         configpath: Optional[str] = None,
     ) -> None:
         # custom or default config

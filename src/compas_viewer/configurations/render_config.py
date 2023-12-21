@@ -56,7 +56,7 @@ ViewModeType = Type[Literal["front", "right", "top", "perspective"]]
 
 
 class RenderConfigType(TypedDict):
-    showgrid: bool
+    show_grid: bool
     gridsize: Tuple[float, float, int, int]
     viewmode: ViewModeType
     rendermode: RenderModeType
@@ -80,7 +80,7 @@ class RenderConfig(Config):
 
     def __init__(self, config: RenderConfigType):
         super().__init__(config)
-        self.showgrid = config["showgrid"]
+        self.show_grid = config["show_grid"]
         self.gridsize = config["gridsize"]
         self.viewmode = config["viewmode"]
         self.rendermode = config["rendermode"]
