@@ -246,8 +246,8 @@ class Camera:
 
         Notes
         -----
-        Camera rotations are only available if the current viewmode
-        is a perspective view (``camera.render.viewmode == camera.render"perspective"``).
+        Camera rotations are only available if the current view mode.
+        is a perspective view (``camera.render.viewmode == "perspective"``).
 
         """
         if self.render.viewmode == "perspective":
