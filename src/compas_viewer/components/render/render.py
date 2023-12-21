@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 
 from compas_viewer.configurations import RenderConfig
 
-from .camera import Camera
+# from .camera import Camera
 
 # from .grid import Grid
 # from .objects import BufferObject
@@ -55,7 +55,7 @@ class Render(QtWidgets.QOpenGLWidget):  # type: ignore
         self._now: float = time.time()
         self._shader_model = None
 
-        self.camera = Camera(self)
+        # self.camera = Camera(self)
         # self.grid = Grid(self.config.grid_size)
         # self.selector = Selector(self)
         self.objects: Dict[str, ViewerObject] = {}
@@ -301,149 +301,3 @@ class Render(QtWidgets.QOpenGLWidget):  # type: ignore
         self.shader_grid.uniform4x4("viewworld", viewworld)
         self.shader_grid.uniform4x4("transform", transform)
         self.shader_grid.release()
-
-    # def update_projection(self) -> None:
-    #     """
-    #     Update the projection matrix of the shaders.
-    #     """
-
-    #     projection = self.camera.projection(self.width, self.height)
-    #     self.shader_model.bind()
-    #     self.shader_model.uniform4x4("projection", projection)
-    #     self.shader_model.release()
-
-    #     self.shader_text.bind()
-    #     self.shader_text.uniform4x4("projection", projection)
-    #     self.shader_text.release()
-
-    #     self.shader_arrow.bind()
-    #     self.shader_arrow.uniform4x4("projection", projection)
-    #     self.shader_arrow.uniform1f("aspect", self.width / self.height)
-    #     self.shader_arrow.release()
-
-    #     self.shader_instance.bind()
-    #     self.shader_instance.uniform4x4("projection", projection)
-    #     self.shader_instance.release()
-
-    #     self.shader_grid.bind()
-    #     self.shader_grid.uniform4x4("projection", projection)
-    #     self.shader_grid.release()
-
-    # resize = update_projection
-
-    # def sort_objects_from_viewworld(self, viewworld) -> List[ViewerObject]:  # -> list[Any]:
-    #     """Sort transparent objects by the distances from their bounding box centers to camera location"""
-    #     opaque_objects: List[ViewerObject] = []
-    #     transparent_objects: List[ViewerObject] = []
-    #     centers: List[Tuple[float, float, float]] = []
-
-    #     for guid in self.objects:
-    #         obj = self.objects[guid]
-    #         if isinstance(obj, BufferObject):
-    #             if obj.opacity * self.opacity < 1 and obj.bounding_box_center is not None:
-    #                 transparent_objects.append(obj)
-    #                 centers.append(transform_points_numpy([obj.bounding_box_center], obj.matrix)[0])
-    #             else:
-    #                 opaque_objects.append(obj)
-    #     if transparent_objects:
-    #         centers = transform_points_numpy(centers, viewworld)
-    #         transparent_objects.sort(key=lambda obj: centers[transparent_objects.index(obj)][2])
-
-    #     return opaque_objects + transparent_objects
-
-    # def paint(self):
-    #     viewworld = self.camera.viewworld()
-    #     if self.current != self."perspective"]:
-    #         self.update_projection()
-
-    #     # Draw instance maps
-    #     if self.app.selector.enabled:
-    #         self.shader_instance.bind()
-    #         # set projection matrix
-    #         self.shader_instance.uniform4x4("viewworld", viewworld)
-    #         if self.app.selector.select_from == "pixel":
-    #             self.app.selector.instance_map = self.paint_instances()
-    #         if self.app.selector.select_from == "box":
-    #             self.app.selector.instance_map = self.paint_instances(self.app.selector.box_select_coords)
-    #         self.app.selector.enabled = False
-    #         self.clear()
-    #         self.shader_instance.release()
-
-    #     # Draw grid
-    #     self.shader_grid.bind()
-    #     self.shader_grid.uniform4x4("viewworld", viewworld)
-    #     if self.app.selector.wait_for_selection_on_plane:
-    #         self.app.selector.uv_plane_map = self.paint_plane()
-    #         self.clear()
-    #     if self.show_grid:
-    #         self.grid.draw(self.shader_grid)
-    #     self.shader_grid.release()
-
-    #     # Draw model objects in the scene
-    #     self.shader_model.bind()
-    #     self.shader_model.uniform4x4("viewworld", viewworld)
-    #     for obj in self.sort_objects_from_viewworld(viewworld):
-    #         if obj.is_visible:
-    #             obj.draw(self.shader_model, self.mode == "wireframe", self.mode == "lighted")
-    #     self.shader_model.release()
-
-    #     # draw arrow sprites
-    #     self.shader_arrow.bind()
-    #     self.shader_arrow.uniform4x4("viewworld", viewworld)
-    #     for guid in self.objects:
-    #         obj = self.objects[guid]
-    #         if isinstance(obj, VectorObject):
-    #             if obj.is_visible:
-    #                 obj.draw(self.shader_arrow)
-    #     self.shader_arrow.release()
-
-    #     # draw text sprites
-    #     self.shader_text.bind()
-    #     self.shader_text.uniform4x4("viewworld", viewworld)
-    #     for guid in self.objects:
-    #         obj = self.objects[guid]
-    #         if isinstance(obj, TextObject):
-    #             if obj.is_visible:
-    #                 obj.draw(self.shader_text, self.camera.position)
-    #     self.shader_text.release()
-
-    #     # draw 2D box for multi-selection
-    #     if self.app.selector.select_from == "box":
-    #         self.shader_model.draw_2d_box(self.app.selector.box_select_coords, self.app.width, self.app.height)
-
-    #     if self.app.record:
-    #         # r = self.devicePixelRatio()
-    #         # x, y, width, height = 0, 0, self.app.width, self.app.height
-    #         # buffer = GL.glReadPixels(x*r, y*r, width*r, height*r, GL.GL_RGB, GL.GL_UNSIGNED_BYTE)
-    #         # arr = np.frombuffer(buffer, dtype=np.uint8).reshape(height*r, width*r, 3)
-    #         # arr = arr[::-r, ::r, :]
-    #         # im = Image.fromarray(arr, mode="RGB")
-    #         # im = im.convert(mode='RGB', dither=0)
-    #         # print("recording frame:", self.app.frame_count)
-    #         # self.app.recorded_frames.append(im)
-    #         qimage = self.grabFramebuffer()
-    #         qimage.save(os.path.join(self.app.tempdir, f"{self.app.frame_count}.png"), "png")
-
-    # def paint_instances(self, cropped_box=None):
-    #     GL.glDisable(GL.GL_POINT_SMOOTH)
-    #     GL.glDisable(GL.GL_LINE_SMOOTH)
-    #     if cropped_box is None:
-    #         x, y, width, height = 0, 0, self.app.width, self.app.height
-    #     else:
-    #         x1, y1, x2, y2 = cropped_box
-    #         x, y = min(x1, x2), self.app.height - max(y1, y2)
-    #         width, height = abs(x1 - x2), abs(y1 - y2)
-    #     for guid in self.objects:
-    #         obj = self.objects[guid]
-    #         if hasattr(obj, "draw_instance"):
-    #             if obj.is_visible:
-    #                 obj.draw_instance(self.shader_instance, self.mode == "wireframe")
-    #     # create map
-    #     r = self.devicePixelRatio()
-    #     instance_buffer = GL.glReadPixels(x * r, y * r, width * r, height * r, GL.GL_RGB, GL.GL_UNSIGNED_BYTE)
-    #     instance_map = np.frombuffer(instance_buffer, dtype=np.uint8).reshape(height * r, width * r, 3)
-    #     instance_map = instance_map[::-r, ::r, :]
-    #     GL.glEnable(GL.GL_POINT_SMOOTH)
-    #     GL.glEnable(GL.GL_LINE_SMOOTH)
-    #     return instance_map
-
