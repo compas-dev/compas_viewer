@@ -1,10 +1,21 @@
 from pathlib import Path
 from typing import Dict
 from typing import List
+from typing import Literal
 from typing import TypedDict
 
 from compas_viewer import DATA
 from compas_viewer.configurations import Config
+
+
+class SelectType(TypedDict):
+    """
+    The type template for the select only.
+    """
+
+    mouse: Literal["left", "right", "middle"]
+    multiselect: str
+    deselect: str
 
 
 class MouseConfigType(TypedDict):
@@ -15,9 +26,9 @@ class MouseConfigType(TypedDict):
     zoom: Dict[str, str]
     pan: Dict[str, str]
     rotate: Dict[str, str]
-    boxselection: Dict[str, str]
-    box_deselection: Dict[str, str]
-    selection: Dict[str, str]
+    drag_selection: Dict[str, str]
+    drag_deselection: Dict[str, str]
+    select: SelectType
 
 
 class KeyConfigType(TypedDict):
@@ -70,10 +81,11 @@ class ControllerConfig(Config):
         self.pan = config["mouse"]["pan"]
         self.zoom = config["mouse"]["zoom"]
         self.rotate = config["mouse"]["rotate"]
-        self.boxselection = config["mouse"]["boxselection"]
-        self.selection: str = config["mouse"]["selection"]["mouse"]
-        self.multiselection: str = config["mouse"]["selection"]["multiselection"]
-        self.deletion: str = config["mouse"]["selection"]["deselection"]
+        self.drag_selection = config["mouse"]["drag_selection"]
+        self.drag_deselection = config["mouse"]["drag_deselection"]
+        self.select: str = config["mouse"]["select"]["mouse"]
+        self.multiselect: str = config["mouse"]["select"]["multiselect"]
+        self.deselect: str = config["mouse"]["select"]["deselect"]
         for key in config["keys"]:
             setattr(self, key["name"], KeyConfig(key))
 

@@ -15,8 +15,8 @@ class ViewerConfigType(TypedDict):
     width: int
     height: int
     fullscreen: bool
-    statusbartext: str
-    showfps: bool
+    statusbar: str
+    show_fps: bool
 
 
 class ViewerConfig(Config):
@@ -38,8 +38,8 @@ class ViewerConfig(Config):
         self.width = config["width"]
         self.height = config["height"]
         self.fullscreen = config["fullscreen"]
-        self.statusbartext = config["statusbartext"]
-        self.showfps = config["showfps"]
+        self.statusbar = config["statusbar"]
+        self.show_fps = config["show_fps"]
 
     @classmethod
     def from_default(cls) -> "ViewerConfig":

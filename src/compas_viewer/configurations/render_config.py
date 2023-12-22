@@ -15,8 +15,8 @@ class CameraConfigType(TypedDict):
     position: Tuple[float, float, float]
     target: Tuple[float, float, float]
     scale: float
-    zoom_delta: float
-    rotation_delta: float
+    zoomdelta: float
+    rotationdelta: float
     pan_delta: float
 
 
@@ -40,8 +40,8 @@ class CameraConfig(Config):
         self.position = config["position"]
         self.target = config["target"]
         self.scale = config["scale"]
-        self.zoom_delta = config["zoom_delta"]
-        self.rotation_delta = config["rotation_delta"]
+        self.zoomdelta = config["zoomdelta"]
+        self.rotationdelta = config["rotationdelta"]
         self.pan_delta = config["pan_delta"]
 
     @classmethod
@@ -61,7 +61,7 @@ class RenderConfigType(TypedDict):
     viewmode: ViewModeType
     rendermode: RenderModeType
     backgroundcolor: Tuple[float, float, float, float]
-    selectioncolor: Tuple[float, float, float, float]
+    selectioncolor: Tuple[float, float, float]
     ghostopacity: float
     camera: CameraConfig
 
