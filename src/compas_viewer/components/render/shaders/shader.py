@@ -1,69 +1,83 @@
 from pathlib import Path
+from typing import Any
+from typing import List
+from typing import Tuple
+from typing import Union
 
+from numpy import float32
+from numpy.typing import NDArray
 from OpenGL import GL
 
 
 class Shader:
     """The shader used by the OpenGL view."""
 
-    def __init__(self, name="mesh"):
+    def __init__(self, name: str = "mesh"):
         self.program = make_shader_program(name)
         self.locations = {}
 
-    def uniform4x4(self, name, value):
+    def uniform4x4(self, name: str, value: NDArray[float32]):
         """Store a uniform 4x4 transformation matrix in the shader program at a named location.
 
         Parameters
         ----------
-        name: str
+        name : str
             The name of the location in the shader program.
-        value: array-like
+        value : array-like[float]
             A 4x4 transformation matrix in column-major ordering.
         """
         location = GL.glGetUniformLocation(self.program, name)
         GL.glUniformMatrix4fv(location, 1, True, value)
 
-    def uniform1i(self, name, value):
+    def uniform1i(self, name: str, value: int):
         """Store a uniform integer in the shader program at a named location.
 
         Parameters
         ----------
-        name: str
+        name : str
             The name of the location in the shader program.
-        value: int
+        value : int
             An integer value.
         """
         location = GL.glGetUniformLocation(self.program, name)
         GL.glUniform1i(location, value)
 
-    def uniform1f(self, name, value):
+    def uniform1f(self, name: str, value: float):
         """Store a uniform float in the shader program at a named location.
 
         Parameters
         ----------
-        name: str
+        name : str
             The name of the location in the shader program.
-        value: float
+        value : float
             A float value.
         """
         location = GL.glGetUniformLocation(self.program, name)
         GL.glUniform1f(location, value)
 
-    def uniform3f(self, name, value):
+    def uniform3f(self, name: str, value: Union[Tuple[float, float, float], List[float]]):
         """Store a uniform list of 3 floats in the shader program at a named location.
 
         Parameters
         ----------
-        name: str
+        name : str
             The name of the location in the shader program.
-        value: (float, float, float) | list[float]
+        value : (float, float, float) | list[float]
             An iterable of 3 floats.
         """
         location = GL.glGetUniformLocation(self.program, name)
         GL.glUniform3f(location, *value)
 
-    def uniformText(self, name, texture):
-        # TODO:
+    def uniformText(self, name: str, texture: Any):
+        """Store a uniform texture in the shader program at a named location.
+
+        Parameters
+        ----------
+        name : str
+            The name of the location in the shader program.
+        texture : Any
+            The texture to store.
+        """
         # location = GL.glGetUniformLocation(self.program, name)
         # print(location)
         GL.glActiveTexture(GL.GL_TEXTURE0 + 0)  # type: ignore
@@ -78,21 +92,52 @@ class Shader:
         GL.glBindBuffer(GL.GL_ARRAY_BUFFER, 0)
         GL.glUseProgram(0)
 
-    def enable_attribute(self, name):
+    def enable_attribute(self, name: str):
+        """Enable a named attribute in the shader program.
+
+        Parameters
+        ----------
+        name : str
+            The name of the attribute.
+        """
         location = GL.glGetAttribLocation(self.program, name)
         GL.glEnableVertexAttribArray(location)
         self.locations[name] = location
 
-    def bind_attribute(self, name, value, step=3):
+    def bind_attribute(self, name: str, value: Any, step: int = 3):
+        """Bind a named attribute to a buffer.
+
+        Parameters
+        ----------
+        name : str
+            The name of the attribute.
+        value : Any
+            The buffer to bind to the attribute.
+        step : int, optional
+            The step size of the attribute.
+        """
         location = self.locations[name]
         GL.glBindBuffer(GL.GL_ARRAY_BUFFER, value)
         GL.glVertexAttribPointer(location, step, GL.GL_FLOAT, False, 0, None)
 
-    def disable_attribute(self, name):
+    def disable_attribute(self, name: str):
         GL.glDisableVertexAttribArray(self.locations[name])
         del self.locations[name]
 
-    def draw_triangles(self, elements=None, n=0, background=False):
+    def draw_triangles(self, elements: Any = None, n: int = 0, background: bool = False):
+        """
+        Draw triangles.
+
+        Parameters
+        ----------
+        elements : Any, optional
+            The buffer elements.
+        n : int, optional
+            The number of elements.
+        background : bool, optional
+            Draw in background.
+
+        """
         if elements:
             if background:
                 GL.glDisable(GL.GL_DEPTH_TEST)
@@ -101,7 +146,21 @@ class Shader:
         else:
             GL.glDrawArrays(GL.GL_TRIANGLES, 0, GL.GL_BUFFER_SIZE)
 
-    def draw_lines(self, elements=None, n=0, width=1, background=False):
+    def draw_lines(self, elements: Any = None, n: int = 0, width: float = 1, background: bool = False):
+        """
+        Draw lines.
+
+        Parameters
+        ----------
+        elements : Any, optional
+            The buffer elements.
+        n : int, optional
+            The number of elements.
+        width : float, optional
+            The width of the lines.
+        background : bool, optional
+            Draw in background.
+        """
         if elements:
             if background:
                 GL.glDisable(GL.GL_DEPTH_TEST)
@@ -112,7 +171,21 @@ class Shader:
         else:
             GL.glDrawArrays(GL.GL_LINES, 0, GL.GL_BUFFER_SIZE)
 
-    def draw_points(self, size=1, elements=None, n=0, background=False):
+    def draw_points(self, size: float = 1, elements: Any = None, n: int = 0, background: bool = False):
+        """
+        Draw points.
+
+        Parameters
+        ----------
+        size : float, optional
+            The size of the points.
+        elements : Any, optional
+            The buffer elements.
+        n : int, optional
+            The number of elements.
+        background : bool, optional
+            Draw in background.
+        """
         GL.glPointSize(size)
         if elements:
             if background:
@@ -122,7 +195,17 @@ class Shader:
         else:
             GL.glDrawArrays(GL.GL_POINTS, 0, GL.GL_BUFFER_SIZE)
 
-    def draw_texts(self, elements=None, n=0):
+    def draw_texts(self, elements: Any = None, n: int = 0):
+        """
+        Draw texts.
+
+        Parameters
+        ----------
+        elements : Any, optional
+            The buffer elements.
+        n : int, optional
+            The number of elements.
+        """
         GL.glDisable(GL.GL_POINT_SMOOTH)
         GL.glEnable(GL.GL_POINT_SPRITE)
         GL.glEnable(GL.GL_PROGRAM_POINT_SIZE)
@@ -134,7 +217,17 @@ class Shader:
         GL.glDisable(GL.GL_POINT_SPRITE)
         GL.glEnable(GL.GL_POINT_SMOOTH)
 
-    def draw_arrows(self, elements=None, n=0):
+    def draw_arrows(self, elements: Any = None, n: int = 0):
+        """
+        Draw arrows.
+
+        Parameters
+        ----------
+        elements : Any, optional
+            The buffer elements.
+        n : int, optional
+            The number of elements.
+        """
         GL.glDisable(GL.GL_POINT_SMOOTH)
         GL.glEnable(GL.GL_POINT_SPRITE)
         GL.glEnable(GL.GL_PROGRAM_POINT_SIZE)
@@ -146,7 +239,18 @@ class Shader:
         GL.glDisable(GL.GL_POINT_SPRITE)
         GL.glEnable(GL.GL_POINT_SMOOTH)
 
-    def draw_2d_box(self, box_coords, width, height):
+    def draw_2d_box(self, box_coords: Tuple[float, float, float, float], width: int, height: int):
+        """Draw a 2D box. Mostly used for drawing bounding boxes and drag selection boxes.
+
+        Parameters
+        ----------
+        box_coords : tuple[float, float, float, float]
+            The coordinates of the box. The coordinates are in the format of (x1, y1, x2, y2).
+        width : int
+            The width of the viewport.
+        height : int
+            The height of the viewport.
+        """
         x1, y1, x2, y2 = box_coords
         x1 = (x1 / width - 0.5) * 2
         x2 = (x2 / width - 0.5) * 2
@@ -167,6 +271,13 @@ class Shader:
 
 
 def make_shader_program(name: str):
+    """Make a shader program.
+
+    Parameters
+    ----------
+    name : str
+        The name of the shader.
+    """
     vsource = Path(Path(__file__).parent, f"{name}.vert")
     fsource = Path(Path(__file__).parent, f"{name}.frag")
 
@@ -189,7 +300,8 @@ def make_shader_program(name: str):
     return program
 
 
-def compile_vertex_shader(source):
+def compile_vertex_shader(source: str):
+    """Compile a vertex shader."""
     shader = GL.glCreateShader(GL.GL_VERTEX_SHADER)
     GL.glShaderSource(shader, source)
     GL.glCompileShader(shader)
@@ -199,7 +311,8 @@ def compile_vertex_shader(source):
     return shader
 
 
-def compile_fragment_shader(source):
+def compile_fragment_shader(source: str):
+    """Compile a fragment shader."""
     shader = GL.glCreateShader(GL.GL_FRAGMENT_SHADER)
     GL.glShaderSource(shader, source)
     GL.glCompileShader(shader)

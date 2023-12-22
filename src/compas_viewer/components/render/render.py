@@ -151,7 +151,7 @@ class Render(QtWidgets.QOpenGLWidget):
         and enables culling, depth testing, blending, point smoothing, and line smoothing.
 
         References
-        ---------------
+        ----------
         .. [1] https://doc.qt.io/qtforpython-5.12/PySide2/QtWidgets/QOpenGLWidget.html#PySide2.QtWidgets.PySide2.QtWidgets.QOpenGLWidget.initializeGL # noqa: E501
         """
         GL.glClearColor(*self.config.backgroundcolor)
@@ -305,7 +305,7 @@ class Render(QtWidgets.QOpenGLWidget):
 
         projection = self.camera.projection(self.viewer.config.width, self.viewer.config.height)
         viewworld = self.camera.viewworld()
-        transform = identity(4)
+        transform = identity(4, dtype=float32)
         # create the program
 
         self.shader_model = Shader(name="model")

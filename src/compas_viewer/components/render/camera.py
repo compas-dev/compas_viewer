@@ -1,8 +1,13 @@
 from math import atan2
+from math import radians
+from math import tan
 from typing import TYPE_CHECKING
+from typing import Callable
+from typing import Optional
 from typing import Tuple
 
 from compas.geometry import Rotation
+from compas.geometry import Transformation
 from compas.geometry import Translation
 from compas.geometry import Vector
 from numpy import array
@@ -14,28 +19,28 @@ from numpy.linalg import det
 from numpy.linalg import norm
 from numpy.typing import NDArray
 
-from .matrices import ortho
-from .matrices import perspective
-
 if TYPE_CHECKING:
     # https://peps.python.org/pep-0484/#runtime-or-type-checking
     from .render import Render
 
 
 class Position(Vector):
-    def __init__(self, vector: Tuple[float, float, float], on_update=None):
-        super().__init__(*vector)
-        self.pause_update = False
-        if on_update:
-            self.on_update = on_update
+    """
+    The position of the camera.
 
-    def set(self, x, y, z, pause_update: bool):
-        pause_update = pause_update or self.pause_update
-        if hasattr(self, "on_update") and not pause_update:
-            self.on_update([x, y, z])
-        self._x = x
-        self._y = y
-        self._z = z
+    Parameters
+    ----------
+    vector : tuple[float, float, float]
+        The position of the camera.
+    on_update : callable
+        A callback function that is called when the position changes.
+
+    """
+
+    def __init__(self, vector: Tuple[float, float, float], on_update: Optional[Callable] = None):
+        self.on_update = on_update
+        self.pause_update = True
+        super().__init__(*vector)
 
     @property
     def x(self):
@@ -43,7 +48,7 @@ class Position(Vector):
 
     @x.setter
     def x(self, x):
-        if hasattr(self, "on_update") and not self.pause_update:
+        if self.on_update is not None and not self.pause_update:
             self.on_update([x, self.y, self.z])
         self._x = float(x)
 
@@ -53,7 +58,7 @@ class Position(Vector):
 
     @y.setter
     def y(self, y):
-        if hasattr(self, "on_update") and not self.pause_update:
+        if self.on_update is not None and not self.pause_update:
             self.on_update([self.x, y, self.z])
         self._y = float(y)
 
@@ -63,9 +68,18 @@ class Position(Vector):
 
     @z.setter
     def z(self, z):
-        if hasattr(self, "on_update") and not self.pause_update:
+        if self.on_update is not None and not self.pause_update:
             self.on_update([self.x, self.y, z])
         self._z = float(z)
+
+    def set(self, x, y, z, pause_update: bool = False):
+        """Set the position of the camera."""
+        pause_update = pause_update or self.pause_update
+        if self.on_update is not None and not pause_update:
+            self.on_update([x, y, z])
+        self._x = x
+        self._y = y
+        self._z = z
 
 
 class RotationEuler(Position):
@@ -88,8 +102,9 @@ class Camera:
     -----
     The camera is defined by the following parameters which can be found in:
     :class:`compas_viewer.configurations.render_config.CameraConfig`:
+
     fov : float
-    The field of view as an angler in degrees.
+        The field of view as an angler in degrees.
     near : float
         The location of the "near" clipping plane.
     far : float
@@ -103,9 +118,9 @@ class Camera:
         Default is the origin of the world coordinate system.
     distance : float
         The distance from the camera standpoint to the target.
-    zoom_delta : float
+    zoomdelta : float
         Size of one zoom increment.
-    rotation_delta : float
+    rotationdelta : float
         Size of one rotation increment.
     pan_delta : float
         Size of one pan increment.
@@ -119,51 +134,126 @@ class Camera:
         self._position = Position((0.0, 0.0, 10.0 * self.config.scale), on_update=self._on_position_update)
         self._rotation = RotationEuler((0, 0, 0), on_update=self._on_rotation_update)
         self._target = Position((0, 0, 0), on_update=self._on_target_update)
+        self._position.pause_update = False
+        self._rotation.pause_update = False
+        self._target.pause_update = False
         self.reset_position()
 
     @property
-    def position(self):
+    def position(self) -> Position:
+        """The position of the camera."""
         return self._position
 
     @position.setter
-    def position(self, position):
-        self._position.set(*position)
+    def position(self, position: Position):
+        self._position.set(position.x, position.y, position.z)
 
     @property
-    def rotation(self):
+    def rotation(self) -> RotationEuler:
+        """The rotation of the camera."""
         return self._rotation
 
     @rotation.setter
-    def rotation(self, rotation):
-        self._rotation.set(*rotation)
+    def rotation(self, rotation: RotationEuler):
+        self._rotation.set(rotation.x, rotation.y, rotation.z)
 
     @property
-    def target(self):
+    def target(self) -> Position:
+        """The target of the camera."""
         return self._target
 
     @target.setter
-    def target(self, target):
-        self._target.set(*target)
+    def target(self, target: Position):
+        self._target.set(target.x, target.y, target.z)
 
-    def look_at(self, target):
+    def look_at(self, target: Position = Position((0, 0, 0))):
         """Set the target of the camera, while keeping the current position."""
-        position = list(self.position)
+        position = self.position
         self.target = target
         self.position = position
 
     @property
-    def distance(self):
+    def distance(self) -> float:
+        """The distance from the camera to the target."""
         return (self.position - self.target).length
 
     @distance.setter
-    def distance(self, distance):
+    def distance(self, distance: float):
         """Update the position based on the distance."""
         direction = self.position - self.target
         direction.unitize()
         new_position = self.target + direction * distance
         self.position.set(*new_position, pause_update=True)
 
-    def _on_position_update(self, new_position):
+    def ortho(self, left: float, right: float, bottom: float, top: float, near: float, far: float) -> Transformation:
+        """Construct an orthogonal projection matrix.
+
+        Parameters
+        ----------
+        left : float
+            Location of the left clipping plane.
+        right : float
+            Location of the right clipping plane.
+        bottom : float
+            Location of the bottom clipping plane.
+        top : float
+            Location of the top clipping plane.
+        near : float
+            Location of the near clipping plane.
+        far : float
+            Location of the far clipping plane.
+
+        Returns
+        -------
+        :class:`compas.geometry.Transformation`
+
+        """
+        dx = right - left
+        dy = top - bottom
+        dz = far - near
+        rx = -(right + left) / dx
+        ry = -(top + bottom) / dy
+        rz = -(far + near) / dz
+        assert dx != 0 and dy != 0 and dz != 0
+        matrix = [
+            [2.0 / dx, 0, 0, rx],
+            [0, 2.0 / dy, 0, ry],
+            [0, 0, -2.0 / dz, rz],
+            [0, 0, 0, 1],
+        ]
+        return Transformation.from_matrix(matrix)
+
+    def perspective(self, fov: float, aspect: float, near: float, far: float) -> Transformation:
+        """Construct a perspective projection matrix.
+
+        Parameters
+        ----------
+        fov : float
+            The field of view in degrees.
+        aspect : float
+            The aspect ratio of the view.
+        near : float
+            Location of the near clipping plane.
+        far : float
+            Location of the far clipping plane.
+
+        Returns
+        -------
+        :class:`compas.geometry.Transformation`
+
+        """
+        assert near != far
+        assert aspect != 0
+        assert fov != 0
+
+        sy = 1.0 / tan(radians(fov) / 2.0)
+        sx = sy / aspect
+        zz = (far + near) / (near - far)
+        zw = 2 * far * near / (near - far)
+        matrix = [[sx, 0, 0, 0], [0, sy, 0, 0], [0, 0, zz, zw], [0, 0, -1, 0]]
+        return Transformation.from_matrix(matrix)
+
+    def _on_position_update(self, new_position: Position):
         """Update camera rotation to keep pointing the target."""
         old_direction = array(self.position - self.target)
         new_direction = array(Vector(*new_position) - self.target)
@@ -205,7 +295,7 @@ class Camera:
 
         self.position.set(*position, pause_update=True)
 
-    def _on_target_update(self, target):
+    def _on_target_update(self, target: Position):
         """Update camera position when target changes."""
         R = Rotation.from_euler_angles(self.rotation)
         T = Translation.from_vector([0, 0, self.distance])
@@ -228,32 +318,28 @@ class Camera:
         if self.render.viewmode == "right":
             self.rotation.set(pi / 2, 0, pi / 2, False)
 
-    def rotate(self, dx, dy):
+    def rotate(self, dx: float, dy: float):
         """Rotate the camera based on current mouse movement.
 
         Parameters
         ----------
         dx : float
             Number of rotation increments around the Z axis, with each increment the size
-            of :attr:`Camera.rotation_delta`.
+            of :attr:`Camera.rotationdelta`.
         dy : float
             Number of rotation increments around the X axis, with each increment the size
-            of :attr:`Camera.rotation_delta`.
-
-        Returns
-        -------
-        None
+            of :attr:`Camera.rotationdelta`.
 
         Notes
         -----
-        Camera rotations are only available if the current view mode.
-        is a perspective view (``camera.render.viewmode == "perspective"``).
+        Camera rotations are only available if the current view mode
+        is a perspective view (``camera.render.config.viewmode == "perspective"``).
 
         """
-        if self.render.viewmode == "perspective":
-            self.rotation += [-self.config.rotation_delta * dy, 0, -self.config.rotation_delta * dx]
+        if self.render.config.viewmode == "perspective":
+            self.rotation += [-self.config.rotationdelta * dy, 0, -self.config.rotationdelta * dx]
 
-    def pan(self, dx, dy):
+    def pan(self, dx: float, dy: float):
         """Pan the camera based on current mouse movement.
 
         Parameters
@@ -264,11 +350,6 @@ class Camera:
         dy : float
             Number of "pan" increments in the "Y" direction of the current view,
             with each increment the size of :attr:`Camera.pan_delta`.
-
-        Returns
-        -------
-        None
-
         """
         R = Rotation.from_euler_angles(self.rotation)
         T = Translation.from_vector(
@@ -278,29 +359,25 @@ class Camera:
         vector = [M[i][3] for i in range(3)]
         self.target += vector
 
-    def zoom(self, steps=1):
+    def zoom(self, steps: int = 1):
         """Zoom in or out.
 
         Parameters
         ----------
         steps : int
-            The number of zoom increments, with each increment the zsize of :attr:`Camera.zoom_delta`.
-
-        Returns
-        -------
-        None
+            The number of zoom increments, with each increment the zsize of :attr:`Camera.zoomdelta`.
 
         """
-        self.distance -= steps * self.config.zoom_delta * self.distance
+        self.distance -= steps * self.config.zoomdelta * self.distance
 
-    def projection(self, width, height) -> NDArray[float32]:
+    def projection(self, width: int, height: int) -> NDArray[float32]:
         """Compute the projection matrix corresponding to the current camera settings.
 
         Parameters
         ----------
-        width : float
+        width : int
             Width of the viewer.
-        height : float
+        height : int
             Height of the viewer.
 
         Returns
@@ -315,7 +392,7 @@ class Camera:
         """
         aspect = width / height
         if self.render.viewmode == "perspective":
-            P = perspective(
+            P = self.perspective(
                 self.config.fov, aspect, self.config.near * self.config.scale, self.config.far * self.config.scale
             )
         else:
@@ -323,7 +400,7 @@ class Camera:
             right = self.distance
             bottom = -self.distance / aspect
             top = self.distance / aspect
-            P = ortho(
+            P = self.ortho(
                 left, right, bottom, top, self.config.near * self.config.scale, self.config.far * self.config.scale
             )
         return asfortranarray(P, dtype=float32)

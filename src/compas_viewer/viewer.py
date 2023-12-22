@@ -124,9 +124,9 @@ class Viewer:
     def _init_statusbar(self) -> None:
         self.statusbar = self._window.statusBar()
         self.statusbar.setContentsMargins(0, 0, 0, 0)
-        self.statusText = QtWidgets.QLabel(self.config.statusbartext)
+        self.statusText = QtWidgets.QLabel(self.config.statusbar)
         self.statusbar.addWidget(self.statusText, 1)
-        if self.config.showfps:
+        if self.config.show_fps:
             self.statusFps = QtWidgets.QLabel("fps: ")
             self.statusbar.addWidget
 
