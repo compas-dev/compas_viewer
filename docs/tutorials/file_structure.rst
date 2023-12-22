@@ -86,7 +86,7 @@ Structure
       - **pan**:  The pan function. | *Dict* | `{"mouse": "r", "key": "shift"}`
       - **rotate**:  The rotate function. | *Dict* | `{"mouse": "r", "key": ""}`
       - **box_selection**:  The box_selection function. | *Dict* | `{"mouse": "l", "key": ""}`
-      - **box_deselection**:  The box_selection function. | *Dict* | `{"mouse": "l", "key": "control"}`
+      - **drag_deselection**:  The box_selection function. | *Dict* | `{"mouse": "l", "key": "control"}`
       - **selection**:  The box_selection function. | *Dict* | `{"mouse": "l", "key": ""}`
       - **multi_selection**:  The box_selection function. | *Dict* | `{"mouse": "l", "key": "shift"}`
       - **deselection**:  The box_selection function. | *Dict* | `{"mouse": "l", "key": "control"}`

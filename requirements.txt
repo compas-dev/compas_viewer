@@ -1,4 +1,4 @@
 compas @ git+https://github.com/compas-dev/compas@main
 pyopengl
-qtpy
+PyQt5
 pyqt5-tools

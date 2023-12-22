@@ -9,7 +9,7 @@ def test_viewer_config() -> None:
     assert isinstance(config.title, str)
     assert isinstance(config.width, int)
     assert isinstance(config.height, int)
-    assert isinstance(config.full_screen, bool)
+    assert isinstance(config.fullscreen, bool)
     config.validate_data(config.data)
 
 
@@ -19,8 +19,8 @@ def test_controller_config() -> None:
     assert isinstance(config.pan, dict)
     assert isinstance(config.zoom, dict)
     assert isinstance(config.rotate, dict)
-    assert isinstance(config.box_selection, dict)
-    assert isinstance(config.selection, str)
-    assert isinstance(config.multi_selection, str)
-    assert isinstance(config.deletion, str)
+    assert isinstance(config.drag_selection, dict)
+    assert isinstance(config.select, str)
+    assert isinstance(config.multiselect, str)
+    assert isinstance(config.deselect, str)
     config.validate_data(config.data)

@@ -5,8 +5,8 @@
         "title": "COMPAS VIEWER",
         "width": 800,
         "height": 800,
-        "full_screen": true,
-        "statusbar_text": "compas_viewer",
+        "fullscreen": true,
+        "statusbar": "compas_viewer",
         "show_fps": true
     },
     "guid": "52a481b3-0a86-45df-92b0-dbd59e9cb7a6"

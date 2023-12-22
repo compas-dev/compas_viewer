@@ -8,7 +8,6 @@ flake8
 invoke >=0.14
 isort
 sphinx_compas2_theme
-sphinx_qt_documentation
 twine
 wheel
 -e .

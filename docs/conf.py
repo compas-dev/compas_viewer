@@ -80,7 +80,7 @@ plot_formats = ["png"]
 
 intersphinx_mapping = {
     "python": ("https://docs.python.org/", None),
-    "compas": ("https://compas.dev/compas/latest/", None),
+    "compas": ("https://compas.dev/compas/latest/", None)
 }
 
 # linkcode

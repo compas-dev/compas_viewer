@@ -5,9 +5,9 @@
             "zoom": { "mouse": "wheel", "key": "" },
             "pan": { "mouse": "right", "key": "shift" },
             "rotate": { "mouse": "right", "key": "" },
-            "box_selection": { "mouse": "left", "key": "" },
-            "box_deselection": { "mouse": "left", "key": "control" },
-            "selection": { "mouse": "left", "multi_selection": "shift", "deselection": "control" }
+            "drag_selection": { "mouse": "left", "key": "" },
+            "drag_deselection": { "mouse": "left", "key": "control" },
+            "select": { "mouse": "left", "multiselect": "shift", "deselect": "control" }
         },
         "keys": [
             {
