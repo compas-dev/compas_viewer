@@ -9,15 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Added and formatted `Shader` and `Camera`.
-- Added a `RenderConfig` for configuring the Render object.
-- Added the `shaders` and the `Shader` class in the shader folder.
-- Created the `Camera`, `metrics` and `gl` functions and classes (most copied from the view2).
-- Adjustment of the `ControllerConfig` and `ViewerConfig``.
-- Adjustment of the `Viewer`.
-- Basic `Viewer` buildup with the widgets.
-- Configurations: `controller_config` and `viewer_config`
-- Code and File structure diagrams.
+* Added and formatted `Shader` and `Camera`.
+* Added a `RenderConfig` for configuring the Render object.
+* Added the `shaders` and the `Shader` class  in the shader folder.
+* Created the `Camera`, `metrics` and `gl` functions and classes (most copied from the view2).
+* Adjustment of the `ControllerConfig` and `ViewerConfig``.
+* Adjustment of the `Viewer`.
+* Basic `Viewer` buildup with the widgets.
+* Configurations: `controller_config` and `viewer_config`
+* Code and File structure diagrams.
 
 ### Changed
 
