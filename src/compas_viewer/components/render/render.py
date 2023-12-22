@@ -1,15 +1,13 @@
 import time
 from typing import TYPE_CHECKING
-from typing import Any
 from typing import Dict
+from typing import List
 
 from compas.geometry import transform_points_numpy
-from compas.utilities import flatten
 from numpy import float32
 from numpy import frombuffer
 from numpy import identity
 from numpy import uint8
-from numpy.typing import NDArray
 from OpenGL import GL
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
@@ -20,8 +18,6 @@ from compas_viewer.configurations import ViewModeType
 from compas_viewer.scene.bufferobject import BufferObject
 
 from .camera import Camera
-from .gl import make_index_buffer
-from .gl import make_vertex_buffer
 from .shaders import Shader
 
 if TYPE_CHECKING:
@@ -305,7 +301,7 @@ class Render(QtWidgets.QOpenGLWidget):
 
         projection = self.camera.projection(self.viewer.config.width, self.viewer.config.height)
         viewworld = self.camera.viewworld()
-        transform = identity(4, dtype=float32)
+        transform = list(identity(4, dtype=float32))
         # create the program
 
         self.shader_model = Shader(name="model")
@@ -348,27 +344,6 @@ class Render(QtWidgets.QOpenGLWidget):
         self.shader_grid.uniform4x4("viewworld", viewworld)
         self.shader_grid.uniform4x4("transform", transform)
         self.shader_grid.release()
-
-    def make_buffer_from_data(self, data) -> Dict[str, Any]:
-        """Create buffers from point/line/face data.
-
-        Parameters
-        ----------
-        data : tuple
-            Contains positions, colors, elements for the buffer
-
-        Returns
-        -------
-        buffer_dict : dict
-            A dict with created buffer indexes
-        """
-        positions, colors, elements = data
-        return {
-            "positions": make_vertex_buffer(list(flatten(positions))),
-            "colors": make_vertex_buffer(list(flatten(colors))),
-            "elements": make_index_buffer(list(flatten(elements))),
-            "n": len(list(flatten(elements))),
-        }
 
     def update_projection(self, w=None, h=None):
         """
@@ -419,12 +394,12 @@ class Render(QtWidgets.QOpenGLWidget):
         """
         self.update_projection(w, h)
 
-    def sort_objects_from_viewworld(self, viewworld: NDArray[float32]):
+    def sort_objects_from_viewworld(self, viewworld: List[List[float]]):
         """Sort objects by the distances from their bounding box centers to camera location
 
         Parameters
         ----------
-        viewworld : NDArray[float32]
+        viewworld : list[list[float]]
             The viewworld matrix.
 
         Returns

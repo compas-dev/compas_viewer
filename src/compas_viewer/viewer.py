@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Literal
 from typing import Optional
 
+from compas.scene import Scene
 from PyQt5 import QtCore
 from PyQt5 import QtGui
 from PyQt5 import QtWidgets
@@ -94,6 +95,12 @@ class Viewer:
             self.config.height = height
 
         self._init(render_config)
+
+    def __new__(cls, *args, **kwargs):
+        instance = super(Viewer, cls).__new__(cls)
+
+        Scene.viewerinstance = instance  # type: ignore
+        return instance
 
     # ==========================================================================
     # Init functions

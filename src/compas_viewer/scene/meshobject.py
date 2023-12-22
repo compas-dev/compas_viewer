@@ -1,45 +1,21 @@
-from compas.utilities import pairwise
+from compas.colors import Color
 from compas.geometry import centroid_points
 from compas.geometry import is_coplanar
-from compas.colors import Color
+from compas.utilities import pairwise
+
 from .bufferobject import BufferObject
 
 
-class MeshObject(BufferObject):
+class MeshObject(BufferObject ):
     """Object for displaying COMPAS mesh data structures.
 
     Parameters
     ----------
-    data : :class: `compas.datastructures.Mesh`
-        Mesh for the viewer
-    name : string
-        name of the object
-    show_vertices : bool
-        True to show vertices
-    show_edges : bool
-        True to show edges
-    show_faces : bool
-        True to show faces
-    facecolor : list
-        Face color
-    linecolor : list
-        Line color
-    pointcolor : list
-        point color
-    linewidth : float
-        Line width
-    pointsize : float
-        Point size
+
     hide_coplanaredges : bool
-        True to hide the coplanar edges
-    opacity : float
-        The opacity of mesh
-    vertices : list
-        Subset of vertices to be displayed
-    edges : list
-        Subset of edges to be displayed
-    faces : list
-        Subset of faces to be displayed
+        True to hide the coplanar edges.
+    kwargs : dict, optional
+        Additional visualization options for
 
     Attributes
     ----------

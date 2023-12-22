@@ -3,6 +3,7 @@ from math import radians
 from math import tan
 from typing import TYPE_CHECKING
 from typing import Callable
+from typing import List
 from typing import Optional
 from typing import Tuple
 
@@ -17,7 +18,6 @@ from numpy import float32
 from numpy import pi
 from numpy.linalg import det
 from numpy.linalg import norm
-from numpy.typing import NDArray
 
 if TYPE_CHECKING:
     # https://peps.python.org/pep-0484/#runtime-or-type-checking
@@ -370,7 +370,7 @@ class Camera:
         """
         self.distance -= steps * self.config.zoomdelta * self.distance
 
-    def projection(self, width: int, height: int) -> NDArray[float32]:
+    def projection(self, width: int, height: int) -> List[List[float]]:
         """Compute the projection matrix corresponding to the current camera settings.
 
         Parameters
@@ -382,7 +382,7 @@ class Camera:
 
         Returns
         -------
-        4x4 np.array
+        list[list[float]]
             The transformation matrix as a `numpy` array in column-major order.
 
         Notes
@@ -403,14 +403,14 @@ class Camera:
             P = self.ortho(
                 left, right, bottom, top, self.config.near * self.config.scale, self.config.far * self.config.scale
             )
-        return asfortranarray(P, dtype=float32)
+        return list(asfortranarray(P, dtype=float32))
 
-    def viewworld(self) -> NDArray[float32]:
+    def viewworld(self) -> List[List[float]]:
         """Compute the view-world matrix corresponding to the current camera settings.
 
         Returns
         -------
-        4x4 np.array
+        list[list[float]]
             The transformation matrix in column-major order.
 
         Notes
@@ -421,4 +421,4 @@ class Camera:
         T = Translation.from_vector(self.position)
         R = Rotation.from_euler_angles(self.rotation)
         W = T * R
-        return asfortranarray(W.inverted(), dtype=float32)
+        return list(asfortranarray(W.inverted(), dtype=float32))

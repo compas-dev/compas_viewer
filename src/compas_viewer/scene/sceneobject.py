@@ -1,11 +1,11 @@
-import abc
-import inspect
 from typing import Dict
+from typing import List
+from typing import Optional
 from typing import Union
 
 import numpy as np
 from compas.colors import Color
-from compas.data import Data
+from compas.geometry import Point
 from compas.geometry import Rotation
 from compas.geometry import Scale
 from compas.geometry import Transformation
@@ -13,33 +13,14 @@ from compas.geometry import Translation
 from compas.geometry import decompose_matrix
 from compas.geometry import identity_matrix
 from compas.scene import SceneObject
-
-DATA_OBJECT = {}
-
-
-def _get_object_cls(data):
-    dtype = type(data)
-    cls = None
-
-    for type_ in inspect.getmro(dtype):
-        cls = DATA_OBJECT.get(type_, None)
-
-        if cls is not None:
-            break
-
-    if cls is None:
-        raise Exception("No object is registered for this data type: {}".format(dtype))
-
-    return cls
+from numpy.typing import NDArray
 
 
-class Object(SceneObject):
+class ViewerSceneObject(SceneObject):
     """Base class for all Viewer scene objects.
 
     Parameters
     ----------
-    data : :class:`compas.data.Data`
-        A COMPAS data object.
     is_selected : bool, optional
         Whether the object is selected.
         Default to False.
@@ -73,7 +54,7 @@ class Object(SceneObject):
     opacity : float, optional
         The opacity of the object.
         Default to 1.0.
-    **kwargs : dict, optional
+    kwargs : dict, optional
         Additional visualization options for specific objects.
 
     Attributes
@@ -88,11 +69,11 @@ class Object(SceneObject):
         Whether to show lines/edges of the object.
     show_faces : bool
         Whether to show faces of the object.
-    pointcolor : :class:`compas.color.Color`
+    pointcolor : :class:`compas.color.Color` | Dict[Union[str, int], Color] | None
         The color of the points.
-    linecolor : :class:`compas.color.Color`
+    linecolor : :class:`compas.color.Color` | Dict[Union[str, int], Color] | None
         The color of the lines.
-    facecolor : :class:`compas.color.Color`
+    facecolor : :class:`compas.color.Color` | Dict[Union[str, int], Color] | None
         The color of the faces.
     pointcolors : Dict[Union[str, int], Color]
         The color dict of individual points.
@@ -101,13 +82,13 @@ class Object(SceneObject):
     facecolors : Dict[Union[str, int], Color]
         The color dict of individual faces.
     linewidth : int
-        The line width to be drawn on screen.
+        The line width to be drawn on screen. Default to 1.
     pointsize : int
-        The point size to be drawn on screen.
+        The point size to be drawn on screen. Default to 10.
     opacity : float
-        The opacity of the object.
+        The opacity of the object. Default to 1.0.
     background : bool
-        Whether the object is drawn on the backgound with depth test disabled.
+        Whether the object is drawn on the background with depth test disabled.
     bounding_box : :class:`numpy.array`, read-only
         The min and max corners of object bounding box, as a numpy array of shape (2, 3).
     bounding_box_center : :class:`numpy.array`, read-only
@@ -122,8 +103,6 @@ class Object(SceneObject):
         The scale vector of the object.
     properties : list, read-only
         The list of object-specific properties.
-    otype : class
-        The data class of the object.
 
     """
 
@@ -131,43 +110,27 @@ class Object(SceneObject):
     default_color_lines = Color(0.4, 0.4, 0.4)
     default_color_faces = Color(0.8, 0.8, 0.8)
 
-    @staticmethod
-    def register(dtype, otype):
-        """Register an object class to its corrensponding data type"""
-        DATA_OBJECT[dtype] = otype
-
-    @staticmethod
-    def build(data, **kwargs):
-        """Build an object class according to its corrensponding data type"""
-        try:
-            obj = _get_object_cls(data)(data, **kwargs)
-        except KeyError:
-            raise TypeError("Type {} is not supported by the viewer.".format(type(data)))
-        return obj
-
     def __init__(
         self,
-        data: Data,
-        app=None,
-        name: str = None,
+        name: Optional[str] = None,
         is_selected: bool = False,
         is_visible: bool = True,
         show_points: bool = False,
         show_lines: bool = True,
         show_faces: bool = True,
-        pointcolor: Union[Color, Dict[Union[str, int], Color]] = None,
-        linecolor: Union[Color, Dict[Union[str, int], Color]] = None,
-        facecolor: Union[Color, Dict[Union[str, int], Color]] = None,
+        pointcolor: Optional[Union[Color, Dict[Union[str, int], Color]]] = None,
+        linecolor: Optional[Union[Color, Dict[Union[str, int], Color]]] = None,
+        facecolor: Optional[Union[Color, Dict[Union[str, int], Color]]] = None, #TODO
         linewidth: int = 1,
         pointsize: int = 10,
         opacity: float = 1.0,
+        kwargs: Dict = {},
     ):
-        self._data = data
-        self._app = app
+        super(ViewerSceneObject, self).__init__(**kwargs)
         self.name = name or str(self)
         self.is_selected = is_selected
         self.is_visible = is_visible
-        self.parent = None
+        self.parent: Optional[ViewerSceneObject] = None
         self._children = set()
 
         self.show_points = show_points
@@ -196,17 +159,17 @@ class Object(SceneObject):
         self.linewidth = linewidth
         self.pointsize = pointsize
         self.opacity = opacity
-        self.background = False
+        self.background: bool = False
 
-        self._instance_color = None
-        self._translation = [0.0, 0.0, 0.0]
-        self._rotation = [0.0, 0.0, 0.0]
-        self._scale = [1.0, 1.0, 1.0]
-        self._transformation = Transformation()
-        self._matrix_buffer = None
+        self._instance_color: Optional[Color] = None
+        self._translation = Translation.from_matrix([0.0, 0.0, 0.0])
+        self._rotation = Rotation.from_matrix([0.0, 0.0, 0.0])
+        self._scale = Scale.from_matrix([1.0, 1.0, 1.0])
+        self._transformation = Transformation.from_matrix(identity_matrix(4))
+        self._matrix_buffer: Optional[List[List[float]]] = None
 
-        self._bounding_box = None
-        self._bounding_box_center = None
+        self._bounding_box: Optional[NDArray] = None
+        self._bounding_box_center: Optional[Point] = None
         self._is_collection = False
 
     @property
@@ -218,43 +181,25 @@ class Object(SceneObject):
         return self._bounding_box_center
 
     @property
-    def otype(self):
-        return DATA_OBJECT[self._data.__class__]
-
-    @property
-    def DATA_OBJECT(self):
-        return DATA_OBJECT
-
-    @abc.abstractmethod
-    def init(self):
-        pass
-
-    @abc.abstractmethod
-    def draw(self, shader):
-        pass
-
-    def create(self):
-        pass
+    def children(self):
+        return self._children
 
     @property
     def properties(self):
         return None
 
-    @property
-    def children(self):
-        return self._children
+    # TODO
+    # def add(self, item, **kwargs):
+    #     if isinstance(item, Object):
+    #         obj = item
+    #     else:
+    #         obj = self._app.add(item, **kwargs)
+    #     self._children.add(obj)
+    #     obj.parent = self
 
-    def add(self, item, **kwargs):
-        if isinstance(item, Object):
-            obj = item
-        else:
-            obj = self._app.add(item, **kwargs)
-        self._children.add(obj)
-        obj.parent = self
-
-        if self._app.dock_slots["sceneform"] and self._app.view.isValid():
-            self._app.dock_slots["sceneform"].update()
-        return obj
+    #     if self._app.dock_slots["sceneform"] and self._app.view.isValid():
+    #         self._app.dock_slots["sceneform"].update()
+    #     return obj
 
     def remove(self, obj):
         obj.parent = None
@@ -303,7 +248,7 @@ class Object(SceneObject):
             S1 = Scale.from_factors(self.scale)
             M = T1 * R1 * S1
             self._transformation.matrix = M.matrix
-            self._matrix_buffer = np.array(self.matrix_world).flatten()
+            self._matrix_buffer = list(np.array(self.matrix_world).flatten())
 
         if self.children:
             for child in self.children:
@@ -317,6 +262,7 @@ class Object(SceneObject):
     def transformation_world(self):
         """Get the updated matrix from object's translation, rotation and scale"""
         if self.parent:
+            assert isinstance(self.parent.transformation_world, Transformation)
             return self.parent.transformation_world * self.transformation
         else:
             return self.transformation
@@ -334,8 +280,8 @@ class Object(SceneObject):
     @matrix.setter
     def matrix(self, matrix):
         """Set the object's translation, rotation and scale from given matrix, and update object's matrix"""
-        scale, _, rotation, tranlation, _ = decompose_matrix(matrix)
-        self.translation = tranlation
+        scale, _, rotation, translation, _ = decompose_matrix(matrix)
+        self.translation = translation
         self.rotation = rotation
         self.scale = scale
         self._update_matrix()
