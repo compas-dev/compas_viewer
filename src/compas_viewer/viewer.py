@@ -1,11 +1,12 @@
 import sys
 from os import path
 from pathlib import Path
-from typing import Literal, Union
+from typing import Literal
 from typing import Optional
+from typing import Union
 
-from compas.geometry import Geometry
 from compas.datastructures import Mesh
+from compas.geometry import Geometry
 from compas.scene import Scene
 from PyQt5 import QtCore
 from PyQt5 import QtGui
