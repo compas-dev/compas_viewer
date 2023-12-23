@@ -102,18 +102,18 @@ class ViewerSceneObject(SceneObject):
         The opacity of the object. Default to 1.0.
     background : bool
         Whether the object is drawn on the background with depth test disabled.
-    bounding_box : :class:`numpy.array`, read-only
+    bounding_box : :class:`list[float]`, read-only
         The min and max corners of object bounding box, as a numpy array of shape (2, 3).
-    bounding_box_center : :class:`numpy.array`, read-only
+    bounding_box_center : :class:`compas.geometry.Point`, read-only
         The center of object bounding box, as a numpy array of shape (3,).
-    matrix : :class:`numpy.array`
+    matrix : :class:`list[float]`, read-only
         The transformation matrix of the object.
-    translation : :class:`numpy.array`
-        The translation vector of the object.
-    rotation : :class:`numpy.array`
-        The euler rotation vector of the object.
-    scale : :class:`numpy.array`
-        The scale vector of the object.
+    translation : :class:`compas.geometry.Translation`
+        The translation of the object.
+    rotation : :class:`compas.geometry.Rotation`
+        The euler rotation  of the object.
+    scale : :class:`compas.geometry.Scale`
+        The scale of the object.
     properties : list, read-only
         The list of object-specific properties.
     visualisation : list[str], read-only
@@ -195,9 +195,6 @@ class ViewerSceneObject(SceneObject):
         self._frontfaces_buffer: Dict[str, Any] = {}
         self._backfaces_buffer: Dict[str, Any] = {}
 
-    def __repr__(self):
-        return f"{self.__class__.__name__}({self.name})"
-
     @property
     def bounding_box(self):
         return self._bounding_box
@@ -268,15 +265,14 @@ class ViewerSceneObject(SceneObject):
     def _update_matrix(self):
         """Update the matrix from object's translation, rotation and scale"""
         if (not self.parent or self.parent._matrix_buffer is None) and (
-            self.translation == [0, 0, 0] and self.rotation == [0, 0, 0] and self.scale == [1, 1, 1]
+            self.translation.matrix == [0, 0, 0]
+            and self.rotation.matrix == [0, 0, 0]
+            and self.scale.matrix == [1, 1, 1]
         ):
             self._transformation.matrix = identity_matrix(4)
             self._matrix_buffer = None
         else:
-            T1 = Translation.from_vector(self.translation)
-            R1 = Rotation.from_euler_angles(self.rotation)
-            S1 = Scale.from_factors(self.scale)
-            M = T1 * R1 * S1
+            M = self.translation * self.rotation * self.scale
             self._transformation.matrix = M.matrix
             self._matrix_buffer = list(np.array(self.matrix_world).flatten())
 

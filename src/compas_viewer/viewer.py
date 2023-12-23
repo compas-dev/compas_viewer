@@ -1,9 +1,11 @@
 import sys
 from os import path
 from pathlib import Path
-from typing import Literal
+from typing import Literal, Union
 from typing import Optional
 
+from compas.geometry import Geometry
+from compas.datastructures import Mesh
 from compas.scene import Scene
 from PyQt5 import QtCore
 from PyQt5 import QtGui
@@ -14,11 +16,12 @@ from PyQt5.QtGui import QIcon
 from compas_viewer.components import Render
 from compas_viewer.configurations import RenderConfig
 from compas_viewer.configurations import ViewerConfig
+from compas_viewer.scene.sceneobject import ViewerSceneObject
 
 ICONS = Path(Path(__file__).parent, "_static", "icons")
 
 
-class Viewer:
+class Viewer(Scene):
     """
     The Viewer class is the main entry of `compas_viewer`. It organizes the scene and create the GUI application.
 
@@ -75,6 +78,7 @@ class Viewer:
         show_grid: Optional[bool] = None,
         configpath: Optional[str] = None,
     ) -> None:
+        super(Viewer, self).__init__()
         # custom or default config
         if configpath is None:
             self.config = ViewerConfig.from_default()
@@ -98,7 +102,6 @@ class Viewer:
 
     def __new__(cls, *args, **kwargs):
         instance = super(Viewer, cls).__new__(cls)
-
         Scene.viewerinstance = instance  # type: ignore
         return instance
 
@@ -317,5 +320,35 @@ class Viewer:
         # stop point of the main thread:
         self._app.exec_()
 
+    # ==========================================================================
+    # Scene
+    # ==========================================================================
 
-ViewerType = type(Viewer)
+    def add(
+        self,
+        item: Union[Mesh, Geometry],
+        name: Optional[str] = None,
+        parent: Optional[ViewerSceneObject] = None,
+        **kwargs
+    ):
+        """
+        Add an item to the scene.
+        This function is inherent from :class:`compas.scene.Scene` with additional functionalities.
+
+        Parameters
+        ----------
+        item : :class:`compas.geometry.Geometry`
+            The geometry to add to the scene.
+        parent : :class:`compas.scene.SceneObject`, optional
+            The parent object of the item.
+
+        Returns
+        -------
+        :class:`compas.scene.SceneObject`
+            The scene object.
+        """
+        sceneobject = super(Viewer, self).add(item=item, parent=parent, name=name, **kwargs)
+        assert isinstance(sceneobject, ViewerSceneObject)
+        self.render.objects[name or str(sceneobject)] = sceneobject
+
+        return sceneobject

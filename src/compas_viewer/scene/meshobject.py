@@ -241,3 +241,12 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
                     elements.append([i + 0, i + 1, i + 2])
                     i += 3
         return positions, colors, elements
+
+    def draw_vertices(self, vertices=None, color=None, text=None):
+        pass
+
+    def draw_edges(self, edges=None, color=None, text=None):
+        pass
+
+    def draw_faces(self, faces=None, color=None, text=None):
+        pass

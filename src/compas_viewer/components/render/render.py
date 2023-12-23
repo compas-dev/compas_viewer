@@ -301,6 +301,7 @@ class Render(QtWidgets.QOpenGLWidget):
 
         projection = self.camera.projection(self.viewer.config.width, self.viewer.config.height)
         viewworld = self.camera.viewworld()
+
         transform = list(identity(4, dtype=float32))
         # create the program
 

@@ -4,6 +4,7 @@ from typing import List
 from typing import Tuple
 from typing import Union
 
+import numpy
 from OpenGL import GL
 
 
@@ -22,10 +23,11 @@ class Shader:
         name : str
             The name of the location in the shader program.
         value : list[list[float]]
-            A 4x4 transformation matrix in column-major ordering.
+            A 4x4 transformation matrix.
         """
+        _value = numpy.array(value)
         location = GL.glGetUniformLocation(self.program, name)
-        GL.glUniformMatrix4fv(location, 1, True, value)
+        GL.glUniformMatrix4fv(location, 1, True, _value)
 
     def uniform1i(self, name: str, value: int):
         """Store a uniform integer in the shader program at a named location.
