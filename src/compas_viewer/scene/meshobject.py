@@ -1,5 +1,3 @@
-from math import e
-from typing import Any
 from typing import List
 from typing import Tuple
 
@@ -53,7 +51,7 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
     """
 
     def __init__(self, mesh, hide_coplanaredges=False, use_vertex_color=True, **kwargs):
-        super(MeshObject, self).__init__(mesh, **kwargs)
+        super(MeshObject, self).__init__( **kwargs)
         self._mesh = mesh
         self.hide_coplanaredges = hide_coplanaredges
         self.use_vertex_color = use_vertex_color

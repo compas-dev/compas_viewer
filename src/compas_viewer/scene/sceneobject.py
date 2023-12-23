@@ -5,7 +5,6 @@ from typing import List
 from typing import Optional
 from typing import Tuple
 from typing import Union
-from click import clear
 
 import numpy as np
 from compas.colors import Color
