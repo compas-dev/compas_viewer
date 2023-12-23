@@ -34,5 +34,9 @@ TEMP = os.path.abspath(os.path.join(HOME, "temp"))
 
 __all__ = ["HOME", "DATA", "DOCS", "TEMP"]
 
+__all_plugins__ = [
+    "compas_viewer.scene",
+]
+
 # Putting imports here to avoid circular imports
 from .viewer import Viewer  # noqa: F401, E402

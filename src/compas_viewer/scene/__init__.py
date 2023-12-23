@@ -3,22 +3,31 @@ This package provides scene object plugins for visualizing COMPAS objects in `co
 """
 from compas.scene import register
 from compas.plugins import plugin
-
+from .sceneobject import ViewerSceneObject
 from compas.datastructures import Mesh
-from compas.geometry import Box
+
 
 from .meshobject import MeshObject
-from .boxobject import BoxObject
+
+
+@plugin(category="drawing-utils", requires=["compas_viewer"])
+def clear(guids=None):
+    pass
+
+
+@plugin(category="drawing-utils", requires=["compas_viewer"])
+def redraw():
+    pass
 
 
 @plugin(category="factories", requires=["Viewer"])
 def register_scene_objects():
     register(Mesh, MeshObject, context="Viewer")
-    register(Box, BoxObject, context="Viewer")
+
     print("Viewer SceneObjects registered.")
 
 
 __all__ = [
-    "BoxObject",
+    "ViewerSceneObject",
     "MeshObject",
 ]

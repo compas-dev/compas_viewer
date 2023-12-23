@@ -15,7 +15,7 @@ from PyQt5 import QtWidgets
 from compas_viewer.configurations import RenderConfig
 from compas_viewer.configurations import RenderModeType
 from compas_viewer.configurations import ViewModeType
-from compas_viewer.scene.bufferobject import BufferObject
+from compas_viewer.scene.sceneobject import ViewerSceneObject
 
 from .camera import Camera
 from .shaders import Shader
@@ -61,7 +61,7 @@ class Render(QtWidgets.QOpenGLWidget):
         self.camera = Camera(self)
         # self.grid = Grid(self.config.gridsize)
         # self.selector = Selector(self)
-        self.objects: Dict[str, BufferObject] = {}
+        self.objects: Dict[str, ViewerSceneObject] = {}
 
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
 
@@ -412,7 +412,7 @@ class Render(QtWidgets.QOpenGLWidget):
         centers = []
         for guid in self.objects:
             obj = self.objects[guid]
-            if isinstance(obj, BufferObject):
+            if isinstance(obj, ViewerSceneObject):
                 if obj.opacity * self.opacity < 1 and obj.bounding_box_center is not None:
                     transparent_objects.append(obj)
                     centers.append(transform_points_numpy([obj.bounding_box_center], obj.matrix)[0])
