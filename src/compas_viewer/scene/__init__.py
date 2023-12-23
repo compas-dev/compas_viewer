@@ -23,11 +23,7 @@ def redraw():
 @plugin(category="factories", requires=["Viewer"])
 def register_scene_objects():
     register(Mesh, MeshObject, context="Viewer")
-
     print("Viewer SceneObjects registered.")
 
 
-__all__ = [
-    "ViewerSceneObject",
-    "MeshObject",
-]
+__all__ = ["ViewerSceneObject", "MeshObject"]

@@ -2,6 +2,7 @@ from typing import List
 from typing import Tuple
 
 from compas.colors import Color
+from compas.datastructures import Mesh
 from compas.geometry import Point
 from compas.geometry import centroid_points
 from compas.geometry import is_coplanar
@@ -50,8 +51,8 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
         The opacity of mesh.
     """
 
-    def __init__(self, mesh, hide_coplanaredges=False, use_vertex_color=True, **kwargs):
-        super(MeshObject, self).__init__( **kwargs)
+    def __init__(self, mesh: Mesh, hide_coplanaredges: bool = False, use_vertex_color: bool = True, **kwargs):
+        super(MeshObject, self).__init__(mesh=mesh, **kwargs)
         self._mesh = mesh
         self.hide_coplanaredges = hide_coplanaredges
         self.use_vertex_color = use_vertex_color
@@ -64,6 +65,7 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
         i = 0
 
         for vertex in self._mesh.vertices():
+            assert isinstance(vertex, int)
             positions.append(self.vertex_xyz[vertex])
             colors.append(self.pointcolors.get(vertex, self.pointcolor))
             elements.append([i])
@@ -80,12 +82,12 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
             color = self.linecolors.get((u, v), self.linecolor)
             if self.hide_coplanaredges:
                 # hide the edge if neighbor faces are coplanar
-                fkeys = self._mesh.edge_faces(u, v)
-                if not self._mesh.is_edge_on_boundary(u, v):
+                fkeys = self._mesh.edge_faces((u, v))
+                if not self._mesh.is_edge_on_boundary((u, v)):
                     ps = [
                         self._mesh.face_center(fkeys[0]),
                         self._mesh.face_center(fkeys[1]),
-                        *self._mesh.edge_coordinates(u, v),
+                        *self._mesh.edge_coordinates((u, v)),
                     ]
                     if is_coplanar(ps, tol=1e-5):
                         continue
@@ -105,6 +107,8 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
 
         for face in self._mesh.faces():
             vertices = self._mesh.face_vertices(face)
+            assert isinstance(face, int)
+
             color = self.facecolors.get(face, self.facecolor)
             if len(vertices) == 3:
                 a, b, c = vertices
@@ -177,6 +181,7 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
         faces = self._mesh.faces()
         for face in faces:
             vertices = self._mesh.face_vertices(face)[::-1]
+            assert isinstance(face, int)
             color = self.facecolors.get(face, self.facecolor)
             if len(vertices) == 3:
                 a, b, c = vertices

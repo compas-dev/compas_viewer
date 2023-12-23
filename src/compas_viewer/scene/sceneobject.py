@@ -67,7 +67,7 @@ class ViewerSceneObject(SceneObject):
     opacity : float, optional
         The opacity of the object.
         Default to 1.0.
-    kwargs : dict, optional
+    **kwargs : dict, optional
         Additional visualization options for specific objects.
 
     Attributes
@@ -138,7 +138,7 @@ class ViewerSceneObject(SceneObject):
         linewidth: int = 1,
         pointsize: int = 10,
         opacity: float = 1.0,
-        kwargs: Dict = {},
+        **kwargs,
     ):
         super(ViewerSceneObject, self).__init__(**kwargs)
         self.name = name or str(self)
