@@ -4,7 +4,7 @@ from typing import List
 from typing import Tuple
 from typing import Union
 
-import numpy
+from numpy import array
 from OpenGL import GL
 
 
@@ -25,7 +25,7 @@ class Shader:
         value : list[list[float]]
             A 4x4 transformation matrix.
         """
-        _value = numpy.array(value)
+        _value = array(value)
         location = GL.glGetUniformLocation(self.program, name)
         GL.glUniformMatrix4fv(location, 1, True, _value)
 
