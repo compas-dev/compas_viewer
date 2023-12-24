@@ -1,0 +1,16 @@
+{
+    "dtype": "compas_viewer.configurations/SceneConfig",
+    "data": {
+        "pointscolor": [0.2, 0.2, 0.2, 1.0],
+        "linescolor": [0.4, 0.4, 0.4, 1.0],
+        "facescolor": [0.8, 0.8, 0.8, 1.0],
+        "show_points": false,
+        "show_lines": true,
+        "show_faces": true,
+        "lineswidth": 1,
+        "pointssize": 10,
+        "opacity": 1.0,
+        "hide_coplanaredges": false
+    },
+    "guid": "4ffff417-3578-4260-aef6-45ea7a480ff9"
+}

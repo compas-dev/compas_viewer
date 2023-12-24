@@ -35,39 +35,28 @@ class ViewerSceneObject(SceneObject):
 
     Parameters
     ----------
-    is_selected : bool, optional
+    is_selected : bool
         Whether the object is selected.
-        Default to False.
-    is_visible : bool, optional
+    is_visible : bool
         Whether to show object.
-        Default to True.
-    show_points : bool, optional
+    show_points : bool
         Whether to show points/vertices of the object.
-        Default to False.
-    show_lines : bool, optional
+    show_lines : bool
         Whether to show lines/edges of the object.
-        Default to True.
-    show_faces : bool, optional
+    show_faces : bool
         Whether to show faces of the object.
-        Default to True.
-    pointcolor : Union[Color, Dict[Union[str, int], Color]], optional
+    pointscolor : Union[Color, Dict[Union[str, int], Color]]
         The color or the dict of colors of the points.
-        Default to `compas_view2.objects.Object.default_color_points`.
-    linecolor : Union[Color, Dict[Union[str, int], Color]], optional
+    linescolor : Union[Color, Dict[Union[str, int], Color]]
         The color or the dict of colors of the lines.
-        Default to `compas_view2.objects.Object.default_color_lines`.
-    facecolor : Union[Color, Dict[Union[str, int], Color]], optional
+    facescolor : Union[Color, Dict[Union[str, int], Color]]
         The color or the dict of colors the faces.
-        Default to `compas_view2.objects.Object.default_color_faces`.
-    linewidth : int, optional
+    lineswidth : int
         The line width to be drawn on screen
-        Default to 1.
-    pointsize : int, optional
+    pointssize : int
         The point size to be drawn on screen
-        Default to 10.
-    opacity : float, optional
+    opacity : float
         The opacity of the object.
-        Default to 1.0.
     **kwargs : dict, optional
         Additional visualization options for specific objects.
 
@@ -83,15 +72,15 @@ class ViewerSceneObject(SceneObject):
         Whether to show lines/edges of the object.
     show_faces : bool
         Whether to show faces of the object.
-    pointcolor : :class:`compas.color.ColorDict`
+    pointscolor : :class:`compas.color.ColorDict`
         The color of the points.
-    linecolor : :class:`compas.color.ColorDict`
+    linescolor : :class:`compas.color.ColorDict`
         The color of the lines.
-    facecolor : :class:`compas.color.ColorDict`
+    facescolor : :class:`compas.color.ColorDict`
         The color of the faces.
-    linewidth : int
+    lineswidth : int
         The line width to be drawn on screen. Default to 1.
-    pointsize : int
+    pointssize : int
         The point size to be drawn on screen. Default to 10.
     opacity : float
         The opacity of the object. Default to 1.0.
@@ -115,24 +104,20 @@ class ViewerSceneObject(SceneObject):
         List of visualisation properties which can be edited in the GUI.
     """
 
-    default_color_points = Color(1.0, 0.2, 0.2)
-    default_color_lines = Color(0.4, 0.4, 0.4)
-    default_color_faces = Color(0.8, 0.8, 0.8)
-
     def __init__(
         self,
-        name: Optional[str] = None,
-        is_selected: bool = False,
-        is_visible: bool = True,
-        show_points: bool = False,
-        show_lines: bool = True,
-        show_faces: bool = True,
-        pointcolor: Optional[Union[Color, Dict[Union[str, int], Color]]] = None,
-        linecolor: Optional[Union[Color, Dict[Union[str, int, Any], Color]]] = None,
-        facecolor: Optional[Union[Color, Dict[Union[str, int], Color]]] = None,
-        linewidth: int = 1,
-        pointsize: int = 10,
-        opacity: float = 1.0,
+        name: Optional[str],
+        is_selected: bool,
+        is_visible: bool,
+        show_points: bool,
+        show_lines: bool,
+        show_faces: bool,
+        pointscolor: Union[Color, Dict[Union[str, int], Color]],
+        linescolor: Union[Color, Dict[Union[str, int, Any], Color]],
+        facescolor: Union[Color, Dict[Union[str, int], Color]],
+        lineswidth: int,
+        pointssize: int,
+        opacity: float,
         **kwargs,
     ):
         super(ViewerSceneObject, self).__init__(**kwargs)
@@ -146,21 +131,12 @@ class ViewerSceneObject(SceneObject):
         self.show_lines = show_lines
         self.show_faces = show_faces
 
-        if isinstance(pointcolor, dict):
-            self.pointcolor = ColorDict(self.default_color_points)
-        else:
-            self.pointcolor = ColorDict((pointcolor or self.default_color_points))
-        if isinstance(linecolor, dict):
-            self.linecolor = ColorDict(self.default_color_lines)
-        else:
-            self.linecolor = ColorDict((linecolor or self.default_color_lines))
-        if isinstance(facecolor, dict):
-            self.facecolor = ColorDict(self.default_color_faces)
-        else:
-            self.facecolor = ColorDict((facecolor or self.default_color_faces))
+        self.pointscolor = ColorDict(pointscolor)
+        self.linescolor = ColorDict(linescolor)
+        self.facescolor = ColorDict(facescolor)
 
-        self.linewidth = linewidth
-        self.pointsize = pointsize
+        self.lineswidth = lineswidth
+        self.pointssize = pointssize
         self.opacity = opacity
         self.background: bool = False
 
@@ -310,11 +286,11 @@ class ViewerSceneObject(SceneObject):
         """List of visualisation properties which can be edited in the GUI."""
         options = ["opacity"]
         if self._points_data is not None:
-            options += ["pointcolor", "show_points", "pointsize"]
+            options += ["pointscolor", "show_points", "pointssize"]
         if self._lines_data is not None:
-            options += ["linecolor", "show_lines", "linewidth"]
+            options += ["linescolor", "show_lines", "lineswidth"]
         if self._frontfaces_data is not None:
-            options += ["facecolor", "show_faces"]
+            options += ["facescolor", "show_faces"]
         return options
 
     def make_buffer_from_data(self, data: Tuple[List[Point], List[Color], List[int]]) -> Dict[str, Any]:
@@ -393,7 +369,6 @@ class ViewerSceneObject(SceneObject):
             if data[0] and self._bounding_box_center is None:
                 self._update_bounding_box(data[0])
 
-
     def update_buffers(self):
         """Update all buffers from object's data"""
 
@@ -451,10 +426,10 @@ class ViewerSceneObject(SceneObject):
         shader.uniform1f("object_opacity", self.opacity)
         shader.uniform1i("element_type", 2)
         if self._frontfaces_buffer is not None and self.show_faces and not wireframe:
-            shader.uniform3f("single_color", self.default_color_faces.rgb)  # TODO: might be  wrong
+            shader.uniform3f("single_color", self.facescolor[0].rgb)
             shader.uniform1i(
                 "use_single_color",
-                not self.facecolor and not self._is_collection and not getattr(self, "use_vertex_color", False),
+                not self.facescolor and not self._is_collection and not getattr(self, "use_vertex_color", False),
             )
             shader.bind_attribute("position", self._frontfaces_buffer["positions"])
             shader.bind_attribute("color", self._frontfaces_buffer["colors"])
@@ -462,10 +437,10 @@ class ViewerSceneObject(SceneObject):
                 elements=self._frontfaces_buffer["elements"], n=self._frontfaces_buffer["n"], background=self.background
             )
         if self._backfaces_buffer is not None and self.show_faces and not wireframe:
-            shader.uniform3f("single_color", self.default_color_faces.rgb)  # TODO: might be  wrong
+            shader.uniform3f("single_color", self.facescolor[0].rgb)
             shader.uniform1i(
                 "use_single_color",
-                not self.facecolor and not self._is_collection and not getattr(self, "use_vertex_color", False),
+                not self.facescolor and not self._is_collection and not getattr(self, "use_vertex_color", False),
             )
             shader.bind_attribute("position", self._backfaces_buffer["positions"])
             shader.bind_attribute("color", self._backfaces_buffer["colors"])
@@ -475,24 +450,24 @@ class ViewerSceneObject(SceneObject):
         shader.uniform1i("is_lighted", False)
         shader.uniform1i("element_type", 1)
         if self._lines_buffer is not None and (self.show_lines or wireframe):
-            shader.uniform3f("single_color", self.default_color_lines.rgb)  # TODO: might be  wrong
-            shader.uniform1i("use_single_color", not self.linecolor and not self._is_collection)
+            shader.uniform3f("single_color", self.linescolor[0].rgb)
+            shader.uniform1i("use_single_color", not self.linescolor and not self._is_collection)
             shader.bind_attribute("position", self._lines_buffer["positions"])
             shader.bind_attribute("color", self._lines_buffer["colors"])
             shader.draw_lines(
-                width=self.linewidth,
+                width=self.lineswidth,
                 elements=self._lines_buffer["elements"],
                 n=self._lines_buffer["n"],
                 background=self.background,
             )
         shader.uniform1i("element_type", 0)
         if self._points_buffer is not None and self.show_points:
-            shader.uniform3f("single_color", self.default_color_points.rgb)
-            shader.uniform1i("use_single_color", not self.pointcolor and not self._is_collection)
+            shader.uniform3f("single_color", self.pointscolor[0].rgb)
+            shader.uniform1i("use_single_color", not self.pointscolor and not self._is_collection)
             shader.bind_attribute("position", self._points_buffer["positions"])
             shader.bind_attribute("color", self._points_buffer["colors"])
             shader.draw_points(
-                size=self.pointsize,
+                size=self.pointssize,
                 elements=self._points_buffer["elements"],
                 n=self._points_buffer["n"],
                 background=self.background,
@@ -514,11 +489,11 @@ class ViewerSceneObject(SceneObject):
         if self._points_buffer is not None and self.show_points:
             shader.bind_attribute("position", self._points_buffer["positions"])
             shader.draw_points(
-                size=self.pointsize, elements=self._points_buffer["elements"], n=self._points_buffer["n"]
+                size=self.pointssize, elements=self._points_buffer["elements"], n=self._points_buffer["n"]
             )
         if self._lines_buffer is not None and (self.show_lines or wireframe):
             shader.bind_attribute("position", self._lines_buffer["positions"])
-            shader.draw_lines(width=self.linewidth, elements=self._lines_buffer["elements"], n=self._lines_buffer["n"])
+            shader.draw_lines(width=self.lineswidth, elements=self._lines_buffer["elements"], n=self._lines_buffer["n"])
         if self._frontfaces_buffer is not None and self.show_faces and not wireframe:
             shader.bind_attribute("position", self._frontfaces_buffer["positions"])
             shader.draw_triangles(elements=self._frontfaces_buffer["elements"], n=self._frontfaces_buffer["n"])
@@ -529,7 +504,6 @@ class ViewerSceneObject(SceneObject):
             shader.uniform4x4("transform", np.identity(4).flatten())
         shader.uniform3f("instance_color", [0, 0, 0])
         shader.disable_attribute("position")
-
 
     def clear(self):
         """Clear the object"""

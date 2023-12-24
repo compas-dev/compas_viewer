@@ -26,7 +26,7 @@ class ViewerConfig(Config):
 
     Parameters
     ----------
-    config : ViewerConfigType
+    config : :class:`ViewerConfigType`
         A TypedDict with defined keys and types.
 
     """

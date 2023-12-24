@@ -55,7 +55,7 @@ class KeyConfig(Config):
 
     Parameters
     ----------
-    config : KeyConfigType
+    config : :class:`KeyConfigType`
         A TypedDict with defined keys and types.
     """
 
@@ -72,7 +72,7 @@ class ControllerConfig(Config):
 
     Parameters
     ----------
-    config : ControllerConfigType
+    config : :class:`ControllerConfigType`
         A TypedDict with defined keys and types.
     """
 

@@ -16,6 +16,7 @@ from PyQt5.QtGui import QIcon
 
 from compas_viewer.components import Render
 from compas_viewer.configurations import RenderConfig
+from compas_viewer.configurations import SceneConfig
 from compas_viewer.configurations import ViewerConfig
 from compas_viewer.scene.sceneobject import ViewerSceneObject
 
@@ -84,10 +85,11 @@ class Viewer(Scene):
         if configpath is None:
             self.config = ViewerConfig.from_default()
             render_config = RenderConfig.from_default()
+            self.scene_config = SceneConfig.from_default()
         else:
-            # TODO
             self.config = ViewerConfig.from_json(Path(configpath, "viewer.json"))
             render_config = RenderConfig.from_json(Path(configpath, "render.json"))
+            self.scene_config = SceneConfig.from_json(Path(configpath, "scene.json"))
 
         #  in-code config
         if title is not None:
@@ -330,6 +332,18 @@ class Viewer(Scene):
         item: Union[Mesh, Geometry],
         name: Optional[str] = None,
         parent: Optional[ViewerSceneObject] = None,
+        is_selected: bool = False,
+        is_visible: bool = True,
+        show_points: Optional[bool] = None,
+        show_lines: Optional[bool] = None,
+        show_faces: Optional[bool] = None,
+        pointscolor: Optional[Union[str, dict]] = None,
+        linescolor: Optional[Union[str, dict]] = None,
+        facescolor: Optional[Union[str, dict]] = None,
+        lineswidth: Optional[int] = None,
+        pointssize: Optional[int] = None,
+        opacity: Optional[float] = None,
+        hide_coplanaredges: Optional[bool] = None,
         **kwargs
     ):
         """
@@ -342,13 +356,68 @@ class Viewer(Scene):
             The geometry to add to the scene.
         parent : :class:`compas.scene.SceneObject`, optional
             The parent object of the item.
+        is_selected : bool, optional
+            Whether the object is selected.
+            Default to False.
+        is_visible : bool, optional
+            Whether to show object.
+            Default to True.
+        show_points : bool, optional
+            Whether to show points/vertices of the object.
+            It will override the value in the scene config file.
+        show_lines : bool, optional
+            Whether to show lines/edges of the object.
+            It will override the value in the scene config file.
+        show_faces : bool, optional
+            Whether to show faces of the object.
+            It will override the value in the scene config file.
+        pointscolor : Union[Color, Dict[Union[str, int], Color]], optional
+            The color or the dict of colors of the points.
+            It will override the value in the scene config file.
+        linescolor : Union[Color, Dict[Union[str, int], Color]], optional
+            The color or the dict of colors of the lines.
+            It will override the value in the scene config file.
+        facescolor : Union[Color, Dict[Union[str, int], Color]], optional
+            The color or the dict of colors the faces.
+            It will override the value in the scene config file.
+        lineswidth : int, optional
+            The line width to be drawn on screen
+            It will override the value in the scene config file.
+        pointssize : int, optional
+            The point size to be drawn on screen
+            It will override the value in the scene config file.
+        opacity : float, optional
+            The opacity of the object.
+            It will override the value in the scene config file.
+        hide_coplanaredges : bool, optional
+            Whether to hide the coplanar edges of the mesh.
+            It will override the value in the scene config file.
+        **kwargs : dict
+            The other possible parameters to be passed to the object.
 
         Returns
         -------
         :class:`compas.scene.SceneObject`
             The scene object.
         """
-        sceneobject = super(Viewer, self).add(item=item, parent=parent, name=name, **kwargs)
+        sceneobject = super(Viewer, self).add(
+            item=item,
+            parent=parent,
+            name=name,
+            is_selected=is_selected,
+            is_visible=is_visible,
+            show_points=show_points or self.scene_config.show_points,
+            show_lines=show_lines or self.scene_config.show_lines,
+            show_faces=show_faces or self.scene_config.show_faces,
+            pointscolor=pointscolor or self.scene_config.pointscolor,
+            linescolor=linescolor or self.scene_config.linescolor,
+            facescolor=facescolor or self.scene_config.facescolor,
+            lineswidth=lineswidth or self.scene_config.lineswidth,
+            pointssize=pointssize or self.scene_config.pointssize,
+            opacity=opacity or self.scene_config.opacity,
+            hide_coplanaredges=hide_coplanaredges or self.scene_config.hide_coplanaredges,
+            **kwargs
+        )
         assert isinstance(sceneobject, ViewerSceneObject)
         self.render.objects[name or str(sceneobject)] = sceneobject
 
