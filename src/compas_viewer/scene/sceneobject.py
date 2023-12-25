@@ -8,7 +8,6 @@ from typing import Union
 
 import numpy as np
 from compas.colors import Color
-from compas.colors import ColorDict
 from compas.geometry import Point
 from compas.geometry import Rotation
 from compas.geometry import Scale
@@ -24,6 +23,7 @@ from compas_viewer.components.render.gl import make_index_buffer
 from compas_viewer.components.render.gl import make_vertex_buffer
 from compas_viewer.components.render.gl import update_index_buffer
 from compas_viewer.components.render.gl import update_vertex_buffer
+from compas_viewer.configurations import SceneConfig
 
 if TYPE_CHECKING:
     from compas_viewer.components.render.shaders import Shader
@@ -35,28 +35,35 @@ class ViewerSceneObject(SceneObject):
 
     Parameters
     ----------
+    name : str, optional
+        The name of the object.
+    parent : :class:`compas_viewer.scene.ViewerSceneObject`, optional
+        The parent object.
     is_selected : bool
         Whether the object is selected.
     is_visible : bool
         Whether to show object.
-    show_points : bool
-        Whether to show points/vertices of the object.
-    show_lines : bool
-        Whether to show lines/edges of the object.
-    show_faces : bool
-        Whether to show faces of the object.
-    pointscolor : Union[:class:`compas.colors.Color`, :class:`compas.colors.ColorDict`]
-        The color or the dict of colors of the points.
-    linescolor : Union[:class:`compas.colors.Color`, :class:`compas.colors.ColorDict`]
-        The color or the dict of colors of the lines.
-    facescolor : Union[:class:`compas.colors.Color`, :class:`compas.colors.ColorDict`]
-        The color or the dict of colors the faces.
-    lineswidth : int
-        The line width to be drawn on screen
-    pointssize : int
-        The point size to be drawn on screen
-    opacity : float
-        The opacity of the object.
+    show_points : bool, optional
+        Whether to show points/vertices of the object. It will override the value in the config file.
+    show_lines : bool, optional
+        Whether to show lines/edges of the object. It will override the value in the config file.
+    show_faces : bool, optional
+        Whether to show faces of the object. It will override the value in the config file.
+    pointscolor : Union[:class:`compas.colors.Color`, dict[any, :class:`compas.colors.Color`]], optional
+        The color or the dict of colors of the points. It will override the value in the config file.
+    linescolor : Union[:class:`compas.colors.Color`, dict[any, :class:`compas.colors.Color`]], optional
+        The color or the dict of colors of the lines. It will override the value in the config file.
+    facescolor : Union[:class:`compas.colors.Color`, dict[any, :class:`compas.colors.Color`]], optional
+        The color or the dict of colors the faces. It will override the value in the config file.
+    lineswidth : float, optional
+        The line width to be drawn on screen. It will override the value in the config file.
+    pointssize : float, optional
+        The point size to be drawn on screen. It will override the value in the config file.
+    opacity : float, optional
+        The opacity of the object. It will override the value in the config file.
+    config: :class:`compas_viewer.configurations.SceneConfig`.
+        The configuration of the scene object. Defaults to None.
+        It should be assigned though the :class:`compas_viewer.viewer.Viewer.add` method. Otherwise a exception will be raised.
     **kwargs : dict, optional
         Additional visualization options for specific objects.
 
@@ -72,18 +79,18 @@ class ViewerSceneObject(SceneObject):
         Whether to show lines/edges of the object.
     show_faces : bool
         Whether to show faces of the object.
-    pointscolor : :class:`compas.colors.ColorDict`
+    pointscolor : dict[Any, :class:`compas.colors.Color]
         The color of the points.
-    linescolor : :class:`compas.colors.ColorDict`
+    linescolor : dict[Any, :class:`compas.colors.Color]
         The color of the lines.
-    facescolor : :class:`compas.colors.ColorDict`
+    facescolor : dict[Any, :class:`compas.colors.Color]
         The color of the faces.
-    lineswidth : int
-        The line width to be drawn on screen. Default to 1.
-    pointssize : int
-        The point size to be drawn on screen. Default to 10.
+    lineswidth : float
+        The line width to be drawn on screen
+    pointssize : float
+        The point size to be drawn on screen.
     opacity : float
-        The opacity of the object. Default to 1.0.
+        The opacity of the object.
     background : bool
         Whether the object is drawn on the background with depth test disabled.
     bounding_box : list[float], read-only
@@ -107,37 +114,64 @@ class ViewerSceneObject(SceneObject):
     def __init__(
         self,
         name: Optional[str],
+        parent: Optional["ViewerSceneObject"],
         is_selected: bool,
         is_visible: bool,
-        show_points: bool,
-        show_lines: bool,
-        show_faces: bool,
-        pointscolor: Union[Color, ColorDict],
-        linescolor: Union[Color, ColorDict],
-        facescolor: Union[Color, ColorDict],
-        lineswidth: int,
-        pointssize: int,
-        opacity: float,
+        show_points: Optional[bool] = None,
+        show_lines: Optional[bool] = None,
+        show_faces: Optional[bool] = None,
+        pointscolor: Optional[Union[Color, Dict[Any, Color]]] = None,
+        linescolor: Optional[Union[Color, Dict[Any, Color]]] = None,
+        facescolor: Optional[Union[Color, Dict[Any, Color]]] = None,
+        lineswidth: Optional[float] = None,
+        pointssize: Optional[float] = None,
+        opacity: Optional[float] = None,
+        config: Optional[SceneConfig] = None,
         **kwargs,
     ):
-        super(ViewerSceneObject, self).__init__(**kwargs)
+        if config is None:
+            raise ValueError(
+                "No SceneConfig specified for the ViewerSceneObject. Check if the object is added by the function `Viewer.add`."
+            )
+        self.config = config
+        super(ViewerSceneObject, self).__init__(config=self.config, **kwargs)
         self.name = name or str(self)
         self.is_selected = is_selected
         self.is_visible = is_visible
-        self.parent: Optional[ViewerSceneObject] = None
+        self.parent = parent
         self._children = set()
 
-        self.show_points = show_points
-        self.show_lines = show_lines
-        self.show_faces = show_faces
+        self.show_points = show_points or self.config.show_points
+        self.show_lines = show_lines or self.config.show_lines
+        self.show_faces = show_faces or self.config.show_faces
 
-        self.pointscolor = ColorDict(pointscolor)
-        self.linescolor = ColorDict(linescolor)
-        self.facescolor = ColorDict(facescolor)
+        if pointscolor is None:
+            self.pointscolor = {"_default": self.config.pointscolor}
+        elif isinstance(pointscolor, Color):
+            self.pointscolor = {"_default": pointscolor}
+        else:
+            self.pointscolor = pointscolor
+            self.pointscolor["_default"] = self.config.pointscolor
 
-        self.lineswidth = lineswidth
-        self.pointssize = pointssize
-        self.opacity = opacity
+        if linescolor is None:
+            self.linescolor = {"_default": self.config.linescolor}
+        elif isinstance(linescolor, Color):
+            self.linescolor = {"_default": linescolor}
+        else:
+            self.linescolor = linescolor
+            self.linescolor["_default"] = self.config.linescolor
+
+        if facescolor is None:
+            self.facescolor = {"_default": self.config.facescolor}
+        elif isinstance(facescolor, Color):
+            self.facescolor = {"_default": facescolor}
+        else:
+            self.facescolor = facescolor
+            self.facescolor["_default"] = self.config.facescolor
+
+        self.lineswidth = lineswidth or self.config.lineswidth
+        self.pointssize = pointssize or self.config.pointssize
+        self.opacity = opacity or self.config.opacity
         self.background: bool = False
 
         self._instance_color: Optional[Color] = None
@@ -426,7 +460,7 @@ class ViewerSceneObject(SceneObject):
         shader.uniform1f("object_opacity", self.opacity)
         shader.uniform1i("element_type", 2)
         if self._frontfaces_buffer is not None and self.show_faces and not wireframe:
-            shader.uniform3f("single_color", self.facescolor[0].rgb)
+            shader.uniform3f("single_color", self.facescolor["_default"].rgb)
             shader.uniform1i(
                 "use_single_color",
                 not self.facescolor and not self._is_collection and not getattr(self, "use_vertex_color", False),
@@ -437,7 +471,7 @@ class ViewerSceneObject(SceneObject):
                 elements=self._frontfaces_buffer["elements"], n=self._frontfaces_buffer["n"], background=self.background
             )
         if self._backfaces_buffer is not None and self.show_faces and not wireframe:
-            shader.uniform3f("single_color", self.facescolor[0].rgb)
+            shader.uniform3f("single_color", self.facescolor["_default"].rgb)
             shader.uniform1i(
                 "use_single_color",
                 not self.facescolor and not self._is_collection and not getattr(self, "use_vertex_color", False),
@@ -450,7 +484,7 @@ class ViewerSceneObject(SceneObject):
         shader.uniform1i("is_lighted", False)
         shader.uniform1i("element_type", 1)
         if self._lines_buffer is not None and (self.show_lines or wireframe):
-            shader.uniform3f("single_color", self.linescolor[0].rgb)
+            shader.uniform3f("single_color", self.linescolor["_default"].rgb)
             shader.uniform1i("use_single_color", not self.linescolor and not self._is_collection)
             shader.bind_attribute("position", self._lines_buffer["positions"])
             shader.bind_attribute("color", self._lines_buffer["colors"])
@@ -462,7 +496,7 @@ class ViewerSceneObject(SceneObject):
             )
         shader.uniform1i("element_type", 0)
         if self._points_buffer is not None and self.show_points:
-            shader.uniform3f("single_color", self.pointscolor[0].rgb)
+            shader.uniform3f("single_color", self.pointscolor["_default"].rgb)
             shader.uniform1i("use_single_color", not self.pointscolor and not self._is_collection)
             shader.bind_attribute("position", self._points_buffer["positions"])
             shader.bind_attribute("color", self._points_buffer["colors"])

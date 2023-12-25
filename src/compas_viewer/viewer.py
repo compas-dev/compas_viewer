@@ -1,6 +1,7 @@
 import sys
 from os import path
 from pathlib import Path
+from typing import Any
 from typing import Dict
 from typing import List
 from typing import Literal
@@ -40,10 +41,10 @@ class Viewer(Scene):
         The width of the viewer window at startup. It will override the value in the config file.
     height : int, optional
         The height of the viewer window at startup. It will override the value in the config file.
-    viewmode : literal['shaded', 'ghosted', 'wireframe', 'lighted'}, optional
+    rendermode : literal['shaded', 'ghosted', 'wireframe', 'lighted'}, optional
         The display mode of the OpenGL view. It will override the value in the config file.
-    viewport : literal['front', 'right', 'top', 'perspective'}, optional
-        The viewport of the OpenGL view. It will override the value in the config file.
+    viewmode : literal['front', 'right', 'top', 'perspective'}, optional
+        The view mode of the OpenGL view. It will override the value in the config file.
         In `ghosted` mode, all objects have a default opacity of 0.7.
     show_grid : bool, optional
         Show the XY plane. It will override the value in the config file.
@@ -78,8 +79,8 @@ class Viewer(Scene):
         fullscreen: Optional[bool] = None,
         width: Optional[int] = None,
         height: Optional[int] = None,
-        viewmode: Optional[Literal["wireframe", "shaded", "ghosted", "lighted"]] = None,
-        viewport: Optional[Literal["front", "right", "top", "perspective"]] = None,
+        rendermode: Optional[Literal["wireframe", "shaded", "ghosted", "lighted"]] = None,
+        viewmode: Optional[Literal["front", "right", "top", "perspective"]] = None,
         show_grid: Optional[bool] = None,
         configpath: Optional[str] = None,
     ) -> None:
@@ -87,11 +88,11 @@ class Viewer(Scene):
         # custom or default config
         if configpath is None:
             self.config = ViewerConfig.from_default()
-            render_config = RenderConfig.from_default()
+            self.render_config = RenderConfig.from_default()
             self.scene_config = SceneConfig.from_default()
         else:
             self.config = ViewerConfig.from_json(Path(configpath, "viewer.json"))
-            render_config = RenderConfig.from_json(Path(configpath, "render.json"))
+            self.render_config = RenderConfig.from_json(Path(configpath, "render.json"))
             self.scene_config = SceneConfig.from_json(Path(configpath, "scene.json"))
 
         #  in-code config
@@ -103,8 +104,14 @@ class Viewer(Scene):
             self.config.width = width
         if height is not None:
             self.config.height = height
+        if rendermode is not None:
+            self.render_config.rendermode = rendermode
+        if viewmode is not None:
+            self.render_config.viewmode = viewmode
+        if show_grid is not None:
+            self.render_config.show_grid = show_grid
 
-        self._init(render_config)
+        self._init()
 
     def __new__(cls, *args, **kwargs):
         instance = super(Viewer, cls).__new__(cls)
@@ -115,7 +122,7 @@ class Viewer(Scene):
     # Init functions
     # ==========================================================================
 
-    def _init(self, render_config) -> None:
+    def _init(self) -> None:
         """Initialize the components of the user interface."""
         self._glFormat = QtGui.QSurfaceFormat()
         self._glFormat.setVersion(2, 1)
@@ -128,7 +135,7 @@ class Viewer(Scene):
         self._icon = QIcon(path.join(ICONS, "compas_icon_white.png"))
         self._app.setWindowIcon(self._icon)  # type: ignore
         self._app.setApplicationName(self.config.title)
-        self.render = Render(self, render_config)
+        self.render = Render(self, self.render_config)
         self._window.setCentralWidget(self.render)
         self._window.setContentsMargins(0, 0, 0, 0)
         self._app.references.add(self._window)  # type: ignore
@@ -334,17 +341,17 @@ class Viewer(Scene):
         self,
         item: Union[Mesh, Geometry],
         name: Optional[str] = None,
-        parent: Optional[ViewerSceneObject] = None,
+        parent: Optional[ViewerSceneObject] = "stsdsd",
         is_selected: bool = False,
         is_visible: bool = True,
         show_points: Optional[bool] = None,
         show_lines: Optional[bool] = None,
         show_faces: Optional[bool] = None,
-        pointscolor: Optional[Union[Color, Dict[str, List[float]]]] = None,
-        linescolor: Optional[Union[Color, Dict[str, List[float]]]] = None,
-        facescolor: Optional[Union[Color, Dict[str, List[float]]]] = None,
-        lineswidth: Optional[int] = None,
-        pointssize: Optional[int] = None,
+        pointscolor: Optional[Union[Color, Dict[Any, List[float]]]] = None,
+        linescolor: Optional[Union[Color, Dict[Any, List[float]]]] = None,
+        facescolor: Optional[Union[Color, Dict[Any, List[float]]]] = None,
+        lineswidth: Optional[float] = None,
+        pointssize: Optional[float] = None,
         opacity: Optional[float] = None,
         hide_coplanaredges: Optional[bool] = None,
         **kwargs
@@ -357,8 +364,11 @@ class Viewer(Scene):
         ----------
         item : :class:`compas.geometry.Geometry`
             The geometry to add to the scene.
+        name : str, optional
+            The name of the item.
         parent : :class:`compas.scene.SceneObject`, optional
             The parent object of the item.
+            Default to None.
         is_selected : bool, optional
             Whether the object is selected.
             Default to False.
@@ -374,19 +384,19 @@ class Viewer(Scene):
         show_faces : bool, optional
             Whether to show faces of the object.
             It will override the value in the scene config file.
-        pointscolor : Union[Color, Dict[Union[str,list[float]]], optional
+        pointscolor : Union[:class:`compas.colors.Color`, Dict[any, :class:`compas.colors.Color`], optional
             The color or the dict of colors of the points.
             It will override the value in the scene config file.
-        linescolor : Union[Color, Dict[Union[str,list[float]]], optional
+        linescolor : Union[:class:`compas.colors.Color`, Dict[any, :class:`compas.colors.Color`], optional
             The color or the dict of colors of the lines.
             It will override the value in the scene config file.
-        facescolor : Union[Color, Dict[Union[str,list[float]]], optional
+        facescolor : Union[:class:`compas.colors.Color`, Dict[any, :class:`compas.colors.Color`], optional
             The color or the dict of colors the faces.
             It will override the value in the scene config file.
-        lineswidth : int, optional
+        lineswidth : float, optional
             The line width to be drawn on screen
             It will override the value in the scene config file.
-        pointssize : int, optional
+        pointssize : float, optional
             The point size to be drawn on screen
             It will override the value in the scene config file.
         opacity : float, optional
@@ -403,22 +413,24 @@ class Viewer(Scene):
         :class:`compas.scene.SceneObject`
             The scene object.
         """
+
         sceneobject = super(Viewer, self).add(
             item=item,
-            parent=parent,
+            parent=p
             name=name,
             is_selected=is_selected,
             is_visible=is_visible,
-            show_points=show_points or self.scene_config.show_points,
-            show_lines=show_lines or self.scene_config.show_lines,
-            show_faces=show_faces or self.scene_config.show_faces,
-            pointscolor=pointscolor or self.scene_config.pointscolor,
-            linescolor=linescolor or self.scene_config.linescolor,
-            facescolor=facescolor or self.scene_config.facescolor,
-            lineswidth=lineswidth or self.scene_config.lineswidth,
-            pointssize=pointssize or self.scene_config.pointssize,
-            opacity=opacity or self.scene_config.opacity,
-            hide_coplanaredges=hide_coplanaredges or self.scene_config.hide_coplanaredges,
+            show_points=show_points,
+            show_lines=show_lines,
+            show_faces=show_faces,
+            pointscolor=pointscolor,
+            linescolor=linescolor,
+            facescolor=facescolor,
+            lineswidth=lineswidth,
+            pointssize=pointssize,
+            opacity=opacity,
+            hide_coplanaredges=hide_coplanaredges,
+            config=self.scene_config,
             **kwargs
         )
         assert isinstance(sceneobject, ViewerSceneObject)

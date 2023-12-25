@@ -20,9 +20,9 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
     mesh : :class:`compas.datastructures.Mesh`
         A COMPAS mesh.
     hide_coplanaredges : bool, optional
-        True to hide the coplanar edges. Defaults to False.
+        True to hide the coplanar edges. It will override the value in the config file.
     use_vertex_color : bool, optional
-        True to use vertex color. Defaults to False.
+        True to use vertex color. It will override the value in the config file.
     kwargs : dict, optional
         Additional options for the :class:`compas.viewer.scene.ViewerSceneObject`.
 
@@ -41,13 +41,15 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
         True to hide the coplanar edges.
     """
 
-    def __init__(self, mesh: Mesh, hide_coplanaredges: bool = False, use_vertex_color: bool = False, **kwargs):
+    def __init__(self, mesh: Mesh, **kwargs):
         super(MeshObject, self).__init__(mesh=mesh, **kwargs)
         self._mesh = mesh
-        self.hide_coplanaredges = hide_coplanaredges
-        self.use_vertex_color = use_vertex_color
+        self.hide_coplanaredges = self.config.hide_coplanaredges
+        self.use_vertex_color = False  # TODO keep it false for now
         self.vertexcolor = {
-            vertex: self._mesh.vertex_attribute(vertex, "color") or self.facescolor[0]
+            vertex: self._mesh.vertex_attribute(vertex, "color")
+            or self.facescolor.get(str(vertex))
+            or self.facescolor["_default"]
             for vertex in self._mesh.vertices()
         }
 
@@ -61,7 +63,7 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
         for vertex in self._mesh.vertices():
             assert isinstance(vertex, int)
             positions.append(self.vertex_xyz[vertex])
-            colors.append(self.pointscolor.get(vertex, self.pointscolor))
+            colors.append(self.pointscolor.get(str(vertex)) or self.pointscolor["_default"])
             elements.append([i])
             i += 1
         return positions, colors, elements
@@ -74,7 +76,7 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
         i = 0
 
         for u, v in self._mesh.edges():
-            color = self.linescolor.get((u, v), self.linescolor)
+            color = self.linescolor.get(str((u, v))) or self.linescolor["_default"]
             if self.hide_coplanaredges:
                 # hide the edge if neighbor faces are coplanar
                 fkeys = self._mesh.edge_faces((u, v))
@@ -104,7 +106,7 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
         for face in self._mesh.faces():
             vertices = self._mesh.face_vertices(face)
             assert isinstance(face, int)
-            color = self.facescolor.get(face, self.facescolor)
+            color = self.facescolor.get(str(face)) or self.facescolor["_default"]
             if len(vertices) == 3:
                 a, b, c = vertices
                 positions.append(self.vertex_xyz[a])
@@ -179,7 +181,7 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
         for face in faces:
             vertices = self._mesh.face_vertices(face)[::-1]
             assert isinstance(face, int)
-            color = self.facescolor.get(face, self.facescolor)
+            color = self.facescolor.get(str(face)) or self.facescolor["_default"]
             if len(vertices) == 3:
                 a, b, c = vertices
                 positions.append(self.vertex_xyz[a])
