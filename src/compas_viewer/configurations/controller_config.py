@@ -67,7 +67,7 @@ class KeyConfig(Config):
 
 class ControllerConfig(Config):
     """
-    The class representation for the `controller.json` of the class : :class:`compas_viewer.controller.Render`
+    The class representation for the `controller.json` of the class :class:`compas_viewer.controller.Controller`
     The controller.json contains all the settings about controlling the viewer: mouse, keys, ...
 
     Parameters

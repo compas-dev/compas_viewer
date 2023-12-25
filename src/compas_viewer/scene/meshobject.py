@@ -24,7 +24,7 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
     use_vertex_color : bool, optional
         True to use vertex color. Defaults to False.
     kwargs : dict, optional
-        Additional options for the :class:`compas.viewer.scene.sceneobject.ViewerSceneObject`.
+        Additional options for the :class:`compas.viewer.scene.ViewerSceneObject`.
 
     Attributes
     ----------

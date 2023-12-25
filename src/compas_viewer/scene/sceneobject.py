@@ -45,11 +45,11 @@ class ViewerSceneObject(SceneObject):
         Whether to show lines/edges of the object.
     show_faces : bool
         Whether to show faces of the object.
-    pointscolor : Union[Color, Dict[Union[str, int], Color]]
+    pointscolor : Union[:class:`compas.colors.Color`, :class:`compas.colors.ColorDict`]
         The color or the dict of colors of the points.
-    linescolor : Union[Color, Dict[Union[str, int], Color]]
+    linescolor : Union[:class:`compas.colors.Color`, :class:`compas.colors.ColorDict`]
         The color or the dict of colors of the lines.
-    facescolor : Union[Color, Dict[Union[str, int], Color]]
+    facescolor : Union[:class:`compas.colors.Color`, :class:`compas.colors.ColorDict`]
         The color or the dict of colors the faces.
     lineswidth : int
         The line width to be drawn on screen
@@ -72,11 +72,11 @@ class ViewerSceneObject(SceneObject):
         Whether to show lines/edges of the object.
     show_faces : bool
         Whether to show faces of the object.
-    pointscolor : :class:`compas.color.ColorDict`
+    pointscolor : :class:`compas.colors.ColorDict`
         The color of the points.
-    linescolor : :class:`compas.color.ColorDict`
+    linescolor : :class:`compas.colors.ColorDict`
         The color of the lines.
-    facescolor : :class:`compas.color.ColorDict`
+    facescolor : :class:`compas.colors.ColorDict`
         The color of the faces.
     lineswidth : int
         The line width to be drawn on screen. Default to 1.
@@ -86,11 +86,11 @@ class ViewerSceneObject(SceneObject):
         The opacity of the object. Default to 1.0.
     background : bool
         Whether the object is drawn on the background with depth test disabled.
-    bounding_box : :class:`list[float]`, read-only
+    bounding_box : list[float], read-only
         The min and max corners of object bounding box, as a numpy array of shape (2, 3).
     bounding_box_center : :class:`compas.geometry.Point`, read-only
-        The center of object bounding box, as a numpy array of shape (3,).
-    matrix : :class:`list[float]`, read-only
+        The center of object bounding box, as a point.
+    matrix : list[float], read-only
         The transformation matrix of the object.
     translation : :class:`compas.geometry.Translation`
         The translation of the object.
@@ -112,9 +112,9 @@ class ViewerSceneObject(SceneObject):
         show_points: bool,
         show_lines: bool,
         show_faces: bool,
-        pointscolor: Union[Color, Dict[Union[str, int], Color]],
-        linescolor: Union[Color, Dict[Union[str, int, Any], Color]],
-        facescolor: Union[Color, Dict[Union[str, int], Color]],
+        pointscolor: Union[Color, ColorDict],
+        linescolor: Union[Color, ColorDict],
+        facescolor: Union[Color, ColorDict],
         lineswidth: int,
         pointssize: int,
         opacity: float,

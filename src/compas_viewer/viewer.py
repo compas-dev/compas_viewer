@@ -40,9 +40,9 @@ class Viewer(Scene):
         The width of the viewer window at startup. It will override the value in the config file.
     height : int, optional
         The height of the viewer window at startup. It will override the value in the config file.
-    viewmode : {'shaded', 'ghosted', 'wireframe', 'lighted'}, optional
+    viewmode : literal['shaded', 'ghosted', 'wireframe', 'lighted'}, optional
         The display mode of the OpenGL view. It will override the value in the config file.
-    viewport : {'front', 'right', 'top', 'perspective'}, optional
+    viewport : literal['front', 'right', 'top', 'perspective'}, optional
         The viewport of the OpenGL view. It will override the value in the config file.
         In `ghosted` mode, all objects have a default opacity of 0.7.
     show_grid : bool, optional
@@ -52,7 +52,7 @@ class Viewer(Scene):
 
     Attributes
     ----------
-    config : ViewerConfig
+    config : :class:`compas_viewer.configurations.ViewerConfig`
         The configuration for the viewer.
 
     Notes
@@ -65,7 +65,7 @@ class Viewer(Scene):
     Currently the viewer uses OpenGL 2.2 and GLSL 120 with a 'compatibility' profile.
 
     Examples
-    -------
+    --------
     >>> from compas_viewer import Viewer # doctest: +SKIP
     >>> viewer = Viewer() # doctest: +SKIP
     >>> viewer.show() # doctest: +SKIP

@@ -109,11 +109,11 @@ class Camera:
         The location of the "near" clipping plane.
     far : float
         The location of the "far" clipping plane.
-    position : :class:`compas_viewer.components.renders.camera.Position`
+    position : :class:`compas_viewer.components.render.camera.Position`
         The location the camera.
-    rotation : :class:`compas_viewer.components.renders.camera.camera.RotationEuler`
+    rotation : :class:`compas_viewer.components.render.camera.RotationEuler`
         The euler rotation of camera.
-    target : :class:`compas_viewer.components.renders.camera.camera.Position`
+    target : :class:`compas_viewer.components.render.camera.Position`
         The viewing target.
         Default is the origin of the world coordinate system.
     distance : float

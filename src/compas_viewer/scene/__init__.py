@@ -25,5 +25,4 @@ def register_scene_objects():
     register(Mesh, MeshObject, context="Viewer")
 
 
-
 __all__ = ["ViewerSceneObject", "MeshObject"]

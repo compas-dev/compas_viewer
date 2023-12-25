@@ -13,8 +13,6 @@ from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 
 from compas_viewer.configurations import RenderConfig
-from compas_viewer.configurations import RenderModeType
-from compas_viewer.configurations import ViewModeType
 from compas_viewer.scene.sceneobject import ViewerSceneObject
 
 from .camera import Camera
@@ -32,10 +30,10 @@ class Render(QtWidgets.QOpenGLWidget):
     The width and height are not in its configuration since they are set by the parent layout.
 
     Parameters
-    ---------------
-    viewer : :class:`Viewer`
+    ----------
+    viewer : :class:`compas_viewer.viewer.Viewer`
         The viewer instance.
-    config : :class:`RenderConfig`
+    config : :class:`compas_viewer.configurations.RenderConfig`
         The render configuration.
     """
 
@@ -66,13 +64,12 @@ class Render(QtWidgets.QOpenGLWidget):
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
 
     @property
-    def rendermode(self) -> RenderModeType:
+    def rendermode(self):
         """
         The render mode of the view.
 
         Returns
         -------
-        :class:`RenderModeType`
             The render mode of the view.
         """
         return self._rendermode
@@ -92,13 +89,12 @@ class Render(QtWidgets.QOpenGLWidget):
             self.update()
 
     @property
-    def viewmode(self) -> ViewModeType:
+    def viewmode(self):
         """
         The view mode of the view.
 
         Returns
         -------
-        :class:`ViewModeType`
             The view mode of the view.
         """
         return self._viewmode

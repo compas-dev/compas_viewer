@@ -24,7 +24,7 @@ class CameraConfigType(TypedDict):
 
 class CameraConfig(Config):
     """
-    The class representation of a camera instance : :class:`compas_viewer.components.renders.camera.Camera`
+    The class representation of a camera class :class:`compas_viewer.components.render.camera.Camera`
     It contains all the settings about the camera: fov, near, far, position, target, ...
 
     Parameters
@@ -53,15 +53,11 @@ class CameraConfig(Config):
         return camera_config
 
 
-RenderModeType = Type[Literal["wireframe", "shaded", "ghosted", "lighted"]]
-ViewModeType = Type[Literal["front", "right", "top", "perspective"]]
-
-
 class RenderConfigType(TypedDict):
     show_grid: bool
     gridsize: Tuple[float, float, int, int]
-    viewmode: ViewModeType
-    rendermode: RenderModeType
+    viewmode: Literal["front", "right", "top", "perspective"]
+    rendermode: Literal["wireframe", "shaded", "ghosted", "lighted"]
     backgroundcolor: Color
     selectioncolor: Color
     ghostopacity: float
@@ -70,7 +66,7 @@ class RenderConfigType(TypedDict):
 
 class RenderConfig(Config):
     """
-    The class representation for the `render.json` of the class : :class:`compas_viewer.components.Render`
+    The class representation for the `render.json` of the class :class:`compas_viewer.components.Render`
     The render.json contains all the settings about the render: background color, selection color, ...
 
     Parameters

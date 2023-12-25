@@ -26,7 +26,7 @@ class SceneConfigType(TypedDict):
 
 class SceneConfig(Config):
     """
-    The class representation for the `scene.json` of the class : :class:`compas_viewer.ViewerSceneObject`
+    The class representation for the `scene.json` of the class :class:`compas_viewer.scene.ViewerSceneObject`
     The scene.json contains all the settings about the general (default) appearance of the scene objects.
 
     Parameters
