@@ -150,7 +150,7 @@ class Render(QtWidgets.QOpenGLWidget):
         ----------
         .. [1] https://doc.qt.io/qtforpython-5.12/PySide2/QtWidgets/QOpenGLWidget.html#PySide2.QtWidgets.PySide2.QtWidgets.QOpenGLWidget.initializeGL # noqa: E501
         """
-        GL.glClearColor(*self.config.backgroundcolor)
+        GL.glClearColor(*self.config.backgroundcolor.rgba)
         GL.glPolygonOffset(1.0, 1.0)
         GL.glEnable(GL.GL_POLYGON_OFFSET_FILL)
         GL.glEnable(GL.GL_CULL_FACE)
@@ -312,7 +312,7 @@ class Render(QtWidgets.QOpenGLWidget):
         self.shader_model.uniform4x4("transform", transform)
         self.shader_model.uniform1i("is_selected", 0)
         self.shader_model.uniform1f("opacity", self.opacity)
-        self.shader_model.uniform3f("selection_color", self.config.selectioncolor)
+        self.shader_model.uniform3f("selection_color", self.config.selectioncolor.rgb)
         self.shader_model.release()
 
         self.shader_text = Shader(name="text")

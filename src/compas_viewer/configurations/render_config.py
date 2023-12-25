@@ -4,6 +4,8 @@ from typing import Tuple
 from typing import Type
 from typing import TypedDict
 
+from compas.colors import Color
+
 from compas_viewer import DATA
 from compas_viewer.configurations import Config
 
@@ -60,8 +62,8 @@ class RenderConfigType(TypedDict):
     gridsize: Tuple[float, float, int, int]
     viewmode: ViewModeType
     rendermode: RenderModeType
-    backgroundcolor: Tuple[float, float, float, float]
-    selectioncolor: Tuple[float, float, float]
+    backgroundcolor: Color
+    selectioncolor: Color
     ghostopacity: float
     camera: CameraConfig
 

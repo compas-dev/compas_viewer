@@ -1,7 +1,8 @@
 from pathlib import Path
-from typing import Tuple
+from typing import Union
 from typing import TypedDict
 
+from compas.colors import Color, ColorDict
 from compas_viewer import DATA
 from compas_viewer.configurations import Config
 
@@ -11,9 +12,9 @@ class SceneConfigType(TypedDict):
     The type template for the `scene.json`.
     """
 
-    pointscolor: Tuple[float, float, float, float]
-    linescolor: Tuple[float, float, float, float]
-    facescolor: Tuple[float, float, float, float]
+    pointscolor: Union[Color, ColorDict]
+    linescolor: Union[Color, ColorDict]
+    facescolor: Union[Color, ColorDict]
     show_points: bool
     show_lines: bool
     show_faces: bool

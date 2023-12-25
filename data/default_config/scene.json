@@ -1,9 +1,21 @@
 {
     "dtype": "compas_viewer.configurations/SceneConfig",
     "data": {
-        "pointscolor": [0.2, 0.2, 0.2, 1.0],
-        "linescolor": [0.4, 0.4, 0.4, 1.0],
-        "facescolor": [0.8, 0.8, 0.8, 1.0],
+        "pointscolor": {
+            "dtype": "compas.colors/Color",
+            "data": { "red": 0.2, "green": 0.2, "blue": 0.2, "alpha": 1.0 },
+            "guid": "69b8ce95-94ca-40ec-b1a7-26c2dfc05471"
+        },
+        "linescolor": {
+            "dtype": "compas.colors/Color",
+            "data": { "red": 0.4, "green": 0.4, "blue": 0.4, "alpha": 1.0 },
+            "guid": "a54d31f7-9298-4493-bed7-06a3fe54771f"
+        },
+        "facescolor": {
+            "dtype": "compas.colors/Color",
+            "data": { "red": 0.8, "green": 0.8, "blue": 0.8, "alpha": 1.0 },
+            "guid": "51be5664-d8a0-41f8-aeaf-45530f78211a"
+        },
         "show_points": false,
         "show_lines": true,
         "show_faces": true,

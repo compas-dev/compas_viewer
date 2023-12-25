@@ -5,8 +5,16 @@
         "gridsize": [1, 10, 10],
         "viewmode": "perspective",
         "rendermode": "wireframe",
-        "backgroundcolor": [1, 1, 1, 1],
-        "selectioncolor": [1, 1, 0],
+        "backgroundcolor": {
+            "dtype": "compas.colors/Color",
+            "data": { "red": 1.0, "green": 1.0, "blue": 1.0, "alpha": 1.0 },
+            "guid": "d2ff2a41-471c-4e95-ac06-70bdd636adf5"
+        },
+        "selectioncolor": {
+            "dtype": "compas.colors/Color",
+            "data": { "red": 1.0, "green": 1.0, "blue": 0, "alpha": 1.0 },
+            "guid": "eba17ebd-9e88-41b0-b3c7-2904e1d04d02"
+        },
         "ghostopacity": 0.7,
         "camera": {
             "dtype": "compas_viewer.configurations/CameraConfig",

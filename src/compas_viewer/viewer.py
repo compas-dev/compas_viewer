@@ -1,10 +1,13 @@
 import sys
 from os import path
 from pathlib import Path
+from typing import Dict
+from typing import List
 from typing import Literal
 from typing import Optional
 from typing import Union
 
+from compas.colors import Color
 from compas.datastructures import Mesh
 from compas.geometry import Geometry
 from compas.scene import Scene
@@ -337,15 +340,15 @@ class Viewer(Scene):
         show_points: Optional[bool] = None,
         show_lines: Optional[bool] = None,
         show_faces: Optional[bool] = None,
-        pointscolor: Optional[Union[str, dict]] = None,
-        linescolor: Optional[Union[str, dict]] = None,
-        facescolor: Optional[Union[str, dict]] = None,
+        pointscolor: Optional[Union[Color, Dict[str, List[float]]]] = None,
+        linescolor: Optional[Union[Color, Dict[str, List[float]]]] = None,
+        facescolor: Optional[Union[Color, Dict[str, List[float]]]] = None,
         lineswidth: Optional[int] = None,
         pointssize: Optional[int] = None,
         opacity: Optional[float] = None,
         hide_coplanaredges: Optional[bool] = None,
         **kwargs
-    ):
+    ) -> ViewerSceneObject:
         """
         Add an item to the scene.
         This function is inherent from :class:`compas.scene.Scene` with additional functionalities.
@@ -371,13 +374,13 @@ class Viewer(Scene):
         show_faces : bool, optional
             Whether to show faces of the object.
             It will override the value in the scene config file.
-        pointscolor : Union[Color, Dict[Union[str, int], Color]], optional
+        pointscolor : Union[Color, Dict[Union[str,list[float]]], optional
             The color or the dict of colors of the points.
             It will override the value in the scene config file.
-        linescolor : Union[Color, Dict[Union[str, int], Color]], optional
+        linescolor : Union[Color, Dict[Union[str,list[float]]], optional
             The color or the dict of colors of the lines.
             It will override the value in the scene config file.
-        facescolor : Union[Color, Dict[Union[str, int], Color]], optional
+        facescolor : Union[Color, Dict[Union[str,list[float]]], optional
             The color or the dict of colors the faces.
             It will override the value in the scene config file.
         lineswidth : int, optional
