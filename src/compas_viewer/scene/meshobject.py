@@ -57,8 +57,12 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
             for vertex in self._mesh.vertices()
         }
 
-    @property
-    def _points_data(self) -> Tuple[List[Point], List[Color], List[int]]:
+        self._points_data = self._get_points_data()
+        self._lines_data = self._get_lines_data()
+        self._frontfaces_data = self._get_frontfaces_data()
+        self._backfaces_data = self._get_backfaces_data()
+
+    def _get_points_data(self) -> Tuple[List[Point], List[Color], List[List[int]]]:
         positions = []
         colors = []
         elements = []
@@ -72,8 +76,7 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
             i += 1
         return positions, colors, elements
 
-    @property
-    def _lines_data(self) -> Tuple[List[Point], List[Color], List[int]]:
+    def _get_lines_data(self) -> Tuple[List[Point], List[Color], List[List[int]]]:
         positions = []
         colors = []
         elements = []
@@ -100,8 +103,7 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
             i += 2
         return positions, colors, elements
 
-    @property
-    def _frontfaces_data(self):
+    def _get_frontfaces_data(self) -> Tuple[List[Point], List[Color], List[List[int]]]:
         positions = []
         colors = []
         elements = []
@@ -171,8 +173,7 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
 
         return positions, colors, elements
 
-    @property
-    def _backfaces_data(self):
+    def _get_backfaces_data(self) -> Tuple[List[Point], List[Color], List[List[int]]]:
         if self.use_vertexcolors:
             self.vertexcolor = {
                 vertex: self._mesh.vertex_attribute(vertex, "color") or Color.grey() for vertex in self._mesh.vertices()

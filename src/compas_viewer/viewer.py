@@ -2,6 +2,7 @@ import sys
 from os import path
 from pathlib import Path
 from typing import Any
+from typing import Callable
 from typing import Dict
 from typing import List
 from typing import Literal
@@ -25,6 +26,32 @@ from compas_viewer.configurations import ViewerConfig
 from compas_viewer.scene.sceneobject import ViewerSceneObject
 
 ICONS = Path(Path(__file__).parent, "_static", "icons")
+
+
+class Timer:
+    """A simple timer that calls a function at specified intervals.
+
+    Parameters
+    ----------
+    interval : int
+        Interval between subsequent calls to this function, in milliseconds.
+    callback : callable
+        The function to call.
+    singleshot : bool, optional
+        If True, the timer is a singleshot timer.
+        Default is False.
+
+    """
+
+    def __init__(self, interval: int, callback: Callable, singleshot: bool = False):
+        self.timer = QtCore.QTimer()
+        self.timer.setInterval(interval)
+        self.timer.timeout.connect(callback)
+        self.timer.setSingleShot(singleshot)
+        self.timer.start()
+
+    def stop(self):
+        self.timer.stop()
 
 
 class Viewer(Scene):
@@ -110,6 +137,10 @@ class Viewer(Scene):
             self.render_config.viewmode = viewmode
         if show_grid is not None:
             self.render_config.show_grid = show_grid
+
+        # `on` function
+        self.timer: Timer
+        self.frame_count: int = 0
 
         self._init()
 
@@ -333,6 +364,72 @@ class Viewer(Scene):
         # stop point of the main thread:
         self._app.exec_()
 
+    def on(
+        self,
+        interval: int,
+        timeout: Optional[int] = None,
+        frames: Optional[int] = None,
+        record_fps: Optional[int] = None,
+        playback_interval: Optional[int] = None,
+    ) -> Callable:
+        """Decorator for callbacks of a dynamic drawing process.
+
+        Parameters
+        ----------
+        interval : int
+            Interval between subsequent calls to this function, in milliseconds.
+        timeout : int, optional
+            Timeout between subsequent calls to this function, in milliseconds.
+        frames : int, optional
+            The number of frames of the process.
+            If no frame number is provided, the process continues until the viewer is closed.
+        playback_interval : int, optional
+            Interval between frames in the recording, in milliseconds.
+
+        Returns
+        -------
+        callable
+
+        Notes
+        -----
+        The difference between `interval` and `timeout` is that the former indicates
+        the time between subsequent calls to the callback,
+        without taking into account the duration of the execution of the call,
+        whereas the latter indicates a pause after the completed execution of the previous call,
+        before starting the next one.
+
+        Examples
+        --------
+        .. code-block:: python
+
+            angle = math.radians(5)
+
+            @viewer.on(interval=1000)
+            def rotate(frame):
+                obj.rotation = [0, 0, frame * angle]
+                obj.update()
+
+        """
+        if (not interval and not timeout) or (interval and timeout):
+            raise ValueError("Must specify either interval or timeout.")
+
+        def outer(func: Callable):
+            def render():
+                func(self.frame_count)
+                self.render.update()
+                self.frame_count += 1
+                if frames is not None and self.frame_count >= frames:
+                    self.timer.stop()
+
+            if interval:
+                self.timer = Timer(interval=interval, callback=render)
+            if timeout:
+                self.timer = Timer(interval=timeout, callback=render, singleshot=True)
+
+            self.frame_count = 0
+
+        return outer
+
     # ==========================================================================
     # Scene
     # ==========================================================================
@@ -355,7 +452,7 @@ class Viewer(Scene):
         opacity: Optional[float] = None,
         hide_coplanaredges: Optional[bool] = None,
         use_vertexcolors: Optional[bool] = None,
-        **kwargs
+        **kwargs,
     ) -> ViewerSceneObject:
         """
         Add an item to the scene.
@@ -437,7 +534,7 @@ class Viewer(Scene):
             hide_coplanaredges=hide_coplanaredges,
             use_vertexcolors=use_vertexcolors,
             config=self.scene_config,
-            **kwargs
+            **kwargs,
         )
         assert isinstance(sceneobject, ViewerSceneObject)
         self.render.objects[name or str(sceneobject)] = sceneobject

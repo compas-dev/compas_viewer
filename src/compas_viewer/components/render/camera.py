@@ -72,7 +72,7 @@ class Position(Vector):
             self.on_update([self.x, self.y, z])
         self._z = float(z)
 
-    def set(self, x, y, z, pause_update: bool = False):
+    def set(self, x: float, y: float, z: float, pause_update: bool = False):
         """Set the position of the camera."""
         pause_update = pause_update or self.pause_update
         if self.on_update is not None and not pause_update:
@@ -132,14 +132,15 @@ class Camera:
         self.render = render
         self.config = render.config.camera
         self._position = Position((0.0, 0.0, 10.0 * self.config.scale), on_update=self._on_position_update)
+
         self._rotation = RotationEuler((0, 0, 0), on_update=self._on_rotation_update)
         self._target = Position((0, 0, 0), on_update=self._on_target_update)
         self._position.pause_update = False
         self._rotation.pause_update = False
         self._target.pause_update = False
         self.reset_position()
-        self.position = Position(self.config.position)
         self.target = Position(self.config.target)
+        self.position = Position(self.config.position)
 
     @property
     def position(self) -> Position:
@@ -148,7 +149,7 @@ class Camera:
 
     @position.setter
     def position(self, position: Position):
-        self._position.set(position.x, position.y, position.z)
+        self._position.set(*position, pause_update=False)
 
     @property
     def rotation(self) -> RotationEuler:

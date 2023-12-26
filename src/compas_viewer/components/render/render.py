@@ -13,7 +13,8 @@ from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 
 from compas_viewer.configurations import RenderConfig
-from compas_viewer.scene.sceneobject import ViewerSceneObject
+from compas_viewer.scene import TagObject
+from compas_viewer.scene import ViewerSceneObject
 
 from .camera import Camera
 from .shaders import Shader
@@ -51,7 +52,7 @@ class Render(QtWidgets.QOpenGLWidget):
         self._shader_model = None
 
         self.shader_model: Shader
-        self.shader_text: Shader
+        self.shader_tag: Shader
         self.shader_arrow: Shader
         self.shader_instance: Shader
         self.shader_grid: Shader
@@ -310,13 +311,13 @@ class Render(QtWidgets.QOpenGLWidget):
         self.shader_model.uniform3f("selection_color", self.config.selectioncolor.rgb)
         self.shader_model.release()
 
-        self.shader_text = Shader(name="text")
-        self.shader_text.bind()
-        self.shader_text.uniform4x4("projection", projection)
-        self.shader_text.uniform4x4("viewworld", viewworld)
-        self.shader_text.uniform4x4("transform", transform)
-        self.shader_text.uniform1f("opacity", self.opacity)
-        self.shader_text.release()
+        self.shader_tag = Shader(name="tag")
+        self.shader_tag.bind()
+        self.shader_tag.uniform4x4("projection", projection)
+        self.shader_tag.uniform4x4("viewworld", viewworld)
+        self.shader_tag.uniform4x4("transform", transform)
+        self.shader_tag.uniform1f("opacity", self.opacity)
+        self.shader_tag.release()
 
         self.shader_arrow = Shader(name="arrow")
         self.shader_arrow.bind()
@@ -360,9 +361,9 @@ class Render(QtWidgets.QOpenGLWidget):
         self.shader_model.uniform4x4("projection", projection)
         self.shader_model.release()
 
-        self.shader_text.bind()
-        self.shader_text.uniform4x4("projection", projection)
-        self.shader_text.release()
+        self.shader_tag.bind()
+        self.shader_tag.uniform4x4("projection", projection)
+        self.shader_tag.release()
 
         self.shader_arrow.bind()
         self.shader_arrow.uniform4x4("projection", projection)
@@ -408,7 +409,7 @@ class Render(QtWidgets.QOpenGLWidget):
         centers = []
         for guid in self.objects:
             obj = self.objects[guid]
-            if isinstance(obj, ViewerSceneObject):
+            if not isinstance(obj, TagObject):
                 if obj.opacity * self.opacity < 1 and obj.bounding_box_center is not None:
                     transparent_objects.append(obj)
                     centers.append(transform_points_numpy([obj.bounding_box_center], obj.matrix)[0])
@@ -469,15 +470,15 @@ class Render(QtWidgets.QOpenGLWidget):
         #             obj.draw(self.shader_arrow)
         # self.shader_arrow.release()
 
-        # # draw text sprites
-        # self.shader_text.bind()
-        # self.shader_text.uniform4x4("viewworld", viewworld)
-        # for guid in self.objects:
-        #     obj = self.objects[guid]
-        #     if isinstance(obj, TextObject):
-        #         if obj.is_visible:
-        #             obj.draw(self.shader_text, self.camera.position)
-        # self.shader_text.release()
+        # draw text sprites
+        self.shader_tag.bind()
+        self.shader_tag.uniform4x4("viewworld", viewworld)
+        for guid in self.objects:
+            obj = self.objects[guid]
+            if isinstance(obj, TagObject):
+                if obj.is_visible:
+                    obj.draw(self.shader_tag, self.camera.position)
+        self.shader_tag.release()
 
         # # draw 2D box for multi-selection
         # if self.app.selector.select_from == "box":
