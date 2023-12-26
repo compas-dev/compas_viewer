@@ -132,7 +132,6 @@ class Camera:
         self.render = render
         self.config = render.config.camera
         self._position = Position((0.0, 0.0, 10.0 * self.config.scale), on_update=self._on_position_update)
-
         self._rotation = RotationEuler((0, 0, 0), on_update=self._on_rotation_update)
         self._target = Position((0, 0, 0), on_update=self._on_target_update)
         self._position.pause_update = False
@@ -398,7 +397,6 @@ class Camera:
             P = self.perspective(
                 self.config.fov, aspect, self.config.near * self.config.scale, self.config.far * self.config.scale
             )
-
         else:
             left = -self.distance
             right = self.distance

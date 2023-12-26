@@ -452,7 +452,7 @@ class Viewer(Scene):
         opacity: Optional[float] = None,
         hide_coplanaredges: Optional[bool] = None,
         use_vertexcolors: Optional[bool] = None,
-        **kwargs,
+        **kwargs
     ) -> ViewerSceneObject:
         """
         Add an item to the scene.
@@ -534,7 +534,7 @@ class Viewer(Scene):
             hide_coplanaredges=hide_coplanaredges,
             use_vertexcolors=use_vertexcolors,
             config=self.scene_config,
-            **kwargs,
+            **kwargs
         )
         assert isinstance(sceneobject, ViewerSceneObject)
         self.render.objects[name or str(sceneobject)] = sceneobject
