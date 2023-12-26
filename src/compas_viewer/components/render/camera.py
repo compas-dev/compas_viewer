@@ -138,6 +138,8 @@ class Camera:
         self._rotation.pause_update = False
         self._target.pause_update = False
         self.reset_position()
+        self.position = Position(self.config.position)
+        self.target = Position(self.config.target)
 
     @property
     def position(self) -> Position:
@@ -395,6 +397,7 @@ class Camera:
             P = self.perspective(
                 self.config.fov, aspect, self.config.near * self.config.scale, self.config.far * self.config.scale
             )
+
         else:
             left = -self.distance
             right = self.distance

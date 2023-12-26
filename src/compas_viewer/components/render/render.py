@@ -297,7 +297,6 @@ class Render(QtWidgets.QOpenGLWidget):
 
         projection = self.camera.projection(self.viewer.config.width, self.viewer.config.height)
         viewworld = self.camera.viewworld()
-
         transform = list(identity(4, dtype=float32))
         # create the program
 
@@ -426,7 +425,7 @@ class Render(QtWidgets.QOpenGLWidget):
         Paint all the items in the render.
         """
         viewworld = self.camera.viewworld()
-        if self.viewmode != "perspective":
+        if self.rendermode != "perspective":
             self.update_projection()
 
         # Draw instance maps
@@ -457,7 +456,7 @@ class Render(QtWidgets.QOpenGLWidget):
         self.shader_model.uniform4x4("viewworld", viewworld)
         for obj in self.sort_objects_from_viewworld(viewworld):
             if obj.is_visible:
-                obj.draw(self.shader_model, self.viewmode == "wireframe", self.viewmode == "lighted")
+                obj.draw(self.shader_model, self.rendermode == "wireframe", self.rendermode == "lighted")
         self.shader_model.release()
 
         # # draw arrow sprites
@@ -510,7 +509,7 @@ class Render(QtWidgets.QOpenGLWidget):
             obj = self.objects[guid]
             if hasattr(obj, "draw_instance"):
                 if obj.is_visible:
-                    obj.draw_instance(self.shader_instance, self.viewmode == "wireframe")
+                    obj.draw_instance(self.shader_instance, self.rendermode == "wireframe")
         # create map
         r = self.devicePixelRatio()
         instance_buffer = GL.glReadPixels(x * r, y * r, width * r, height * r, GL.GL_RGB, GL.GL_UNSIGNED_BYTE)
