@@ -84,11 +84,11 @@ class ViewerSceneObject(SceneObject):
         Whether to show lines/edges of the object.
     show_faces : bool
         Whether to show faces of the object.
-    pointscolor : dict[Any, :class:`compas.colors.Color]
+    pointscolor : dict[Any, :class:`compas.colors.Color`]
         The color of the points.
-    linescolor : dict[Any, :class:`compas.colors.Color]
+    linescolor : dict[Any, :class:`compas.colors.Color`]
         The color of the lines.
-    facescolor : dict[Any, :class:`compas.colors.Color]
+    facescolor : dict[Any, :class:`compas.colors.Color`]
         The color of the faces.
     lineswidth : float
         The line width to be drawn on screen

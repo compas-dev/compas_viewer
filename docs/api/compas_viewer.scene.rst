@@ -13,3 +13,7 @@ Classes
 
     ViewerSceneObject
     MeshObject
+    LineObject
+    PointObject
+    TagObject
+    Tag
