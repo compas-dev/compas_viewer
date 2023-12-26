@@ -2,7 +2,7 @@
     "dtype": "compas_viewer.configurations/RenderConfig",
     "data": {
         "show_grid": true,
-        "gridsize": [1, 10, 10],
+        "gridsize": [1.0, 1.0, 10, 10],
         "viewmode": "perspective",
         "rendermode": "wireframe",
         "backgroundcolor": {
@@ -19,11 +19,11 @@
         "camera": {
             "dtype": "compas_viewer.configurations/CameraConfig",
             "data": {
-                "fov": 45,
+                "fov": 45.0,
                 "near": 0.1,
-                "far": 1000,
-                "position": [1, 1, 1],
-                "target": [0, 0, 0],
+                "far": 1000.0,
+                "position": [1.0, 1.0, 1.0],
+                "target": [0.0, 0.0, 0.0],
                 "scale": 1.0,
                 "zoomdelta": 0.05,
                 "rotationdelta": 0.01,

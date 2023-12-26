@@ -22,6 +22,7 @@ class SceneConfigType(TypedDict):
     pointssize: float
     opacity: float
     hide_coplanaredges: bool
+    use_vertexcolors: bool
 
 
 class SceneConfig(Config):
@@ -49,6 +50,7 @@ class SceneConfig(Config):
         self.pointssize = config["pointssize"]
         self.opacity = config["opacity"]
         self.hide_coplanaredges = config["hide_coplanaredges"]
+        self.use_vertexcolors = config["use_vertexcolors"]
 
     @classmethod
     def from_default(cls) -> "SceneConfig":

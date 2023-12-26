@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+-   Added test files for configurations.
 -   Added doc build, and many doc-building syntax fixes.
 -   Added `scene.json` for storing the scene configurations. Mostly store the default appearance features of the objects.
 -   `compas` recognizes `compas_viewer` context, and map the according `compas_viewer` objects to the `compas` objects.

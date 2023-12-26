@@ -1,7 +1,6 @@
 from pathlib import Path
 from typing import Literal
 from typing import Tuple
-from typing import Type
 from typing import TypedDict
 
 from compas.colors import Color

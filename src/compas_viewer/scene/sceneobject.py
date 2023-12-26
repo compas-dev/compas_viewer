@@ -26,6 +26,7 @@ from compas_viewer.components.render.gl import update_vertex_buffer
 from compas_viewer.configurations import SceneConfig
 
 if TYPE_CHECKING:
+    from compas_viewer import Viewer
     from compas_viewer.components.render.shaders import Shader
 
 
@@ -37,8 +38,8 @@ class ViewerSceneObject(SceneObject):
     ----------
     name : str, optional
         The name of the object.
-    parent : :class:`compas_viewer.scene.ViewerSceneObject`, optional
-        The parent object.
+    viewer : :class:`compas_viewer.viewer.Viewer`
+        The viewer object.
     is_selected : bool
         Whether the object is selected.
     is_visible : bool
@@ -63,12 +64,15 @@ class ViewerSceneObject(SceneObject):
         The opacity of the object. It will override the value in the config file.
     config: :class:`compas_viewer.configurations.SceneConfig`.
         The configuration of the scene object. Defaults to None.
-        It should be assigned though the :class:`compas_viewer.viewer.Viewer.add` method. Otherwise a exception will be raised.
+        It should be assigned though the :class:`compas_viewer.viewer.Viewer.add` method.
+        Otherwise a exception will be raised.
     **kwargs : dict, optional
         Additional visualization options for specific objects.
 
     Attributes
     ----------
+    name : str
+        The name of the object.
     is_selected : bool
         Whether the object is selected.
     is_visible : bool
@@ -114,7 +118,7 @@ class ViewerSceneObject(SceneObject):
     def __init__(
         self,
         name: Optional[str],
-        parent: Optional["ViewerSceneObject"],
+        viewer: "Viewer",
         is_selected: bool,
         is_visible: bool,
         show_points: Optional[bool] = None,
@@ -131,19 +135,21 @@ class ViewerSceneObject(SceneObject):
     ):
         if config is None:
             raise ValueError(
-                "No SceneConfig specified for the ViewerSceneObject. Check if the object is added by the function `Viewer.add`."
+                "No SceneConfig specified for the ViewerSceneObject. "
+                + "Check if the object is added by the function `Viewer.add`."
             )
         self.config = config
         super(ViewerSceneObject, self).__init__(config=self.config, **kwargs)
         self.name = name or str(self)
         self.is_selected = is_selected
         self.is_visible = is_visible
-        self.parent = parent
+        self.viewer = viewer
+        self.parent: Optional[ViewerSceneObject] = None
         self._children = set()
 
-        self.show_points = show_points or self.config.show_points
-        self.show_lines = show_lines or self.config.show_lines
-        self.show_faces = show_faces or self.config.show_faces
+        self.show_points = show_points if show_points is not None else self.config.show_points
+        self.show_lines = show_lines if show_lines is not None else self.config.show_lines
+        self.show_faces = show_faces if show_faces is not None else self.config.show_faces
 
         if pointscolor is None:
             self.pointscolor = {"_default": self.config.pointscolor}
@@ -463,7 +469,7 @@ class ViewerSceneObject(SceneObject):
             shader.uniform3f("single_color", self.facescolor["_default"].rgb)
             shader.uniform1i(
                 "use_single_color",
-                not self.facescolor and not self._is_collection and not getattr(self, "use_vertex_color", False),
+                not self.facescolor and not self._is_collection and not getattr(self, "use_vertexcolors", False),
             )
             shader.bind_attribute("position", self._frontfaces_buffer["positions"])
             shader.bind_attribute("color", self._frontfaces_buffer["colors"])
@@ -474,7 +480,7 @@ class ViewerSceneObject(SceneObject):
             shader.uniform3f("single_color", self.facescolor["_default"].rgb)
             shader.uniform1i(
                 "use_single_color",
-                not self.facescolor and not self._is_collection and not getattr(self, "use_vertex_color", False),
+                not self.facescolor and not self._is_collection and not getattr(self, "use_vertexcolors", False),
             )
             shader.bind_attribute("position", self._backfaces_buffer["positions"])
             shader.bind_attribute("color", self._backfaces_buffer["colors"])

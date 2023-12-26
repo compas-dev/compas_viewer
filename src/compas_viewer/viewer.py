@@ -341,7 +341,7 @@ class Viewer(Scene):
         self,
         item: Union[Mesh, Geometry],
         name: Optional[str] = None,
-        parent: Optional[ViewerSceneObject] = "stsdsd",
+        parent: Optional[ViewerSceneObject] = None,
         is_selected: bool = False,
         is_visible: bool = True,
         show_points: Optional[bool] = None,
@@ -354,6 +354,7 @@ class Viewer(Scene):
         pointssize: Optional[float] = None,
         opacity: Optional[float] = None,
         hide_coplanaredges: Optional[bool] = None,
+        use_vertexcolors: Optional[bool] = None,
         **kwargs
     ) -> ViewerSceneObject:
         """
@@ -366,9 +367,9 @@ class Viewer(Scene):
             The geometry to add to the scene.
         name : str, optional
             The name of the item.
-        parent : :class:`compas.scene.SceneObject`, optional
-            The parent object of the item.
             Default to None.
+        parent : :class:`compas_viewer.scene.ViewerSceneObject`, optional
+            The parent of the item.
         is_selected : bool, optional
             Whether the object is selected.
             Default to False.
@@ -405,6 +406,9 @@ class Viewer(Scene):
         hide_coplanaredges : bool, optional
             Whether to hide the coplanar edges of the mesh.
             It will override the value in the scene config file.
+        use_vertexcolors : bool, optional
+            Whether to use vertex color.
+            It will override the value in the scene config file.
         **kwargs : dict
             The other possible parameters to be passed to the object.
 
@@ -416,8 +420,9 @@ class Viewer(Scene):
 
         sceneobject = super(Viewer, self).add(
             item=item,
-            parent=p
+            parent=parent,
             name=name,
+            viewer=self,
             is_selected=is_selected,
             is_visible=is_visible,
             show_points=show_points,
@@ -430,10 +435,12 @@ class Viewer(Scene):
             pointssize=pointssize,
             opacity=opacity,
             hide_coplanaredges=hide_coplanaredges,
+            use_vertexcolors=use_vertexcolors,
             config=self.scene_config,
             **kwargs
         )
         assert isinstance(sceneobject, ViewerSceneObject)
         self.render.objects[name or str(sceneobject)] = sceneobject
-
+        if parent:
+            sceneobject.parent = parent
         return sceneobject
