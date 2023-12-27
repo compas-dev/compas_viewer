@@ -93,13 +93,8 @@ class GridObject(ViewerSceneObject, BaseMeshObject):
     def __init__(self, grid: Grid, **kwargs):
         super(GridObject, self).__init__(mesh=grid.mesh, **kwargs)
         self._grid = grid
-        self._points_data = self._get_points_data()
-        self._lines_data = self._get_lines_data()
-        self._frontfaces_data = self._get_frontfaces_data()
-        self._backfaces_data = self._get_backfaces_data()
 
-    def _get_points_data(self):
-        pass
+        self._lines_data = self._get_lines_data()
 
     def _get_lines_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
         positions = []
@@ -131,12 +126,6 @@ class GridObject(ViewerSceneObject, BaseMeshObject):
             elements.append([i + 0, i + 1])
 
         return positions, colors, elements
-
-    def _get_frontfaces_data(self):
-        pass
-
-    def _get_backfaces_data(self):
-        pass
 
     def init(self):
         self.make_buffers()
