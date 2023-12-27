@@ -1,4 +1,5 @@
-from typing import List, Optional
+from typing import List
+from typing import Optional
 from typing import Tuple
 
 from compas.colors import Color
@@ -29,7 +30,6 @@ class LineObject(ViewerSceneObject, GeometryObject):
     def __init__(self, line: Line, **kwargs):
         super(LineObject, self).__init__(geometry=line, **kwargs)
         self._line = line
-        self.show_lines = self.is_visible
 
         self._points_data = self._get_points_data()
         self._lines_data = self._get_lines_data()
@@ -49,8 +49,6 @@ class LineObject(ViewerSceneObject, GeometryObject):
         return positions, colors, elements
 
     def _get_lines_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
-        if not self.show_lines:
-            return None
         line = self._line
         color = self.linescolor["_default"]
         positions = [line.start, line.end]
