@@ -6,18 +6,19 @@ from typing import Optional
 from typing import Tuple
 from typing import Union
 
-import numpy as np
 from compas.colors import Color
 from compas.geometry import Point
 from compas.geometry import Rotation
 from compas.geometry import Scale
 from compas.geometry import Transformation
 from compas.geometry import Translation
-from compas.geometry import decompose_matrix
 from compas.geometry import identity_matrix
 from compas.geometry import transform_points_numpy
 from compas.scene import SceneObject
 from compas.utilities import flatten
+from numpy import array
+from numpy import average
+from numpy import identity
 
 from compas_viewer.configurations import SceneConfig
 from compas_viewer.utilities.gl import make_index_buffer
@@ -181,20 +182,20 @@ class ViewerSceneObject(SceneObject):
         self.background: bool = False
 
         self._instance_color: Optional[Color] = None
-        self._translation = Translation.from_matrix([0.0, 0.0, 0.0])
-        self._rotation = Rotation.from_matrix([0.0, 0.0, 0.0])
-        self._scale = Scale.from_matrix([1.0, 1.0, 1.0])
         self._transformation = Transformation.from_matrix(identity_matrix(4))
+        self._translation = self._transformation.translation
+        self._rotation = self._transformation.rotation
+        self._scale = self._transformation.scale
         self._matrix_buffer: Optional[List[List[float]]] = None
 
         self._bounding_box: Optional[List[float]] = None
         self._bounding_box_center: Optional[Point] = None
         self._is_collection = False
 
-        self._points_data: Optional[Tuple[List[Point], List[Color], List[List[int]]]]
-        self._lines_data: Optional[Tuple[List[Point], List[Color], List[List[int]]]]
-        self._frontfaces_data: Optional[Tuple[List[Point], List[Color], List[List[int]]]]
-        self._backfaces_data: Optional[Tuple[List[Point], List[Color], List[List[int]]]]
+        self._points_data: Optional[Tuple[List[Point], List[Color], List[List[int]]]] = None
+        self._lines_data: Optional[Tuple[List[Point], List[Color], List[List[int]]]] = None
+        self._frontfaces_data: Optional[Tuple[List[Point], List[Color], List[List[int]]]] = None
+        self._backfaces_data: Optional[Tuple[List[Point], List[Color], List[List[int]]]] = None
         self._points_buffer: Optional[Dict[str, Any]] = None
         self._lines_buffer: Optional[Dict[str, Any]] = None
         self._frontfaces_buffer: Optional[Dict[str, Any]] = None
@@ -238,48 +239,42 @@ class ViewerSceneObject(SceneObject):
         self._children.remove(obj)
 
     @property
-    def translation(self):
+    def translation(self) -> Translation:
         return self._translation
 
     @translation.setter
-    def translation(self, vector):
-        self._translation[0] = vector[0]
-        self._translation[1] = vector[1]
-        self._translation[2] = vector[2]
+    def translation(self, translation: Translation):
+        self._translation = translation
 
     @property
-    def rotation(self):
+    def rotation(self) -> Rotation:
         return self._rotation
 
     @rotation.setter
-    def rotation(self, angles):
-        self._rotation[0] = angles[0]
-        self._rotation[1] = angles[1]
-        self._rotation[2] = angles[2]
+    def rotation(self, rotation: Rotation):
+        self._rotation = rotation
 
     @property
-    def scale(self):
+    def scale(self) -> Scale:
         return self._scale
 
     @scale.setter
-    def scale(self, factors):
-        self._scale[0] = factors[0]
-        self._scale[1] = factors[1]
-        self._scale[2] = factors[2]
+    def scale(self, scale: Scale):
+        self._scale = scale
 
     def _update_matrix(self):
         """Update the matrix from object's translation, rotation and scale"""
         if (not self.parent or self.parent._matrix_buffer is None) and (
-            self.translation.matrix == [0, 0, 0]
-            and self.rotation.matrix == [0, 0, 0]
-            and self.scale.matrix == [1, 1, 1]
+            self.translation.matrix == identity_matrix(4)
+            and self.rotation.matrix == identity_matrix(4)
+            and self.scale.matrix == identity_matrix(4)
         ):
             self._transformation.matrix = identity_matrix(4)
             self._matrix_buffer = None
         else:
             M = self.translation * self.rotation * self.scale
             self._transformation.matrix = M.matrix
-            self._matrix_buffer = list(np.array(self.matrix_world).flatten())
+            self._matrix_buffer = list(array(self.matrix_world).flatten())
 
         if self.children:
             for child in self.children:
@@ -288,6 +283,14 @@ class ViewerSceneObject(SceneObject):
     @property
     def transformation(self):
         return self._transformation
+
+    @transformation.setter
+    def transformation(self, transformation: Transformation):
+        self._translation = transformation.translation
+        self._rotation = transformation.rotation
+        self._scale = transformation.scale
+        self._transformation = transformation
+        self._update_matrix()
 
     @property
     def transformation_world(self):
@@ -310,11 +313,8 @@ class ViewerSceneObject(SceneObject):
 
     @matrix.setter
     def matrix(self, matrix):
-        """Set the object's translation, rotation and scale from given matrix, and update object's matrix"""
-        scale, _, rotation, translation, _ = decompose_matrix(matrix)
-        self.translation = translation
-        self.rotation = rotation
-        self.scale = scale
+        """Set the object's transformation from given matrix, and update object's matrix"""
+        self.transformation.matrix = matrix
         self._update_matrix()
 
     # ==========================================================================
@@ -449,11 +449,11 @@ class ViewerSceneObject(SceneObject):
             if not positions:
                 return
 
-        _positions = np.array(positions)
+        _positions = array(positions)
         self._bounding_box = list(
-            transform_points_numpy(np.array([_positions.min(axis=0), _positions.max(axis=0)]), self._transformation)
+            transform_points_numpy(array([_positions.min(axis=0), _positions.max(axis=0)]), self._transformation)
         )
-        self._bounding_box_center = Point(*list(np.average(a=np.array(self.bounding_box), axis=0)))
+        self._bounding_box_center = Point(*list(average(a=array(self.bounding_box), axis=0)))
 
     def draw(self, shader: "Shader", wireframe: bool, is_lighted: bool):
         """Draw the object from its buffers"""
@@ -517,7 +517,7 @@ class ViewerSceneObject(SceneObject):
         shader.uniform1i("is_selected", 0)
         shader.uniform1f("object_opacity", 1)
         if self._matrix_buffer is not None:
-            shader.uniform4x4("transform", list(np.identity(4).flatten()))
+            shader.uniform4x4("transform", list(identity(4).flatten()))
         shader.disable_attribute("position")
         shader.disable_attribute("color")
 
@@ -542,7 +542,7 @@ class ViewerSceneObject(SceneObject):
             shader.bind_attribute("position", self._backfaces_buffer["positions"])
             shader.draw_triangles(elements=self._backfaces_buffer["elements"], n=self._backfaces_buffer["n"])
         if self._matrix_buffer is not None:
-            shader.uniform4x4("transform", np.identity(4).flatten())
+            shader.uniform4x4("transform", identity(4).flatten())
         shader.uniform3f("instance_color", [0, 0, 0])
         shader.disable_attribute("position")
 
