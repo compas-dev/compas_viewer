@@ -192,10 +192,10 @@ class ViewerSceneObject(SceneObject):
         self._bounding_box_center: Optional[Point] = None
         self._is_collection = False
 
-        self._points_data: Optional[Tuple[List[Point], List[Color], List[List[int]]]]
-        self._lines_data: Optional[Tuple[List[Point], List[Color], List[List[int]]]]
-        self._frontfaces_data: Optional[Tuple[List[Point], List[Color], List[List[int]]]]
-        self._backfaces_data: Optional[Tuple[List[Point], List[Color], List[List[int]]]]
+        self._points_data: Optional[Tuple[List[Point], List[Color], List[List[int]]]] = None
+        self._lines_data: Optional[Tuple[List[Point], List[Color], List[List[int]]]] = None
+        self._frontfaces_data: Optional[Tuple[List[Point], List[Color], List[List[int]]]] = None
+        self._backfaces_data: Optional[Tuple[List[Point], List[Color], List[List[int]]]] = None
         self._points_buffer: Optional[Dict[str, Any]] = None
         self._lines_buffer: Optional[Dict[str, Any]] = None
         self._frontfaces_buffer: Optional[Dict[str, Any]] = None
