@@ -19,11 +19,11 @@ from compas.geometry import transform_points_numpy
 from compas.scene import SceneObject
 from compas.utilities import flatten
 
+from compas_viewer.configurations import SceneConfig
 from compas_viewer.utilities.gl import make_index_buffer
 from compas_viewer.utilities.gl import make_vertex_buffer
 from compas_viewer.utilities.gl import update_index_buffer
 from compas_viewer.utilities.gl import update_vertex_buffer
-from compas_viewer.configurations import SceneConfig
 
 if TYPE_CHECKING:
     from compas_viewer import Viewer
@@ -358,9 +358,9 @@ class ViewerSceneObject(SceneObject):
         self,
         data: Tuple[List[Point], List[Color], List[int]],
         buffer: Dict[str, Any],
-        update_positions: bool = True,
-        update_colors: bool = True,
-        update_elements: bool = True,
+        update_positions: bool,
+        update_colors: bool,
+        update_elements: bool,
     ):
         """Update existing buffers from point/line/face data.
 
@@ -414,16 +414,17 @@ class ViewerSceneObject(SceneObject):
 
         if self._points_data is not None:
             assert self._points_buffer is not None
-            self.update_buffer_from_data(self._points_data, self._points_buffer)
+            # boolean values are keys for improving the performance, true for now to update all, will flag them later.
+            self.update_buffer_from_data(self._points_data, self._points_buffer, True, True, True)
         if self._lines_data is not None:
             assert self._lines_buffer is not None
-            self.update_buffer_from_data(self._lines_data, self._lines_buffer)
+            self.update_buffer_from_data(self._lines_data, self._lines_buffer, True, True, True)
         if self._frontfaces_data is not None:
             assert self._frontfaces_buffer is not None
-            self.update_buffer_from_data(self._frontfaces_data, self._frontfaces_buffer)
+            self.update_buffer_from_data(self._frontfaces_data, self._frontfaces_buffer, True, True, True)
         if self._backfaces_data is not None:
             assert self._backfaces_buffer is not None
-            self.update_buffer_from_data(self._backfaces_data, self._backfaces_buffer)
+            self.update_buffer_from_data(self._backfaces_data, self._backfaces_buffer, True, True, True)
 
     def init(self):
         """Initialize the object"""
@@ -435,7 +436,7 @@ class ViewerSceneObject(SceneObject):
         self._update_matrix()
         self.update_buffers()
 
-    def _update_bounding_box(self, positions=None):
+    def _update_bounding_box(self, positions: Optional[List[Point]] = None):
         """Update the bounding box of the object"""
         if positions is None:
             positions = []
@@ -448,13 +449,13 @@ class ViewerSceneObject(SceneObject):
             if not positions:
                 return
 
-        positions = np.array(positions)
+        _positions = np.array(positions)
         self._bounding_box = list(
-            transform_points_numpy(np.array([positions.min(axis=0), positions.max(axis=0)]), self._transformation)
+            transform_points_numpy(np.array([_positions.min(axis=0), _positions.max(axis=0)]), self._transformation)
         )
         self._bounding_box_center = Point(*list(np.average(a=np.array(self.bounding_box), axis=0)))
 
-    def draw(self, shader: "Shader", wireframe=False, is_lighted=False):
+    def draw(self, shader: "Shader", wireframe: bool, is_lighted: bool):
         """Draw the object from its buffers"""
 
         shader.enable_attribute("position")
@@ -465,7 +466,7 @@ class ViewerSceneObject(SceneObject):
         shader.uniform1i("is_lighted", is_lighted)
         shader.uniform1f("object_opacity", self.opacity)
         shader.uniform1i("element_type", 2)
-        if self._frontfaces_buffer is not None and self.show_faces and not wireframe:
+        if self._frontfaces_buffer is not None and not wireframe:
             shader.uniform3f("single_color", self.facescolor["_default"].rgb)
             shader.uniform1i(
                 "use_single_color",
@@ -476,7 +477,7 @@ class ViewerSceneObject(SceneObject):
             shader.draw_triangles(
                 elements=self._frontfaces_buffer["elements"], n=self._frontfaces_buffer["n"], background=self.background
             )
-        if self._backfaces_buffer is not None and self.show_faces and not wireframe:
+        if self._backfaces_buffer is not None and not wireframe:
             shader.uniform3f("single_color", self.facescolor["_default"].rgb)
             shader.uniform1i(
                 "use_single_color",
@@ -489,7 +490,7 @@ class ViewerSceneObject(SceneObject):
             )
         shader.uniform1i("is_lighted", False)
         shader.uniform1i("element_type", 1)
-        if self._lines_buffer is not None and (self.show_lines or wireframe):
+        if self._lines_buffer is not None:
             shader.uniform3f("single_color", self.linescolor["_default"].rgb)
             shader.uniform1i("use_single_color", not self.linescolor and not self._is_collection)
             shader.bind_attribute("position", self._lines_buffer["positions"])
@@ -501,7 +502,7 @@ class ViewerSceneObject(SceneObject):
                 background=self.background,
             )
         shader.uniform1i("element_type", 0)
-        if self._points_buffer is not None and self.show_points:
+        if self._points_buffer is not None:
             shader.uniform3f("single_color", self.pointscolor["_default"].rgb)
             shader.uniform1i("use_single_color", not self.pointscolor and not self._is_collection)
             shader.bind_attribute("position", self._points_buffer["positions"])
@@ -520,7 +521,7 @@ class ViewerSceneObject(SceneObject):
         shader.disable_attribute("position")
         shader.disable_attribute("color")
 
-    def draw_instance(self, shader, wireframe=False):
+    def draw_instance(self, shader, wireframe: bool):
         """Draw the object instance for picking"""
         shader.enable_attribute("position")
         shader.uniform3f("instance_color", self._instance_color)
@@ -534,7 +535,7 @@ class ViewerSceneObject(SceneObject):
         if self._lines_buffer is not None and (self.show_lines or wireframe):
             shader.bind_attribute("position", self._lines_buffer["positions"])
             shader.draw_lines(width=self.lineswidth, elements=self._lines_buffer["elements"], n=self._lines_buffer["n"])
-        if self._frontfaces_buffer is not None and self.show_faces and not wireframe:
+        if self._frontfaces_buffer is not None and not wireframe:
             shader.bind_attribute("position", self._frontfaces_buffer["positions"])
             shader.draw_triangles(elements=self._frontfaces_buffer["elements"], n=self._frontfaces_buffer["n"])
             assert self._backfaces_buffer is not None
