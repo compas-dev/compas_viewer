@@ -1,27 +1,21 @@
 import time
 from typing import TYPE_CHECKING
-from typing import Any
 from typing import Dict
+from typing import List
 
 from compas.geometry import transform_points_numpy
-from compas.utilities import flatten
 from numpy import float32
 from numpy import frombuffer
 from numpy import identity
 from numpy import uint8
-from numpy.typing import NDArray
 from OpenGL import GL
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 
 from compas_viewer.configurations import RenderConfig
-from compas_viewer.configurations import RenderModeType
-from compas_viewer.configurations import ViewModeType
+from compas_viewer.scene.sceneobject import ViewerSceneObject
 
 from .camera import Camera
-from .gl import make_index_buffer
-from .gl import make_vertex_buffer
-from .objects.bufferobject import BufferObject
 from .shaders import Shader
 
 if TYPE_CHECKING:
@@ -36,10 +30,10 @@ class Render(QtWidgets.QOpenGLWidget):
     The width and height are not in its configuration since they are set by the parent layout.
 
     Parameters
-    ---------------
-    viewer : :class:`Viewer`
+    ----------
+    viewer : :class:`compas_viewer.viewer.Viewer`
         The viewer instance.
-    config : :class:`RenderConfig`
+    config : :class:`compas_viewer.configurations.RenderConfig`
         The render configuration.
     """
 
@@ -65,18 +59,17 @@ class Render(QtWidgets.QOpenGLWidget):
         self.camera = Camera(self)
         # self.grid = Grid(self.config.gridsize)
         # self.selector = Selector(self)
-        self.objects: Dict[str, BufferObject] = {}
+        self.objects: Dict[str, ViewerSceneObject] = {}
 
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
 
     @property
-    def rendermode(self) -> RenderModeType:
+    def rendermode(self):
         """
         The render mode of the view.
 
         Returns
         -------
-        :class:`RenderModeType`
             The render mode of the view.
         """
         return self._rendermode
@@ -96,13 +89,12 @@ class Render(QtWidgets.QOpenGLWidget):
             self.update()
 
     @property
-    def viewmode(self) -> ViewModeType:
+    def viewmode(self):
         """
         The view mode of the view.
 
         Returns
         -------
-        :class:`ViewModeType`
             The view mode of the view.
         """
         return self._viewmode
@@ -154,7 +146,7 @@ class Render(QtWidgets.QOpenGLWidget):
         ----------
         .. [1] https://doc.qt.io/qtforpython-5.12/PySide2/QtWidgets/QOpenGLWidget.html#PySide2.QtWidgets.PySide2.QtWidgets.QOpenGLWidget.initializeGL # noqa: E501
         """
-        GL.glClearColor(*self.config.backgroundcolor)
+        GL.glClearColor(*self.config.backgroundcolor.rgba)
         GL.glPolygonOffset(1.0, 1.0)
         GL.glEnable(GL.GL_POLYGON_OFFSET_FILL)
         GL.glEnable(GL.GL_CULL_FACE)
@@ -305,7 +297,8 @@ class Render(QtWidgets.QOpenGLWidget):
 
         projection = self.camera.projection(self.viewer.config.width, self.viewer.config.height)
         viewworld = self.camera.viewworld()
-        transform = identity(4, dtype=float32)
+
+        transform = list(identity(4, dtype=float32))
         # create the program
 
         self.shader_model = Shader(name="model")
@@ -315,7 +308,7 @@ class Render(QtWidgets.QOpenGLWidget):
         self.shader_model.uniform4x4("transform", transform)
         self.shader_model.uniform1i("is_selected", 0)
         self.shader_model.uniform1f("opacity", self.opacity)
-        self.shader_model.uniform3f("selection_color", self.config.selectioncolor)
+        self.shader_model.uniform3f("selection_color", self.config.selectioncolor.rgb)
         self.shader_model.release()
 
         self.shader_text = Shader(name="text")
@@ -348,27 +341,6 @@ class Render(QtWidgets.QOpenGLWidget):
         self.shader_grid.uniform4x4("viewworld", viewworld)
         self.shader_grid.uniform4x4("transform", transform)
         self.shader_grid.release()
-
-    def make_buffer_from_data(self, data) -> Dict[str, Any]:
-        """Create buffers from point/line/face data.
-
-        Parameters
-        ----------
-        data : tuple
-            Contains positions, colors, elements for the buffer
-
-        Returns
-        -------
-        buffer_dict : dict
-            A dict with created buffer indexes
-        """
-        positions, colors, elements = data
-        return {
-            "positions": make_vertex_buffer(list(flatten(positions))),
-            "colors": make_vertex_buffer(list(flatten(colors))),
-            "elements": make_index_buffer(list(flatten(elements))),
-            "n": len(list(flatten(elements))),
-        }
 
     def update_projection(self, w=None, h=None):
         """
@@ -419,12 +391,12 @@ class Render(QtWidgets.QOpenGLWidget):
         """
         self.update_projection(w, h)
 
-    def sort_objects_from_viewworld(self, viewworld: NDArray[float32]):
+    def sort_objects_from_viewworld(self, viewworld: List[List[float]]):
         """Sort objects by the distances from their bounding box centers to camera location
 
         Parameters
         ----------
-        viewworld : NDArray[float32]
+        viewworld : list[list[float]]
             The viewworld matrix.
 
         Returns
@@ -437,7 +409,7 @@ class Render(QtWidgets.QOpenGLWidget):
         centers = []
         for guid in self.objects:
             obj = self.objects[guid]
-            if isinstance(obj, BufferObject):
+            if isinstance(obj, ViewerSceneObject):
                 if obj.opacity * self.opacity < 1 and obj.bounding_box_center is not None:
                     transparent_objects.append(obj)
                     centers.append(transform_points_numpy([obj.bounding_box_center], obj.matrix)[0])

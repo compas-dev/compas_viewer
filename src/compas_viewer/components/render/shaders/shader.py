@@ -4,8 +4,7 @@ from typing import List
 from typing import Tuple
 from typing import Union
 
-from numpy import float32
-from numpy.typing import NDArray
+from numpy import array
 from OpenGL import GL
 
 
@@ -16,18 +15,19 @@ class Shader:
         self.program = make_shader_program(name)
         self.locations = {}
 
-    def uniform4x4(self, name: str, value: NDArray[float32]):
+    def uniform4x4(self, name: str, value: List[List[float]]):
         """Store a uniform 4x4 transformation matrix in the shader program at a named location.
 
         Parameters
         ----------
         name : str
             The name of the location in the shader program.
-        value : array-like[float]
-            A 4x4 transformation matrix in column-major ordering.
+        value : list[list[float]]
+            A 4x4 transformation matrix.
         """
+        _value = array(value)
         location = GL.glGetUniformLocation(self.program, name)
-        GL.glUniformMatrix4fv(location, 1, True, value)
+        GL.glUniformMatrix4fv(location, 1, True, _value)
 
     def uniform1i(self, name: str, value: int):
         """Store a uniform integer in the shader program at a named location.

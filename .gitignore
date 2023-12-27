@@ -115,6 +115,6 @@ temp/**
 
 .vscode
 
-docs/api/generated/
+**/generated/
 
 conda.recipe/

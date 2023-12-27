@@ -10,18 +10,23 @@ def gl_info() -> str:
     -------
     str
 
+    Notes
+    -----
+    This function is used for debugging purposes on your machine.
+    The GL error could be diverse depending the driver, OS, and GL versions.
+    Please report your error to help us improve the compatibility.
+
+    Examples
+    --------
+    >>> from compas_viewer.utilities import gl_info
+    >>> print(gl_info()) # doctest: +SKIP
     """
-    info: str = """
-        Vendor: {0}
-        Renderer: {1}
-        OpenGL Version: {2}
-        Shader Version: {3}
-        """.format(
-        GL.glGetString(GL.GL_VENDOR),
-        GL.glGetString(GL.GL_RENDERER),
-        GL.glGetString(GL.GL_VERSION),
-        GL.glGetString(GL.GL_SHADING_LANGUAGE_VERSION),
-    )
+    info: str = f"""
+        Vendor: {GL.glGetString(GL.GL_VENDOR)}
+        Renderer: {GL.glGetString(GL.GL_RENDERER)}
+        OpenGL Version: {GL.glGetString(GL.GL_VERSION)}
+        Shader Version: {GL.glGetString(GL.GL_SHADING_LANGUAGE_VERSION)}
+        """
     return info
 
 

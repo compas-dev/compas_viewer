@@ -1,9 +1,17 @@
 import sys
 from os import path
 from pathlib import Path
+from typing import Any
+from typing import Dict
+from typing import List
 from typing import Literal
 from typing import Optional
+from typing import Union
 
+from compas.colors import Color
+from compas.datastructures import Mesh
+from compas.geometry import Geometry
+from compas.scene import Scene
 from PyQt5 import QtCore
 from PyQt5 import QtGui
 from PyQt5 import QtWidgets
@@ -12,12 +20,14 @@ from PyQt5.QtGui import QIcon
 
 from compas_viewer.components import Render
 from compas_viewer.configurations import RenderConfig
+from compas_viewer.configurations import SceneConfig
 from compas_viewer.configurations import ViewerConfig
+from compas_viewer.scene.sceneobject import ViewerSceneObject
 
 ICONS = Path(Path(__file__).parent, "_static", "icons")
 
 
-class Viewer:
+class Viewer(Scene):
     """
     The Viewer class is the main entry of `compas_viewer`. It organizes the scene and create the GUI application.
 
@@ -31,10 +41,10 @@ class Viewer:
         The width of the viewer window at startup. It will override the value in the config file.
     height : int, optional
         The height of the viewer window at startup. It will override the value in the config file.
-    viewmode : {'shaded', 'ghosted', 'wireframe', 'lighted'}, optional
+    rendermode : literal['shaded', 'ghosted', 'wireframe', 'lighted'}, optional
         The display mode of the OpenGL view. It will override the value in the config file.
-    viewport : {'front', 'right', 'top', 'perspective'}, optional
-        The viewport of the OpenGL view. It will override the value in the config file.
+    viewmode : literal['front', 'right', 'top', 'perspective'}, optional
+        The view mode of the OpenGL view. It will override the value in the config file.
         In `ghosted` mode, all objects have a default opacity of 0.7.
     show_grid : bool, optional
         Show the XY plane. It will override the value in the config file.
@@ -43,7 +53,7 @@ class Viewer:
 
     Attributes
     ----------
-    config : ViewerConfig
+    config : :class:`compas_viewer.configurations.ViewerConfig`
         The configuration for the viewer.
 
     Notes
@@ -56,7 +66,7 @@ class Viewer:
     Currently the viewer uses OpenGL 2.2 and GLSL 120 with a 'compatibility' profile.
 
     Examples
-    -------
+    --------
     >>> from compas_viewer import Viewer # doctest: +SKIP
     >>> viewer = Viewer() # doctest: +SKIP
     >>> viewer.show() # doctest: +SKIP
@@ -69,19 +79,21 @@ class Viewer:
         fullscreen: Optional[bool] = None,
         width: Optional[int] = None,
         height: Optional[int] = None,
-        viewmode: Optional[Literal["wireframe", "shaded", "ghosted", "lighted"]] = None,
-        viewport: Optional[Literal["front", "right", "top", "perspective"]] = None,
+        rendermode: Optional[Literal["wireframe", "shaded", "ghosted", "lighted"]] = None,
+        viewmode: Optional[Literal["front", "right", "top", "perspective"]] = None,
         show_grid: Optional[bool] = None,
         configpath: Optional[str] = None,
     ) -> None:
+        super(Viewer, self).__init__()
         # custom or default config
         if configpath is None:
             self.config = ViewerConfig.from_default()
-            render_config = RenderConfig.from_default()
+            self.render_config = RenderConfig.from_default()
+            self.scene_config = SceneConfig.from_default()
         else:
-            # TODO
             self.config = ViewerConfig.from_json(Path(configpath, "viewer.json"))
-            render_config = RenderConfig.from_json(Path(configpath, "render.json"))
+            self.render_config = RenderConfig.from_json(Path(configpath, "render.json"))
+            self.scene_config = SceneConfig.from_json(Path(configpath, "scene.json"))
 
         #  in-code config
         if title is not None:
@@ -92,14 +104,25 @@ class Viewer:
             self.config.width = width
         if height is not None:
             self.config.height = height
+        if rendermode is not None:
+            self.render_config.rendermode = rendermode
+        if viewmode is not None:
+            self.render_config.viewmode = viewmode
+        if show_grid is not None:
+            self.render_config.show_grid = show_grid
 
-        self._init(render_config)
+        self._init()
+
+    def __new__(cls, *args, **kwargs):
+        instance = super(Viewer, cls).__new__(cls)
+        Scene.viewerinstance = instance  # type: ignore
+        return instance
 
     # ==========================================================================
     # Init functions
     # ==========================================================================
 
-    def _init(self, render_config) -> None:
+    def _init(self) -> None:
         """Initialize the components of the user interface."""
         self._glFormat = QtGui.QSurfaceFormat()
         self._glFormat.setVersion(2, 1)
@@ -112,7 +135,7 @@ class Viewer:
         self._icon = QIcon(path.join(ICONS, "compas_icon_white.png"))
         self._app.setWindowIcon(self._icon)  # type: ignore
         self._app.setApplicationName(self.config.title)
-        self.render = Render(self, render_config)
+        self.render = Render(self, self.render_config)
         self._window.setCentralWidget(self.render)
         self._window.setContentsMargins(0, 0, 0, 0)
         self._app.references.add(self._window)  # type: ignore
@@ -310,5 +333,114 @@ class Viewer:
         # stop point of the main thread:
         self._app.exec_()
 
+    # ==========================================================================
+    # Scene
+    # ==========================================================================
 
-ViewerType = type(Viewer)
+    def add(
+        self,
+        item: Union[Mesh, Geometry],
+        name: Optional[str] = None,
+        parent: Optional[ViewerSceneObject] = None,
+        is_selected: bool = False,
+        is_visible: bool = True,
+        show_points: Optional[bool] = None,
+        show_lines: Optional[bool] = None,
+        show_faces: Optional[bool] = None,
+        pointscolor: Optional[Union[Color, Dict[Any, List[float]]]] = None,
+        linescolor: Optional[Union[Color, Dict[Any, List[float]]]] = None,
+        facescolor: Optional[Union[Color, Dict[Any, List[float]]]] = None,
+        lineswidth: Optional[float] = None,
+        pointssize: Optional[float] = None,
+        opacity: Optional[float] = None,
+        hide_coplanaredges: Optional[bool] = None,
+        use_vertexcolors: Optional[bool] = None,
+        **kwargs
+    ) -> ViewerSceneObject:
+        """
+        Add an item to the scene.
+        This function is inherent from :class:`compas.scene.Scene` with additional functionalities.
+
+        Parameters
+        ----------
+        item : :class:`compas.geometry.Geometry`
+            The geometry to add to the scene.
+        name : str, optional
+            The name of the item.
+            Default to None.
+        parent : :class:`compas_viewer.scene.ViewerSceneObject`, optional
+            The parent of the item.
+        is_selected : bool, optional
+            Whether the object is selected.
+            Default to False.
+        is_visible : bool, optional
+            Whether to show object.
+            Default to True.
+        show_points : bool, optional
+            Whether to show points/vertices of the object.
+            It will override the value in the scene config file.
+        show_lines : bool, optional
+            Whether to show lines/edges of the object.
+            It will override the value in the scene config file.
+        show_faces : bool, optional
+            Whether to show faces of the object.
+            It will override the value in the scene config file.
+        pointscolor : Union[:class:`compas.colors.Color`, Dict[any, :class:`compas.colors.Color`], optional
+            The color or the dict of colors of the points.
+            It will override the value in the scene config file.
+        linescolor : Union[:class:`compas.colors.Color`, Dict[any, :class:`compas.colors.Color`], optional
+            The color or the dict of colors of the lines.
+            It will override the value in the scene config file.
+        facescolor : Union[:class:`compas.colors.Color`, Dict[any, :class:`compas.colors.Color`], optional
+            The color or the dict of colors the faces.
+            It will override the value in the scene config file.
+        lineswidth : float, optional
+            The line width to be drawn on screen
+            It will override the value in the scene config file.
+        pointssize : float, optional
+            The point size to be drawn on screen
+            It will override the value in the scene config file.
+        opacity : float, optional
+            The opacity of the object.
+            It will override the value in the scene config file.
+        hide_coplanaredges : bool, optional
+            Whether to hide the coplanar edges of the mesh.
+            It will override the value in the scene config file.
+        use_vertexcolors : bool, optional
+            Whether to use vertex color.
+            It will override the value in the scene config file.
+        **kwargs : dict
+            The other possible parameters to be passed to the object.
+
+        Returns
+        -------
+        :class:`compas.scene.SceneObject`
+            The scene object.
+        """
+
+        sceneobject = super(Viewer, self).add(
+            item=item,
+            parent=parent,
+            name=name,
+            viewer=self,
+            is_selected=is_selected,
+            is_visible=is_visible,
+            show_points=show_points,
+            show_lines=show_lines,
+            show_faces=show_faces,
+            pointscolor=pointscolor,
+            linescolor=linescolor,
+            facescolor=facescolor,
+            lineswidth=lineswidth,
+            pointssize=pointssize,
+            opacity=opacity,
+            hide_coplanaredges=hide_coplanaredges,
+            use_vertexcolors=use_vertexcolors,
+            config=self.scene_config,
+            **kwargs
+        )
+        assert isinstance(sceneobject, ViewerSceneObject)
+        self.render.objects[name or str(sceneobject)] = sceneobject
+        if parent:
+            sceneobject.parent = parent
+        return sceneobject

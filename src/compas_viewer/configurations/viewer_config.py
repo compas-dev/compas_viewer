@@ -21,12 +21,12 @@ class ViewerConfigType(TypedDict):
 
 class ViewerConfig(Config):
     """
-    The class representation for the `viewer.json` of the class : :class:`compas_viewer.Viewer`
+    The class representation for the `viewer.json` of the class :class:`compas_viewer.viewer.Viewer`
     The viewer.json contains all the settings about the viewer application it self: width, height, fullscreen, ...
 
     Parameters
     ----------
-    config : ViewerConfigType
+    config : :class:`ViewerConfigType`
         A TypedDict with defined keys and types.
 
     """
