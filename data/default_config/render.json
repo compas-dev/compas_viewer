@@ -3,6 +3,7 @@
     "data": {
         "show_grid": true,
         "gridsize": [1.0, 1.0, 10, 10],
+        "show_gridz": true,
         "viewmode": "perspective",
         "rendermode": "wireframe",
         "backgroundcolor": {
