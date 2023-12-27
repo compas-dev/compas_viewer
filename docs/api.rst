@@ -12,3 +12,4 @@ API Reference
     api/compas_viewer.configurations
     api/compas_viewer.controller
     api/compas_viewer.actions
+    api/compas_viewer.utilities

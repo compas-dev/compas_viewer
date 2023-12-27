@@ -20,10 +20,10 @@ from numpy import array
 from numpy import average
 from numpy import identity
 
-from compas_viewer.components.render.gl import make_index_buffer
-from compas_viewer.components.render.gl import make_vertex_buffer
-from compas_viewer.components.render.gl import update_index_buffer
-from compas_viewer.components.render.gl import update_vertex_buffer
+from compas_viewer.utilities.gl import make_index_buffer
+from compas_viewer.utilities.gl import make_vertex_buffer
+from compas_viewer.utilities.gl import update_index_buffer
+from compas_viewer.utilities.gl import update_vertex_buffer
 from compas_viewer.configurations import SceneConfig
 
 if TYPE_CHECKING:
