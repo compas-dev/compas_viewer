@@ -11,6 +11,7 @@ from numpy import uint8
 from OpenGL import GL
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
+from PyQt5.QtGui import QMouseEvent
 
 from compas_viewer.configurations import RenderConfig
 from compas_viewer.scene import Grid
@@ -223,7 +224,7 @@ class Render(QtWidgets.QOpenGLWidget):
     # event
     # ==========================================================================
 
-    def mouseMoveEvent(self, event):
+    def mouseMoveEvent(self, event: QMouseEvent):
         """
         Callback for the mouse move event.
 
@@ -232,70 +233,70 @@ class Render(QtWidgets.QOpenGLWidget):
 
         Parameters
         ----------
-        event : :class:`PySide2.QtGui.QMouseEvent`
+        event : :class:`PyQt5.QtGui.QMouseEvent`
             The Qt event.
         """
         if self.isActiveWindow() and self.underMouse():
             self.viewer.controller.mouse_move_action(event)
             self.update()
 
-    def mousePressEvent(self, event):
+    def mousePressEvent(self, event: QMouseEvent):
         """
         Callback for the mouse press event.
 
         Parameters
         ----------
-        event : :class:`PySide2.QtGui.QMouseEvent`
+        event : :class:`PyQt5.QtGui.QMouseEvent`
             The Qt event.
         """
         if self.isActiveWindow() and self.underMouse():
             self.viewer.controller.mouse_press_action(event)
             self.update()
 
-    def mouseReleaseEvent(self, event):
+    def mouseReleaseEvent(self, event: QMouseEvent):
         """
         Callback for the release press event.
 
         Parameters
         ----------
-        event : :class:`PySide2.QtGui.QMouseEvent`
+        event : :class:`PyQt5.QtGui.QMouseEvent`
             The Qt event.
         """
         if self.isActiveWindow() and self.underMouse():
             self.viewer.controller.mouse_release_action(event)
             self.update()
 
-    def wheelEvent(self, event):
+    def wheelEvent(self, event: QMouseEvent):
         """
         Callback for the mouse wheel event.
 
         Parameters
         ----------
-        event : :class:`PySide2.QtGui.QMouseEvent`
+        event : :class:`PyQt5.QtGui.QMouseEvent`
             The Qt event.
         """
         if self.isActiveWindow() and self.underMouse():
             self.viewer.controller.wheel_action(event)
             self.update()
 
-    def keyPressEvent(self, event):
+    def keyPressEvent(self, event: QMouseEvent):
         """
         Callback for the key press event.
 
         Parameters
         ----------
-        event : :class:`PySide2.QtGui.QMouseEvent`
+        event : :class:`PyQt5.QtGui.QMouseEvent`
             The Qt event.
         """
         self.viewer.controller.key_press_action(event)
 
-    def keyReleaseEvent(self, event):
+    def keyReleaseEvent(self, event: QMouseEvent):
         """
         Callback for the key release event.
 
         Parameters
         ----------
-        event : :class:`PySide2.QtGui.QMouseEvent`
+        event : :class:`PyQt5.QtGui.QMouseEvent`
             The Qt event.
         """
         self.viewer.controller.key_release_action(event)

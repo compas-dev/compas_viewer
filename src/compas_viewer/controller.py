@@ -1,5 +1,7 @@
 from typing import TYPE_CHECKING
 
+from PyQt5.QtGui import QMouseEvent
+
 from compas_viewer.configurations import ControllerConfig
 from compas_viewer.utilities import supported_keys
 
@@ -34,7 +36,7 @@ class Controller:
         self.config = config
         self.supported_keys = supported_keys
 
-    def mouse_move_action(self, event):
+    def mouse_move_action(self, event: QMouseEvent):
         """
         The mouse move action.
 
@@ -45,7 +47,7 @@ class Controller:
         """
         raise NotImplementedError
 
-    def mouse_press_action(self, event):
+    def mouse_press_action(self, event: QMouseEvent):
         """
         The mouse press action.
 
@@ -56,7 +58,7 @@ class Controller:
         """
         raise NotImplementedError
 
-    def mouse_release_action(self, event):
+    def mouse_release_action(self, event: QMouseEvent):
         """
         The mouse release action.
 
@@ -67,7 +69,7 @@ class Controller:
         """
         raise NotImplementedError
 
-    def wheel_action(self, event):
+    def wheel_action(self, event: QMouseEvent):
         """
         The wheel action.
 
@@ -78,7 +80,7 @@ class Controller:
         """
         raise NotImplementedError
 
-    def key_press_action(self, event):
+    def key_press_action(self, event: QMouseEvent):
         """
         The key press action.
 
@@ -89,7 +91,7 @@ class Controller:
         """
         raise NotImplementedError
 
-    def key_release_action(self, event):
+    def key_release_action(self, event: QMouseEvent):
         """
         The key release action.
 
