@@ -232,10 +232,12 @@ class Render(QtWidgets.QOpenGLWidget):
 
         Parameters
         ----------
-        event : PySide2.QtGui.QMouseEvent
+        event : :class:`PySide2.QtGui.QMouseEvent`
             The Qt event.
         """
-        pass
+        if self.isActiveWindow() and self.underMouse():
+            self.viewer.controller.mouse_move_action(event)
+            self.update()
 
     def mousePressEvent(self, event):
         """
@@ -243,10 +245,12 @@ class Render(QtWidgets.QOpenGLWidget):
 
         Parameters
         ----------
-        event : PySide2.QtGui.QMouseEvent
+        event : :class:`PySide2.QtGui.QMouseEvent`
             The Qt event.
         """
-        pass
+        if self.isActiveWindow() and self.underMouse():
+            self.viewer.controller.mouse_press_action(event)
+            self.update()
 
     def mouseReleaseEvent(self, event):
         """
@@ -254,10 +258,12 @@ class Render(QtWidgets.QOpenGLWidget):
 
         Parameters
         ----------
-        event : PySide2.QtGui.QMouseEvent
+        event : :class:`PySide2.QtGui.QMouseEvent`
             The Qt event.
         """
-        pass
+        if self.isActiveWindow() and self.underMouse():
+            self.viewer.controller.mouse_release_action(event)
+            self.update()
 
     def wheelEvent(self, event):
         """
@@ -265,10 +271,12 @@ class Render(QtWidgets.QOpenGLWidget):
 
         Parameters
         ----------
-        event : PySide2.QtGui.QMouseEvent
+        event : :class:`PySide2.QtGui.QMouseEvent`
             The Qt event.
         """
-        pass
+        if self.isActiveWindow() and self.underMouse():
+            self.viewer.controller.wheel_action(event)
+            self.update()
 
     def keyPressEvent(self, event):
         """
@@ -276,10 +284,10 @@ class Render(QtWidgets.QOpenGLWidget):
 
         Parameters
         ----------
-        event : PySide2.QtGui.QMouseEvent
+        event : :class:`PySide2.QtGui.QMouseEvent`
             The Qt event.
         """
-        pass
+        self.viewer.controller.key_press_action(event)
 
     def keyReleaseEvent(self, event):
         """
@@ -287,10 +295,10 @@ class Render(QtWidgets.QOpenGLWidget):
 
         Parameters
         ----------
-        event : PySide2.QtGui.QMouseEvent
+        event : :class:`PySide2.QtGui.QMouseEvent`
             The Qt event.
         """
-        pass
+        self.viewer.controller.key_release_action(event)
 
     # ==========================================================================
     # view

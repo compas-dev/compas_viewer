@@ -20,9 +20,11 @@ from PyQt5.QtCore import QCoreApplication
 from PyQt5.QtGui import QIcon
 
 from compas_viewer.components import Render
+from compas_viewer.configurations import ControllerConfig
 from compas_viewer.configurations import RenderConfig
 from compas_viewer.configurations import SceneConfig
 from compas_viewer.configurations import ViewerConfig
+from compas_viewer.controller import Controller
 from compas_viewer.scene.sceneobject import ViewerSceneObject
 
 ICONS = Path(Path(__file__).parent, "_static", "icons")
@@ -117,10 +119,15 @@ class Viewer(Scene):
             self.config = ViewerConfig.from_default()
             self.render_config = RenderConfig.from_default()
             self.scene_config = SceneConfig.from_default()
+            self.controller_config = ControllerConfig.from_default()
         else:
             self.config = ViewerConfig.from_json(Path(configpath, "viewer.json"))
             self.render_config = RenderConfig.from_json(Path(configpath, "render.json"))
             self.scene_config = SceneConfig.from_json(Path(configpath, "scene.json"))
+            self.controller_config = ControllerConfig.from_json(Path(configpath, "controller.json"))
+
+        # controller
+        self.controller = Controller(self, self.controller_config)
 
         #  in-code config
         if title is not None:
@@ -364,14 +371,7 @@ class Viewer(Scene):
         # stop point of the main thread:
         self._app.exec_()
 
-    def on(
-        self,
-        interval: int,
-        timeout: Optional[int] = None,
-        frames: Optional[int] = None,
-        record_fps: Optional[int] = None,
-        playback_interval: Optional[int] = None,
-    ) -> Callable:
+    def on(self, interval: int, timeout: Optional[int] = None, frames: Optional[int] = None) -> Callable:
         """Decorator for callbacks of a dynamic drawing process.
 
         Parameters
@@ -383,8 +383,6 @@ class Viewer(Scene):
         frames : int, optional
             The number of frames of the process.
             If no frame number is provided, the process continues until the viewer is closed.
-        playback_interval : int, optional
-            Interval between frames in the recording, in milliseconds.
 
         Returns
         -------
