@@ -62,7 +62,7 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
         self._backfaces_data = self._get_backfaces_data()
 
     def _get_points_data(self) -> Optional[Tuple[List[Point], List[Color], List[int]]]:
-        if self.show_points:
+        if not self.show_points:
             return None
         positions = []
         colors = []
@@ -78,7 +78,7 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
         return positions, colors, elements
 
     def _get_lines_data(self) -> Optional[Tuple[List[Point], List[Color], List[int]]]:
-        if self.show_lines:
+        if not self.show_lines:
             return None
         positions = []
         colors = []
@@ -107,7 +107,7 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
         return positions, colors, elements
 
     def _get_frontfaces_data(self) -> Optional[Tuple[List[Point], List[Color], List[int]]]:
-        if self.show_faces:
+        if not self.show_faces:
             return None
         positions = []
         colors = []
@@ -179,7 +179,7 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
         return positions, colors, elements
 
     def _get_backfaces_data(self) -> Optional[Tuple[List[Point], List[Color], List[int]]]:
-        if self.show_faces:
+        if not self.show_faces:
             return None
         if self.use_vertexcolors:
             self.vertexcolor = {
