@@ -27,7 +27,7 @@ class Controller:
         The viewer object.
     config : :class:`compas_viewer.configurations.ControllerConfig`
         The controller configuration.
-    supported_keys : dict[str, any]
+    supported_keys : dict[str, :class:`PyQt5.QtCore.Qt.Key`]
         The supported keys.
     """
 
