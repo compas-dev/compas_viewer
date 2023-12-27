@@ -449,9 +449,9 @@ class ViewerSceneObject(SceneObject):
             if not positions:
                 return
 
-        _positions = np.array(positions)
+        _positions = array(positions)
         self._bounding_box = list(
-            transform_points_numpy(np.array([_positions.min(axis=0), _positions.max(axis=0)]), self._transformation)
+            transform_points_numpy(array([_positions.min(axis=0), _positions.max(axis=0)]), self._transformation)
         )
         self._bounding_box_center = Point(*list(average(a=array(self.bounding_box), axis=0)))
 
