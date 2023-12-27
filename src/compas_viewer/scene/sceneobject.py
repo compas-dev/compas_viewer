@@ -191,10 +191,10 @@ class ViewerSceneObject(SceneObject):
         self._bounding_box_center: Optional[Point] = None
         self._is_collection = False
 
-        self._points_data: Optional[Tuple[List[Point], List[Color], List[int]]]
-        self._lines_data: Optional[Tuple[List[Point], List[Color], List[int]]]
-        self._frontfaces_data: Optional[Tuple[List[Point], List[Color], List[int]]]
-        self._backfaces_data: Optional[Tuple[List[Point], List[Color], List[int]]]
+        self._points_data: Optional[Tuple[List[Point], List[Color], List[List[int]]]]
+        self._lines_data: Optional[Tuple[List[Point], List[Color], List[List[int]]]]
+        self._frontfaces_data: Optional[Tuple[List[Point], List[Color], List[List[int]]]]
+        self._backfaces_data: Optional[Tuple[List[Point], List[Color], List[List[int]]]]
         self._points_buffer: Optional[Dict[str, Any]] = None
         self._lines_buffer: Optional[Dict[str, Any]] = None
         self._frontfaces_buffer: Optional[Dict[str, Any]] = None
@@ -333,7 +333,7 @@ class ViewerSceneObject(SceneObject):
             options += ["facescolor", "show_faces"]
         return options
 
-    def make_buffer_from_data(self, data: Tuple[List[Point], List[Color], List[int]]) -> Dict[str, Any]:
+    def make_buffer_from_data(self, data: Tuple[List[Point], List[Color], List[List[int]]]) -> Dict[str, Any]:
         """Create buffers from point/line/face data.
 
         Parameters
@@ -356,7 +356,7 @@ class ViewerSceneObject(SceneObject):
 
     def update_buffer_from_data(
         self,
-        data: Tuple[List[Point], List[Color], List[int]],
+        data: Tuple[List[Point], List[Color], List[List[int]]],
         buffer: Dict[str, Any],
         update_positions: bool,
         update_colors: bool,
