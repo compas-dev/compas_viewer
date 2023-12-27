@@ -30,24 +30,12 @@ class PointObject(ViewerSceneObject, GeometryObject):
         self._point = point
 
         self._points_data = self._get_points_data()
-        self._lines_data = self._get_lines_data()
-        self._frontfaces_data = self._get_frontfaces_data()
-        self._backfaces_data = self._get_backfaces_data()
 
     def _get_points_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
         positions = [self._point]
         colors = [self.pointscolor["_default"]]
         elements = [[0]]
         return positions, colors, elements
-
-    def _get_lines_data(self):
-        pass
-
-    def _get_frontfaces_data(self):
-        pass
-
-    def _get_backfaces_data(self):
-        pass
 
     @classmethod
     def create_default(cls) -> Point:

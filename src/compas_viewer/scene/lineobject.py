@@ -33,8 +33,6 @@ class LineObject(ViewerSceneObject, GeometryObject):
 
         self._points_data = self._get_points_data()
         self._lines_data = self._get_lines_data()
-        self._frontfaces_data = self._get_frontfaces_data()
-        self._backfaces_data = self._get_backfaces_data()
 
     def _get_points_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
         if not self.show_points:
@@ -55,12 +53,6 @@ class LineObject(ViewerSceneObject, GeometryObject):
         colors = [color, color]
         elements = [[0, 1]]
         return positions, colors, elements
-
-    def _get_frontfaces_data(self):
-        pass
-
-    def _get_backfaces_data(self):
-        pass
 
     @classmethod
     def create_default(cls) -> Line:
