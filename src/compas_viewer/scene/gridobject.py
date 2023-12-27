@@ -18,7 +18,7 @@ from OpenGL import GL
 from compas_viewer.utilities import make_index_buffer
 from compas_viewer.utilities import make_vertex_buffer
 
-from .sceneobject import ViewerSceneObject
+from .meshobject import MeshObject
 
 
 class Grid(Mesh):
@@ -43,7 +43,14 @@ class Grid(Mesh):
     """
 
     def __eq__(self, other):
-        return isinstance(other, Grid) and self.gridsize == other.gridsize and self.show_geidz == other.show_geidz
+        return (
+            isinstance(other, Grid)
+            and self.dx == other.dx
+            and self.nx == other.nx
+            and self.dy == other.dy
+            and self.ny == other.ny
+            and self.show_geidz == other.show_geidz
+        )
 
     def __init__(
         self,
@@ -82,8 +89,6 @@ class TagObject(MeshObject, GeometryObject):
         self._grid = grid
         self.linescolor = gridcolor
         self.show_lines = self.is_visible
-        self.show_points = False
-        self.show_faces = False
 
     def _lines_data(self):
         positions = []
