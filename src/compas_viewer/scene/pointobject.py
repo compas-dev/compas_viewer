@@ -28,7 +28,6 @@ class PointObject(ViewerSceneObject, GeometryObject):
     def __init__(self, point: Point, **kwargs):
         super(PointObject, self).__init__(geometry=point, **kwargs)
         self._point = point
-        self.show_points = self.is_visible
 
         self._points_data = self._get_points_data()
         self._lines_data = self._get_lines_data()
@@ -36,8 +35,6 @@ class PointObject(ViewerSceneObject, GeometryObject):
         self._backfaces_data = self._get_backfaces_data()
 
     def _get_points_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
-        if not self.show_points:
-            return None
         positions = [self._point]
         colors = [self.pointscolor["_default"]]
         elements = [[0]]
