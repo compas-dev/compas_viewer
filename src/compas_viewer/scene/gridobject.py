@@ -21,14 +21,13 @@ if TYPE_CHECKING:
 class Grid:
     """
     The geometry class of the grid. A grid is a set of lines.
-    It is created by the :class:`compas.datastructures.Mesh.from_meshgrid`.
 
     Parameters
     ----------
     gridsize : tuple[float, int, float, int]
         The size of the grid in [dx, nx, dy, ny] format.
         Notice that the `nx` and `ny` must be even numbers.
-        See the :class:`compas.datastructures.Mesh.from_meshgrid` for more details.
+        See the :func:`compas.datastructures.Mesh.from_meshgrid` for more details.
     show_geidz : bool
         If True, the Z axis of the grid will be shown.
 
@@ -48,6 +47,7 @@ class Grid:
         If the Z axis of the grid is shown.
     mesh : :class:`compas.datastructures.Mesh`
         The mesh of the grid.
+
     """
 
     def __eq__(self, other):

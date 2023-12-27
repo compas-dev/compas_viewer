@@ -16,7 +16,7 @@ class Controller:
 
     Parameters
     ----------
-    viewer : :class:`compas_viewer.Viewer`
+    viewer : :class:`compas_viewer.viewer.Viewer`
         The viewer object.
     config : :class:`compas_viewer.configurations.ControllerConfig`
         The controller configuration.
@@ -42,7 +42,7 @@ class Controller:
 
         Parameters
         ----------
-        event : :class:`PySide2.QtGui.QMouseEvent`
+        event : :class:`PyQt5.QtGui.QMouseEvent`
             The Qt event.
         """
         raise NotImplementedError
@@ -53,7 +53,7 @@ class Controller:
 
         Parameters
         ----------
-        event : :class:`PySide2.QtGui.QMouseEvent`
+        event : :class:`PyQt5.QtGui.QMouseEvent`
             The Qt event.
         """
         raise NotImplementedError
@@ -64,7 +64,7 @@ class Controller:
 
         Parameters
         ----------
-        event : :class:`PySide2.QtGui.QMouseEvent`
+        event : :class:`PyQt5.QtGui.QMouseEvent`
             The Qt event.
         """
         raise NotImplementedError
@@ -75,7 +75,7 @@ class Controller:
 
         Parameters
         ----------
-        event : :class:`PySide2.QtGui.QWheelEvent`
+        event : :class:`PyQt5.QtGui.QWheelEvent`
             The Qt event.
         """
         raise NotImplementedError
@@ -86,7 +86,7 @@ class Controller:
 
         Parameters
         ----------
-        event : :class:`PySide2.QtGui.QKeyEvent`
+        event : :class:`PyQt5.QtGui.QKeyEvent`
             The Qt event.
         """
         raise NotImplementedError
@@ -97,7 +97,7 @@ class Controller:
 
         Parameters
         ----------
-        event : :class:`PySide2.QtGui.QKeyEvent`
+        event : :class:`PyQt5.QtGui.QKeyEvent`
             The Qt event.
         """
         raise NotImplementedError

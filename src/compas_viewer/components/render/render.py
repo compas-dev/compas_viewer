@@ -226,7 +226,7 @@ class Render(QtWidgets.QOpenGLWidget):
 
     def mouseMoveEvent(self, event: QMouseEvent):
         """
-        Callback for the mouse move event.
+        Callback for the mouse move event which passes the event to the controller.
 
         This method registers selections, if the left button is pressed,
         and modifies the view (pan/rotate), if the right button is pressed.
@@ -235,6 +235,10 @@ class Render(QtWidgets.QOpenGLWidget):
         ----------
         event : :class:`PyQt5.QtGui.QMouseEvent`
             The Qt event.
+
+        See Also
+        --------
+        :func:`compas_viewer.controller.Controller.mouse_move_action`
         """
         if self.isActiveWindow() and self.underMouse():
             self.viewer.controller.mouse_move_action(event)
@@ -242,12 +246,16 @@ class Render(QtWidgets.QOpenGLWidget):
 
     def mousePressEvent(self, event: QMouseEvent):
         """
-        Callback for the mouse press event.
+        Callback for the mouse press event which passes the event to the controller.
 
         Parameters
         ----------
         event : :class:`PyQt5.QtGui.QMouseEvent`
             The Qt event.
+
+        See Also
+        --------
+        :func:`compas_viewer.controller.Controller.mouse_press_action`
         """
         if self.isActiveWindow() and self.underMouse():
             self.viewer.controller.mouse_press_action(event)
@@ -255,12 +263,16 @@ class Render(QtWidgets.QOpenGLWidget):
 
     def mouseReleaseEvent(self, event: QMouseEvent):
         """
-        Callback for the release press event.
+        Callback for the release press event which passes the event to the controller.
 
         Parameters
         ----------
         event : :class:`PyQt5.QtGui.QMouseEvent`
             The Qt event.
+
+        See Also
+        --------
+        :func:`compas_viewer.controller.Controller.mouse_release_action`
         """
         if self.isActiveWindow() and self.underMouse():
             self.viewer.controller.mouse_release_action(event)
@@ -268,12 +280,16 @@ class Render(QtWidgets.QOpenGLWidget):
 
     def wheelEvent(self, event: QMouseEvent):
         """
-        Callback for the mouse wheel event.
+        Callback for the mouse wheel event which passes the event to the controller.
 
         Parameters
         ----------
         event : :class:`PyQt5.QtGui.QMouseEvent`
             The Qt event.
+
+        See Also
+        --------
+        :func:`compas_viewer.controller.Controller.wheel_action`
         """
         if self.isActiveWindow() and self.underMouse():
             self.viewer.controller.wheel_action(event)
@@ -281,23 +297,31 @@ class Render(QtWidgets.QOpenGLWidget):
 
     def keyPressEvent(self, event: QMouseEvent):
         """
-        Callback for the key press event.
+        Callback for the key press event which passes the event to the controller.
 
         Parameters
         ----------
         event : :class:`PyQt5.QtGui.QMouseEvent`
             The Qt event.
+
+        See Also
+        --------
+        :func:`compas_viewer.controller.Controller.key_press_action`
         """
         self.viewer.controller.key_press_action(event)
 
     def keyReleaseEvent(self, event: QMouseEvent):
         """
-        Callback for the key release event.
+        Callback for the key release event which passes the event to the controller.
 
         Parameters
         ----------
         event : :class:`PyQt5.QtGui.QMouseEvent`
             The Qt event.
+
+        See Also
+        --------
+        :func:`compas_viewer.controller.Controller.key_release_action`
         """
         self.viewer.controller.key_release_action(event)
 
