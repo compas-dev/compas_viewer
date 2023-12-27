@@ -17,3 +17,5 @@ Classes
     PointObject
     TagObject
     Tag
+    GridObject
+    Grid

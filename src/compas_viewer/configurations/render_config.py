@@ -54,7 +54,8 @@ class CameraConfig(Config):
 
 class RenderConfigType(TypedDict):
     show_grid: bool
-    gridsize: Tuple[float, float, int, int]
+    gridsize: Tuple[float, int, float, int]
+    show_gridz: bool
     viewmode: Literal["front", "right", "top", "perspective"]
     rendermode: Literal["wireframe", "shaded", "ghosted", "lighted"]
     backgroundcolor: Color
@@ -79,6 +80,7 @@ class RenderConfig(Config):
         super().__init__(config)
         self.show_grid = config["show_grid"]
         self.gridsize = config["gridsize"]
+        self.show_gridz = config["show_gridz"]
         self.viewmode = config["viewmode"]
         self.rendermode = config["rendermode"]
         self.backgroundcolor = config["backgroundcolor"]
