@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+-   Moved `gl` from `render` folder to the `utilities` folder.
 -   All color representations are now in `compas.colors.Color`.
 -   Reduce the `numpy.array` representation. Mostly use `list` instead for clarity.
 -   Comments improved and better type hints.

@@ -19,10 +19,10 @@ from compas.geometry import transform_points_numpy
 from compas.scene import SceneObject
 from compas.utilities import flatten
 
-from compas_viewer.components.render.gl import make_index_buffer
-from compas_viewer.components.render.gl import make_vertex_buffer
-from compas_viewer.components.render.gl import update_index_buffer
-from compas_viewer.components.render.gl import update_vertex_buffer
+from compas_viewer.utilities.gl import make_index_buffer
+from compas_viewer.utilities.gl import make_vertex_buffer
+from compas_viewer.utilities.gl import update_index_buffer
+from compas_viewer.utilities.gl import update_vertex_buffer
 from compas_viewer.configurations import SceneConfig
 
 if TYPE_CHECKING:
@@ -83,11 +83,11 @@ class ViewerSceneObject(SceneObject):
         Whether to show lines/edges of the object.
     show_faces : bool
         Whether to show faces of the object.
-    pointscolor : dict[Any, :class:`compas.colors.Color]
+    pointscolor : dict[Any, :class:`compas.colors.Color`]
         The color of the points.
-    linescolor : dict[Any, :class:`compas.colors.Color]
+    linescolor : dict[Any, :class:`compas.colors.Color`]
         The color of the lines.
-    facescolor : dict[Any, :class:`compas.colors.Color]
+    facescolor : dict[Any, :class:`compas.colors.Color`]
         The color of the faces.
     lineswidth : float
         The line width to be drawn on screen
