@@ -54,7 +54,7 @@ class CameraConfig(Config):
 
 class RenderConfigType(TypedDict):
     show_grid: bool
-    gridsize: Tuple[float, float, int, int]
+    gridsize: Tuple[float, int, float, int]
     show_gridz: bool
     viewmode: Literal["front", "right", "top", "perspective"]
     rendermode: Literal["wireframe", "shaded", "ghosted", "lighted"]

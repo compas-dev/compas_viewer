@@ -25,7 +25,7 @@ FONT = path.join(DATA, "default_config", "FreeSans.ttf")
 
 
 class Tag(Geometry):
-    """The shape class of the tag. A tag is a text label that is always facing the camera.
+    """The geometry class of the tag. A tag is a text label that is always facing the camera.
 
     Parameters
     ----------

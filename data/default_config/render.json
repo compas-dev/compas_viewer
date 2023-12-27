@@ -2,8 +2,13 @@
     "dtype": "compas_viewer.configurations/RenderConfig",
     "data": {
         "show_grid": true,
-        "gridsize": [1.0, 1.0, 10, 10],
+        "gridsize": [1.0, 10, 1.0, 10],
         "show_gridz": true,
+        "gridcolor": {
+            "dtype": "compas.colors/Color",
+            "data": { "red": 1, "green": 1, "blue": 1, "alpha": 1.0 },
+            "guid": "1d181918-3d0d-4882-9d17-a3414ed86a83"
+        },
         "viewmode": "perspective",
         "rendermode": "wireframe",
         "backgroundcolor": {
