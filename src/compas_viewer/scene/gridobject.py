@@ -1,35 +1,33 @@
-from os import PathLike
-from os import path
+from typing import TYPE_CHECKING
+from typing import List
 from typing import Optional
 from typing import Tuple
-from typing import Union
 
 from compas.colors import Color
 from compas.datastructures import Mesh
 from compas.geometry import Point
-from compas.scene import GeometryObject
-from freetype import FT_LOAD_FLAGS
-from freetype import Face
-from numpy import array
-from numpy import linalg
-from numpy import zeros
-from OpenGL import GL
+from compas.geometry import Translation
+from compas.scene import MeshObject as BaseMeshObject
+from compas.utilities import flatten
 
+from compas_viewer.scene.sceneobject import ViewerSceneObject
 from compas_viewer.utilities import make_index_buffer
 from compas_viewer.utilities import make_vertex_buffer
 
-from .meshobject import MeshObject
+if TYPE_CHECKING:
+    from compas_viewer.components.render.shaders import Shader
 
 
-class Grid(Mesh):
+class Grid:
     """
-    The geometry class of the grid. A grid is a mesh with no faces and only edges.
-    It is basically created by the :class:`compas.datastructures.Mesh.from_meshgrid`.
+    The geometry class of the grid. A grid is a set of lines.
+    It is created by the :class:`compas.datastructures.Mesh.from_meshgrid`.
 
     Parameters
     ----------
     gridsize : tuple[float, int, float, int]
         The size of the grid in [dx, nx, dy, ny] format.
+        Notice that the `nx` and `ny` must be even numbers.
         See the :class:`compas.datastructures.Mesh.from_meshgrid` for more details.
     show_geidz : bool
         If True, the Z axis of the grid will be shown.
@@ -38,8 +36,18 @@ class Grid(Mesh):
     ----------
     gridsize : tuple[float, float, int, int]
         The size of the grid in [dx, nx, dy, ny] format.
+    dx : float
+        The size of the grid in the X direction.
+    nx : int
+        The number of grid cells in the X direction.
+    dy : float
+        The size of the grid in the Y direction.
+    ny : int
+        The number of grid cells in the Y direction.
     show_geidz : bool
         If the Z axis of the grid is shown.
+    mesh : :class:`compas.datastructures.Mesh`
+        The mesh of the grid.
     """
 
     def __eq__(self, other):
@@ -57,15 +65,18 @@ class Grid(Mesh):
         gridsize: Tuple[float, int, float, int],
         show_geidz: bool,
     ):
-        super().from_meshgrid(*gridsize)
         self.dx = gridsize[0]
         self.nx = gridsize[1]
         self.dy = gridsize[2]
         self.ny = gridsize[3]
+        if self.nx % 2 == 1 or self.ny % 2 == 1:
+            raise ValueError("gridsize : [dx, nx, dy, ny]: nx and ny must be even numbers.")
         self.show_geidz = show_geidz
+        self.mesh = Mesh.from_meshgrid(*gridsize)
+        self.mesh.transform(Translation.from_vector([-self.dx / 2, -self.dy / 2, 0]))
 
 
-class TagObject(MeshObject, GeometryObject):
+class GridObject(ViewerSceneObject, BaseMeshObject):
     """
     The scene object of the :class:`compas_viewer.scene.Grid` geometry.
 
@@ -73,78 +84,66 @@ class TagObject(MeshObject, GeometryObject):
     ----------
     grid : :class:`compas_viewer.scene.Grid`
         The grid geometry.
-    color : :class:`compas.colors.Color`
-        The color of the grid. Yet the XYZ axis are always red, green and blue.
-
     Attributes
     ----------
     grid : :class:`compas_viewer.scene.Grid`
         The grid geometry.
-    color : :class:`compas.colors.Color`
-        The color of the grid.
     """
 
-    def __init__(self, grid: Grid, gridcolor: Color, **kwargs):
-        super(TagObject, self).__init__(geometry=grid, **kwargs)
+    def __init__(self, grid: Grid, **kwargs):
+        super(GridObject, self).__init__(mesh=grid.mesh, **kwargs)
         self._grid = grid
-        self.linescolor = gridcolor
-        self.show_lines = self.is_visible
+        self._points_data = self._get_points_data()
+        self._lines_data = self._get_lines_data()
+        self._frontfaces_data = self._get_frontfaces_data()
+        self._backfaces_data = self._get_backfaces_data()
 
-    def _lines_data(self):
+    def _get_points_data(self):
+        pass
+
+    def _get_lines_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
         positions = []
         colors = []
         elements = []
-        color = self._color
-        n = 0
-        for x in range(-self._grid.nx, self._grid.nx + 1):
-            if x == 0:
-                positions.append([x * self.cell_size, -self._grid.nx * self.cell_size, 0])
-                positions.append([x * self.cell_size, 0, 0])
-                colors.append(color)
-                colors.append(color)
-                positions.append([x * self.cell_size, 0, 0])
-                positions.append([x * self.cell_size, self._grid.nx * self.cell_size, 0])
-                colors.append([0, 1, 0])
-                colors.append([0, 1, 0])
-                n = len(elements) * 2
-                elements.append([n + 0, n + 1])
-                elements.append([n + 2, n + 3])
-            else:
-                positions.append([x * self.cell_size, -self._grid.nx * self.cell_size, 0])
-                positions.append([x * self.cell_size, self._grid.nx * self.cell_size, 0])
-                colors.append(color)
-                colors.append(color)
-                n = len(elements) * 2
-                elements.append([n, n + 1])
+        i = 0
 
-        for y in range(-self.y_cells, self.y_cells + 1):
-            if y == 0:
-                positions.append([-self.y_cells * self.cell_size, y * self.cell_size, 0])
-                positions.append([0, y * self.cell_size, 0])
-                colors.append(color)
-                colors.append(color)
-                positions.append([0, y * self.cell_size, 0])
-                positions.append([self.y_cells * self.cell_size, y * self.cell_size, 0])
-                colors.append([1, 0, 0])
-                colors.append([1, 0, 0])
-                n = len(elements) * 2
-                elements.append([n + 0, n + 1])
-                elements.append([n + 2, n + 3])
+        for u, v in self._grid.mesh.edges():
+            positions.append(self.vertex_xyz[u])
+            positions.append(self.vertex_xyz[v])
+            # Color the axis:
+            if self.vertex_xyz[u][1] == 0 and self.vertex_xyz[v][1] == 0 and self.vertex_xyz[u][0] >= 0:
+                colors.append(Color.red())
+                colors.append(Color.red())
+            elif self.vertex_xyz[u][0] == 0 and self.vertex_xyz[v][0] == 0 and self.vertex_xyz[u][1] >= 0:
+                colors.append(Color.green())
+                colors.append(Color.green())
             else:
-                positions.append([-self.y_cells * self.cell_size, y * self.cell_size, 0])
-                positions.append([self.y_cells * self.cell_size, y * self.cell_size, 0])
-                colors.append(color)
-                colors.append(color)
-                n = len(elements) * 2
-                elements.append([n, n + 1])
+                colors.append(self.linescolor["_default"])
+                colors.append(self.linescolor["_default"])
+            elements.append([i + 0, i + 1])
+            i += 2
+
+        if self._grid.show_geidz:
+            positions.append([0, 0, 0])
+            positions.append([0, 0, self._grid.dx * self._grid.dy / 2])
+            colors.append(Color.blue())
+            colors.append(Color.blue())
+            elements.append([i + 0, i + 1])
+
         return positions, colors, elements
+
+    def _get_frontfaces_data(self):
+        pass
+
+    def _get_backfaces_data(self):
+        pass
 
     def init(self):
         self.make_buffers()
 
         # Create uv plane
-        x_size = self._grid.nx * self.cell_size
-        y_size = self.y_cells * self.cell_size
+        x_size = self._grid.nx * self._grid.dx
+        y_size = self._grid.ny * self._grid.dy
         positions = [[-x_size, -y_size, 0], [x_size, -y_size, 0], [x_size, y_size, 0], [-x_size, y_size, 0]]
         color = [[0, 0, 0], [1, 0, 0], [1, 1, 0], [0, 1, 0]]
         elements = [[0, 1, 3], [1, 2, 3], [1, 0, 3], [2, 1, 3]]
@@ -156,19 +155,20 @@ class TagObject(MeshObject, GeometryObject):
             "n": len(list(flatten(elements))),
         }
 
-    def draw(self, shader):
+    def draw(self, shader: "Shader"):
         """Draw the object from its buffers"""
+        assert self._lines_buffer is not None
         shader.enable_attribute("position")
         shader.enable_attribute("color")
         shader.bind_attribute("position", self._lines_buffer["positions"])
         shader.bind_attribute("color", self._lines_buffer["colors"])
         shader.draw_lines(
-            width=self.linewidth, elements=self._lines_buffer["elements"], n=self._lines_buffer["n"], background=True
+            width=self.lineswidth, elements=self._lines_buffer["elements"], n=self._lines_buffer["n"], background=True
         )
         shader.disable_attribute("position")
         shader.disable_attribute("color")
 
-    def draw_plane(self, shader):
+    def draw_plane(self, shader: "Shader"):
         shader.enable_attribute("position")
         shader.enable_attribute("color")
         shader.bind_attribute("position", self._uvplane["positions"])
@@ -176,3 +176,12 @@ class TagObject(MeshObject, GeometryObject):
         shader.draw_triangles(elements=self._uvplane["elements"], n=self._uvplane["n"])
         shader.disable_attribute("position")
         shader.disable_attribute("color")
+
+    def draw_vertices(self):
+        pass
+
+    def draw_edges(self):
+        pass
+
+    def draw_faces(self):
+        pass

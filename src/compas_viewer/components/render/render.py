@@ -13,6 +13,8 @@ from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 
 from compas_viewer.configurations import RenderConfig
+from compas_viewer.scene import Grid
+from compas_viewer.scene import GridObject
 from compas_viewer.scene import TagObject
 from compas_viewer.scene import ViewerSceneObject
 
@@ -58,9 +60,16 @@ class Render(QtWidgets.QOpenGLWidget):
         self.shader_grid: Shader
 
         self.camera = Camera(self)
-        # self.grid = Grid(self.config.gridsize)
+        self.grid = GridObject(
+            Grid(self.config.gridsize, self.config.show_gridz),
+            name="grid_world",
+            viewer=self.viewer,
+            is_selected=False,
+            is_visible=True,
+            config=self.viewer.scene_config,
+        )
         # self.selector = Selector(self)
-        self.objects: Dict[str, ViewerSceneObject] = {}
+        self.objects: Dict[str, ViewerSceneObject] = {"grid_world": self.grid}
 
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
 
@@ -290,7 +299,6 @@ class Render(QtWidgets.QOpenGLWidget):
     def init(self):
         """Initialize the render."""
 
-        # TODO self.grid.init()
         # init the buffers
         for guid in self.objects:
             obj = self.objects[guid]
@@ -409,7 +417,7 @@ class Render(QtWidgets.QOpenGLWidget):
         centers = []
         for guid in self.objects:
             obj = self.objects[guid]
-            if not isinstance(obj, TagObject):
+            if not isinstance(obj, TagObject) and not isinstance(obj, GridObject):
                 if obj.opacity * self.opacity < 1 and obj.bounding_box_center is not None:
                     transparent_objects.append(obj)
                     centers.append(transform_points_numpy([obj.bounding_box_center], obj.matrix)[0])
@@ -443,14 +451,14 @@ class Render(QtWidgets.QOpenGLWidget):
         #     self.shader_instance.release()
 
         # Draw grid
-        # self.shader_grid.bind()
-        # self.shader_grid.uniform4x4("viewworld", viewworld)
+        self.shader_grid.bind()
+        self.shader_grid.uniform4x4("viewworld", viewworld)
         # if self.app.selector.wait_for_selection_on_plane:
         #     self.app.selector.uv_plane_map = self.paint_plane()
         #     self.clear()
-        # if self.show_grid:
-        #     self.grid.draw(self.shader_grid)
-        # self.shader_grid.release()
+        if self.config.show_grid:
+            self.grid.draw(self.shader_grid)
+        self.shader_grid.release()
 
         # Draw model objects in the scene
         self.shader_model.bind()
