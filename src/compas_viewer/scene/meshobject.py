@@ -56,13 +56,14 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
             or self.facescolor.get(vertex, self.facescolor["_default"])  # type: ignore
             for vertex in self._mesh.vertices()
         }
-
         self._points_data = self._get_points_data()
         self._lines_data = self._get_lines_data()
         self._frontfaces_data = self._get_frontfaces_data()
         self._backfaces_data = self._get_backfaces_data()
 
-    def _get_points_data(self) -> Tuple[List[Point], List[Color], List[List[int]]]:
+    def _get_points_data(self) -> Optional[Tuple[List[Point], List[Color], List[int]]]:
+        if not self.show_points:
+            return None
         positions = []
         colors = []
         elements = []
@@ -76,7 +77,9 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
             i += 1
         return positions, colors, elements
 
-    def _get_lines_data(self) -> Tuple[List[Point], List[Color], List[List[int]]]:
+    def _get_lines_data(self) -> Optional[Tuple[List[Point], List[Color], List[int]]]:
+        if not self.show_lines:
+            return None
         positions = []
         colors = []
         elements = []
@@ -103,7 +106,9 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
             i += 2
         return positions, colors, elements
 
-    def _get_frontfaces_data(self) -> Tuple[List[Point], List[Color], List[List[int]]]:
+    def _get_frontfaces_data(self) -> Optional[Tuple[List[Point], List[Color], List[int]]]:
+        if not self.show_faces:
+            return None
         positions = []
         colors = []
         elements = []
@@ -173,7 +178,9 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
 
         return positions, colors, elements
 
-    def _get_backfaces_data(self) -> Tuple[List[Point], List[Color], List[List[int]]]:
+    def _get_backfaces_data(self) -> Optional[Tuple[List[Point], List[Color], List[int]]]:
+        if not self.show_faces:
+            return None
         if self.use_vertexcolors:
             self.vertexcolor = {
                 vertex: self._mesh.vertex_attribute(vertex, "color") or Color.grey() for vertex in self._mesh.vertices()
