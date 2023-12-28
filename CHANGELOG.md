@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
+* Added complete key, mouse and modifier support from `PySide6`.
 * Added `ZoomSelected` and `GLInfo` classes as template action classes.
 * Added `Action` class.
 * Added `Controller` class for the controller.
