@@ -1,20 +1,16 @@
 {
     "dtype": "compas_viewer.configurations/ControllerConfig",
     "data": {
-        "mouse": {
-            "zoom": { "mouse": "wheel", "key": "" },
-            "pan": { "mouse": "right", "key": "shift" },
-            "rotate": { "mouse": "right", "key": "" },
-            "drag_selection": { "mouse": "left", "key": "" },
-            "drag_deselection": { "mouse": "left", "key": "control" },
-            "select": { "mouse": "left", "multiselect": "shift", "deselect": "control" }
-        },
-        "keys": [
-            {
-                "name": "zoom_selected",
-                "keys": ["f"]
-            }
-        ]
+        "pan": { "mouse": "RightButton", "modifier": "ShiftModifier" },
+        "rotate": { "mouse": "RightButton", "modifier": "NoModifier" },
+        "drag_selection": { "mouse": "LeftButton", "modifier": "NoModifier" },
+        "drag_deselection": { "mouse": "LeftButton", "modifier": "ControlModifier" },
+        "multiselect": { "mouse": "LeftButton", "modifier": "ShiftModifier" },
+        "deselect": { "mouse": "LeftButton", "modifier": "ControlModifier" },
+        "actions": {
+            "zoom_selected": { "key": "Key_F", "modifier": "NoModifier" },
+            "print_gl_info": { "key": "Key_I", "modifier": "NoModifier" }
+        }
     },
     "guid": "5088a780-910d-4df3-a1b3-d389e0e9c7f2"
 }

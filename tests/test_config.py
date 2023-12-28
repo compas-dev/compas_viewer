@@ -3,7 +3,9 @@ from compas.colors import Color
 from compas_viewer.configurations import CameraConfig
 from compas_viewer.configurations import ControllerConfig
 from compas_viewer.configurations import RenderConfig
-from compas_viewer.configurations import ViewerConfig, SceneConfig
+from compas_viewer.configurations import SceneConfig
+from compas_viewer.configurations import ViewerConfig
+from compas_viewer.configurations.controller_config import MouseConfig
 
 
 def test_viewer_config() -> None:
@@ -22,13 +24,11 @@ def test_viewer_config() -> None:
 def test_controller_config() -> None:
     config = ControllerConfig.from_default()
     assert isinstance(config, ControllerConfig)
-    assert isinstance(config.pan, dict)
-    assert isinstance(config.zoom, dict)
-    assert isinstance(config.rotate, dict)
-    assert isinstance(config.drag_selection, dict)
-    assert isinstance(config.select, str)
-    assert isinstance(config.multiselect, str)
-    assert isinstance(config.deselect, str)
+    assert isinstance(config.pan, MouseConfig)
+    assert isinstance(config.rotate, MouseConfig)
+    assert isinstance(config.drag_selection, MouseConfig)
+    assert isinstance(config.multiselect, MouseConfig)
+    assert isinstance(config.deselect, MouseConfig)
     config.validate_data(config.data)
 
 

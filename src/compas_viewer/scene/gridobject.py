@@ -120,7 +120,7 @@ class GridObject(ViewerSceneObject, BaseMeshObject):
 
         if self._grid.show_geidz:
             positions.append([0, 0, 0])
-            positions.append([0, 0, self._grid.dx * self._grid.dy / 2])
+            positions.append([0, 0, (self._grid.dx + self._grid.dy) / 4])
             colors.append(Color.blue())
             colors.append(Color.blue())
             elements.append([i + 0, i + 1])

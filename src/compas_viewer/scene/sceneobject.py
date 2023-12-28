@@ -145,7 +145,7 @@ class ViewerSceneObject(SceneObject):
         self.is_selected = is_selected
         self.is_visible = is_visible
         self.viewer = viewer
-        self.parent: Optional[ViewerSceneObject] = None
+        self.parent: Optional[ViewerSceneObject]
         self._children = set()
 
         self.show_points = show_points if show_points is not None else self.config.show_points

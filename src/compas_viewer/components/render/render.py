@@ -9,12 +9,13 @@ from numpy import frombuffer
 from numpy import identity
 from numpy import uint8
 from OpenGL import GL
-from PyQt5 import QtCore
-from PyQt5 import QtWidgets
-from PyQt5.QtGui import QMouseEvent
+from PySide6 import QtCore
+from PySide6.QtGui import QKeyEvent
+from PySide6.QtGui import QMouseEvent
+from PySide6.QtGui import QWheelEvent
+from PySide6.QtOpenGLWidgets import QOpenGLWidget
 
 from compas_viewer.configurations import RenderConfig
-from compas_viewer.scene import Grid
 from compas_viewer.scene import GridObject
 from compas_viewer.scene import TagObject
 from compas_viewer.scene import ViewerSceneObject
@@ -27,7 +28,7 @@ if TYPE_CHECKING:
     from compas_viewer import Viewer
 
 
-class Render(QtWidgets.QOpenGLWidget):
+class Render(QOpenGLWidget):
     """
     Render class for 3D rendering of COMPAS geometry.
     We constantly use OpenGL version 2.1 and GLSL 120 with a Compatibility Profile at the moment.
@@ -61,18 +62,11 @@ class Render(QtWidgets.QOpenGLWidget):
         self.shader_grid: Shader
 
         self.camera = Camera(self)
-        self.grid = GridObject(
-            Grid(self.config.gridsize, self.config.show_gridz),
-            name="grid_world",
-            viewer=self.viewer,
-            is_selected=False,
-            is_visible=True,
-            config=self.viewer.scene_config,
-        )
+        self.grid = self.viewer.grid
         # self.selector = Selector(self)
         self.objects: Dict[str, ViewerSceneObject] = {"grid_world": self.grid}
 
-        self.setFocusPolicy(QtCore.Qt.StrongFocus)
+        self.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
 
     @property
     def rendermode(self):
@@ -149,13 +143,12 @@ class Render(QtWidgets.QOpenGLWidget):
         Notes
         -----
         This implements the virtual function of the OpenGL widget.
-        See the PySide2 docs [1]_ for more info.
         It sets the clear color of the view,
         and enables culling, depth testing, blending, point smoothing, and line smoothing.
 
         References
         ----------
-        .. [1] https://doc.qt.io/qtforpython-5.12/PySide2/QtWidgets/QOpenGLWidget.html#PySide2.QtWidgets.PySide2.QtWidgets.QOpenGLWidget.initializeGL # noqa: E501
+        * https://doc.qt.io/qtforpython-6/PySide6/QtOpenGL/QOpenGLWindow.html#PySide6.QtOpenGL.PySide6.QtOpenGL.QOpenGLWindow.initializeGL # noqa: E501
         """
         GL.glClearColor(*self.config.backgroundcolor.rgba)
         GL.glPolygonOffset(1.0, 1.0)
@@ -185,12 +178,10 @@ class Render(QtWidgets.QOpenGLWidget):
         Notes
         -----
         This implements the virtual function of the OpenGL widget.
-        See the PySide2 docs [1]_ for more info.
 
         References
         ----------
-        .. [1] https://doc.qt.io/qtforpython-5.12/PySide2/QtWidgets/QOpenGLWidget.html#PySide2.QtWidgets.PySide2.QtWidgets.QOpenGLWidget.resizeGL # noqa: E501
-
+        * https://doc.qt.io/qtforpython-6/PySide6/QtOpenGL/QOpenGLWindow.html#PySide6.QtOpenGL.PySide6.QtOpenGL.QOpenGLWindow.resizeGL # noqa: E501
         """
         self.viewer.config.width = w
         self.viewer.config.height = h
@@ -203,14 +194,12 @@ class Render(QtWidgets.QOpenGLWidget):
         Notes
         -----
         This implements the virtual function of the OpenGL widget.
-        See the PySide2 docs [1]_ for more info.
         This method also paints the instance map used by the selector to identify selected objects.
         The instance map is immediately cleared again, after which the real scene objects are drawn.
 
         References
         ----------
-        .. [1] https://doc.qt.io/qtforpython-5.12/PySide2/QtWidgets/QOpenGLWidget.html#PySide2.QtWidgets.PySide2.QtWidgets.QOpenGLWidget.paintGL # noqa: E501
-
+        * https://doc.qt.io/qtforpython-6/PySide6/QtOpenGL/QOpenGLWindow.html#PySide6.QtOpenGL.PySide6.QtOpenGL.QOpenGLWindow.paintGL # noqa: E501
         """
         self.clear()
         self.paint()
@@ -227,21 +216,24 @@ class Render(QtWidgets.QOpenGLWidget):
     def mouseMoveEvent(self, event: QMouseEvent):
         """
         Callback for the mouse move event which passes the event to the controller.
+        Inherited from :class:`PySide6.QtOpenGLWidgets.QOpenGLWidget`.
 
-        This method registers selections, if the left button is pressed,
-        and modifies the view (pan/rotate), if the right button is pressed.
 
         Parameters
         ----------
-        event : :class:`PyQt5.QtGui.QMouseEvent`
+        event : :class:`PySide6.QtGui.QMouseEvent`
             The Qt event.
 
         See Also
         --------
         :func:`compas_viewer.controller.Controller.mouse_move_action`
+
+        References
+        ----------
+        * https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QWidget.html#PySide6.QtWidgets.PySide6.QtWidgets.QWidget.mouseMoveEvent # noqa: E501
         """
         if self.isActiveWindow() and self.underMouse():
-            self.viewer.controller.mouse_move_action(event)
+            self.viewer.controller.mouse_move_action(self, event)
             self.update()
 
     def mousePressEvent(self, event: QMouseEvent):
@@ -250,15 +242,19 @@ class Render(QtWidgets.QOpenGLWidget):
 
         Parameters
         ----------
-        event : :class:`PyQt5.QtGui.QMouseEvent`
+        event : :class:`PySide6.QtGui.QMouseEvent`
             The Qt event.
 
         See Also
         --------
         :func:`compas_viewer.controller.Controller.mouse_press_action`
+
+        References
+        ----------
+        * https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QWidget.html#PySide6.QtWidgets.PySide6.QtWidgets.QWidget.mousePressEvent # noqa: E501
         """
         if self.isActiveWindow() and self.underMouse():
-            self.viewer.controller.mouse_press_action(event)
+            self.viewer.controller.mouse_press_action(self, event)
             self.update()
 
     def mouseReleaseEvent(self, event: QMouseEvent):
@@ -267,63 +263,79 @@ class Render(QtWidgets.QOpenGLWidget):
 
         Parameters
         ----------
-        event : :class:`PyQt5.QtGui.QMouseEvent`
+        event : :class:`PySide6.QtGui.QMouseEvent`
             The Qt event.
 
         See Also
         --------
         :func:`compas_viewer.controller.Controller.mouse_release_action`
+
+        References
+        ----------
+        * https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QWidget.html#PySide6.QtWidgets.PySide6.QtWidgets.QWidget.mouseReleaseEvent # noqa: E501
         """
         if self.isActiveWindow() and self.underMouse():
-            self.viewer.controller.mouse_release_action(event)
+            self.viewer.controller.mouse_release_action(self, event)
             self.update()
 
-    def wheelEvent(self, event: QMouseEvent):
+    def wheelEvent(self, event: QWheelEvent):
         """
         Callback for the mouse wheel event which passes the event to the controller.
 
         Parameters
         ----------
-        event : :class:`PyQt5.QtGui.QMouseEvent`
+        event : :class:`PySide6.QtGui.QWheelEvent`
             The Qt event.
 
         See Also
         --------
         :func:`compas_viewer.controller.Controller.wheel_action`
+
+        References
+        ----------
+        * https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QWidget.html#PySide6.QtWidgets.PySide6.QtWidgets.QWidget.wheelEvent # noqa: E501
         """
         if self.isActiveWindow() and self.underMouse():
-            self.viewer.controller.wheel_action(event)
+            self.viewer.controller.wheel_action(self, event)
             self.update()
 
-    def keyPressEvent(self, event: QMouseEvent):
+    def keyPressEvent(self, event: QKeyEvent):
         """
         Callback for the key press event which passes the event to the controller.
 
         Parameters
         ----------
-        event : :class:`PyQt5.QtGui.QMouseEvent`
+        event : :class:`PySide6.QtGui.QKeyEvent`
             The Qt event.
 
         See Also
         --------
         :func:`compas_viewer.controller.Controller.key_press_action`
-        """
-        self.viewer.controller.key_press_action(event)
 
-    def keyReleaseEvent(self, event: QMouseEvent):
+        References
+        ----------
+        * https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QWidget.html#PySide6.QtWidgets.PySide6.QtWidgets.QWidget.keyPressEvent # noqa: E501
+        """
+        self.viewer.controller.key_press_action(self, event)
+
+    def keyReleaseEvent(self, event: QKeyEvent):
         """
         Callback for the key release event which passes the event to the controller.
 
         Parameters
         ----------
-        event : :class:`PyQt5.QtGui.QMouseEvent`
+        event : :class:`PySide6.QtGui.QKeyEvent`
             The Qt event.
 
         See Also
         --------
         :func:`compas_viewer.controller.Controller.key_release_action`
+
+        References
+        ----------
+        * https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QWidget.html#PySide6.QtWidgets.PySide6.QtWidgets.QWidget.keyReleaseEvent # noqa: E501
         """
-        self.viewer.controller.key_release_action(event)
+        self.viewer.controller.key_release_action(self, event)
 
     # ==========================================================================
     # view
@@ -553,9 +565,9 @@ class Render(QtWidgets.QOpenGLWidget):
                 if obj.is_visible:
                     obj.draw_instance(self.shader_instance, self.rendermode == "wireframe")
         # create map
-        r = self.devicePixelRatio()
+        r = int(self.devicePixelRatio())
         instance_buffer = GL.glReadPixels(x * r, y * r, width * r, height * r, GL.GL_RGB, GL.GL_UNSIGNED_BYTE)
-        instance_map = frombuffer(instance_buffer, dtype=uint8).reshape(height * r, width * r, 3)
+        instance_map = frombuffer(buffer=instance_buffer, dtype=uint8).reshape(height * r, width * r, 3)
         instance_map = instance_map[::-r, ::r, :]
         GL.glEnable(GL.GL_POINT_SMOOTH)
         GL.glEnable(GL.GL_LINE_SMOOTH)

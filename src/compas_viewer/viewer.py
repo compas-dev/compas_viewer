@@ -13,21 +13,22 @@ from compas.colors import Color
 from compas.datastructures import Mesh
 from compas.geometry import Geometry
 from compas.scene import Scene
-from PyQt5 import QtCore
-from PyQt5 import QtGui
-from PyQt5 import QtWidgets
-from PyQt5.QtCore import QCoreApplication
-from PyQt5.QtGui import QIcon
+from PySide6 import QtCore
+from PySide6 import QtGui
+from PySide6 import QtWidgets
+from PySide6.QtCore import QCoreApplication
+from PySide6.QtGui import QIcon
 
+from compas_viewer import DATA
 from compas_viewer.components import Render
 from compas_viewer.configurations import ControllerConfig
 from compas_viewer.configurations import RenderConfig
 from compas_viewer.configurations import SceneConfig
 from compas_viewer.configurations import ViewerConfig
 from compas_viewer.controller import Controller
-from compas_viewer.scene.sceneobject import ViewerSceneObject
-
-ICONS = Path(Path(__file__).parent, "_static", "icons")
+from compas_viewer.scene import Grid
+from compas_viewer.scene import GridObject
+from compas_viewer.scene import ViewerSceneObject
 
 
 class Timer:
@@ -160,26 +161,34 @@ class Viewer(Scene):
     # Init functions
     # ==========================================================================
 
-    def _init(self) -> None:
+    def _init(self):
         """Initialize the components of the user interface."""
         self._glFormat = QtGui.QSurfaceFormat()
         self._glFormat.setVersion(2, 1)
-        self._glFormat.setProfile(QtGui.QSurfaceFormat.CompatibilityProfile)
+        self._glFormat.setProfile(QtGui.QSurfaceFormat.OpenGLContextProfile.CompatibilityProfile)
         self._glFormat.setDefaultFormat(self._glFormat)
         QtGui.QSurfaceFormat.setDefaultFormat(self._glFormat)
         self._app = QCoreApplication.instance() or QtWidgets.QApplication(sys.argv)
         self._app.references = set()  # type: ignore
         self._window = QtWidgets.QMainWindow()
-        self._icon = QIcon(path.join(ICONS, "compas_icon_white.png"))
+        self._icon = QIcon(path.join(DATA, "compas_icon_white.png"))
         self._app.setWindowIcon(self._icon)  # type: ignore
         self._app.setApplicationName(self.config.title)
+        self.grid = GridObject(
+            Grid(self.render_config.gridsize, self.render_config.show_gridz),
+            name="grid_world",
+            viewer=self,
+            is_selected=False,
+            is_visible=True,
+            config=self.scene_config,
+        )
         self.render = Render(self, self.render_config)
         self._window.setCentralWidget(self.render)
         self._window.setContentsMargins(0, 0, 0, 0)
         self._app.references.add(self._window)  # type: ignore
         self._window.resize(self.config.width, self.config.height)
         if self.config.fullscreen:
-            self._window.setWindowState(self._window.windowState() | QtCore.Qt.WindowMaximized)
+            self._window.setWindowState(self._window.windowState() | QtCore.Qt.WindowState.WindowMaximized)
         self._init_statusbar()
 
     def _init_statusbar(self) -> None:
@@ -290,7 +299,7 @@ class Viewer(Scene):
         flags = QtWidgets.QMessageBox.StandardButton.Yes
         flags |= QtWidgets.QMessageBox.StandardButton.No
         response = QtWidgets.QMessageBox.question(self._window, "Question", message, flags)  # type: ignore
-        if response == QtWidgets.QMessageBox.Yes:
+        if response == QtWidgets.QMessageBox.StandardButton.Yes:
             return True
         return False
 
@@ -434,7 +443,7 @@ class Viewer(Scene):
 
     def add(
         self,
-        item: Union[Mesh, Geometry],
+        item: Union[Mesh, Geometry, Grid],
         name: Optional[str] = None,
         parent: Optional[ViewerSceneObject] = None,
         is_selected: bool = False,
@@ -458,7 +467,7 @@ class Viewer(Scene):
 
         Parameters
         ----------
-        item : :class:`compas.geometry.Geometry`
+        item : Union[:class:`compas.geometry.Geometry`, :class:`compas.datastructures.Mesh`]
             The geometry to add to the scene.
         name : str, optional
             The name of the item.

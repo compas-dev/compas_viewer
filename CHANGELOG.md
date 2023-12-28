@@ -8,7 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
-
+* Added `ZoomSelected` and `GLInfo` classes as template action classes.
+* Added `Action` class.
+* Added `Controller` class for the controller.
 * Added `Grid` and `GridObject` for the scene objects.
 * Added `TagObject`, `LineObject` and `PointObject` for the scene objects.
 * Added test files for configurations.
@@ -29,6 +31,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* Refactored the `ControllerConfig`.
+* Fix Qt package of `PySide6`.
 * Moved `gl` from `render` folder to the `utilities` folder.
 * All color representations are now in `compas.colors.Color`.
 * Reduce the `numpy.array` representation. Mostly use `list` instead for clarity.

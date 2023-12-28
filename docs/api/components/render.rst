@@ -14,4 +14,10 @@ Classes
     Render
     Camera
     Shader
+    Render.mouseMoveEvent
+    Render.mousePressEvent
+    Render.mouseReleaseEvent
+    Render.wheelEvent
+    Render.keyPressEvent
+    Render.keyReleaseEvent
 

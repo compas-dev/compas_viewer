@@ -66,7 +66,7 @@ class RenderConfigType(TypedDict):
 
 class RenderConfig(Config):
     """
-    The class representation for the `render.json` of the class :class:`compas_viewer.components.Render`
+    The class representation for the `render.json` of the class :class:`compas_viewer.components.render.Render`
     The render.json contains all the settings about the render: background color, selection color, ...
 
     Parameters

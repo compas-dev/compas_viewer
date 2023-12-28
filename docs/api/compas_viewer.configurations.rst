@@ -16,6 +16,10 @@ Classes
     ViewerConfigType
     ControllerConfig
     ControllerConfigType
+    ActionConfig
+    ActionConfigType
+    MouseConfig
+    MouseConfigType
     RenderConfig
     RenderConfigType
     CameraConfig

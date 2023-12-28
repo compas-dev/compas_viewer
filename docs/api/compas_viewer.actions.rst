@@ -10,3 +10,7 @@ Classes
 .. autosummary::
     :toctree: generated/
     :nosignatures:
+
+    Action
+    ZoomSelected
+    GLInfo
