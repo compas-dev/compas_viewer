@@ -33,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* Update the compatibility of the `ViewerSceneObject` to the core `SceneObject`.
 * Refactored the `ControllerConfig`.
 * Fix Qt package of `PySide6`.
 * Moved `gl` from `render` folder to the `utilities` folder.
