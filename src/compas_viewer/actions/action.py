@@ -39,7 +39,7 @@ class Action(QObject):
         The modifier of the action.
 
     References
-    --------
+    ----------
     * https://doc.qt.io/qtforpython-6/PySide6/QtCore/Signal.html
     """
 
