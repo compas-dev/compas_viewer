@@ -9,7 +9,6 @@ from typing import Union
 from compas.colors import Color
 from compas.geometry import Point
 from compas.geometry import Transformation
-from compas.geometry import identity_matrix
 from compas.geometry import transform_points_numpy
 from compas.scene import SceneObject
 from compas.utilities import flatten
@@ -167,7 +166,7 @@ class ViewerSceneObject(SceneObject):
         self.background: bool = False
 
         self._instance_color: Optional[Color] = None
-        self.transformation = Transformation.from_matrix(identity_matrix(4))
+        self.transformation: Optional[Transformation] = None
         self._matrix_buffer: Optional[List[List[float]]] = None
         self._bounding_box: Optional[List[float]] = None
         self._bounding_box_center: Optional[Point] = None
@@ -196,7 +195,8 @@ class ViewerSceneObject(SceneObject):
 
     def _update_matrix(self):
         """Update the matrix from object's translation, rotation and scale"""
-        self._matrix_buffer = list(array(self.transformation.matrix).flatten())
+        if self.transformation is not None:
+            self._matrix_buffer = list(array(self.worldtransformation.matrix).flatten())
 
         if self.children:
             for child in self.children:
@@ -324,7 +324,7 @@ class ViewerSceneObject(SceneObject):
 
         _positions = array(positions)
         self._bounding_box = list(
-            transform_points_numpy(array([_positions.min(axis=0), _positions.max(axis=0)]), self._transformation)
+            transform_points_numpy(array([_positions.min(axis=0), _positions.max(axis=0)]), self.worldtransformation)
         )
         self._bounding_box_center = Point(*list(average(a=array(self.bounding_box), axis=0)))
 

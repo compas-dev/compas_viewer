@@ -192,7 +192,8 @@ class TagObject(ViewerSceneObject, GeometryObject):
     def draw(self, shader, camera_position):
         """Draw the object from its buffers"""
         shader.enable_attribute("position")
-        shader.uniform4x4("transform", self.transformation.matrix)
+        if self.worldtransformation is not None:
+            shader.uniform4x4("transform", self.worldtransformation.matrix)
         shader.uniform1f("object_opacity", self.opacity)
         shader.uniform1i("text_height", self._calculate_text_height(camera_position))
         shader.uniform1i("text_num", len(self._tag.text))
