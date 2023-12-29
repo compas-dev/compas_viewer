@@ -17,7 +17,7 @@ class LineObject(ViewerSceneObject, GeometryObject):
     ----------
     line : :class:`compas.geometry.Line`
         The line geometry.
-    kwargs : dict, optional
+    **kwargs : Dict, optional
         Additional options for the :class:`compas_viewer.scene.ViewerSceneObject`.
 
     Attributes

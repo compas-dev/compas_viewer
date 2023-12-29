@@ -33,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* `Grid` object inherits from `compas.data.Data`.
 * Update the compatibility of the `ViewerSceneObject` to the core `SceneObject`.
 * Refactored the `ControllerConfig`.
 * Fix Qt package of `PySide6`.

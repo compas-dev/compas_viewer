@@ -15,7 +15,7 @@ class Config(Data):
         self.config = config
 
     @property
-    def data(self):  # -> dict[str, Any]:
+    def data(self):  # -> Dict[str, Any]:
         return self.config
 
     @classmethod

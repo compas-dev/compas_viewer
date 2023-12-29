@@ -449,7 +449,7 @@ class Render(QOpenGLWidget):
 
         Parameters
         ----------
-        viewworld : list[list[float]]
+        viewworld : List[List[float]]
             The viewworld matrix.
 
         Returns

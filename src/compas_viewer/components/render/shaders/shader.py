@@ -22,7 +22,7 @@ class Shader:
         ----------
         name : str
             The name of the location in the shader program.
-        value : list[list[float]]
+        value : List[List[float]]
             A 4x4 transformation matrix.
         """
         _value = array(value)
@@ -62,7 +62,7 @@ class Shader:
         ----------
         name : str
             The name of the location in the shader program.
-        value : (float, float, float) | list[float]
+        value : Union[Tuple[float, float, float], List[float]]
             An iterable of 3 floats.
         """
         location = GL.glGetUniformLocation(self.program, name)
@@ -244,7 +244,7 @@ class Shader:
 
         Parameters
         ----------
-        box_coords : tuple[float, float, float, float]
+        box_coords : Tuple[float, float, float, float]
             The coordinates of the box. The coordinates are in the format of (x1, y1, x2, y2).
         width : int
             The width of the viewport.
