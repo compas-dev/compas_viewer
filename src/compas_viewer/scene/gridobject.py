@@ -28,7 +28,7 @@ class Grid(Data):
     gridsize : Tuple[float, int, float, int]
         The size of the grid in [dx, nx, dy, ny] format.
         Notice that the `nx` and `ny` must be even numbers.
-        See the :func:`compas.datastructures.Mesh.from_meshgrid()` for more details.
+        See the :meth:`compas.datastructures.Mesh.from_meshgrid()` for more details.
     show_geidz : bool
         If True, the Z axis of the grid will be shown.
 
