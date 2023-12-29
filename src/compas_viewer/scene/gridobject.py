@@ -4,6 +4,7 @@ from typing import Optional
 from typing import Tuple
 
 from compas.colors import Color
+from compas.data import Data
 from compas.datastructures import Mesh
 from compas.geometry import Point
 from compas.geometry import Translation
@@ -18,22 +19,22 @@ if TYPE_CHECKING:
     from compas_viewer.components.render.shaders import Shader
 
 
-class Grid:
+class Grid(Data):
     """
     The geometry class of the grid. A grid is a set of lines.
 
     Parameters
     ----------
-    gridsize : tuple[float, int, float, int]
+    gridsize : Tuple[float, int, float, int]
         The size of the grid in [dx, nx, dy, ny] format.
         Notice that the `nx` and `ny` must be even numbers.
-        See the :func:`compas.datastructures.Mesh.from_meshgrid` for more details.
+        See the :func:`compas.datastructures.Mesh.from_meshgrid()` for more details.
     show_geidz : bool
         If True, the Z axis of the grid will be shown.
 
     Attributes
     ----------
-    gridsize : tuple[float, float, int, int]
+    gridsize : Tuple[float, float, int, int]
         The size of the grid in [dx, nx, dy, ny] format.
     dx : float
         The size of the grid in the X direction.
@@ -65,6 +66,7 @@ class Grid:
         gridsize: Tuple[float, int, float, int],
         show_geidz: bool,
     ):
+        super(Grid, self).__init__()
         self.dx = gridsize[0]
         self.nx = gridsize[1]
         self.dy = gridsize[2]
@@ -75,6 +77,13 @@ class Grid:
         self.mesh = Mesh.from_meshgrid(*gridsize)
         self.mesh.transform(Translation.from_vector([-self.dx / 2, -self.dy / 2, 0]))
 
+    @property
+    def data(self):
+        return {
+            "gridsize": [self.dx, self.nx, self.dy, self.ny],
+            "show_geidz": self.show_geidz,
+        }
+
 
 class GridObject(ViewerSceneObject, BaseMeshObject):
     """
@@ -84,6 +93,7 @@ class GridObject(ViewerSceneObject, BaseMeshObject):
     ----------
     grid : :class:`compas_viewer.scene.Grid`
         The grid geometry.
+
     Attributes
     ----------
     grid : :class:`compas_viewer.scene.Grid`

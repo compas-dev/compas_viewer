@@ -8,11 +8,7 @@ from typing import Union
 
 from compas.colors import Color
 from compas.geometry import Point
-from compas.geometry import Rotation
-from compas.geometry import Scale
 from compas.geometry import Transformation
-from compas.geometry import Translation
-from compas.geometry import identity_matrix
 from compas.geometry import transform_points_numpy
 from compas.scene import SceneObject
 from compas.utilities import flatten
@@ -51,11 +47,11 @@ class ViewerSceneObject(SceneObject):
         Whether to show lines/edges of the object. It will override the value in the config file.
     show_faces : bool, optional
         Whether to show faces of the object. It will override the value in the config file.
-    pointscolor : Union[:class:`compas.colors.Color`, dict[any, :class:`compas.colors.Color`]], optional
+    pointscolor : Union[:class:`compas.colors.Color`, Dict[Any, :class:`compas.colors.Color`]], optional
         The color or the dict of colors of the points. It will override the value in the config file.
-    linescolor : Union[:class:`compas.colors.Color`, dict[any, :class:`compas.colors.Color`]], optional
+    linescolor : Union[:class:`compas.colors.Color`, Dict[Any, :class:`compas.colors.Color`]], optional
         The color or the dict of colors of the lines. It will override the value in the config file.
-    facescolor : Union[:class:`compas.colors.Color`, dict[any, :class:`compas.colors.Color`]], optional
+    facescolor : Union[:class:`compas.colors.Color`, Dict[Any, :class:`compas.colors.Color`]], optional
         The color or the dict of colors the faces. It will override the value in the config file.
     lineswidth : float, optional
         The line width to be drawn on screen. It will override the value in the config file.
@@ -63,11 +59,11 @@ class ViewerSceneObject(SceneObject):
         The point size to be drawn on screen. It will override the value in the config file.
     opacity : float, optional
         The opacity of the object. It will override the value in the config file.
-    config: :class:`compas_viewer.configurations.SceneConfig`.
+    config: :class:`compas_viewer.configurations.scene_config.SceneConfig`.
         The configuration of the scene object. Defaults to None.
         It should be assigned though the :class:`compas_viewer.viewer.Viewer.add` method.
         Otherwise a exception will be raised.
-    **kwargs : dict, optional
+    **kwargs : Dict, optional
         Additional visualization options for specific objects.
 
     Attributes
@@ -84,11 +80,11 @@ class ViewerSceneObject(SceneObject):
         Whether to show lines/edges of the object.
     show_faces : bool
         Whether to show faces of the object.
-    pointscolor : dict[Any, :class:`compas.colors.Color`]
+    pointscolor : Dict[Any, :class:`compas.colors.Color`]
         The color of the points.
-    linescolor : dict[Any, :class:`compas.colors.Color`]
+    linescolor : Dict[Any, :class:`compas.colors.Color`]
         The color of the lines.
-    facescolor : dict[Any, :class:`compas.colors.Color`]
+    facescolor : Dict[Any, :class:`compas.colors.Color`]
         The color of the faces.
     lineswidth : float
         The line width to be drawn on screen
@@ -98,22 +94,11 @@ class ViewerSceneObject(SceneObject):
         The opacity of the object.
     background : bool
         Whether the object is drawn on the background with depth test disabled.
-    bounding_box : list[float], read-only
+    bounding_box : List[float], read-only
         The min and max corners of object bounding box, as a numpy array of shape (2, 3).
     bounding_box_center : :class:`compas.geometry.Point`, read-only
         The center of object bounding box, as a point.
-    matrix : list[float], read-only
-        The transformation matrix of the object.
-    translation : :class:`compas.geometry.Translation`
-        The translation of the object.
-    rotation : :class:`compas.geometry.Rotation`
-        The euler rotation  of the object.
-    scale : :class:`compas.geometry.Scale`
-        The scale of the object.
-    properties : list, read-only
-        The list of object-specific properties.
-    visualisation : list[str], read-only
-        List of visualisation properties which can be edited in the GUI.
+
     """
 
     def __init__(
@@ -146,7 +131,6 @@ class ViewerSceneObject(SceneObject):
         self.is_visible = is_visible
         self.viewer = viewer
         self.parent: Optional[ViewerSceneObject]
-        self._children = set()
 
         self.show_points = show_points if show_points is not None else self.config.show_points
         self.show_lines = show_lines if show_lines is not None else self.config.show_lines
@@ -182,12 +166,8 @@ class ViewerSceneObject(SceneObject):
         self.background: bool = False
 
         self._instance_color: Optional[Color] = None
-        self._transformation = Transformation.from_matrix(identity_matrix(4))
-        self._translation = self._transformation.translation
-        self._rotation = self._transformation.rotation
-        self._scale = self._transformation.scale
+        self.transformation: Optional[Transformation] = None
         self._matrix_buffer: Optional[List[List[float]]] = None
-
         self._bounding_box: Optional[List[float]] = None
         self._bounding_box_center: Optional[Point] = None
         self._is_collection = False
@@ -209,141 +189,34 @@ class ViewerSceneObject(SceneObject):
     def bounding_box_center(self):
         return self._bounding_box_center
 
-    @property
-    def children(self):
-        return self._children
-
-    @property
-    def properties(self):
-        return None
-
     # ==========================================================================
     # general
     # ==========================================================================
 
-    # TODO
-    # def add(self, item, **kwargs):
-    #     if isinstance(item, Object):
-    #         obj = item
-    #     else:
-    #         obj = self._app.add(item, **kwargs)
-    #     self._children.add(obj)
-    #     obj.parent = self
-
-    #     if self._app.dock_slots["sceneform"] and self._app.view.isValid():
-    #         self._app.dock_slots["sceneform"].update()
-    #     return obj
-
-    def remove(self, obj):
-        obj.parent = None
-        self._children.remove(obj)
-
-    @property
-    def translation(self) -> Translation:
-        return self._translation
-
-    @translation.setter
-    def translation(self, translation: Translation):
-        self._translation = translation
-
-    @property
-    def rotation(self) -> Rotation:
-        return self._rotation
-
-    @rotation.setter
-    def rotation(self, rotation: Rotation):
-        self._rotation = rotation
-
-    @property
-    def scale(self) -> Scale:
-        return self._scale
-
-    @scale.setter
-    def scale(self, scale: Scale):
-        self._scale = scale
-
     def _update_matrix(self):
         """Update the matrix from object's translation, rotation and scale"""
-        if (not self.parent or self.parent._matrix_buffer is None) and (
-            self.translation.matrix == identity_matrix(4)
-            and self.rotation.matrix == identity_matrix(4)
-            and self.scale.matrix == identity_matrix(4)
-        ):
-            self._transformation.matrix = identity_matrix(4)
-            self._matrix_buffer = None
-        else:
-            M = self.translation * self.rotation * self.scale
-            self._transformation.matrix = M.matrix
-            self._matrix_buffer = list(array(self.matrix_world).flatten())
+        if self.transformation is not None:
+            self._matrix_buffer = list(array(self.worldtransformation.matrix).flatten())
 
         if self.children:
             for child in self.children:
                 child._update_matrix()
 
-    @property
-    def transformation(self):
-        return self._transformation
-
-    @transformation.setter
-    def transformation(self, transformation: Transformation):
-        self._translation = transformation.translation
-        self._rotation = transformation.rotation
-        self._scale = transformation.scale
-        self._transformation = transformation
-        self._update_matrix()
-
-    @property
-    def transformation_world(self):
-        """Get the updated matrix from object's translation, rotation and scale"""
-        if self.parent:
-            assert isinstance(self.parent.transformation_world, Transformation)
-            return self.parent.transformation_world * self.transformation
-        else:
-            return self.transformation
-
-    @property
-    def matrix(self):
-        """Get the updated matrix from object's translation, rotation and scale"""
-        return self.transformation.matrix
-
-    @property
-    def matrix_world(self):
-        """Get the updated matrix from object's translation, rotation and scale"""
-        return self.transformation_world.matrix
-
-    @matrix.setter
-    def matrix(self, matrix):
-        """Set the object's transformation from given matrix, and update object's matrix"""
-        self.transformation.matrix = matrix
-        self._update_matrix()
-
     # ==========================================================================
     # buffer
     # ==========================================================================
-
-    @property
-    def visualisation(self) -> List[str]:
-        """List of visualisation properties which can be edited in the GUI."""
-        options = ["opacity"]
-        if self._points_data is not None:
-            options += ["pointscolor", "show_points", "pointssize"]
-        if self._lines_data is not None:
-            options += ["linescolor", "show_lines", "lineswidth"]
-        if self._frontfaces_data is not None:
-            options += ["facescolor", "show_faces"]
-        return options
 
     def make_buffer_from_data(self, data: Tuple[List[Point], List[Color], List[List[int]]]) -> Dict[str, Any]:
         """Create buffers from point/line/face data.
 
         Parameters
         ----------
-        data : tuple[list[:class:`compas.geometry.Point`], list[:class:`compas.colors.Color`], list[int]]
+        data : Tuple[List[:class:`compas.geometry.Point`], List[:class:`compas.colors.Color`], List[int]]
             Contains positions, colors, elements for the buffer.
 
         Returns
         -------
-        buffer_dict : dict[str, Any]
+        buffer_dict : Dict[str, Any]
             A dict with created buffer indexes.
         """
         positions, colors, elements = data
@@ -366,9 +239,9 @@ class ViewerSceneObject(SceneObject):
 
         Parameters
         ----------
-        data : tuple[list[:class:`compas.geometry.Point`], list[:class:`compas.colors.Color`], list[int]]
+        data : Tuple[List[:class:`compas.geometry.Point`], List[:class:`compas.colors.Color`], List[int]]
             Contains positions, colors, elements for the buffer.
-        buffer : dict[str, Any]
+        buffer : Dict[str, Any]
             The dict with created buffer indexes
         update_positions : bool
             Whether to update positions in the buffer dict.
@@ -451,7 +324,7 @@ class ViewerSceneObject(SceneObject):
 
         _positions = array(positions)
         self._bounding_box = list(
-            transform_points_numpy(array([_positions.min(axis=0), _positions.max(axis=0)]), self._transformation)
+            transform_points_numpy(array([_positions.min(axis=0), _positions.max(axis=0)]), self.worldtransformation)
         )
         self._bounding_box_center = Point(*list(average(a=array(self.bounding_box), axis=0)))
 

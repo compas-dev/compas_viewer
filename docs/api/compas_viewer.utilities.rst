@@ -24,3 +24,4 @@ Functions
     make_index_buffer
     update_vertex_buffer
     update_index_buffer
+    key_mapper

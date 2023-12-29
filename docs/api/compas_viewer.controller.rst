@@ -12,4 +12,5 @@ Classes
     :nosignatures:
 
     Controller
+    Mouse
 

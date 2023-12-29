@@ -31,7 +31,7 @@ class Tag(Geometry):
     ----------
     text : str
         The text of the tag.
-    position : :class:`compas.geometry.Point` | tuple[float, float, float]
+    position : Union[:class:`compas.geometry.Point`, Tuple[float, float, float]]
         The position of the tag.
     color : :class:`compas.colors.Color`, optional
         The color of the tag.
@@ -115,7 +115,7 @@ class TagObject(ViewerSceneObject, GeometryObject):
     ----------
     tag : :class:`compas_viewer.scene.Tag`
         The tag geometry.
-    **kwargs : dict, optional
+    **kwargs : Dict, optional
         Additional options for the :class:`compas_viewer.scene.ViewerSceneObject`.
     """
 
@@ -192,7 +192,8 @@ class TagObject(ViewerSceneObject, GeometryObject):
     def draw(self, shader, camera_position):
         """Draw the object from its buffers"""
         shader.enable_attribute("position")
-        shader.uniform4x4("transform", self.matrix)
+        if self.worldtransformation is not None:
+            shader.uniform4x4("transform", self.worldtransformation.matrix)
         shader.uniform1f("object_opacity", self.opacity)
         shader.uniform1i("text_height", self._calculate_text_height(camera_position))
         shader.uniform1i("text_num", len(self._tag.text))

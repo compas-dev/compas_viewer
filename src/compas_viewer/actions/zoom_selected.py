@@ -1,9 +1,7 @@
-from PySide6.QtCore import QObject
-
 from .action import Action
 
 
-class ZoomSelected(Action, QObject):
+class ZoomSelected(Action):
     """Look at action."""
 
     def pressed_action(self):
