@@ -38,7 +38,7 @@ class Action(QObject):
     modifier : :class:`PySide6.QtCore.Qt.KeyboardModifier`
         The modifier of the action.
 
-    See Also
+    References
     --------
     * https://doc.qt.io/qtforpython-6/PySide6/QtCore/Signal.html
     """
