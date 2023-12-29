@@ -48,11 +48,11 @@ class ViewerSceneObject(SceneObject):
         Whether to show lines/edges of the object. It will override the value in the config file.
     show_faces : bool, optional
         Whether to show faces of the object. It will override the value in the config file.
-    pointscolor : Union[:class:`compas.colors.Color`, dict[any, :class:`compas.colors.Color`]], optional
+    pointscolor : Union[:class:`compas.colors.Color`, Dict[Any, :class:`compas.colors.Color`]], optional
         The color or the dict of colors of the points. It will override the value in the config file.
-    linescolor : Union[:class:`compas.colors.Color`, dict[any, :class:`compas.colors.Color`]], optional
+    linescolor : Union[:class:`compas.colors.Color`, Dict[Any, :class:`compas.colors.Color`]], optional
         The color or the dict of colors of the lines. It will override the value in the config file.
-    facescolor : Union[:class:`compas.colors.Color`, dict[any, :class:`compas.colors.Color`]], optional
+    facescolor : Union[:class:`compas.colors.Color`, Dict[Any, :class:`compas.colors.Color`]], optional
         The color or the dict of colors the faces. It will override the value in the config file.
     lineswidth : float, optional
         The line width to be drawn on screen. It will override the value in the config file.
@@ -60,11 +60,11 @@ class ViewerSceneObject(SceneObject):
         The point size to be drawn on screen. It will override the value in the config file.
     opacity : float, optional
         The opacity of the object. It will override the value in the config file.
-    config: :class:`compas_viewer.configurations.SceneConfig`.
+    config: :class:`compas_viewer.configurations.scene_config.SceneConfig`.
         The configuration of the scene object. Defaults to None.
         It should be assigned though the :class:`compas_viewer.viewer.Viewer.add` method.
         Otherwise a exception will be raised.
-    **kwargs : dict, optional
+    **kwargs : Dict, optional
         Additional visualization options for specific objects.
 
     Attributes
@@ -81,11 +81,11 @@ class ViewerSceneObject(SceneObject):
         Whether to show lines/edges of the object.
     show_faces : bool
         Whether to show faces of the object.
-    pointscolor : dict[Any, :class:`compas.colors.Color`]
+    pointscolor : Dict[Any, :class:`compas.colors.Color`]
         The color of the points.
-    linescolor : dict[Any, :class:`compas.colors.Color`]
+    linescolor : Dict[Any, :class:`compas.colors.Color`]
         The color of the lines.
-    facescolor : dict[Any, :class:`compas.colors.Color`]
+    facescolor : Dict[Any, :class:`compas.colors.Color`]
         The color of the faces.
     lineswidth : float
         The line width to be drawn on screen
@@ -216,7 +216,7 @@ class ViewerSceneObject(SceneObject):
 
         Returns
         -------
-        buffer_dict : dict[str, Any]
+        buffer_dict : Dict[str, Any]
             A dict with created buffer indexes.
         """
         positions, colors, elements = data
@@ -241,7 +241,7 @@ class ViewerSceneObject(SceneObject):
         ----------
         data : Tuple[List[:class:`compas.geometry.Point`], List[:class:`compas.colors.Color`], List[int]]
             Contains positions, colors, elements for the buffer.
-        buffer : dict[str, Any]
+        buffer : Dict[str, Any]
             The dict with created buffer indexes
         update_positions : bool
             Whether to update positions in the buffer dict.

@@ -1,5 +1,5 @@
 *******************************************************************************
-compas_viewer.components
+compas_viewer.components.render
 *******************************************************************************
 
 .. currentmodule:: compas_viewer.components.render

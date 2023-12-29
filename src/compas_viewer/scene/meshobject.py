@@ -24,14 +24,14 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
         True to hide the coplanar edges. It will override the value in the config file.
     use_vertexcolors : bool, optional
         True to use vertex color. It will override the value in the config file.
-    kwargs : dict, optional
+    **kwargs : Dict, optional
         Additional options for the :class:`compas_viewer.scene.ViewerSceneObject`.
 
     Attributes
     ----------
     mesh : :class:`compas.datastructures.Mesh`
         The mesh data structure.
-    vertex_xyz : dict[int, List[float]]
+    vertex_xyz : Dict[int, List[float]]
         View coordinates of the vertices.
         Defaults to the real coordinates.
     vertexcolor : :class:`compas.colors.ColorDict`

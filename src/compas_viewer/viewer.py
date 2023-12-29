@@ -71,9 +71,9 @@ class Viewer(Scene):
         The width of the viewer window at startup. It will override the value in the config file.
     height : int, optional
         The height of the viewer window at startup. It will override the value in the config file.
-    rendermode : literal['shaded', 'ghosted', 'wireframe', 'lighted'}, optional
+    rendermode : Literal['shaded', 'ghosted', 'wireframe', 'lighted'}, optional
         The display mode of the OpenGL view. It will override the value in the config file.
-    viewmode : literal['front', 'right', 'top', 'perspective'}, optional
+    viewmode : Literal['front', 'right', 'top', 'perspective'}, optional
         The view mode of the OpenGL view. It will override the value in the config file.
         In `ghosted` mode, all objects have a default opacity of 0.7.
     show_grid : bool, optional
@@ -489,13 +489,13 @@ class Viewer(Scene):
         show_faces : bool, optional
             Whether to show faces of the object.
             It will override the value in the scene config file.
-        pointscolor : Union[:class:`compas.colors.Color`, Dict[any, :class:`compas.colors.Color`], optional
+        pointscolor : Union[:class:`compas.colors.Color`, Dict[Any, :class:`compas.colors.Color`], optional
             The color or the dict of colors of the points.
             It will override the value in the scene config file.
-        linescolor : Union[:class:`compas.colors.Color`, Dict[any, :class:`compas.colors.Color`], optional
+        linescolor : Union[:class:`compas.colors.Color`, Dict[Any, :class:`compas.colors.Color`], optional
             The color or the dict of colors of the lines.
             It will override the value in the scene config file.
-        facescolor : Union[:class:`compas.colors.Color`, Dict[any, :class:`compas.colors.Color`], optional
+        facescolor : Union[:class:`compas.colors.Color`, Dict[Any, :class:`compas.colors.Color`], optional
             The color or the dict of colors the faces.
             It will override the value in the scene config file.
         lineswidth : float, optional
@@ -513,7 +513,7 @@ class Viewer(Scene):
         use_vertexcolors : bool, optional
             Whether to use vertex color.
             It will override the value in the scene config file.
-        **kwargs : dict
+        **kwargs : Dict, optional
             The other possible parameters to be passed to the object.
 
         Returns

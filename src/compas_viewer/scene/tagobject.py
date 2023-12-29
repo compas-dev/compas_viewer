@@ -115,7 +115,7 @@ class TagObject(ViewerSceneObject, GeometryObject):
     ----------
     tag : :class:`compas_viewer.scene.Tag`
         The tag geometry.
-    **kwargs : dict, optional
+    **kwargs : Dict, optional
         Additional options for the :class:`compas_viewer.scene.ViewerSceneObject`.
     """
 
