@@ -30,7 +30,7 @@ class Position(Vector):
 
     Parameters
     ----------
-    vector : tuple[float, float, float]
+    vector : Tuple[float, float, float]
         The position of the camera.
     on_update : callable
         A callback function that is called when the position changes.
@@ -384,7 +384,7 @@ class Camera:
 
         Returns
         -------
-        list[list[float]]
+        List[List[float]]
             The transformation matrix as a `numpy` array in column-major order.
 
         Notes
@@ -412,7 +412,7 @@ class Camera:
 
         Returns
         -------
-        list[list[float]]
+        List[List[float]]
             The transformation matrix in column-major order.
 
         Notes

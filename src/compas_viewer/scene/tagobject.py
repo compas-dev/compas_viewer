@@ -31,7 +31,7 @@ class Tag(Geometry):
     ----------
     text : str
         The text of the tag.
-    position : :class:`compas.geometry.Point` | tuple[float, float, float]
+    position : Union[:class:`compas.geometry.Point`, Tuple[float, float, float]]
         The position of the tag.
     color : :class:`compas.colors.Color`, optional
         The color of the tag.

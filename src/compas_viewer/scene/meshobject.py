@@ -31,7 +31,7 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
     ----------
     mesh : :class:`compas.datastructures.Mesh`
         The mesh data structure.
-    vertex_xyz : dict[int, list[float]]
+    vertex_xyz : dict[int, List[float]]
         View coordinates of the vertices.
         Defaults to the real coordinates.
     vertexcolor : :class:`compas.colors.ColorDict`

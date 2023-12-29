@@ -95,7 +95,7 @@ class ViewerSceneObject(SceneObject):
         The opacity of the object.
     background : bool
         Whether the object is drawn on the background with depth test disabled.
-    bounding_box : list[float], read-only
+    bounding_box : List[float], read-only
         The min and max corners of object bounding box, as a numpy array of shape (2, 3).
     bounding_box_center : :class:`compas.geometry.Point`, read-only
         The center of object bounding box, as a point.
@@ -211,7 +211,7 @@ class ViewerSceneObject(SceneObject):
 
         Parameters
         ----------
-        data : tuple[list[:class:`compas.geometry.Point`], list[:class:`compas.colors.Color`], list[int]]
+        data : Tuple[List[:class:`compas.geometry.Point`], List[:class:`compas.colors.Color`], List[int]]
             Contains positions, colors, elements for the buffer.
 
         Returns
@@ -239,7 +239,7 @@ class ViewerSceneObject(SceneObject):
 
         Parameters
         ----------
-        data : tuple[list[:class:`compas.geometry.Point`], list[:class:`compas.colors.Color`], list[int]]
+        data : Tuple[List[:class:`compas.geometry.Point`], List[:class:`compas.colors.Color`], List[int]]
             Contains positions, colors, elements for the buffer.
         buffer : dict[str, Any]
             The dict with created buffer indexes

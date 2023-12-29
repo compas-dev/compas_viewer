@@ -24,16 +24,16 @@ class Grid:
 
     Parameters
     ----------
-    gridsize : tuple[float, int, float, int]
+    gridsize : Tuple[float, int, float, int]
         The size of the grid in [dx, nx, dy, ny] format.
         Notice that the `nx` and `ny` must be even numbers.
-        See the :func:`compas.datastructures.Mesh.from_meshgrid` for more details.
+        See the :func:`compas.datastructures.Mesh.from_meshgrid()` for more details.
     show_geidz : bool
         If True, the Z axis of the grid will be shown.
 
     Attributes
     ----------
-    gridsize : tuple[float, float, int, int]
+    gridsize : Tuple[float, float, int, int]
         The size of the grid in [dx, nx, dy, ny] format.
     dx : float
         The size of the grid in the X direction.
@@ -84,6 +84,7 @@ class GridObject(ViewerSceneObject, BaseMeshObject):
     ----------
     grid : :class:`compas_viewer.scene.Grid`
         The grid geometry.
+
     Attributes
     ----------
     grid : :class:`compas_viewer.scene.Grid`
