@@ -8,10 +8,7 @@ from typing import Union
 
 from compas.colors import Color
 from compas.geometry import Point
-from compas.geometry import Rotation
-from compas.geometry import Scale
 from compas.geometry import Transformation
-from compas.geometry import Translation
 from compas.geometry import identity_matrix
 from compas.geometry import transform_points_numpy
 from compas.scene import SceneObject
@@ -102,18 +99,7 @@ class ViewerSceneObject(SceneObject):
         The min and max corners of object bounding box, as a numpy array of shape (2, 3).
     bounding_box_center : :class:`compas.geometry.Point`, read-only
         The center of object bounding box, as a point.
-    matrix : list[float], read-only
-        The transformation matrix of the object.
-    translation : :class:`compas.geometry.Translation`
-        The translation of the object.
-    rotation : :class:`compas.geometry.Rotation`
-        The euler rotation  of the object.
-    scale : :class:`compas.geometry.Scale`
-        The scale of the object.
-    properties : list, read-only
-        The list of object-specific properties.
-    visualisation : list[str], read-only
-        List of visualisation properties which can be edited in the GUI.
+
     """
 
     def __init__(
@@ -146,7 +132,6 @@ class ViewerSceneObject(SceneObject):
         self.is_visible = is_visible
         self.viewer = viewer
         self.parent: Optional[ViewerSceneObject]
-        self._children = set()
 
         self.show_points = show_points if show_points is not None else self.config.show_points
         self.show_lines = show_lines if show_lines is not None else self.config.show_lines
@@ -182,12 +167,8 @@ class ViewerSceneObject(SceneObject):
         self.background: bool = False
 
         self._instance_color: Optional[Color] = None
-        self._transformation = Transformation.from_matrix(identity_matrix(4))
-        self._translation = self._transformation.translation
-        self._rotation = self._transformation.rotation
-        self._scale = self._transformation.scale
+        self.transformation = Transformation.from_matrix(identity_matrix(4))
         self._matrix_buffer: Optional[List[List[float]]] = None
-
         self._bounding_box: Optional[List[float]] = None
         self._bounding_box_center: Optional[Point] = None
         self._is_collection = False
@@ -209,129 +190,21 @@ class ViewerSceneObject(SceneObject):
     def bounding_box_center(self):
         return self._bounding_box_center
 
-    @property
-    def children(self):
-        return self._children
-
-    @property
-    def properties(self):
-        return None
-
     # ==========================================================================
     # general
     # ==========================================================================
 
-    # TODO
-    # def add(self, item, **kwargs):
-    #     if isinstance(item, Object):
-    #         obj = item
-    #     else:
-    #         obj = self._app.add(item, **kwargs)
-    #     self._children.add(obj)
-    #     obj.parent = self
-
-    #     if self._app.dock_slots["sceneform"] and self._app.view.isValid():
-    #         self._app.dock_slots["sceneform"].update()
-    #     return obj
-
-    def remove(self, obj):
-        obj.parent = None
-        self._children.remove(obj)
-
-    @property
-    def translation(self) -> Translation:
-        return self._translation
-
-    @translation.setter
-    def translation(self, translation: Translation):
-        self._translation = translation
-
-    @property
-    def rotation(self) -> Rotation:
-        return self._rotation
-
-    @rotation.setter
-    def rotation(self, rotation: Rotation):
-        self._rotation = rotation
-
-    @property
-    def scale(self) -> Scale:
-        return self._scale
-
-    @scale.setter
-    def scale(self, scale: Scale):
-        self._scale = scale
-
     def _update_matrix(self):
         """Update the matrix from object's translation, rotation and scale"""
-        if (not self.parent or self.parent._matrix_buffer is None) and (
-            self.translation.matrix == identity_matrix(4)
-            and self.rotation.matrix == identity_matrix(4)
-            and self.scale.matrix == identity_matrix(4)
-        ):
-            self._transformation.matrix = identity_matrix(4)
-            self._matrix_buffer = None
-        else:
-            M = self.translation * self.rotation * self.scale
-            self._transformation.matrix = M.matrix
-            self._matrix_buffer = list(array(self.matrix_world).flatten())
+        self._matrix_buffer = list(array(self.transformation.matrix).flatten())
 
         if self.children:
             for child in self.children:
                 child._update_matrix()
 
-    @property
-    def transformation(self):
-        return self._transformation
-
-    @transformation.setter
-    def transformation(self, transformation: Transformation):
-        self._translation = transformation.translation
-        self._rotation = transformation.rotation
-        self._scale = transformation.scale
-        self._transformation = transformation
-        self._update_matrix()
-
-    @property
-    def transformation_world(self):
-        """Get the updated matrix from object's translation, rotation and scale"""
-        if self.parent:
-            assert isinstance(self.parent.transformation_world, Transformation)
-            return self.parent.transformation_world * self.transformation
-        else:
-            return self.transformation
-
-    @property
-    def matrix(self):
-        """Get the updated matrix from object's translation, rotation and scale"""
-        return self.transformation.matrix
-
-    @property
-    def matrix_world(self):
-        """Get the updated matrix from object's translation, rotation and scale"""
-        return self.transformation_world.matrix
-
-    @matrix.setter
-    def matrix(self, matrix):
-        """Set the object's transformation from given matrix, and update object's matrix"""
-        self.transformation.matrix = matrix
-        self._update_matrix()
-
     # ==========================================================================
     # buffer
     # ==========================================================================
-
-    @property
-    def visualisation(self) -> List[str]:
-        """List of visualisation properties which can be edited in the GUI."""
-        options = ["opacity"]
-        if self._points_data is not None:
-            options += ["pointscolor", "show_points", "pointssize"]
-        if self._lines_data is not None:
-            options += ["linescolor", "show_lines", "lineswidth"]
-        if self._frontfaces_data is not None:
-            options += ["facescolor", "show_faces"]
-        return options
 
     def make_buffer_from_data(self, data: Tuple[List[Point], List[Color], List[List[int]]]) -> Dict[str, Any]:
         """Create buffers from point/line/face data.
