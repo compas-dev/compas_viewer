@@ -17,7 +17,7 @@ class PointObject(ViewerSceneObject, GeometryObject):
     point : :class:`compas.geometry.Point`
         The point geometry.
     kwargs : dict, optional
-        Additional options for the :class:`compas.viewer.scene.ViewerSceneObject`.
+        Additional options for the :class:`compas_viewer.scene.ViewerSceneObject`.
 
     Attributes
     ----------

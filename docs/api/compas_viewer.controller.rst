@@ -10,3 +10,6 @@ Classes
 .. autosummary::
     :toctree: generated/
     :nosignatures:
+
+    Controller
+

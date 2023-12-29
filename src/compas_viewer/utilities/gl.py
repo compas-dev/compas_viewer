@@ -27,6 +27,7 @@ def gl_info() -> str:
         OpenGL Version: {GL.glGetString(GL.GL_VERSION)}
         Shader Version: {GL.glGetString(GL.GL_SHADING_LANGUAGE_VERSION)}
         """
+
     return info
 
 

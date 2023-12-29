@@ -21,14 +21,13 @@ if TYPE_CHECKING:
 class Grid:
     """
     The geometry class of the grid. A grid is a set of lines.
-    It is created by the :class:`compas.datastructures.Mesh.from_meshgrid`.
 
     Parameters
     ----------
     gridsize : tuple[float, int, float, int]
         The size of the grid in [dx, nx, dy, ny] format.
         Notice that the `nx` and `ny` must be even numbers.
-        See the :class:`compas.datastructures.Mesh.from_meshgrid` for more details.
+        See the :func:`compas.datastructures.Mesh.from_meshgrid` for more details.
     show_geidz : bool
         If True, the Z axis of the grid will be shown.
 
@@ -48,6 +47,7 @@ class Grid:
         If the Z axis of the grid is shown.
     mesh : :class:`compas.datastructures.Mesh`
         The mesh of the grid.
+
     """
 
     def __eq__(self, other):
@@ -93,13 +93,8 @@ class GridObject(ViewerSceneObject, BaseMeshObject):
     def __init__(self, grid: Grid, **kwargs):
         super(GridObject, self).__init__(mesh=grid.mesh, **kwargs)
         self._grid = grid
-        self._points_data = self._get_points_data()
-        self._lines_data = self._get_lines_data()
-        self._frontfaces_data = self._get_frontfaces_data()
-        self._backfaces_data = self._get_backfaces_data()
 
-    def _get_points_data(self):
-        pass
+        self._lines_data = self._get_lines_data()
 
     def _get_lines_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
         positions = []
@@ -125,18 +120,12 @@ class GridObject(ViewerSceneObject, BaseMeshObject):
 
         if self._grid.show_geidz:
             positions.append([0, 0, 0])
-            positions.append([0, 0, self._grid.dx * self._grid.dy / 2])
+            positions.append([0, 0, (self._grid.dx + self._grid.dy) / 4])
             colors.append(Color.blue())
             colors.append(Color.blue())
             elements.append([i + 0, i + 1])
 
         return positions, colors, elements
-
-    def _get_frontfaces_data(self):
-        pass
-
-    def _get_backfaces_data(self):
-        pass
 
     def init(self):
         self.make_buffers()
