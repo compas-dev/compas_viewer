@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from compas_viewer.viewer import Viewer
 
 
-class Action:
+class Action(QObject):
     """
     Actions are functions that are called when a certain event happens, such as mouse and keyboard click.
 
@@ -43,23 +43,20 @@ class Action:
     * https://doc.qt.io/qtforpython-6/PySide6/QtCore/Signal.html
     """
 
-    class ActionSignal(QObject):
-        pressed = Signal()
-        released = Signal()
+    pressed = Signal()
+    released = Signal()
 
     def __new__(cls, name: str, viewer: "Viewer", config: ActionConfig, **kwargs):
         action_cls = get_action_cls(name)
         return super(Action, cls).__new__(action_cls, **kwargs)
 
     def __init__(self, name: str, viewer: "Viewer", config: ActionConfig):
+        super(Action, self).__init__()
         self.name = name
         self.viewer = viewer
         self.config = config
         self.key = self.config.key
         self.modifier = self.config.modifier
-        self.signal = self.ActionSignal()
-        self.pressed = self.signal.pressed
-        self.released = self.signal.released
         self.pressed.connect(self.pressed_action)
         self.released.connect(self.released_action)
 
