@@ -465,7 +465,7 @@ class Render(QOpenGLWidget):
             if not isinstance(obj, TagObject) and not isinstance(obj, GridObject):
                 if obj.opacity * self.opacity < 1 and obj.bounding_box_center is not None:
                     transparent_objects.append(obj)
-                    centers.append(transform_points_numpy([obj.bounding_box_center], obj.transformation.matrix)[0])
+                    centers.append(transform_points_numpy([obj.bounding_box_center], obj.worldtransformation)[0])
                 else:
                     opaque_objects.append(obj)
         if transparent_objects:
