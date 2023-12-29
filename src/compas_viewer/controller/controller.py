@@ -144,8 +144,6 @@ class Controller:
         """
         for action in self.actions.values():
             if event.key() == action.key and event.modifiers() == action.modifier:
-                print(action.name)
-
                 action.pressed.emit()
                 break
 
