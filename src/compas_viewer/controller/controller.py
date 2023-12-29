@@ -144,7 +144,9 @@ class Controller:
         """
         for action in self.actions.values():
             if event.key() == action.key and event.modifiers() == action.modifier:
-                action.pressed()
+                print(action.name)
+
+                action.pressed.emit()
                 break
 
     def key_release_action(self, render: "Render", event: QKeyEvent):
@@ -160,5 +162,5 @@ class Controller:
         """
         for action in self.actions.values():
             if event.key() == action.key and event.modifiers() == action.modifier:
-                action.released()
+                action.released.emit()
                 break

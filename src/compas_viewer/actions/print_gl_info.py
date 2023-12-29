@@ -8,5 +8,5 @@ class GLInfo(Action):
     Pop up a window with OpenGL information.
     """
 
-    def pressed(self):
+    def pressed_action(self):
         self.viewer.info(gl_info())

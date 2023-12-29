@@ -1,6 +1,10 @@
 from abc import abstractmethod
 from typing import TYPE_CHECKING
 
+from PySide6.QtCore import QObject
+from PySide6.QtCore import Signal
+from PySide6.QtCore import Slot
+
 from compas_viewer.configurations import ActionConfig
 
 from . import get_action_cls
@@ -9,7 +13,7 @@ if TYPE_CHECKING:
     from compas_viewer.viewer import Viewer
 
 
-class Action:
+class Action(QObject):
     """
     Actions are functions that are called when a certain event happens, such as mouse and keyboard click.
 
@@ -34,7 +38,15 @@ class Action:
         The key of the action.
     modifier : :class:`PySide6.QtCore.Qt.KeyboardModifier`
         The modifier of the action.
+
+    See Also
+    --------
+    * https://doc.qt.io/qtforpython-6/PySide6/QtCore/Signal.html
     """
+
+    class ActionSignal(QObject):
+        pressed = Signal()
+        released = Signal()
 
     def __new__(cls, name: str, viewer: "Viewer", config: ActionConfig, **kwargs):
         action_cls = get_action_cls(name)
@@ -46,16 +58,21 @@ class Action:
         self.config = config
         self.key = self.config.key
         self.modifier = self.config.modifier
+        self.signal = self.ActionSignal()
+        self.pressed = self.signal.pressed
+        self.released = self.signal.released
+        self.pressed.connect(self.pressed_action)
+        self.released.connect(self.released_action)
 
     @abstractmethod
-    def pressed(self):
+    def pressed_action(self):
         """
         The behavior of the action when the key is pressed.
         """
         pass
 
     @abstractmethod
-    def released(self):
+    def released_action(self):
         """
         The behavior of the action when the key is released.
         """
