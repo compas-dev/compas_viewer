@@ -4,6 +4,7 @@ from typing import Optional
 from typing import Tuple
 
 from compas.colors import Color
+from compas.data import Data
 from compas.datastructures import Mesh
 from compas.geometry import Point
 from compas.geometry import Translation
@@ -18,7 +19,7 @@ if TYPE_CHECKING:
     from compas_viewer.components.render.shaders import Shader
 
 
-class Grid:
+class Grid(Data):
     """
     The geometry class of the grid. A grid is a set of lines.
 
@@ -65,6 +66,7 @@ class Grid:
         gridsize: Tuple[float, int, float, int],
         show_geidz: bool,
     ):
+        super(Grid, self).__init__()
         self.dx = gridsize[0]
         self.nx = gridsize[1]
         self.dy = gridsize[2]
@@ -74,6 +76,13 @@ class Grid:
         self.show_geidz = show_geidz
         self.mesh = Mesh.from_meshgrid(*gridsize)
         self.mesh.transform(Translation.from_vector([-self.dx / 2, -self.dy / 2, 0]))
+
+    @property
+    def data(self):
+        return {
+            "gridsize": [self.dx, self.nx, self.dy, self.ny],
+            "show_geidz": self.show_geidz,
+        }
 
 
 class GridObject(ViewerSceneObject, BaseMeshObject):
