@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING
 
 from PySide6.QtCore import QObject
 from PySide6.QtCore import Signal
+from PySide6.QtCore import Slot
 
 from compas_viewer.configurations import ActionConfig
 
@@ -12,7 +13,7 @@ if TYPE_CHECKING:
     from compas_viewer.viewer import Viewer
 
 
-class Action(QObject):
+class Action:
     """
     Actions are functions that are called when a certain event happens, such as mouse and keyboard click.
 
