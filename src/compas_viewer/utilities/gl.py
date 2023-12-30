@@ -9,6 +9,8 @@ def gl_info() -> str:
     Returns
     -------
     str
+        A formatted string containing information about the current GL
+        implementation.
 
     Notes
     -----
