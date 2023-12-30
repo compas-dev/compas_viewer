@@ -71,9 +71,9 @@ class Viewer(Scene):
         The width of the viewer window at startup. It will override the value in the config file.
     height : int, optional
         The height of the viewer window at startup. It will override the value in the config file.
-    rendermode : Literal['shaded', 'ghosted', 'wireframe', 'lighted'}, optional
+    rendermode : Literal['shaded', 'ghosted', 'wireframe', 'lighted'], optional
         The display mode of the OpenGL view. It will override the value in the config file.
-    viewmode : Literal['front', 'right', 'top', 'perspective'}, optional
+    viewmode : Literal['front', 'right', 'top', 'perspective'], optional
         The view mode of the OpenGL view. It will override the value in the config file.
         In `ghosted` mode, all objects have a default opacity of 0.7.
     show_grid : bool, optional
