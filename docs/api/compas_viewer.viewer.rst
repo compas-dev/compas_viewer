@@ -12,3 +12,5 @@ Classes
     :nosignatures:
 
     Viewer
+    Viewer.add
+    Viewer.add_action
