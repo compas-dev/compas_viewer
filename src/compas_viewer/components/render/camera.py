@@ -32,7 +32,7 @@ class Position(Vector):
     ----------
     vector : Tuple[float, float, float]
         The position of the camera.
-    on_update : callable
+    on_update : Callable
         A callback function that is called when the position changes.
 
     """
