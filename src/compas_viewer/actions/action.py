@@ -1,10 +1,13 @@
 from abc import abstractmethod
 from typing import TYPE_CHECKING
+from typing import Callable
+from typing import Optional
 
 from PySide6.QtCore import QObject
 from PySide6.QtCore import Signal
 
 from compas_viewer.configurations import ActionConfig
+from compas_viewer.configurations import ActionConfigType
 
 from . import get_action_cls
 

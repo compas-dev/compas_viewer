@@ -163,5 +163,5 @@ class Controller:
                 action.released.emit()
                 break
 
-    def add_action(self, pressed_action: Callable, ) #TODO
+    # def add_action(self, pressed_action: Callable, ) #TODO
 

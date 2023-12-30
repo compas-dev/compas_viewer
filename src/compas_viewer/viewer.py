@@ -20,7 +20,11 @@ from PySide6.QtCore import QCoreApplication
 from PySide6.QtGui import QIcon
 
 from compas_viewer import DATA
+from compas_viewer.actions import Action
+from compas_viewer.actions import register
 from compas_viewer.components import Render
+from compas_viewer.configurations import ActionConfig
+from compas_viewer.configurations import ActionConfigType
 from compas_viewer.configurations import ControllerConfig
 from compas_viewer.configurations import RenderConfig
 from compas_viewer.configurations import SceneConfig
@@ -38,7 +42,7 @@ class Timer:
     ----------
     interval : int
         Interval between subsequent calls to this function, in milliseconds.
-    callback : callable
+    callback : Callable
         The function to call.
     singleshot : bool, optional
         If True, the timer is a singleshot timer.
@@ -395,7 +399,7 @@ class Viewer(Scene):
 
         Returns
         -------
-        callable
+        Callable
 
         Notes
         -----
@@ -548,3 +552,69 @@ class Viewer(Scene):
         if parent:
             sceneobject.parent = parent
         return sceneobject
+
+    def add_action(
+        self,
+        pressed_action: Callable,
+        key: str,
+        released_action: Optional[Callable] = None,
+        modifier: Optional[str] = None,
+        name: Optional[str] = None,
+    ):
+        """Add a custom action to the viewer.
+
+        Parameters
+        ----------
+        pressed_action : Callable
+            The function to be called when the key is pressed.
+        key : str
+            The key to be pressed.
+        released_action : Callable, optional
+            The function to be called when the key is released.
+            Default to None.
+        modifier : str, optional
+            The modifier of the key.
+            Default to None.
+        name : str, optional
+            The name of the action.
+            Default to the name of the pressed_action function.
+
+        Returns
+        -------
+        :class:`compas_viewer.actions.Action`
+            The action object.
+
+        Examples
+        --------
+        >>> viewer = Viewer()
+        >>> faces = viewer.add(Mesh.from_obj(compas.get("faces.obj")))
+        >>> faces.transformation = Transformation()
+        >>> def pressed_action():
+        >>>     faces.transformation *= Scale.from_factors([1.1, 1.1, 1.1], Frame.worldXY())
+        >>>     faces.update()
+        >>> action = viewer.add_action(pressed_action, "p")
+        >>> viewer.show()
+
+        """
+
+        if name is None:
+            name = pressed_action.__name__
+        if modifier is None:
+            modifier = "no"
+        config: ActionConfigType = {"key": key, "modifier": modifier}
+
+        class CustomAction(Action):
+            def pressed_action(self):
+                pressed_action()
+
+            def released_action(self):
+                if released_action:
+                    released_action()
+
+        register(name, CustomAction)
+
+        action = CustomAction(name, self, ActionConfig(config))
+
+        self.controller.actions[name] = action
+
+        return action
