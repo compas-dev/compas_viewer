@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING
 from typing import Dict
 
 from PySide6.QtCore import Qt
@@ -162,6 +162,3 @@ class Controller:
             if event.key() == action.key and event.modifiers() == action.modifier:
                 action.released.emit()
                 break
-
-    # def add_action(self, pressed_action: Callable, ) #TODO
-
