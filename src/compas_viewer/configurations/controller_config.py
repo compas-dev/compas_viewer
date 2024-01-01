@@ -106,7 +106,7 @@ class ControllerConfig(Config):
         A TypedDict with defined keys and types.
     """
 
-    def __init__(self, config: ControllerConfigType) -> None:
+    def __init__(self, config: ControllerConfigType) :
         super(ControllerConfig, self).__init__(config)
         # Zoom function fixed.
         self.zoom = None

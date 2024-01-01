@@ -91,8 +91,11 @@ class Controller:
             The Qt event.
         """
         self.mouse.last_pos = event.pos()
+        # Select: single left click.
+        if event.buttons() == Qt.MouseButton.LeftButton and event.modifiers() == Qt.KeyboardModifier.NoModifier:
+            render.selector.single_selection.emit()
         # Pan
-        if (
+        elif (
             event.buttons() == self.config.pan.mouse
             and event.modifiers() == self.config.pan.modifier
             and event.modifiers() != self.config.rotate.modifier

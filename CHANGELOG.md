@@ -43,3 +43,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Comments improved and better type hints.
 
 ### Removed
+* Removed `self.objects` from the `Render` class.`

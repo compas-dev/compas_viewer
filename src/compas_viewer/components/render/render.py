@@ -1,13 +1,15 @@
 import time
 from typing import TYPE_CHECKING
-from typing import Dict
 from typing import List
+from typing import Optional
+from typing import Tuple
 
 from compas.geometry import transform_points_numpy
 from numpy import float32
 from numpy import frombuffer
 from numpy import identity
 from numpy import uint8
+from numpy.typing import NDArray
 from OpenGL import GL
 from PySide6 import QtCore
 from PySide6.QtGui import QKeyEvent
@@ -18,9 +20,9 @@ from PySide6.QtOpenGLWidgets import QOpenGLWidget
 from compas_viewer.configurations import RenderConfig
 from compas_viewer.scene import GridObject
 from compas_viewer.scene import TagObject
-from compas_viewer.scene import ViewerSceneObject
 
 from .camera import Camera
+from .selector import Selector
 from .shaders import Shader
 
 if TYPE_CHECKING:
@@ -42,7 +44,7 @@ class Render(QOpenGLWidget):
         The render configuration.
     """
 
-    def __init__(self, viewer: "Viewer", config: RenderConfig) -> None:
+    def __init__(self, viewer: "Viewer", config: RenderConfig):
         super().__init__()
 
         self.config = config
@@ -61,10 +63,11 @@ class Render(QOpenGLWidget):
         self.shader_instance: Shader
         self.shader_grid: Shader
 
+        self.instance_map: NDArray
+
         self.camera = Camera(self)
         self.grid = self.viewer.grid
-        # self.selector = Selector(self)
-        self.objects: Dict[str, ViewerSceneObject] = {"grid_world": self.grid}
+        self.selector = Selector(self)
 
         self.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
 
@@ -343,10 +346,11 @@ class Render(QOpenGLWidget):
 
     def init(self):
         """Initialize the render."""
+        # Init the grid
+        self.grid.init()
 
-        # init the buffers
-        for guid in self.objects:
-            obj = self.objects[guid]
+        # Init the buffers
+        for obj in self.viewer.objects:
             obj.init()
 
         projection = self.camera.projection(self.viewer.config.width, self.viewer.config.height)
@@ -361,7 +365,7 @@ class Render(QOpenGLWidget):
         self.shader_model.uniform4x4("transform", transform)
         self.shader_model.uniform1i("is_selected", 0)
         self.shader_model.uniform1f("opacity", self.opacity)
-        self.shader_model.uniform3f("selection_color", self.config.selectioncolor.rgb)
+        self.shader_model.uniform3f("selection_color", self.config.selector.selectioncolor.rgb)
         self.shader_model.release()
 
         self.shader_tag = Shader(name="tag")
@@ -460,8 +464,7 @@ class Render(QOpenGLWidget):
         opaque_objects = []
         transparent_objects = []
         centers = []
-        for guid in self.objects:
-            obj = self.objects[guid]
+        for obj in self.viewer.objects:
             if not isinstance(obj, TagObject) and not isinstance(obj, GridObject):
                 if obj.opacity * self.opacity < 1 and obj.bounding_box_center is not None:
                     transparent_objects.append(obj)
@@ -476,34 +479,39 @@ class Render(QOpenGLWidget):
 
     def paint(self):
         """
-        Paint all the items in the render.
+        Paint all the items in the render, which only be called by the paintGL function and determines the performance of the render.
+        This function introduces decision tree for different render modes and settings.
         """
+        #  Matrix
         viewworld = self.camera.viewworld()
-        if self.rendermode != "perspective":
-            self.update_projection()
+
+        # Draw grid
+        # if self.app.selector.wait_for_selection_on_plane:
+        # self.paint_plane()
+        #     self.clear()
+        if self.config.show_grid:
+            self.shader_grid.bind()
+            self.shader_grid.uniform4x4("viewworld", viewworld)
+            self.grid.draw(self.shader_grid)
+            self.shader_grid.release()
 
         # Draw instance maps
+        if self.rendermode == "instance" or self.config.selector.enable_selector:
+            self.shader_instance.bind()
+            self.shader_instance.uniform4x4("viewworld", viewworld)
+            self.paint_instances()
+            self.shader_instance.release()
+
         # if self.app.selector.enabled:
-        #     self.shader_instance.bind()
         #     # set projection matrix
-        #     self.shader_instance.uniform4x4("viewworld", viewworld)
         #     if self.app.selector.select_from == "pixel":
         #         self.app.selector.instance_map = self.paint_instances()
         #     if self.app.selector.select_from == "box":
         #         self.app.selector.instance_map = self.paint_instances(self.app.selector.box_select_coords)
         #     self.app.selector.enabled = False
         #     self.clear()
-        #     self.shader_instance.release()
 
-        # Draw grid
-        self.shader_grid.bind()
-        self.shader_grid.uniform4x4("viewworld", viewworld)
-        # if self.app.selector.wait_for_selection_on_plane:
-        #     self.app.selector.uv_plane_map = self.paint_plane()
-        #     self.clear()
-        if self.config.show_grid:
-            self.grid.draw(self.shader_grid)
-        self.shader_grid.release()
+        """
 
         # Draw model objects in the scene
         self.shader_model.bind()
@@ -536,57 +544,55 @@ class Render(QOpenGLWidget):
         # # draw 2D box for multi-selection
         # if self.app.selector.select_from == "box":
         #     self.shader_model.draw_2d_box(self.app.selector.box_select_coords, self.app.width, self.app.height)
+        """
 
-    def paint_instances(self, cropped_box=None):
+    def paint_instances(self, cropped_box: Optional[Tuple[float, float, float, float]] = None):
         """
         Paint the instance map for the selection.
 
         Parameters
         ----------
-        cropped_box : tuple, optional
+        cropped_box : Tuple[float, float, float, float], optional
             The cropped box, by default None
 
-        Returns
-        -------
-        instance_map : numpy.ndarray
-            The instance map.
         """
         GL.glDisable(GL.GL_POINT_SMOOTH)
         GL.glDisable(GL.GL_LINE_SMOOTH)
+
         if cropped_box is None:
             x, y, width, height = 0, 0, self.viewer.config.width, self.viewer.config.height
         else:
             x1, y1, x2, y2 = cropped_box
             x, y = min(x1, x2), self.viewer.config.height - max(y1, y2)
-            width, height = abs(x1 - x2), abs(y1 - y2)
-        for guid in self.objects:
-            obj = self.objects[guid]
-            if hasattr(obj, "draw_instance"):
-                if obj.is_visible:
-                    obj.draw_instance(self.shader_instance, self.rendermode == "wireframe")
-        # create map
+            width, height = int(abs(x1 - x2)), int(abs(y1 - y2))
+
+        for obj in self.viewer.objects:
+            if obj.is_visible and not obj.is_locked:
+                obj.draw_instance(self.shader_instance, self.rendermode == "wireframe")
+
+        # Create the map
         r = int(self.devicePixelRatio())
         instance_buffer = GL.glReadPixels(x * r, y * r, width * r, height * r, GL.GL_RGB, GL.GL_UNSIGNED_BYTE)
         instance_map = frombuffer(buffer=instance_buffer, dtype=uint8).reshape(height * r, width * r, 3)
         instance_map = instance_map[::-r, ::r, :]
         GL.glEnable(GL.GL_POINT_SMOOTH)
         GL.glEnable(GL.GL_LINE_SMOOTH)
-        return instance_map
+        self.instance_map = instance_map
 
-    def paint_plane(self):
-        """
-        Paint the plane for the selection.
+    # def paint_plane(self):
+    #     """
+    #     Paint the plane for the selection.
 
-        Returns
-        -------
-        plane_uv_map : numpy.ndarray
-            The plane uv map.
+    #     Returns
+    #     -------
+    #     plane_uv_map : numpy.ndarray
+    #         The plane uv map.
 
-        """
-        x, y, width, height = 0, 0, self.viewer.config.width, self.viewer.config.height
-        # self.grid.draw_plane(self.shader_grid)
-        r = self.devicePixelRatio()
-        plane_uv_map = GL.glReadPixels(x * r, y * r, width * r, height * r, GL.GL_RGB, GL.GL_FLOAT)
-        plane_uv_map = plane_uv_map.reshape(height * r, width * r, 3)  # type: ignore
-        plane_uv_map = plane_uv_map[::-r, ::r, :]
-        return plane_uv_map
+    #     """
+    #     x, y, width, height = 0, 0, self.viewer.config.width, self.viewer.config.height
+    #     # self.grid.draw_plane(self.shader_grid)
+    #     r = self.devicePixelRatio()
+    #     plane_uv_map = GL.glReadPixels(x * r, y * r, width * r, height * r, GL.GL_RGB, GL.GL_FLOAT)
+    #     plane_uv_map = plane_uv_map.reshape(height * r, width * r, 3)  # type: ignore
+    #     plane_uv_map = plane_uv_map[::-r, ::r, :]
+    #     return plane_uv_map

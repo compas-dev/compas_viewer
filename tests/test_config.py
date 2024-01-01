@@ -8,7 +8,7 @@ from compas_viewer.configurations import ViewerConfig
 from compas_viewer.configurations.controller_config import MouseConfig
 
 
-def test_viewer_config() -> None:
+def test_viewer_config() :
     config = ViewerConfig.from_default()
     assert isinstance(config, ViewerConfig)
     assert isinstance(config.about, str)
@@ -21,7 +21,7 @@ def test_viewer_config() -> None:
     config.validate_data(config.data)
 
 
-def test_controller_config() -> None:
+def test_controller_config() :
     config = ControllerConfig.from_default()
     assert isinstance(config, ControllerConfig)
     assert isinstance(config.pan, MouseConfig)
@@ -32,7 +32,7 @@ def test_controller_config() -> None:
     config.validate_data(config.data)
 
 
-def test_render_config() -> None:
+def test_render_config() :
     config = RenderConfig.from_default()
     assert isinstance(config, RenderConfig)
     assert isinstance(config.show_grid, bool)
@@ -55,7 +55,7 @@ def test_render_config() -> None:
     config.validate_data(config.data)
 
 
-def test_scene_config() -> None:
+def test_scene_config() :
     config = SceneConfig.from_default()
     assert isinstance(config, SceneConfig)
     assert isinstance(config.pointscolor, Color)
