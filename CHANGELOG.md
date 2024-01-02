@@ -30,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Basic `Viewer` buildup with the widgets.
 * Configurations: `controller_config` and `viewer_config`
 * Code and File structure diagrams.
+* Added `NetworkObject`.
 
 ### Changed
 
