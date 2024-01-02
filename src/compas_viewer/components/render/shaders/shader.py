@@ -240,7 +240,7 @@ class Shader:
         GL.glEnable(GL.GL_POINT_SMOOTH)
 
     def draw_2d_box(self, box_coords: Tuple[float, float, float, float], width: int, height: int):
-        """Draw a 2D box. Mostly used for drawing bounding boxes and drag selection boxes.
+        """Draw a 2D box. Mostly used for box selection.
 
         Parameters
         ----------

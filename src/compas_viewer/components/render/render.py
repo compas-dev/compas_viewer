@@ -1,15 +1,14 @@
 import time
+from math import ceil
 from typing import TYPE_CHECKING
+from typing import Any
 from typing import List
 from typing import Optional
 from typing import Tuple
 
 from compas.geometry import transform_points_numpy
 from numpy import float32
-from numpy import frombuffer
 from numpy import identity
-from numpy import uint8
-from numpy.typing import NDArray
 from OpenGL import GL
 from PySide6 import QtCore
 from PySide6.QtGui import QKeyEvent
@@ -63,7 +62,7 @@ class Render(QOpenGLWidget):
         self.shader_instance: Shader
         self.shader_grid: Shader
 
-        self.instance_map: NDArray
+        self.instance_buffer: Any
 
         self.camera = Camera(self)
         self.grid = self.viewer.grid
@@ -132,7 +131,7 @@ class Render(QOpenGLWidget):
         return self._opacity
 
     # ==========================================================================
-    # gl
+    # GL
     # ==========================================================================
 
     def clear(self):
@@ -213,7 +212,7 @@ class Render(QOpenGLWidget):
             self._frames = 0
 
     # ==========================================================================
-    # event
+    # Event
     # ==========================================================================
 
     def mouseMoveEvent(self, event: QMouseEvent):
@@ -484,6 +483,16 @@ class Render(QOpenGLWidget):
         """
         #  Matrix
         viewworld = self.camera.viewworld()
+        # self.pdate_projection()
+
+        # Draw instance maps
+        if self.rendermode == "instance" or self.config.selector.enable_selector:
+            self.shader_instance.bind()
+            self.shader_instance.uniform4x4("viewworld", viewworld)
+            self.paint_instance_map()
+            self.shader_instance.release()
+            if not self.rendermode == "instance":
+                self.clear()
 
         # Draw grid
         # if self.app.selector.wait_for_selection_on_plane:
@@ -495,31 +504,28 @@ class Render(QOpenGLWidget):
             self.grid.draw(self.shader_grid)
             self.shader_grid.release()
 
-        # Draw instance maps
-        if self.rendermode == "instance" or self.config.selector.enable_selector:
-            self.shader_instance.bind()
-            self.shader_instance.uniform4x4("viewworld", viewworld)
-            self.paint_instances()
-            self.shader_instance.release()
+        # Draw model objects in the scene
+
+        if not self.rendermode == "instance":
+            self.shader_model.bind()
+            self.shader_model.uniform4x4("viewworld", viewworld)
+            for obj in self.sort_objects_from_viewworld(viewworld):
+                if obj.is_visible:
+                    obj.draw(self.shader_model, self.rendermode == "wireframe", self.rendermode == "lighted")
+            self.shader_model.release()
 
         # if self.app.selector.enabled:
         #     # set projection matrix
         #     if self.app.selector.select_from == "pixel":
-        #         self.app.selector.instance_map = self.paint_instances()
+        #         self.app.selector.instance_buffer = self.paint_instances()
         #     if self.app.selector.select_from == "box":
-        #         self.app.selector.instance_map = self.paint_instances(self.app.selector.box_select_coords)
+        #         self.app.selector.instance_buffer = self.paint_instances(self.app.selector.box_select_coords)
         #     self.app.selector.enabled = False
         #     self.clear()
 
         """
 
-        # Draw model objects in the scene
-        self.shader_model.bind()
-        self.shader_model.uniform4x4("viewworld", viewworld)
-        for obj in self.sort_objects_from_viewworld(viewworld):
-            if obj.is_visible:
-                obj.draw(self.shader_model, self.rendermode == "wireframe", self.rendermode == "lighted")
-        self.shader_model.release()
+
 
         # # draw arrow sprites
         # self.shader_arrow.bind()
@@ -541,43 +547,51 @@ class Render(QOpenGLWidget):
                     obj.draw(self.shader_tag, self.camera.position)
         self.shader_tag.release()
 
-        # # draw 2D box for multi-selection
-        # if self.app.selector.select_from == "box":
-        #     self.shader_model.draw_2d_box(self.app.selector.box_select_coords, self.app.width, self.app.height)
-        """
-
-    def paint_instances(self, cropped_box: Optional[Tuple[float, float, float, float]] = None):
-        """
-        Paint the instance map for the selection.
-
-        Parameters
-        ----------
-        cropped_box : Tuple[float, float, float, float], optional
-            The cropped box, by default None
 
         """
+        # draw 2D box for multi-selection
+        if self.selector.on_drag_selection and self.selector.enable_selector:
+            self.shader_model.draw_2d_box(
+                (
+                    self.selector.drag_start_pt.x(),
+                    self.selector.drag_start_pt.y(),
+                    self.viewer.controller.mouse.last_pos.x(),
+                    self.viewer.controller.mouse.last_pos.y(),
+                ),
+                self.viewer.config.width,
+                self.viewer.config.height,
+            )
+
+    def paint_instance_map(self):
+        """
+        Paint the instance map for the selection or the instance render mode.
+
+        Notes
+        -----
+        The instance map is used by the selector to identify selected objects.
+        The mechanism of a :class:`compas_viewer.components.render.selector.Selector`
+        is picking the color from instance map and then find the corresponding object.
+        """
+
         GL.glDisable(GL.GL_POINT_SMOOTH)
         GL.glDisable(GL.GL_LINE_SMOOTH)
-
-        if cropped_box is None:
-            x, y, width, height = 0, 0, self.viewer.config.width, self.viewer.config.height
-        else:
-            x1, y1, x2, y2 = cropped_box
-            x, y = min(x1, x2), self.viewer.config.height - max(y1, y2)
-            width, height = int(abs(x1 - x2)), int(abs(y1 - y2))
 
         for obj in self.viewer.objects:
             if obj.is_visible and not obj.is_locked:
                 obj.draw_instance(self.shader_instance, self.rendermode == "wireframe")
 
-        # Create the map
-        r = int(self.devicePixelRatio())
-        instance_buffer = GL.glReadPixels(x * r, y * r, width * r, height * r, GL.GL_RGB, GL.GL_UNSIGNED_BYTE)
-        instance_map = frombuffer(buffer=instance_buffer, dtype=uint8).reshape(height * r, width * r, 3)
-        instance_map = instance_map[::-r, ::r, :]
+        r = self.devicePixelRatio()
+        self.instance_buffer = GL.glReadPixels(
+            0,
+            0,
+            ceil(r * self.viewer.config.width),
+            ceil(r * self.viewer.config.height),
+            GL.GL_RGB,
+            GL.GL_UNSIGNED_BYTE,
+        )
+
         GL.glEnable(GL.GL_POINT_SMOOTH)
         GL.glEnable(GL.GL_LINE_SMOOTH)
-        self.instance_map = instance_map
 
     # def paint_plane(self):
     #     """
