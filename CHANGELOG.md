@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
+* Added `compas_viewer.Viewer.add_action` for adding actions to the viewer.
 * Added `Signal` structure for the `Action` class.
 * Added complete key, mouse and modifier support from `PySide6`.
 * Added `ZoomSelected` and `GLInfo` classes as template action classes.
@@ -34,6 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* Naming of the keys, mouses, and modifiers are changed. The key string which is the same as what it was called in the PySide6.QtCore.Qt, with lowercases and with prefix&underscores removed.
 * `Grid` object inherits from `compas.data.Data`.
 * Update the compatibility of the `ViewerSceneObject` to the core `SceneObject`.
 * Refactored the `ControllerConfig`.

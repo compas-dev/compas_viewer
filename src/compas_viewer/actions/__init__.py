@@ -46,4 +46,5 @@ register_actions()
 ___all__ = [
     "Action",
     "ZoomSelected",
+    "GLInfo",
 ]
