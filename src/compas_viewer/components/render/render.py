@@ -17,6 +17,7 @@ from PySide6.QtOpenGLWidgets import QOpenGLWidget
 from compas_viewer.configurations import RenderConfig
 from compas_viewer.scene import GridObject
 from compas_viewer.scene import TagObject
+from compas_viewer.scene.vectorobject import VectorObject
 
 from .camera import Camera
 from .selector import Selector
@@ -462,7 +463,7 @@ class Render(QOpenGLWidget):
         transparent_objects = []
         centers = []
         for obj in self.viewer.objects:
-            if not isinstance(obj, TagObject) and not isinstance(obj, GridObject):
+            if not isinstance(obj, TagObject) and not isinstance(obj, GridObject) and not isinstance(obj, VectorObject):
                 if obj.opacity * self.opacity < 1 and obj.bounding_box_center is not None:
                     transparent_objects.append(obj)
                     centers.append(transform_points_numpy([obj.bounding_box_center], obj.worldtransformation)[0])
@@ -512,28 +513,21 @@ class Render(QOpenGLWidget):
                     obj.draw(self.shader_model, self.rendermode == "wireframe", self.rendermode == "lighted")
             self.shader_model.release()
 
-        """
-        # # draw arrow sprites
-        # self.shader_arrow.bind()
-        # self.shader_arrow.uniform4x4("viewworld", viewworld)
-        # for guid in self.objects:
-        #     obj = self.objects[guid]
-        #     if isinstance(obj, VectorObject):
-        #         if obj.is_visible:
-        #             obj.draw(self.shader_arrow)
-        # self.shader_arrow.release()
+        # Draw arrow sprites
+        self.shader_arrow.bind()
+        self.shader_arrow.uniform4x4("viewworld", viewworld)
+        for obj in self.viewer.objects:
+            if isinstance(obj, VectorObject) and obj.is_visible:
+                obj.draw(self.shader_arrow)
+        self.shader_arrow.release()
 
-        # draw text sprites
+        # Draw text sprites
         self.shader_tag.bind()
         self.shader_tag.uniform4x4("viewworld", viewworld)
-        for guid in self.objects:
-            obj = self.objects[guid]
-            if isinstance(obj, TagObject):
-                if obj.is_visible:
-                    obj.draw(self.shader_tag, self.camera.position)
+        for obj in self.viewer.objects:
+            if isinstance(obj, TagObject) and obj.is_visible:
+                obj.draw(self.shader_tag, self.camera.position)
         self.shader_tag.release()
-
-        """
 
         # draw 2D box for multi-selection
         if self.selector.on_drag_selection and self.selector.enable_selector:

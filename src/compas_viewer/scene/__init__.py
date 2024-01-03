@@ -5,13 +5,14 @@ from compas.scene import register
 from compas.plugins import plugin
 from .sceneobject import ViewerSceneObject
 from compas.datastructures import Mesh, Network
-from compas.geometry import Point, Line
+from compas.geometry import Point, Line, Vector
 
 
 from .meshobject import MeshObject
 from .networkobject import NetworkObject
 from .pointobject import PointObject
 from .lineobject import LineObject
+from .vectorobject import VectorObject
 from .tagobject import TagObject, Tag
 from .gridobject import GridObject, Grid
 
@@ -34,6 +35,18 @@ def register_scene_objects():
     register(Line, LineObject, context="Viewer")
     register(Tag, TagObject, context="Viewer")
     register(Grid, GridObject, context="Viewer")
+    register(Vector, VectorObject, context="Viewer")
 
 
-__all__ = ["ViewerSceneObject", "MeshObject", "PointObject", "LineObject", "TagObject", "Tag", "GridObject", "Grid"]
+__all__ = [
+    "ViewerSceneObject",
+    "MeshObject",
+    "PointObject",
+    "LineObject",
+    "TagObject",
+    "Tag",
+    "GridObject",
+    "Grid",
+    "Vector",
+    "VectorObject",
+]
