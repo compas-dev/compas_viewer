@@ -406,7 +406,7 @@ class ViewerSceneObject(SceneObject):
         if self.is_locked:
             return
         shader.enable_attribute("position")
-        shader.uniform3f("instance_color", Color.from_rgb255(*self.instance_color).rgb)
+        shader.uniform3f("instance_color",[rgb/255 for rgb in self.instance_color])
         if self._matrix_buffer is not None:
             shader.uniform4x4("transform", self._matrix_buffer)
         if self._points_buffer is not None and self.show_points:

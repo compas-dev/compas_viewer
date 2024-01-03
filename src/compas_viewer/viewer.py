@@ -221,10 +221,6 @@ class Viewer(Scene):
         height: int
             Height of the viewer window.
 
-        Returns
-        -------
-        None
-
         """
         self._window.resize(width, height)
         desktop = self._app.desktop()  # type: ignore
@@ -242,10 +238,6 @@ class Viewer(Scene):
     def about(self):
         """Display the about message as defined in the config file.
 
-        Returns
-        -------
-        None
-
         """
         QtWidgets.QMessageBox.about(self._window, "About", self.config.about)
 
@@ -256,10 +248,6 @@ class Viewer(Scene):
         ----------
         message : str
             An info message.
-
-        Returns
-        -------
-        None
 
         """
         QtWidgets.QMessageBox.information(self._window, "Info", message)
@@ -272,10 +260,6 @@ class Viewer(Scene):
         message : str
             A warning message.
 
-        Returns
-        -------
-        None
-
         """
         QtWidgets.QMessageBox.warning(self._window, "Warning", message)
 
@@ -287,10 +271,6 @@ class Viewer(Scene):
         message : str
             A critical warning message.
 
-        Returns
-        -------
-        None
-
         """
         QtWidgets.QMessageBox.critical(self._window, "Critical", message)
 
@@ -301,10 +281,6 @@ class Viewer(Scene):
         ----------
         message : str
             A question.
-
-        Returns
-        -------
-        None
 
         """
         flags = QtWidgets.QMessageBox.StandardButton.Yes
@@ -351,10 +327,6 @@ class Viewer(Scene):
         message : str
             A status message.
 
-        Returns
-        -------
-        None
-
         """
         self.statusText.setText(message)
 
@@ -366,10 +338,6 @@ class Viewer(Scene):
         fps : int
             The number of frames per second.
 
-        Returns
-        -------
-        None
-
         """
         self.statusFps.setText("fps: {}".format(fps))
 
@@ -379,10 +347,6 @@ class Viewer(Scene):
 
     def show(self):
         """Show the viewer window.
-
-        Returns
-        -------
-        None
 
         """
 

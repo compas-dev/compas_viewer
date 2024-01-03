@@ -148,7 +148,7 @@ html_context = {
     "doc_path": "docs",
 }
 
-html_static_path = sphinx_compas2_theme.get_html_static_path() + ["_static"]
+
 html_css_files = []
 html_extra_path = []
 html_last_updated_fmt = ""
