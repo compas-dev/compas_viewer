@@ -236,9 +236,7 @@ class Viewer(Scene):
     # ==========================================================================
 
     def about(self):
-        """Display the about message as defined in the config file.
-
-        """
+        """Display the about message as defined in the config file."""
         QtWidgets.QMessageBox.about(self._window, "About", self.config.about)
 
     def info(self, message: str):
@@ -346,9 +344,7 @@ class Viewer(Scene):
     # ==========================================================================
 
     def show(self):
-        """Show the viewer window.
-
-        """
+        """Show the viewer window."""
 
         self.started = True
         self._window.show()
