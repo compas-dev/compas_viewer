@@ -3,8 +3,6 @@ from math import ceil
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import List
-from typing import Optional
-from typing import Tuple
 
 from compas.geometry import transform_points_numpy
 from numpy import float32
@@ -483,7 +481,7 @@ class Render(QOpenGLWidget):
         """
         #  Matrix
         viewworld = self.camera.viewworld()
-        # self.pdate_projection()
+        # self.update_projection()
 
         # Draw instance maps
         if self.rendermode == "instance" or self.config.selector.enable_selector:
@@ -505,7 +503,6 @@ class Render(QOpenGLWidget):
             self.shader_grid.release()
 
         # Draw model objects in the scene
-
         if not self.rendermode == "instance":
             self.shader_model.bind()
             self.shader_model.uniform4x4("viewworld", viewworld)
@@ -514,19 +511,7 @@ class Render(QOpenGLWidget):
                     obj.draw(self.shader_model, self.rendermode == "wireframe", self.rendermode == "lighted")
             self.shader_model.release()
 
-        # if self.app.selector.enabled:
-        #     # set projection matrix
-        #     if self.app.selector.select_from == "pixel":
-        #         self.app.selector.instance_buffer = self.paint_instances()
-        #     if self.app.selector.select_from == "box":
-        #         self.app.selector.instance_buffer = self.paint_instances(self.app.selector.box_select_coords)
-        #     self.app.selector.enabled = False
-        #     self.clear()
-
         """
-
-
-
         # # draw arrow sprites
         # self.shader_arrow.bind()
         # self.shader_arrow.uniform4x4("viewworld", viewworld)
@@ -547,8 +532,8 @@ class Render(QOpenGLWidget):
                     obj.draw(self.shader_tag, self.camera.position)
         self.shader_tag.release()
 
-
         """
+
         # draw 2D box for multi-selection
         if self.selector.on_drag_selection and self.selector.enable_selector:
             self.shader_model.draw_2d_box(
@@ -571,10 +556,12 @@ class Render(QOpenGLWidget):
         The instance map is used by the selector to identify selected objects.
         The mechanism of a :class:`compas_viewer.components.render.selector.Selector`
         is picking the color from instance map and then find the corresponding object.
-        """
+        Anti aliasing, which is always force opened in many machines,  can cause color picking inaccuracy.
 
-        GL.glDisable(GL.GL_POINT_SMOOTH)
-        GL.glDisable(GL.GL_LINE_SMOOTH)
+        See Also
+        --------
+        :func:`compas_viewer.components.render.selector.Selector.ANTI_ALIASING_FACTOR`
+        """
 
         for obj in self.viewer.objects:
             if obj.is_visible and not obj.is_locked:
@@ -589,24 +576,3 @@ class Render(QOpenGLWidget):
             GL.GL_RGB,
             GL.GL_UNSIGNED_BYTE,
         )
-
-        GL.glEnable(GL.GL_POINT_SMOOTH)
-        GL.glEnable(GL.GL_LINE_SMOOTH)
-
-    # def paint_plane(self):
-    #     """
-    #     Paint the plane for the selection.
-
-    #     Returns
-    #     -------
-    #     plane_uv_map : numpy.ndarray
-    #         The plane uv map.
-
-    #     """
-    #     x, y, width, height = 0, 0, self.viewer.config.width, self.viewer.config.height
-    #     # self.grid.draw_plane(self.shader_grid)
-    #     r = self.devicePixelRatio()
-    #     plane_uv_map = GL.glReadPixels(x * r, y * r, width * r, height * r, GL.GL_RGB, GL.GL_FLOAT)
-    #     plane_uv_map = plane_uv_map.reshape(height * r, width * r, 3)  # type: ignore
-    #     plane_uv_map = plane_uv_map[::-r, ::r, :]
-    #     return plane_uv_map

@@ -1,4 +1,4 @@
-from random import random
+from random import randint
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import Dict
@@ -134,7 +134,7 @@ class ViewerSceneObject(SceneObject):
         #  Selection
         self.is_locked = is_locked
         self.is_selected = not is_locked and is_selected
-        self.instance_color = Color.from_i(random())
+        self.instance_color: Tuple[int, int, int] = (randint(0, 255), randint(0, 255), randint(0, 255))
 
         #  Visual
         self.show_points = show_points if show_points is not None else self.config.show_points
@@ -405,7 +405,7 @@ class ViewerSceneObject(SceneObject):
         if self.is_locked:
             return
         shader.enable_attribute("position")
-        shader.uniform3f("instance_color", self.instance_color.rgb)
+        shader.uniform3f("instance_color", Color.from_rgb255(*self.instance_color).rgb)
         if self._matrix_buffer is not None:
             shader.uniform4x4("transform", self._matrix_buffer)
         if self._points_buffer is not None and self.show_points:

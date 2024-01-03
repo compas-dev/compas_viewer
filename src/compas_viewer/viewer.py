@@ -110,7 +110,7 @@ class Viewer(Scene):
         fullscreen: Optional[bool] = None,
         width: Optional[int] = None,
         height: Optional[int] = None,
-        rendermode: Optional[Literal["wireframe", "shaded", "ghosted", "lighted"]] = None,
+        rendermode: Optional[Literal["wireframe", "shaded", "ghosted", "lighted", "instance"]] = None,
         viewmode: Optional[Literal["front", "right", "top", "perspective"]] = None,
         show_grid: Optional[bool] = None,
         configpath: Optional[str] = None,
@@ -152,7 +152,7 @@ class Viewer(Scene):
         self.frame_count: int = 0
 
         #  Selection
-        self.instance_colors: Dict[Tuple[float, float, float], ViewerSceneObject] = {}
+        self.instance_colors: Dict[Tuple[int, int, int], ViewerSceneObject] = {}
 
         #  Primitive
         self.objects: List[ViewerSceneObject]
@@ -551,9 +551,9 @@ class Viewer(Scene):
             **kwargs
         )
         assert isinstance(sceneobject, ViewerSceneObject)
-        if self.instance_colors.get(sceneobject.instance_color.rgb):
+        if self.instance_colors.get(sceneobject.instance_color):
             raise ValueError("Instance color of the instance is not unique.")
         else:
-            self.instance_colors[sceneobject.instance_color.rgb] = sceneobject
+            self.instance_colors[sceneobject.instance_color] = sceneobject
 
         return sceneobject

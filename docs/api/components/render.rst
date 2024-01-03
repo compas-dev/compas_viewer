@@ -14,6 +14,7 @@ Classes
     Render
     Camera
     Shader
+    Selector
     Render.mouseMoveEvent
     Render.mousePressEvent
     Render.mouseReleaseEvent

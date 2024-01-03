@@ -166,13 +166,7 @@ class Camera:
 
     @target.setter
     def target(self, target: Position):
-        self._target.set(target.x, target.y, target.z)
-
-    def look_at(self, target: Position = Position((0, 0, 0))):
-        """Set the target of the camera, while keeping the current position."""
-        position = self.position
-        self.target = target
-        self.position = position
+        self._target.set(*target,pause_update=False)
 
     @property
     def distance(self) -> float:
@@ -424,3 +418,6 @@ class Camera:
         R = Rotation.from_euler_angles(self.rotation)
         W = T * R
         return list(asfortranarray(W.inverted(), dtype=float32))
+
+
+

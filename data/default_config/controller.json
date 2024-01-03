@@ -9,7 +9,8 @@
         "deselect": { "mouse": "LeftButton", "modifier": "ControlModifier" },
         "actions": {
             "zoom_selected": { "key": "Key_F", "modifier": "NoModifier" },
-            "print_gl_info": { "key": "Key_I", "modifier": "NoModifier" }
+            "print_gl_info": { "key": "Key_I", "modifier": "NoModifier" },
+            "select_all": { "key": "Key_A", "modifier": "ControlModifier" }
         }
     },
     "guid": "5088a780-910d-4df3-a1b3-d389e0e9c7f2"

@@ -26,6 +26,7 @@ def register(name: str, action_class: Callable):
 def register_actions():
     register("zoom_selected", ZoomSelected)
     register("print_gl_info", GLInfo)
+    register("select_all", SelectAll)
 
 
 def get_action_cls(name: str) -> Any:
@@ -40,10 +41,13 @@ def get_action_cls(name: str) -> Any:
 from .action import Action  # noqa: F401 E402
 from .zoom_selected import ZoomSelected  # noqa: E402
 from .print_gl_info import GLInfo  # noqa: E402
+from .select_all import SelectAll  # noqa: E402
 
 register_actions()
 
 ___all__ = [
     "Action",
     "ZoomSelected",
+    "GLInfo",
+    "SelectAll",
 ]
