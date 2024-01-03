@@ -1,5 +1,3 @@
-import select
-from gc import enable
 from pathlib import Path
 from typing import Literal
 from typing import Tuple
@@ -54,7 +52,7 @@ class CameraConfigType(TypedDict):
 
 class CameraConfig(Config):
     """
-    The class representation of a camera class :class:`compas_viewer.components.render.camera.Camera`
+    The class representation of a camera class :class:`compas_viewer.components.render.camera.Camera.Camera`
     It contains all the settings about the camera: fov, near, far, position, target, ...
 
     Parameters

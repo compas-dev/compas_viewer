@@ -10,7 +10,7 @@ class Config(Data):
     The abstract class for different configurations.
     """
 
-    def __init__(self, config: Union[TypedDict, Dict]) :
+    def __init__(self, config: Union[TypedDict, Dict]):
         super(Config, self).__init__()
         self.config = config
 

@@ -109,11 +109,11 @@ class Camera:
         The location of the "near" clipping plane.
     far : float
         The location of the "far" clipping plane.
-    position : :class:`compas_viewer.components.render.camera.Position`
+    position : :class:`compas_viewer.components.render.camera.Camera.Position`
         The location the camera.
-    rotation : :class:`compas_viewer.components.render.camera.RotationEuler`
+    rotation : :class:`compas_viewer.components.render.camera.Camera.RotationEuler`
         The euler rotation of camera.
-    target : :class:`compas_viewer.components.render.camera.Position`
+    target : :class:`compas_viewer.components.render.camera.Camera.Position`
         The viewing target.
         Default is the origin of the world coordinate system.
     distance : float
@@ -166,7 +166,7 @@ class Camera:
 
     @target.setter
     def target(self, target: Position):
-        self._target.set(*target,pause_update=False)
+        self._target.set(*target, pause_update=False)
 
     @property
     def distance(self) -> float:
@@ -418,6 +418,3 @@ class Camera:
         R = Rotation.from_euler_angles(self.rotation)
         W = T * R
         return list(asfortranarray(W.inverted(), dtype=float32))
-
-
-

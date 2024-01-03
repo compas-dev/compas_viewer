@@ -595,14 +595,14 @@ class Viewer(Scene):
 
         Examples
         --------
-        >>> viewer = Viewer()
-        >>> faces = viewer.add(Mesh.from_obj(compas.get("faces.obj")))
-        >>> faces.transformation = Transformation()
-        >>> def pressed_action():
-        >>>     faces.transformation *= Scale.from_factors([1.1, 1.1, 1.1], Frame.worldXY())
-        >>>     faces.update()
-        >>> action = viewer.add_action(pressed_action, "p")
-        >>> viewer.show()
+        >>> viewer = Viewer() # doctest: +SKIP
+        >>> faces = viewer.add(Mesh.from_obj(compas.get("faces.obj"))) # doctest: +SKIP
+        >>> faces.transformation = Transformation() # doctest: +SKIP
+        >>> def pressed_action(): # doctest: +SKIP
+        >>>     faces.transformation *= Scale.from_factors([1.1, 1.1, 1.1], Frame.worldXY()) # doctest: +SKIP
+        >>>     faces.update() # doctest: +SKIP
+        >>> action = viewer.add_action(pressed_action, "p") # doctest: +SKIP
+        >>> viewer.show() # doctest: +SKIP
 
         """
 

@@ -476,7 +476,8 @@ class Render(QOpenGLWidget):
 
     def paint(self):
         """
-        Paint all the items in the render, which only be called by the paintGL function and determines the performance of the render.
+        Paint all the items in the render, which only be called by the paintGL function
+        and determines the performance of the renders
         This function introduces decision tree for different render modes and settings.
         """
         #  Matrix

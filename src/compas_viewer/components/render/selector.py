@@ -120,7 +120,8 @@ class Selector(QObject):
 
         instance_map = self.read_instance_map()
         box_map = instance_map[
-            self.drag_start_pt.y() : self.drag_end_pt.y(), self.drag_start_pt.x() : self.drag_end_pt.x(), :
+            self.drag_start_pt.y() : self.drag_end_pt.y(),  # noqa: E203
+            self.drag_start_pt.x() : self.drag_end_pt.x(),  # noqa: E203
         ]
 
         unique_colors = unique(box_map.reshape(box_map.shape[0] * box_map.shape[1], 3), axis=0, return_counts=True)
@@ -143,7 +144,8 @@ class Selector(QObject):
 
         instance_map = self.read_instance_map()
         box_map = instance_map[
-            self.drag_start_pt.y() : self.drag_end_pt.y(), self.drag_start_pt.x() : self.drag_end_pt.x(), :
+            self.drag_start_pt.y() : self.drag_end_pt.y(),  # noqa: E203
+            self.drag_start_pt.x() : self.drag_end_pt.x(),  # noqa: E203
         ]
 
         unique_colors = unique(box_map.reshape(box_map.shape[0] * box_map.shape[1], 3), axis=0, return_counts=True)
@@ -170,7 +172,8 @@ class Selector(QObject):
         while "physical pixels" is the common unit. The method :func:`PySide6.QtGui.QPaintDevice.devicePixelRatio()`
         plays a role in the conversion between the two units, which is different on different devices.
         For example, Mac Retina display has a devicePixelRatio of 2.0.
-        This method contains an uniform-sampling-similar math operation, which is not absolutely accurate but enough for the selection.
+        This method contains an uniform-sampling-similar math operation,
+        which is not absolutely accurate but enough for the selection.
 
         References
         ----------

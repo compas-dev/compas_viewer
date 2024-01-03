@@ -31,7 +31,7 @@ class ViewerConfig(Config):
 
     """
 
-    def __init__(self, config: ViewerConfigType) :
+    def __init__(self, config: ViewerConfigType):
         super().__init__(config)
         self.about = config["about"]
         self.title = config["title"]
