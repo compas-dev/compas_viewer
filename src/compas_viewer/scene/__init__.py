@@ -4,11 +4,12 @@ This package provides scene object plugins for visualizing COMPAS objects in `co
 from compas.scene import register
 from compas.plugins import plugin
 from .sceneobject import ViewerSceneObject
-from compas.datastructures import Mesh
+from compas.datastructures import Mesh, Network
 from compas.geometry import Point, Line
 
 
 from .meshobject import MeshObject
+from .networkobject import NetworkObject
 from .pointobject import PointObject
 from .lineobject import LineObject
 from .tagobject import TagObject, Tag
@@ -28,6 +29,7 @@ def redraw():
 @plugin(category="factories", requires=["compas_viewer"])
 def register_scene_objects():
     register(Mesh, MeshObject, context="Viewer")
+    register(Network, NetworkObject, context="Viewer")
     register(Point, PointObject, context="Viewer")
     register(Line, LineObject, context="Viewer")
     register(Tag, TagObject, context="Viewer")

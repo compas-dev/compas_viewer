@@ -314,6 +314,7 @@ class ViewerSceneObject(SceneObject):
         """Update the object"""
         self._update_matrix()
         self.update_buffers()
+        self.viewer.render.update()
 
     def _update_bounding_box(self, positions: Optional[List[Point]] = None):
         """Update the bounding box of the object"""

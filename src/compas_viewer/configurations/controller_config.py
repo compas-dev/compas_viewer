@@ -1,5 +1,6 @@
 from pathlib import Path
 from typing import Dict
+from typing import Optional
 from typing import TypedDict
 
 from PySide6.QtCore import Qt
@@ -15,7 +16,7 @@ class MouseConfigType(TypedDict):
     """
 
     mouse: str
-    modifier: str
+    modifier: Optional[str]
 
 
 class ActionConfigType(TypedDict):
@@ -24,7 +25,7 @@ class ActionConfigType(TypedDict):
     """
 
     key: str
-    modifier: str
+    modifier: Optional[str]
 
 
 class ControllerConfigType(TypedDict):
@@ -65,7 +66,9 @@ class ActionConfig:
     def __init__(self, config: ActionConfigType):
         self.config = config
         self.key = key_mapper(config["key"], 0)
-        self.modifier = key_mapper(config["modifier"], 1)
+        _modifier = config.get("modifier", "no")
+        assert _modifier is not None
+        self.modifier = key_mapper(_modifier, 1)
 
 
 class MouseConfig:
@@ -91,7 +94,9 @@ class MouseConfig:
     def __init__(self, config: MouseConfigType):
         self.config = config
         self.mouse = key_mapper(config["mouse"], 2)
-        self.modifier = key_mapper(config["modifier"], 1)
+        _modifier = config.get("modifier", "no")
+        assert _modifier is not None
+        self.modifier = key_mapper(_modifier, 1)
 
 
 class ControllerConfig(Config):
