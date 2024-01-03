@@ -403,8 +403,6 @@ class ViewerSceneObject(SceneObject):
 
     def draw_instance(self, shader, wireframe: bool):
         """Draw the object instance for picking"""
-        if self.is_locked:
-            return
         shader.enable_attribute("position")
         shader.uniform3f("instance_color", [rgb / 255 for rgb in self.instance_color])
         if self._matrix_buffer is not None:
