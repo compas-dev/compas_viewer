@@ -19,3 +19,4 @@ Classes
     Tag
     GridObject
     Grid
+    VectorObject
