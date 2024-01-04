@@ -37,7 +37,7 @@ class SceneConfig(Config):
 
     """
 
-    def __init__(self, config: SceneConfigType) -> None:
+    def __init__(self, config: SceneConfigType):
         super().__init__(config)
 
         self.pointscolor = config["pointscolor"]

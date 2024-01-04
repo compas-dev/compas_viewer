@@ -1,3 +1,5 @@
+from random import random
+
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import Dict
@@ -33,12 +35,12 @@ class ViewerSceneObject(SceneObject):
 
     Parameters
     ----------
-    name : str, optional
-        The name of the object.
     viewer : :class:`compas_viewer.viewer.Viewer`
         The viewer object.
     is_selected : bool
         Whether the object is selected.
+    is_locked : bool
+        Whether the object is locked.
     is_visible : bool
         Whether to show object.
     show_points : bool, optional
@@ -68,10 +70,11 @@ class ViewerSceneObject(SceneObject):
 
     Attributes
     ----------
-    name : str
-        The name of the object.
     is_selected : bool
         Whether the object is selected.
+    is_locked : bool
+        Whether the object is locked (selectable).
+        The global grid is a typical object that is not selectable.
     is_visible : bool
         Whether to show object.
     show_points : bool
@@ -103,9 +106,9 @@ class ViewerSceneObject(SceneObject):
 
     def __init__(
         self,
-        name: Optional[str],
         viewer: "Viewer",
         is_selected: bool,
+        is_locked: bool,
         is_visible: bool,
         show_points: Optional[bool] = None,
         show_lines: Optional[bool] = None,
@@ -124,14 +127,18 @@ class ViewerSceneObject(SceneObject):
                 "No SceneConfig specified for the ViewerSceneObject. "
                 + "Check if the object is added by the function `Viewer.add`."
             )
+        #  Basic
         self.config = config
         super(ViewerSceneObject, self).__init__(config=self.config, **kwargs)
-        self.name = name or str(self)
-        self.is_selected = is_selected
-        self.is_visible = is_visible
         self.viewer = viewer
-        self.parent: Optional[ViewerSceneObject]
+        self.is_visible = is_visible
 
+        #  Selection
+        self.is_locked = is_locked
+        self.is_selected = not is_locked and is_selected
+        self.instance_color = Color.from_i(random())
+
+        #  Visual
         self.show_points = show_points if show_points is not None else self.config.show_points
         self.show_lines = show_lines if show_lines is not None else self.config.show_lines
         self.show_faces = show_faces if show_faces is not None else self.config.show_faces
@@ -165,13 +172,14 @@ class ViewerSceneObject(SceneObject):
         self.opacity = opacity or self.config.opacity
         self.background: bool = False
 
-        self._instance_color: Optional[Color] = None
+        #  Geometric
         self.transformation: Optional[Transformation] = None
         self._matrix_buffer: Optional[List[List[float]]] = None
         self._bounding_box: Optional[List[float]] = None
         self._bounding_box_center: Optional[Point] = None
         self._is_collection = False
 
+        #  Primitive
         self._points_data: Optional[Tuple[List[Point], List[Color], List[List[int]]]] = None
         self._lines_data: Optional[Tuple[List[Point], List[Color], List[List[int]]]] = None
         self._frontfaces_data: Optional[Tuple[List[Point], List[Color], List[List[int]]]] = None
@@ -398,7 +406,7 @@ class ViewerSceneObject(SceneObject):
     def draw_instance(self, shader, wireframe: bool):
         """Draw the object instance for picking"""
         shader.enable_attribute("position")
-        shader.uniform3f("instance_color", self._instance_color)
+        shader.uniform3f("instance_color", self.instance_color.rgb)
         if self._matrix_buffer is not None:
             shader.uniform4x4("transform", self._matrix_buffer)
         if self._points_buffer is not None and self.show_points:

@@ -54,6 +54,7 @@ class Controller:
     def mouse_move_action(self, render: "Render", event: QMouseEvent):
         """
         The mouse move action of the render object.
+        This function introduces elif for different actions, meaning only one action can be performed at a time.
 
         Parameters
         ----------
@@ -69,8 +70,20 @@ class Controller:
         dx = self.mouse.dx()
         dy = self.mouse.dy()
 
+        # Drag selection
+        if (
+            event.buttons() == self.config.drag_selection.mouse
+            and event.modifiers() == self.config.drag_selection.modifier
+        ):
+            render.selector.on_drag_selection = True
+        # Drag deselection
+        elif (
+            event.buttons() == self.config.drag_deselection.mouse
+            and event.modifiers() == self.config.drag_deselection.modifier
+        ):
+            render.selector.on_drag_selection = True
         # Pan
-        if event.buttons() == self.config.pan.mouse and event.modifiers() == self.config.pan.modifier:
+        elif event.buttons() == self.config.pan.mouse and event.modifiers() == self.config.pan.modifier:
             render.camera.pan(dx, dy)
         # Rotate
         elif event.buttons() == self.config.rotate.mouse and event.modifiers() == self.config.rotate.modifier:
@@ -82,6 +95,7 @@ class Controller:
     def mouse_press_action(self, render: "Render", event: QMouseEvent):
         """
         The mouse press action of the render object.
+        This function introduces elif for different actions, meaning only one action can be performed at a time.
 
         Parameters
         ----------
@@ -91,8 +105,31 @@ class Controller:
             The Qt event.
         """
         self.mouse.last_pos = event.pos()
-        # Pan
+
+        # Drag selection: not in the elif.
         if (
+            event.buttons() == self.config.drag_selection.mouse
+            and event.modifiers() == self.config.drag_selection.modifier
+        ):
+            render.selector.drag_start_pt = event.pos()
+        # Drag deselection
+        elif (
+            event.buttons() == self.config.drag_deselection.mouse
+            and event.modifiers() == self.config.drag_deselection.modifier
+        ):
+            render.selector.drag_start_pt = event.pos()
+
+        # Select: single left click.
+        if event.buttons() == Qt.MouseButton.LeftButton and event.modifiers() == Qt.KeyboardModifier.NoModifier:
+            render.selector.select.emit()
+        # Multiselect
+        elif event.buttons() == self.config.multiselect.mouse and event.modifiers() == self.config.multiselect.modifier:
+            render.selector.multiselect.emit()
+        # Deselect
+        elif event.buttons() == self.config.deselect.mouse and event.modifiers() == self.config.deselect.modifier:
+            render.selector.deselect.emit()
+        # Pan
+        elif (
             event.buttons() == self.config.pan.mouse
             and event.modifiers() == self.config.pan.modifier
             and event.modifiers() != self.config.rotate.modifier
@@ -105,6 +142,7 @@ class Controller:
     def mouse_release_action(self, render: "Render", event: QMouseEvent):
         """
         The mouse release action of the render object.
+        This function introduces elif for different actions, meaning only one action can be performed at a time.
 
         Parameters
         ----------
@@ -113,12 +151,25 @@ class Controller:
         event : :class:`PySide6.QtGui.QMouseEvent`
             The Qt event.
         """
+
+        # Drag selection
+        if event.modifiers() == self.config.drag_selection.modifier and render.selector.on_drag_selection:
+            render.selector.on_drag_selection = False
+            render.selector.drag_end_pt = event.pos()
+            render.selector.drag_selection.emit()
+        # Drag deselection
+        elif event.modifiers() == self.config.drag_deselection.modifier and render.selector.on_drag_selection:
+            render.selector.on_drag_selection = False
+            render.selector.drag_end_pt = event.pos()
+            render.selector.drag_deselection.emit()
+
         if event.buttons() == Qt.KeyboardModifier.NoModifier or event.buttons() == Qt.MouseButton.NoButton:
             QApplication.restoreOverrideCursor()
 
     def wheel_action(self, render: "Render", event: QWheelEvent):
         """
         The wheel action of the render object.
+        It is used from zooming action only.
 
         Parameters
         ----------
@@ -134,6 +185,7 @@ class Controller:
     def key_press_action(self, render: "Render", event: QKeyEvent):
         """
         The key press action of the render object.
+        This function introduces break for different actions, meaning only one action can be performed at a time.
 
         Parameters
         ----------
@@ -150,6 +202,7 @@ class Controller:
     def key_release_action(self, render: "Render", event: QKeyEvent):
         """
         The key release action of the render object.
+        This function introduces break for different actions, meaning only one action can be performed at a time.
 
         Parameters
         ----------

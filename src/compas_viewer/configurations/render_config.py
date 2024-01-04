@@ -9,6 +9,35 @@ from compas_viewer import DATA
 from compas_viewer.configurations import Config
 
 
+class SelectorConfigType(TypedDict):
+    enable_selector: bool
+    selectioncolor: Color
+
+
+class SelectorConfig(Config):
+    """
+    The class representation of a selector class :class:`compas_viewer.components.render.selector.Selector`
+    It contains all the settings about the selector: enable_selector, selectioncolor, ...
+
+    Parameters
+    ----------
+    config : SelectorConfigType
+        A TypedDict with defined keys and types.
+
+    """
+
+    def __init__(self, config: SelectorConfigType):
+        super().__init__(config)
+        self.enable_selector = config["enable_selector"]
+        self.selectioncolor = config["selectioncolor"]
+
+    @classmethod
+    def from_json(cls, filepath) -> "SelectorConfig":
+        selector_config = super().from_json(filepath)
+        assert isinstance(selector_config, SelectorConfig)
+        return selector_config
+
+
 class CameraConfigType(TypedDict):
     fov: float
     near: float
@@ -33,7 +62,7 @@ class CameraConfig(Config):
 
     """
 
-    def __init__(self, config: CameraConfigType) -> None:
+    def __init__(self, config: CameraConfigType):
         super().__init__(config)
         self.fov = config["fov"]
         self.near = config["near"]
@@ -57,11 +86,11 @@ class RenderConfigType(TypedDict):
     gridsize: Tuple[float, int, float, int]
     show_gridz: bool
     viewmode: Literal["front", "right", "top", "perspective"]
-    rendermode: Literal["wireframe", "shaded", "ghosted", "lighted"]
+    rendermode: Literal["wireframe", "shaded", "ghosted", "lighted", "instance"]
     backgroundcolor: Color
-    selectioncolor: Color
     ghostopacity: float
     camera: CameraConfig
+    selector: SelectorConfig
 
 
 class RenderConfig(Config):
@@ -84,9 +113,9 @@ class RenderConfig(Config):
         self.viewmode = config["viewmode"]
         self.rendermode = config["rendermode"]
         self.backgroundcolor = config["backgroundcolor"]
-        self.selectioncolor = config["selectioncolor"]
         self.ghostopacity = config["ghostopacity"]
         self.camera = config["camera"]
+        self.selector = config["selector"]
 
     @classmethod
     def from_default(cls) -> "RenderConfig":

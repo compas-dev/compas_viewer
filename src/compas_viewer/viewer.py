@@ -7,6 +7,7 @@ from typing import Dict
 from typing import List
 from typing import Literal
 from typing import Optional
+from typing import Tuple
 from typing import Union
 
 from compas.colors import Color
@@ -113,13 +114,13 @@ class Viewer(Scene):
         fullscreen: Optional[bool] = None,
         width: Optional[int] = None,
         height: Optional[int] = None,
-        rendermode: Optional[Literal["wireframe", "shaded", "ghosted", "lighted"]] = None,
+        rendermode: Optional[Literal["wireframe", "shaded", "ghosted", "lighted", "instance"]] = None,
         viewmode: Optional[Literal["front", "right", "top", "perspective"]] = None,
         show_grid: Optional[bool] = None,
         configpath: Optional[str] = None,
-    ) -> None:
+    ):
         super(Viewer, self).__init__()
-        # custom or default config
+        # Custom or default config
         if configpath is None:
             self.config = ViewerConfig.from_default()
             self.render_config = RenderConfig.from_default()
@@ -131,10 +132,10 @@ class Viewer(Scene):
             self.scene_config = SceneConfig.from_json(Path(configpath, "scene.json"))
             self.controller_config = ControllerConfig.from_json(Path(configpath, "controller.json"))
 
-        # controller
+        # Controller
         self.controller = Controller(self, self.controller_config)
 
-        #  in-code config
+        #  In-code config
         if title is not None:
             self.config.title = title
         if fullscreen is not None:
@@ -153,6 +154,12 @@ class Viewer(Scene):
         # `on` function
         self.timer: Timer
         self.frame_count: int = 0
+
+        #  Selection
+        self.instance_colors: Dict[Tuple[int, int, int], ViewerSceneObject] = {}
+
+        #  Primitive
+        self.objects: List[ViewerSceneObject]
 
         self._init()
 
@@ -180,9 +187,9 @@ class Viewer(Scene):
         self._app.setApplicationName(self.config.title)
         self.grid = GridObject(
             Grid(self.render_config.gridsize, self.render_config.show_gridz),
-            name="grid_world",
             viewer=self,
             is_selected=False,
+            is_locked=True,
             is_visible=True,
             config=self.scene_config,
         )
@@ -195,7 +202,7 @@ class Viewer(Scene):
             self._window.setWindowState(self._window.windowState() | QtCore.Qt.WindowState.WindowMaximized)
         self._init_statusbar()
 
-    def _init_statusbar(self) -> None:
+    def _init_statusbar(self):
         self.statusbar = self._window.statusBar()
         self.statusbar.setContentsMargins(0, 0, 0, 0)
         self.statusText = QtWidgets.QLabel(self.config.statusbar)
@@ -204,7 +211,7 @@ class Viewer(Scene):
             self.statusFps = QtWidgets.QLabel("fps: ")
             self.statusbar.addWidget
 
-    def _resize(self, width: int, height: int) -> None:
+    def _resize(self, width: int, height: int):
         """Resize the main window programmatically.
 
         Parameters
@@ -213,10 +220,6 @@ class Viewer(Scene):
             Width of the viewer window.
         height: int
             Height of the viewer window.
-
-        Returns
-        -------
-        None
 
         """
         self._window.resize(width, height)
@@ -232,17 +235,11 @@ class Viewer(Scene):
     # Messages
     # ==========================================================================
 
-    def about(self) -> None:
-        """Display the about message as defined in the config file.
-
-        Returns
-        -------
-        None
-
-        """
+    def about(self):
+        """Display the about message as defined in the config file."""
         QtWidgets.QMessageBox.about(self._window, "About", self.config.about)
 
-    def info(self, message: str) -> None:
+    def info(self, message: str):
         """Display info.
 
         Parameters
@@ -250,14 +247,10 @@ class Viewer(Scene):
         message : str
             An info message.
 
-        Returns
-        -------
-        None
-
         """
         QtWidgets.QMessageBox.information(self._window, "Info", message)
 
-    def warning(self, message: str) -> None:
+    def warning(self, message: str):
         """Display a warning.
 
         Parameters
@@ -265,24 +258,16 @@ class Viewer(Scene):
         message : str
             A warning message.
 
-        Returns
-        -------
-        None
-
         """
         QtWidgets.QMessageBox.warning(self._window, "Warning", message)
 
-    def critical(self, message: str) -> None:
+    def critical(self, message: str):
         """Display a critical warning.
 
         Parameters
         ----------
         message : str
             A critical warning message.
-
-        Returns
-        -------
-        None
 
         """
         QtWidgets.QMessageBox.critical(self._window, "Critical", message)
@@ -294,10 +279,6 @@ class Viewer(Scene):
         ----------
         message : str
             A question.
-
-        Returns
-        -------
-        None
 
         """
         flags = QtWidgets.QMessageBox.StandardButton.Yes
@@ -336,7 +317,7 @@ class Viewer(Scene):
             return True
         return False
 
-    def status(self, message: str) -> None:
+    def status(self, message: str):
         """Display a message in the status bar.
 
         Parameters
@@ -344,24 +325,16 @@ class Viewer(Scene):
         message : str
             A status message.
 
-        Returns
-        -------
-        None
-
         """
         self.statusText.setText(message)
 
-    def fps(self, fps: int) -> None:
+    def fps(self, fps: int):
         """Update fps info in the status bar.
 
         Parameters
         ----------
         fps : int
             The number of frames per second.
-
-        Returns
-        -------
-        None
 
         """
         self.statusFps.setText("fps: {}".format(fps))
@@ -370,14 +343,8 @@ class Viewer(Scene):
     # Runtime
     # ==========================================================================
 
-    def show(self) -> None:
-        """Show the viewer window.
-
-        Returns
-        -------
-        None
-
-        """
+    def show(self):
+        """Show the viewer window."""
 
         self.started = True
         self._window.show()
@@ -448,9 +415,9 @@ class Viewer(Scene):
     def add(
         self,
         item: Union[Mesh, Geometry, Grid],
-        name: Optional[str] = None,
         parent: Optional[ViewerSceneObject] = None,
         is_selected: bool = False,
+        is_locked: bool = False,
         is_visible: bool = True,
         show_points: Optional[bool] = None,
         show_lines: Optional[bool] = None,
@@ -473,13 +440,13 @@ class Viewer(Scene):
         ----------
         item : Union[:class:`compas.geometry.Geometry`, :class:`compas.datastructures.Mesh`]
             The geometry to add to the scene.
-        name : str, optional
-            The name of the item.
-            Default to None.
         parent : :class:`compas_viewer.scene.ViewerSceneObject`, optional
             The parent of the item.
         is_selected : bool, optional
             Whether the object is selected.
+            Default to False.
+        is_locked : bool, optional
+            Whether the object is locked (not selectable).
             Default to False.
         is_visible : bool, optional
             Whether to show object.
@@ -529,10 +496,10 @@ class Viewer(Scene):
         sceneobject = super(Viewer, self).add(
             item=item,
             parent=parent,
-            name=name,
             viewer=self,
             is_selected=is_selected,
             is_visible=is_visible,
+            is_locked=is_locked,
             show_points=show_points,
             show_lines=show_lines,
             show_faces=show_faces,
@@ -548,9 +515,11 @@ class Viewer(Scene):
             **kwargs
         )
         assert isinstance(sceneobject, ViewerSceneObject)
-        self.render.objects[name or str(sceneobject)] = sceneobject
-        if parent:
-            sceneobject.parent = parent
+        if self.instance_colors.get(sceneobject.instance_color.rgb255):
+            raise ValueError("Instance color of the instance is not unique.")
+        else:
+            self.instance_colors[sceneobject.instance_color.rgb255] = sceneobject
+
         return sceneobject
 
     def add_action(
@@ -586,14 +555,14 @@ class Viewer(Scene):
 
         Examples
         --------
-        >>> viewer = Viewer()
-        >>> faces = viewer.add(Mesh.from_obj(compas.get("faces.obj")))
-        >>> faces.transformation = Transformation()
-        >>> def pressed_action():
-        >>>     faces.transformation *= Scale.from_factors([1.1, 1.1, 1.1], Frame.worldXY())
-        >>>     faces.update()
-        >>> action = viewer.add_action(pressed_action, "p")
-        >>> viewer.show()
+        >>> viewer = Viewer() # doctest: +SKIP
+        >>> faces = viewer.add(Mesh.from_obj(compas.get("faces.obj"))) # doctest: +SKIP
+        >>> faces.transformation = Transformation() # doctest: +SKIP
+        >>> def pressed_action(): # doctest: +SKIP
+        >>>     faces.transformation *= Scale.from_factors([1.1, 1.1, 1.1], Frame.worldXY()) # doctest: +SKIP
+        >>>     faces.update() # doctest: +SKIP
+        >>> action = viewer.add_action(pressed_action, "p") # doctest: +SKIP
+        >>> viewer.show() # doctest: +SKIP
 
         """
 

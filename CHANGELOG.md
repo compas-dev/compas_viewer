@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
+* Added "instance" render mode for debugging and geometric analysis.
+* Added contents in the `README.md`.
+* Added full support for selection: drag_selection, drag_deselection, multiselect, deselect, select.
+* Added `SelectAll` action class.
+* Added `LookAt` action class.
 * Added `compas_viewer.Viewer.add_action` for adding actions to the viewer.
 * Added `Signal` structure for the `Action` class.
 * Added complete key, mouse and modifier support from `PySide6`.
@@ -35,6 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* More performative instance map and QObject-based selection architecture.
 * Naming of the keys, mouses, and modifiers are changed. The key string which is the same as what it was called in the PySide6.QtCore.Qt, with lowercases and with prefix&underscores removed.
 * `Grid` object inherits from `compas.data.Data`.
 * Update the compatibility of the `ViewerSceneObject` to the core `SceneObject`.
@@ -46,3 +52,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Comments improved and better type hints.
 
 ### Removed
+* Removed `self.objects` from the `Render` class.`

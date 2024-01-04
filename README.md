@@ -1,92 +1,40 @@
 # COMPAS VIEWER
 
-Standalone viewer for COMPAS
+Standalone viewer for COMPAS 2.0
 
 
-## Getting started with this project
+## Features
+-   Performative and easy-to-use new architecture based on [compas_v1](https://compas.dev/compas/1.17.9/)'s [compas_view2](https://compas.dev/compas_view2/).
+-   Complete configurable settings and flexible customization.
+-   Full support for all COMPAS objects (primitives, shapes, network, mesh, volmesh) based on [compas.scene](https://compas.dev/compas/latest/api/generated/compas.scene.Scene.html#scene) architecture.
+-   Up-to-date [PySide6](https://pypi.org/project/PySide6/) and [PyOpenGL](https://pypi.org/project/PyOpenGL/) compatibility.
+-   Action-based user interaction: drag, select, zoom, pan, rotate, etc.
+-   Data-driven visualization with simple decorators: facecolor, edgecolor, vertexcolor, linewidth, pointsize, etc.
+-   Text tags and grids.
+-   Customizable UI and UI Controller
+-   Transformations in object space
+-   ...
 
-### Setup code editor
+## Installation
 
-1. Open project folder in VS Code
-2. Select python environment for the project
-3. First time using VS Code and on Windows? Make sure select the correct terminal profile: `Ctrl+Shift+P`, `Terminal: Select Default Profile` and select `Command Prompt`.
+See the [Getting Started](https://compas.dev/compas_viewer/latest/gettingstarted.html) instructions in the docs.
 
-> All terminal commands in the following sections can be run from the VS Code integrated terminal. 
+## Tutorials
 
+This [tutorial page](https://compas.dev/compas_viewer/latest/tutorials.html) contains basic lead-through, configuration setting, and software concepts.
 
-### First steps with git
+## Examples
 
-1. Go to the `Source control` tab
-2. Make an initial commit with all newly created files
+Examples can be found in our [example page](https://compas.dev/compas_viewer/latest/examples.html).
 
+## Contributing
+[Contributing page](CONTRIBUTING.md) provides the guidelines for contributing to this project. We very much welcome any contributions to this project (Bug Fix, Action class contribution, etc.)
 
-### First steps with code
+## License
 
-1. Install the newly created project 
+The code in this repo is licensed under the [MIT License](LICENCSE).
 
-        pip install -e .
+## Known Issues
 
-2. Install it on Rhino
+Please check the [Issue Tracker](https://github.com/compas-dev/compas_viewer/issues) of the repo for known issues and their solutions.
 
-        python -m compas_rhino.install
-
-
-### Code conventions
-
-Code convention follows [PEP8](https://pep8.org/) style guidelines and line length of 120 characters.
-
-1. Check adherence to style guidelines
-
-        invoke lint
-
-2. Format code automatically
-
-        invoke format
-
-
-### Documentation
-
-Documentation is generated automatically out of docstrings and [RST](https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html) files in this repository
-
-1. Generate the docs
-
-        invoke docs
-
-2. Check links in docs are valid
-
-        invoke linkcheck
-
-3. Open docs in your browser (file explorer -> `dist/docs/index.html`)
-
-
-### Testing
-
-Tests are written using the [pytest](https://docs.pytest.org/) framework
-
-1. Run all tests from terminal
-
-        invoke test
-
-2. Or run them from VS Code from the `Testing` tab
-
-
-### Developing Grasshopper components
-
-We use [Grasshopper Componentizer](https://github.com/compas-dev/compas-actions.ghpython_components) to develop Python components that can be stored and edited on git.
-
-1. Build components
-
-        invoke build-ghuser-components
-
-2. Install components on Rhino
-
-        python -m compas_rhino.install
-
-
-### Publish release
-
-Releases follow the [semver](https://semver.org/spec/v2.0.0.html) versioning convention.
-
-1. Create a new release
-
-        invoke release major
