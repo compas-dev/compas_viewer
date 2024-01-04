@@ -515,10 +515,10 @@ class Viewer(Scene):
             **kwargs
         )
         assert isinstance(sceneobject, ViewerSceneObject)
-        if self.instance_colors.get(sceneobject.instance_color):
+        if self.instance_colors.get(sceneobject.instance_color.rgb255):
             raise ValueError("Instance color of the instance is not unique.")
         else:
-            self.instance_colors[sceneobject.instance_color] = sceneobject
+            self.instance_colors[sceneobject.instance_color.rgb255] = sceneobject
 
         return sceneobject
 
