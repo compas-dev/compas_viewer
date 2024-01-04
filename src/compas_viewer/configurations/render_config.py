@@ -52,7 +52,7 @@ class CameraConfigType(TypedDict):
 
 class CameraConfig(Config):
     """
-    The class representation of a camera class :class:`compas_viewer.components.render.camera.Camera.Camera`
+    The class representation of a camera class :class:`compas_viewer.components.render.camera.Camera`
     It contains all the settings about the camera: fov, near, far, position, target, ...
 
     Parameters

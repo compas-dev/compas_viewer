@@ -15,10 +15,6 @@ def register(name: str, action_class: Callable):
     action_class : :class:`Action`
         Action class.
 
-    Returns
-    -------
-    None
-
     """
     ITEM_ACTIONS[name] = action_class
 

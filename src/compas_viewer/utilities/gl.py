@@ -109,10 +109,6 @@ def update_vertex_buffer(data, buffer):
     buffer : int
         The ID of the buffer.
 
-    Returns
-    -------
-    None
-
     """
     n = len(data)
     size = n * ct.sizeof(ct.c_float)
@@ -131,10 +127,6 @@ def update_index_buffer(data, buffer):
         A flat list of ints.
     buffer : int
         The ID of the buffer.
-
-    Returns
-    -------
-    None
 
     """
     n = len(data)

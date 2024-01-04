@@ -98,10 +98,6 @@ class Tag(Geometry):
         transformation : :class:`compas.geometry.Transformation`
             The transformation used to transform the geometry.
 
-        Returns
-        -------
-        None
-
         """
         self.position.transform(transformation)
 
