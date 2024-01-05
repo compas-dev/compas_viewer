@@ -137,9 +137,11 @@ class Camera:
         self._position.pause_update = False
         self._rotation.pause_update = False
         self._target.pause_update = False
+        # Camera position only modifiable in perspective view mode.
         self.reset_position()
+        if self.render.config.viewmode == "perspective":
+            self.position = Position(self.config.position)
         self.target = Position(self.config.target)
-        self.position = Position(self.config.position)
 
     @property
     def position(self) -> Position:
@@ -361,7 +363,8 @@ class Camera:
         Parameters
         ----------
         steps : int
-            The number of zoom increments, with each increment the zsize of :attr:`Camera.zoomdelta`.
+            The number of zoom increments, with each increment the size
+            of :attr:`compas_viewer.components.render.Camera.config.zoomdelta`.
 
         """
         self.distance -= steps * self.config.zoomdelta * self.distance
