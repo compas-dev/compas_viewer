@@ -16,12 +16,7 @@ class LineObject(ViewerSceneObject, GeometryObject):
     def __init__(self, line: Line, **kwargs):
         super(LineObject, self).__init__(geometry=line, **kwargs)
 
-        self._points_data = self._get_points_data()
-        self._lines_data = self._get_lines_data()
-
-    def _get_points_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
-        if not self.show_points:
-            return None
+    def _read_points_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
         positions = [self.geometry.start, self.geometry.end]
         colors = [
             self.pointscolor.get(0, self.pointscolor["_default"]),  # type: ignore
@@ -30,7 +25,7 @@ class LineObject(ViewerSceneObject, GeometryObject):
         elements = [[0], [1]]
         return positions, colors, elements
 
-    def _get_lines_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
+    def _read_lines_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
         positions = [self.geometry.start, self.geometry.end]
         colors = [
             self.pointscolor.get(0, self.pointscolor["_default"]),  # type: ignore
@@ -38,3 +33,11 @@ class LineObject(ViewerSceneObject, GeometryObject):
         ]
         elements = [[0, 1]]
         return positions, colors, elements
+
+    def _read_frontfaces_data(self):
+        """No frontfaces data exist for this geometry, Return None."""
+        return None
+
+    def _read_backfaces_data(self):
+        """No backfaces data exist for this geometry, Return None."""
+        return None

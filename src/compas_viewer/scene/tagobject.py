@@ -77,7 +77,7 @@ class Tag(Geometry):
         self,
         text: str,
         position: Union[Point, Tuple[float, float, float]],
-        color: Color = Color(1.0, 1.0, 1.0),
+        color: Color = Color(0.0, 0.0, 0.0),
         height: float = 50,
         absolute_height: bool = False,
         font: Optional[PathLike] = None,
@@ -116,10 +116,7 @@ class TagObject(ViewerSceneObject, GeometryObject):
     """
 
     def __init__(self, tag: Tag, **kwargs):
-        super(TagObject, self).__init__(geometry=Tag, **kwargs)
-
-    def init(self):
-        self.make_buffers()
+        super(TagObject, self).__init__(geometry=tag, **kwargs)
 
     def make_buffers(self):
         self._text_buffer = {
@@ -200,6 +197,18 @@ class TagObject(ViewerSceneObject, GeometryObject):
         shader.uniform1f("object_opacity", 1)
         shader.disable_attribute("position")
 
-    def update(self):
-        super()._update_matrix()
-        self.init()
+    def _read_points_data(self):
+        """No point data exist for this geometry, Return None."""
+        return None
+
+    def _read_lines_data(self):
+        """No line data exist for this geometry, Return None."""
+        return None
+
+    def _read_frontfaces_data(self):
+        """No frontfaces data exist for this geometry, Return None."""
+        return None
+
+    def _read_backfaces_data(self):
+        """No backfaces data exist for this geometry, Return None."""
+        return None

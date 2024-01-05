@@ -1,6 +1,7 @@
 import sys
 from os import path
 from pathlib import Path
+from typing import TYPE_CHECKING
 from typing import Any
 from typing import Callable
 from typing import Dict
@@ -34,6 +35,9 @@ from compas_viewer.controller import Controller
 from compas_viewer.scene import Grid
 from compas_viewer.scene import GridObject
 from compas_viewer.scene import ViewerSceneObject
+
+if TYPE_CHECKING:
+    from compas_occ.brep import BRep
 
 
 class Timer:
@@ -414,7 +418,7 @@ class Viewer(Scene):
 
     def add(
         self,
-        item: Union[Mesh, Geometry, Grid],
+        item: Union[Mesh, Geometry, Grid, "BRep"],
         parent: Optional[ViewerSceneObject] = None,
         is_selected: bool = False,
         is_locked: bool = False,

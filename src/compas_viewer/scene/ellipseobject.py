@@ -1,10 +1,14 @@
-import math
+from math import cos
+from math import pi
+from math import sin
+from math import sqrt
 from typing import List
 from typing import Optional
 from typing import Tuple
 
 from compas.colors import Color
-from compas.geometry import Circle
+from compas.geometry import Ellipse
+from compas.geometry import Frame
 from compas.geometry import Point
 from compas.scene import GeometryObject
 from compas.utilities import pairwise
@@ -12,21 +16,26 @@ from compas.utilities import pairwise
 from .sceneobject import ViewerSceneObject
 
 
-class CircleObject(ViewerSceneObject, GeometryObject):
-    """Viewer scene object for displaying COMPAS :class:`compas.geometry.Circle` geometry."""
+class EllipseObject(ViewerSceneObject, GeometryObject):
+    """Viewer scene object for displaying COMPAS :class:`compas.geometry.Ellipse` geometry."""
 
-    def __init__(self, circle: Circle, **kwargs):
-        self.geometry: Circle
-        self.u = int(circle.circumference / self.LINEARDEFLECTION)
-        self.u_points = self._calculate_circle_points(circle)
-        super().__init__(geometry=circle, **kwargs)
+    def __init__(self, ellipse: Ellipse, **kwargs):
+        self.geometry = ellipse
+        self.u = int(self._proximate_circumference / self.LINEARDEFLECTION)
+        self.u_points = self._calculate_ellipse_points(ellipse)
+        super().__init__(geometry=ellipse, close=True, **kwargs)
 
-    def _calculate_circle_points(self, circle):
+    @property
+    def _proximate_circumference(self):
+        return 2 * pi * sqrt((self.geometry.major**2 + self.geometry.minor**2) / 2)
+
+    def _calculate_ellipse_points(self, ellipse):
+        frame = Frame.from_plane(ellipse.plane)
         return [
-            circle.frame.to_world_coordinates(
+            frame.to_world_coordinates(
                 [
-                    math.cos(i * math.pi * 2 / self.u) * circle.radius,
-                    math.sin(i * math.pi * 2 / self.u) * circle.radius,
+                    cos(i * pi * 2 / self.u) * ellipse.major,
+                    sin(i * pi * 2 / self.u) * ellipse.minor,
                     0,
                 ]
             )

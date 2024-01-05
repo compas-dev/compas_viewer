@@ -18,16 +18,13 @@ class PolylineObject(ViewerSceneObject, GeometryObject):
         super(PolylineObject, self).__init__(geometry=polyline, **kwargs)
         self.geometry: Polyline
 
-        self._points_data = self._get_points_data()
-        self._lines_data = self._get_lines_data()
-
-    def _get_points_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
+    def _read_points_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
         positions = [point for point in self.geometry.points]
         colors = [self.pointscolor.get(i, self.pointscolor["_default"]) for i, _ in enumerate(self.geometry.points)]  # type: ignore
         elements = [[i] for i in range(len(positions))]
         return positions, colors, elements
 
-    def _get_lines_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
+    def _read_lines_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
         positions = []
         colors = []
         elements = []
@@ -44,3 +41,11 @@ class PolylineObject(ViewerSceneObject, GeometryObject):
             elements.append([count, count + 1])
             count += 2
         return positions, colors, elements
+
+    def _read_frontfaces_data(self):
+        """No frontfaces data exist for this geometry, Return None."""
+        return None
+
+    def _read_backfaces_data(self):
+        """No backfaces data exist for this geometry, Return None."""
+        return None

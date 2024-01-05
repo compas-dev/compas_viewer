@@ -1,4 +1,3 @@
-from typing import TYPE_CHECKING
 from typing import List
 from typing import Optional
 from typing import Tuple
@@ -9,15 +8,9 @@ from compas.datastructures import Mesh
 from compas.geometry import Point
 from compas.geometry import Translation
 from compas.scene import MeshObject as BaseMeshObject
-from compas.utilities import flatten
 
-from compas_viewer.scene.sceneobject import ViewerSceneObject
-from compas_viewer.utilities import make_index_buffer
-from compas_viewer.utilities import make_vertex_buffer
-
-if TYPE_CHECKING:
-    from compas_viewer.components.render.shaders import Shader
-
+from .sceneobject import ViewerSceneObject
+# TODO
 
 class Grid(Data):
     """
@@ -101,8 +94,8 @@ class GridObject(ViewerSceneObject, BaseMeshObject):
     """
 
     def __init__(self, grid: Grid, **kwargs):
-        super(GridObject, self).__init__(mesh=grid.mesh, **kwargs)
         self._grid = grid
+        super(GridObject, self).__init__(mesh=grid.mesh, **kwargs)
 
     def _read_lines_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
         positions = []
@@ -135,21 +128,17 @@ class GridObject(ViewerSceneObject, BaseMeshObject):
 
         return positions, colors, elements
 
-    def init(self):
-        self.make_buffers()
+    def _read_points_data(self):
+        """No points data exist for this geometry, Return None."""
+        return None
 
-    def draw(self, shader: "Shader"):
-        """Draw the object from its buffers"""
-        assert self._lines_buffer is not None
-        shader.enable_attribute("position")
-        shader.enable_attribute("color")
-        shader.bind_attribute("position", self._lines_buffer["positions"])
-        shader.bind_attribute("color", self._lines_buffer["colors"])
-        shader.draw_lines(
-            width=self.lineswidth, elements=self._lines_buffer["elements"], n=self._lines_buffer["n"], background=True
-        )
-        shader.disable_attribute("position")
-        shader.disable_attribute("color")
+    def _read_backfaces_data(self):
+        """No backfaces data exist for this geometry, Return None."""
+        return None
+
+    def _read_frontfaces_data(self):
+        """No frontfaces data exist for this geometry, Return None."""
+        return None
 
     def draw_vertices(self):
         pass

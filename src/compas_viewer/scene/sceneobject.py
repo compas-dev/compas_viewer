@@ -104,7 +104,7 @@ class ViewerSceneObject(SceneObject):
 
     """
 
-    LINEARDEFLECTION = 0.1
+    LINEARDEFLECTION = 0.5
 
     def __init__(
         self,
@@ -182,10 +182,10 @@ class ViewerSceneObject(SceneObject):
         self._is_collection = False
 
         #  Primitive
-        self._points_data = self._read_points_data() if self.show_points else None
-        self._lines_data = self._read_lines_data() if self.show_lines else None
-        self._frontfaces_data = self._read_frontfaces_data() if self.show_faces else None
-        self._backfaces_data = self._read_backfaces_data() if self.show_faces else None
+        self._points_data: Optional[Tuple[List[Point], List[Color], List[List[int]]]] = None
+        self._lines_data: Optional[Tuple[List[Point], List[Color], List[List[int]]]] = None
+        self._frontfaces_data: Optional[Tuple[List[Point], List[Color], List[List[int]]]] = None
+        self._backfaces_data: Optional[Tuple[List[Point], List[Color], List[List[int]]]] = None
         self._points_buffer: Optional[Dict[str, Any]] = None
         self._lines_buffer: Optional[Dict[str, Any]] = None
         self._frontfaces_buffer: Optional[Dict[str, Any]] = None
@@ -200,7 +200,7 @@ class ViewerSceneObject(SceneObject):
         return self._bounding_box_center
 
     # ==========================================================================
-    # Reading geometric data, downstream classes should implement these methods.
+    # Reading geometric data, downstream classes should implement these properties.
     # ==========================================================================
 
     @abstractmethod
@@ -335,6 +335,10 @@ class ViewerSceneObject(SceneObject):
 
     def init(self):
         """Initialize the object"""
+        self._points_data = self._read_points_data() if self.show_points else None
+        self._lines_data = self._read_lines_data() if self.show_lines else None
+        self._frontfaces_data = self._read_frontfaces_data() if self.show_faces else None
+        self._backfaces_data = self._read_backfaces_data() if self.show_faces else None
         self.make_buffers()
         self._update_matrix()
 

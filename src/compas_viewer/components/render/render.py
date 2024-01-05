@@ -497,7 +497,7 @@ class Render(QOpenGLWidget):
             if obj.is_visible:
                 if isinstance(obj, TagObject):
                     tag_objs.append(obj)
-                if isinstance(obj, VectorObject):
+                elif isinstance(obj, VectorObject):
                     vector_objs.append(obj)
                 else:
                     mesh_objs.append(obj)
@@ -518,7 +518,7 @@ class Render(QOpenGLWidget):
         if self.config.show_grid:
             self.shader_grid.bind()
             self.shader_grid.uniform4x4("viewworld", viewworld)
-            self.grid.draw(self.shader_grid)
+            self.grid.draw(self.shader_grid, self.config.rendermode == "wireframe", self.config.rendermode == "lighted")
             self.shader_grid.release()
 
         # Draw model objects in the scene
