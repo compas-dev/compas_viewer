@@ -463,7 +463,7 @@ class Render(QOpenGLWidget):
         transparent_objects = []
         centers = []
         for obj in self.viewer.objects:
-            if not isinstance(obj, TagObject) and not isinstance(obj, GridObject) and not isinstance(obj, VectorObject):
+            if not isinstance(obj, (TagObject, GridObject, VectorObject)):
                 if obj.opacity * self.opacity < 1 and obj.bounding_box_center is not None:
                     transparent_objects.append(obj)
                     centers.append(transform_points_numpy([obj.bounding_box_center], obj.worldtransformation)[0])
@@ -513,7 +513,7 @@ class Render(QOpenGLWidget):
                     obj.draw(self.shader_model, self.rendermode == "wireframe", self.rendermode == "lighted")
             self.shader_model.release()
 
-        # Draw arrow sprites
+        # Draw arrow
         self.shader_arrow.bind()
         self.shader_arrow.uniform4x4("viewworld", viewworld)
         for obj in self.viewer.objects:
