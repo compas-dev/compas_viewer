@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
+* Added `VectorObject` for the scene objects with mesh-based display for better visual effect.
 * Added "instance" render mode for debugging and geometric analysis.
 * Added contents in the `README.md`.
 * Added full support for selection: drag_selection, drag_deselection, multiselect, deselect, select.

@@ -217,26 +217,32 @@ class Shader:
         GL.glDisable(GL.GL_POINT_SPRITE)
         GL.glEnable(GL.GL_POINT_SMOOTH)
 
-    def draw_arrows(self, elements: Any = None, n: int = 0):
+    def draw_arrows(self, elements: Any, n: int, width: float, background: bool = False):
         """
         Draw arrows.
 
         Parameters
         ----------
-        elements : Any, optional
+        elements : Any
             The buffer elements.
-        n : int, optional
+        n : int
             The number of elements.
+        width : float
+            The width of the arrows.
+        background : bool, optional
+            Draw in background.
         """
         GL.glDisable(GL.GL_POINT_SMOOTH)
-        GL.glEnable(GL.GL_POINT_SPRITE)
-        GL.glEnable(GL.GL_PROGRAM_POINT_SIZE)
+
         if elements:
+            if background:
+                GL.glDisable(GL.GL_DEPTH_TEST)
+            GL.glLineWidth(width)
             GL.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, elements)
-            GL.glDrawElements(GL.GL_POINTS, n, GL.GL_UNSIGNED_INT, None)
+            GL.glDrawElements(GL.GL_LINES, n, GL.GL_UNSIGNED_INT, None)
+            GL.glEnable(GL.GL_DEPTH_TEST)
         else:
-            GL.glDrawArrays(GL.GL_POINTS, 0, GL.GL_BUFFER_SIZE)
-        GL.glDisable(GL.GL_POINT_SPRITE)
+            GL.glDrawArrays(GL.GL_LINES, 0, GL.GL_BUFFER_SIZE)
         GL.glEnable(GL.GL_POINT_SMOOTH)
 
     def draw_2d_box(self, box_coords: Tuple[float, float, float, float], width: int, height: int):

@@ -20,11 +20,6 @@ class LineObject(ViewerSceneObject, GeometryObject):
     **kwargs : Dict, optional
         Additional options for the :class:`compas_viewer.scene.ViewerSceneObject`.
 
-    Attributes
-    ----------
-    line : :class:`compas.geometry.Line`
-        The line geometry.
-
     """
 
     def __init__(self, line: Line, **kwargs):

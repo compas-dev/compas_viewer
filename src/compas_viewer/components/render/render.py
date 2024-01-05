@@ -17,6 +17,8 @@ from PySide6.QtOpenGLWidgets import QOpenGLWidget
 from compas_viewer.configurations import RenderConfig
 from compas_viewer.scene import GridObject
 from compas_viewer.scene import TagObject
+from compas_viewer.scene.meshobject import MeshObject
+from compas_viewer.scene.vectorobject import VectorObject
 
 from .camera import Camera
 from .selector import Selector
@@ -445,11 +447,13 @@ class Render(QOpenGLWidget):
         """
         self.update_projection(w, h)
 
-    def sort_objects_from_viewworld(self, viewworld: List[List[float]]):
+    def sort_objects_from_viewworld(self, objects: List[MeshObject], viewworld: List[List[float]]):
         """Sort objects by the distances from their bounding box centers to camera location
 
         Parameters
         ----------
+        objects : List[:class:`compas_viewer.scene.meshobject.MeshObject`]
+            The objects to be sorted.
         viewworld : List[List[float]]
             The viewworld matrix.
 
@@ -461,13 +465,12 @@ class Render(QOpenGLWidget):
         opaque_objects = []
         transparent_objects = []
         centers = []
-        for obj in self.viewer.objects:
-            if not isinstance(obj, TagObject) and not isinstance(obj, GridObject):
-                if obj.opacity * self.opacity < 1 and obj.bounding_box_center is not None:
-                    transparent_objects.append(obj)
-                    centers.append(transform_points_numpy([obj.bounding_box_center], obj.worldtransformation)[0])
-                else:
-                    opaque_objects.append(obj)
+        for obj in objects:
+            if obj.opacity * self.opacity < 1 and obj.bounding_box_center is not None:
+                transparent_objects.append(obj)
+                centers.append(transform_points_numpy([obj.bounding_box_center], obj.worldtransformation)[0])
+            else:
+                opaque_objects.append(obj)
         if transparent_objects:
             centers = transform_points_numpy(centers, viewworld)
             transparent_objects = sorted(zip(transparent_objects, centers), key=lambda pair: pair[1][2])
@@ -480,9 +483,23 @@ class Render(QOpenGLWidget):
         and determines the performance of the renders
         This function introduces decision tree for different render modes and settings.
         """
-        #  Matrix
+
+        #  Matrix update
         viewworld = self.camera.viewworld()
-        # self.update_projection()
+        self.update_projection()
+
+        # Object categorization
+        tag_objs = []
+        vector_objs = []
+        mesh_objs = []
+        for obj in self.viewer.objects:
+            if obj.is_visible:
+                if isinstance(obj, TagObject):
+                    tag_objs.append(obj)
+                if isinstance(obj, VectorObject):
+                    vector_objs.append(obj)
+                else:
+                    mesh_objs.append(obj)
 
         # Draw instance maps
         if self.rendermode == "instance" or self.config.selector.enable_selector:
@@ -507,33 +524,23 @@ class Render(QOpenGLWidget):
         if not self.rendermode == "instance":
             self.shader_model.bind()
             self.shader_model.uniform4x4("viewworld", viewworld)
-            for obj in self.sort_objects_from_viewworld(viewworld):
-                if obj.is_visible:
-                    obj.draw(self.shader_model, self.rendermode == "wireframe", self.rendermode == "lighted")
+            for obj in self.sort_objects_from_viewworld(mesh_objs, viewworld):
+                obj.draw(self.shader_model, self.rendermode == "wireframe", self.rendermode == "lighted")
             self.shader_model.release()
 
-        """
-        # # draw arrow sprites
-        # self.shader_arrow.bind()
-        # self.shader_arrow.uniform4x4("viewworld", viewworld)
-        # for guid in self.objects:
-        #     obj = self.objects[guid]
-        #     if isinstance(obj, VectorObject):
-        #         if obj.is_visible:
-        #             obj.draw(self.shader_arrow)
-        # self.shader_arrow.release()
+        # Draw vector arrows
+        self.shader_arrow.bind()
+        self.shader_arrow.uniform4x4("viewworld", viewworld)
+        for obj in vector_objs:
+            obj.draw(self.shader_arrow)
+        self.shader_arrow.release()
 
-        # draw text sprites
+        # Draw text tag sprites
         self.shader_tag.bind()
         self.shader_tag.uniform4x4("viewworld", viewworld)
-        for guid in self.objects:
-            obj = self.objects[guid]
-            if isinstance(obj, TagObject):
-                if obj.is_visible:
-                    obj.draw(self.shader_tag, self.camera.position)
+        for obj in tag_objs:
+            obj.draw(self.shader_tag, self.camera.position)
         self.shader_tag.release()
-
-        """
 
         # draw 2D box for multi-selection
         if self.selector.on_drag_selection and self.selector.enable_selector:
