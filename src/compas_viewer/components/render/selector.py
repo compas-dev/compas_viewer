@@ -31,6 +31,8 @@ class Selector(QObject):
         Enable the selector.
     selectioncolor : :class:`compas.colors.Color`
         The color of the selected items.
+    ANTI_ALIASING_FACTOR : int
+        The anti-aliasing factor for the drag selection.
 
     References
     ----------

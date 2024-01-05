@@ -516,7 +516,10 @@ class Viewer(Scene):
         )
         assert isinstance(sceneobject, ViewerSceneObject)
         if self.instance_colors.get(sceneobject.instance_color.rgb255):
-            raise ValueError("Instance color of the instance is not unique.")
+            raise ValueError(
+                "Program error: Instance color is not unique."
+                + "Scene object might exceed the limit of 16,581,375 or rerun the program."
+            )
         else:
             self.instance_colors[sceneobject.instance_color.rgb255] = sceneobject
 

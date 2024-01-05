@@ -10,7 +10,11 @@
         "actions": {
             "zoom_selected": { "key": "f" },
             "print_gl_info": { "key": "i" },
-            "select_all": { "key": "a", "modifier": "control" }
+            "select_all": { "key": "a", "modifier": "control" },
+            "view_top": { "key": "f3" },
+            "view_perspective": { "key": "f4" },
+            "view_front": { "key": "f5" },
+            "view_right": { "key": "f6" }
         }
     },
     "guid": "5088a780-910d-4df3-a1b3-d389e0e9c7f2"
