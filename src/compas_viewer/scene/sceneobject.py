@@ -1,5 +1,5 @@
+from abc import abstractmethod
 from random import randint
-from random import random
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import Dict
@@ -104,6 +104,8 @@ class ViewerSceneObject(SceneObject):
 
     """
 
+    LINEARDEFLECTION = 0.1
+
     def __init__(
         self,
         viewer: "Viewer",
@@ -180,10 +182,10 @@ class ViewerSceneObject(SceneObject):
         self._is_collection = False
 
         #  Primitive
-        self._points_data: Optional[Tuple[List[Point], List[Color], List[List[int]]]] = None
-        self._lines_data: Optional[Tuple[List[Point], List[Color], List[List[int]]]] = None
-        self._frontfaces_data: Optional[Tuple[List[Point], List[Color], List[List[int]]]] = None
-        self._backfaces_data: Optional[Tuple[List[Point], List[Color], List[List[int]]]] = None
+        self._points_data = self._read_points_data() if self.show_points else None
+        self._lines_data = self._read_lines_data() if self.show_lines else None
+        self._frontfaces_data = self._read_frontfaces_data() if self.show_faces else None
+        self._backfaces_data = self._read_backfaces_data() if self.show_faces else None
         self._points_buffer: Optional[Dict[str, Any]] = None
         self._lines_buffer: Optional[Dict[str, Any]] = None
         self._frontfaces_buffer: Optional[Dict[str, Any]] = None
@@ -196,6 +198,30 @@ class ViewerSceneObject(SceneObject):
     @property
     def bounding_box_center(self):
         return self._bounding_box_center
+
+    # ==========================================================================
+    # Reading geometric data, downstream classes should implement these methods.
+    # ==========================================================================
+
+    @abstractmethod
+    def _read_points_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
+        """Read points data from the object."""
+        pass
+
+    @abstractmethod
+    def _read_lines_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
+        """Read lines data from the object."""
+        pass
+
+    @abstractmethod
+    def _read_frontfaces_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
+        """Read frontfaces data from the object."""
+        pass
+
+    @abstractmethod
+    def _read_backfaces_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
+        """Read backfaces data from the object."""
+        pass
 
     # ==========================================================================
     # general

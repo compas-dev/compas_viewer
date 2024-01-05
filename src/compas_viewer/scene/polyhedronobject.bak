@@ -1,0 +1,18 @@
+from typing import List
+from typing import Optional
+from typing import Tuple
+
+from compas.colors import Color
+from compas.geometry import Line
+from compas.geometry import Point
+from compas.scene import GeometryObject
+
+from .sceneobject import ViewerSceneObject
+
+
+class PolyhedronObject(MeshObject):
+    """Object for displaying COMPAS Polyhedron geometry."""
+
+    def __init__(self, data, **kwargs):
+        super().__init__(Mesh.from_shape(data), **kwargs)
+        self._data = data

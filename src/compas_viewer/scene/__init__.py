@@ -5,7 +5,7 @@ from compas.scene import register
 from compas.plugins import plugin
 from .sceneobject import ViewerSceneObject
 from compas.datastructures import Mesh, Network
-from compas.geometry import Point, Line, Vector
+from compas.geometry import Point, Line, Vector, Circle, Box, Polyline
 
 
 from .meshobject import MeshObject
@@ -15,6 +15,9 @@ from .lineobject import LineObject
 from .vectorobject import VectorObject
 from .tagobject import TagObject, Tag
 from .gridobject import GridObject, Grid
+from .circleobject import CircleObject
+from .boxobject import BoxObject
+from .polylineobject import PolylineObject
 
 
 @plugin(category="drawing-utils", requires=["compas_viewer"])
@@ -36,6 +39,9 @@ def register_scene_objects():
     register(Tag, TagObject, context="Viewer")
     register(Grid, GridObject, context="Viewer")
     register(Vector, VectorObject, context="Viewer")
+    register(Circle, CircleObject, context="Viewer")
+    register(Box, BoxObject, context="Viewer")
+    register(Polyline, PolylineObject, context="Viewer")
 
 
 __all__ = [
@@ -49,4 +55,10 @@ __all__ = [
     "Grid",
     "Vector",
     "VectorObject",
+    "Circle",
+    "CircleObject",
+    "Box",
+    "BoxObject",
+    "Polyline",
+    "PolylineObject",
 ]

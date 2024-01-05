@@ -14,7 +14,7 @@ from .sceneobject import ViewerSceneObject
 
 
 class MeshObject(ViewerSceneObject, BaseMeshObject):
-    """Object for displaying COMPAS mesh data structures.
+    """Viewer scene object for displaying COMPAS :class:`compas.datastructures.Mesh` geometry.
 
     Parameters
     ----------

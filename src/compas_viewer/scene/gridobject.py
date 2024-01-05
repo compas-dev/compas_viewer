@@ -104,9 +104,7 @@ class GridObject(ViewerSceneObject, BaseMeshObject):
         super(GridObject, self).__init__(mesh=grid.mesh, **kwargs)
         self._grid = grid
 
-        self._lines_data = self._get_lines_data()
-
-    def _get_lines_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
+    def _read_lines_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
         positions = []
         colors = []
         elements = []
@@ -140,20 +138,6 @@ class GridObject(ViewerSceneObject, BaseMeshObject):
     def init(self):
         self.make_buffers()
 
-        # Create uv plane
-        x_size = self._grid.nx * self._grid.dx
-        y_size = self._grid.ny * self._grid.dy
-        positions = [[-x_size, -y_size, 0], [x_size, -y_size, 0], [x_size, y_size, 0], [-x_size, y_size, 0]]
-        color = [[0, 0, 0], [1, 0, 0], [1, 1, 0], [0, 1, 0]]
-        elements = [[0, 1, 3], [1, 2, 3], [1, 0, 3], [2, 1, 3]]
-
-        self._uvplane = {
-            "positions": make_vertex_buffer(list(flatten(positions))),
-            "colors": make_vertex_buffer(list(flatten(color))),
-            "elements": make_index_buffer(list(flatten(elements))),
-            "n": len(list(flatten(elements))),
-        }
-
     def draw(self, shader: "Shader"):
         """Draw the object from its buffers"""
         assert self._lines_buffer is not None
@@ -164,15 +148,6 @@ class GridObject(ViewerSceneObject, BaseMeshObject):
         shader.draw_lines(
             width=self.lineswidth, elements=self._lines_buffer["elements"], n=self._lines_buffer["n"], background=True
         )
-        shader.disable_attribute("position")
-        shader.disable_attribute("color")
-
-    def draw_plane(self, shader: "Shader"):
-        shader.enable_attribute("position")
-        shader.enable_attribute("color")
-        shader.bind_attribute("position", self._uvplane["positions"])
-        shader.bind_attribute("color", self._uvplane["colors"])
-        shader.draw_triangles(elements=self._uvplane["elements"], n=self._uvplane["n"])
         shader.disable_attribute("position")
         shader.disable_attribute("color")
 

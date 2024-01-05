@@ -11,16 +11,7 @@ from .sceneobject import ViewerSceneObject
 
 
 class NetworkObject(ViewerSceneObject, BaseNetworkObject):
-    """Object for displaying COMPAS network data structures.
-
-    Parameters
-    ----------
-    network : :class:`compas.datastructures.Network`
-        The network data structure.
-    **kwargs : Dict, optional
-        Additional options for the :class:`compas_viewer.scene.ViewerSceneObject`.
-
-    """
+    """Viewer scene object for displaying COMPAS :class:`compas.datastructures.Network` geometry."""
 
     def __init__(self, network: Network, **kwargs):
         super(NetworkObject, self).__init__(network=network, **kwargs)

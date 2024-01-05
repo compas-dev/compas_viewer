@@ -15,7 +15,7 @@ from .sceneobject import ViewerSceneObject
 
 
 class VectorObject(ViewerSceneObject, GeometryObject):
-    """Object for displaying COMPAS Vector.
+    """Viewer scene object for displaying COMPAS :class:`compas.geometry.Vector` geometry.
 
     Parameters
     ----------
@@ -43,22 +43,21 @@ class VectorObject(ViewerSceneObject, GeometryObject):
 
     def __init__(self, vector: Vector, anchor: Point = Point(0, 0, 0), **kwargs):
         super(VectorObject, self).__init__(geometry=vector, **kwargs)
-        self._vector = vector
         self._anchor = anchor
         self.arrow_buffer: Dict[str, Any]
         self._lines_data = self._get_lines_data()
 
     def _get_lines_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
-        arrow_end = self._anchor + self._vector * (1 - self.ARROW_SIZE_FACTOR)
-        arrow_width = self.ARROW_SIZE_FACTOR * self.ARROW_SIZE_FACTOR * self._vector.length
+        arrow_end = self._anchor + self.geometry * (1 - self.ARROW_SIZE_FACTOR)
+        arrow_width = self.ARROW_SIZE_FACTOR * self.ARROW_SIZE_FACTOR * self.geometry.length
         positions = [
             self._anchor,  # Arrow start
             arrow_end,  # Arrow body end
-            arrow_end + (self._vector.cross([1, 0, 0]) / self._vector.length) * arrow_width,  # Arrow corner 1
-            arrow_end + (self._vector.cross([0, 1, 0]) / self._vector.length) * arrow_width,  # Arrow corner 2
-            arrow_end + (self._vector.cross([-1, 0, 0]) / self._vector.length) * arrow_width,  # Arrow corner 3
-            arrow_end + (self._vector.cross([0, -1, 0]) / self._vector.length) * arrow_width,  # Arrow corner 4
-            self._anchor + self._vector,  # Arrow end
+            arrow_end + (self.geometry.cross([1, 0, 0]) / self.geometry.length) * arrow_width,  # Arrow corner 1
+            arrow_end + (self.geometry.cross([0, 1, 0]) / self.geometry.length) * arrow_width,  # Arrow corner 2
+            arrow_end + (self.geometry.cross([-1, 0, 0]) / self.geometry.length) * arrow_width,  # Arrow corner 3
+            arrow_end + (self.geometry.cross([0, -1, 0]) / self.geometry.length) * arrow_width,  # Arrow corner 4
+            self._anchor + self.geometry,  # Arrow end
         ]
 
         colors = [self.linescolor["_default"]] * len(positions)

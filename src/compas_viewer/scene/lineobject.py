@@ -11,20 +11,10 @@ from .sceneobject import ViewerSceneObject
 
 
 class LineObject(ViewerSceneObject, GeometryObject):
-    """Object for displaying COMPAS line geometry.
-
-    Parameters
-    ----------
-    line : :class:`compas.geometry.Line`
-        The line geometry.
-    **kwargs : Dict, optional
-        Additional options for the :class:`compas_viewer.scene.ViewerSceneObject`.
-
-    """
+    """Viewer scene object for displaying COMPAS :class:`compas.geometry.Line` geometry."""
 
     def __init__(self, line: Line, **kwargs):
         super(LineObject, self).__init__(geometry=line, **kwargs)
-        self._line = line
 
         self._points_data = self._get_points_data()
         self._lines_data = self._get_lines_data()
@@ -32,8 +22,7 @@ class LineObject(ViewerSceneObject, GeometryObject):
     def _get_points_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
         if not self.show_points:
             return None
-        line = self._line
-        positions = [line.start, line.end]
+        positions = [self.geometry.start, self.geometry.end]
         colors = [
             self.pointscolor.get(0, self.pointscolor["_default"]),  # type: ignore
             self.pointscolor.get(1, self.pointscolor["_default"]),  # type: ignore
@@ -42,13 +31,10 @@ class LineObject(ViewerSceneObject, GeometryObject):
         return positions, colors, elements
 
     def _get_lines_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
-        line = self._line
-        color = self.linescolor["_default"]
-        positions = [line.start, line.end]
-        colors = [color, color]
+        positions = [self.geometry.start, self.geometry.end]
+        colors = [
+            self.pointscolor.get(0, self.pointscolor["_default"]),  # type: ignore
+            self.pointscolor.get(1, self.pointscolor["_default"]),  # type: ignore
+        ]
         elements = [[0, 1]]
         return positions, colors, elements
-
-    @classmethod
-    def create_default(cls) -> Line:
-        return Line([0, 0, 0], [0, 0, 1])
