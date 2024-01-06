@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Tuple
 from typing import TypedDict
 
 from compas.colors import Color
@@ -23,6 +24,9 @@ class SceneConfigType(TypedDict):
     opacity: float
     hide_coplanaredges: bool
     use_vertexcolors: bool
+    framesize: Tuple[float, int, float, int]
+    show_framez: bool
+    vectorsize: float
 
 
 class SceneConfig(Config):
@@ -51,6 +55,11 @@ class SceneConfig(Config):
         self.opacity = config["opacity"]
         self.hide_coplanaredges = config["hide_coplanaredges"]
         self.use_vertexcolors = config["use_vertexcolors"]
+        self.framesize = config["framesize"]
+        self.show_framez = config["show_framez"]
+        self.vectorsize = config["vectorsize"]
+        if self.vectorsize < 0 or self.vectorsize > 1:
+            raise ValueError("The vectorsize must be between 0 and 1.")
 
     @classmethod
     def from_default(cls) -> "SceneConfig":

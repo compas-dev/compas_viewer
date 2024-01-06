@@ -104,6 +104,9 @@ class ViewerSceneObject(SceneObject):
 
     """
 
+    # Enhance line width for selection only.
+    LINEWIDTH_SELECTION_INCREMENTAL = 2
+
     LINEARDEFLECTION = 0.2
 
     def __init__(
@@ -446,7 +449,11 @@ class ViewerSceneObject(SceneObject):
             )
         if self._lines_buffer is not None and (self.show_lines or wireframe):
             shader.bind_attribute("position", self._lines_buffer["positions"])
-            shader.draw_lines(width=self.lineswidth, elements=self._lines_buffer["elements"], n=self._lines_buffer["n"])
+            shader.draw_lines(
+                width=self.lineswidth + self.LINEWIDTH_SELECTION_INCREMENTAL,
+                elements=self._lines_buffer["elements"],
+                n=self._lines_buffer["n"],
+            )
         if self._frontfaces_buffer is not None and not wireframe:
             shader.bind_attribute("position", self._frontfaces_buffer["positions"])
             shader.draw_triangles(elements=self._frontfaces_buffer["elements"], n=self._frontfaces_buffer["n"])

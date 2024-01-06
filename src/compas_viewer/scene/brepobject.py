@@ -4,6 +4,7 @@ from typing import Tuple
 
 from compas.colors import Color
 from compas.geometry import Point
+from compas.geometry import Polyline
 from compas.utilities import pairwise
 
 from .meshobject import MeshObject
@@ -23,11 +24,12 @@ try:
         """
 
         def __init__(self, brep: BRep, **kwargs):
-            mesh, boundaries = brep.to_viewmesh()
+            self.brep = brep
+            mesh, boundaries = self.to_viewmesh()
             super().__init__(mesh=mesh, **kwargs)
             self.boundaries = boundaries
 
-        def _lines_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
+        def _read_lines_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
             positions = []
             colors = []
             elements = []
@@ -45,5 +47,15 @@ try:
                 count += 2
             return positions, colors, elements
 
-except:
+        def to_viewmesh(self, linear_deflection=1):
+            """
+            Convert the BRep to a view mesh.
+            """
+            lines = []
+            for edge in self.brep.edges:
+                if edge.is_line:
+                    lines.append(Polyline([edge.vertices[0].point, edge.vertices[-1].point]))
+            return self.brep.to_tesselation(linear_deflection=linear_deflection), lines
+
+except ImportError:
     pass

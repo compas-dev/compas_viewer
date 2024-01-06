@@ -570,7 +570,8 @@ class Render(QOpenGLWidget):
         --------
         :func:`compas_viewer.components.render.selector.Selector.ANTI_ALIASING_FACTOR`
         """
-
+        GL.glDisable(GL.GL_POINT_SMOOTH)
+        GL.glDisable(GL.GL_LINE_SMOOTH)
         for obj in self.viewer.objects:
             if obj.is_visible and not obj.is_locked:
                 obj.draw_instance(self.shader_instance, self.rendermode == "wireframe")
@@ -584,3 +585,5 @@ class Render(QOpenGLWidget):
             GL.GL_RGB,
             GL.GL_UNSIGNED_BYTE,
         )
+        GL.glEnable(GL.GL_POINT_SMOOTH)
+        GL.glEnable(GL.GL_LINE_SMOOTH)

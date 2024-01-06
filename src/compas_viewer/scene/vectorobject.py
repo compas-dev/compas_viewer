@@ -27,17 +27,15 @@ class VectorObject(ViewerSceneObject, GeometryObject):
     **kwargs : Dict, optional
         Additional options for the :class:`compas_viewer.scene.ViewerSceneObject`.
 
-    Attributes
-    ----------
-    ARROW_SIZE_FACTOR : float
-        Fixed size of the arrow relative to the vector length.
-    ARROW_FACE_INDICES : List[List[int]]
-        Fixed indices for the arrow faces.
-
+    Notes
+    -----
+    The frame object is always unselectable.
+    Apart from the :attr:`compas_viewer.scene.vectorobject.VectorObject.config.lineswidth`
+    that controls the width of the vector,
+    the :attr:`compas_viewer.scene.vectorobject.VectorObject.config.vectorsize`
+    (float 0-1) controls the size of the arrow.
     """
 
-    # Size of the arrow relative to the vector length.
-    ARROW_SIZE_FACTOR = 0.1
     # Fixed indices for the arrow faces:
     ARROW_FACE_INDICES = [[6, 2, 3], [6, 3, 4], [6, 4, 5], [6, 5, 2], [2, 4, 3], [2, 5, 4]]
 
@@ -47,8 +45,8 @@ class VectorObject(ViewerSceneObject, GeometryObject):
         self.arrow_buffer: Dict[str, Any]
 
     def _read_lines_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
-        arrow_end = self._anchor + self.geometry * (1 - self.ARROW_SIZE_FACTOR)
-        arrow_width = self.ARROW_SIZE_FACTOR * self.ARROW_SIZE_FACTOR * self.geometry.length
+        arrow_end = self._anchor + self.geometry * (1 - self.config.vectorsize)
+        arrow_width = self.config.vectorsize * self.config.vectorsize * self.geometry.length
         positions = [
             self._anchor,  # Arrow start
             arrow_end,  # Arrow body end

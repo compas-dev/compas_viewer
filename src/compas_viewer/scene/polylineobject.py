@@ -20,7 +20,10 @@ class PolylineObject(ViewerSceneObject, GeometryObject):
 
     def _read_points_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
         positions = [point for point in self.geometry.points]
-        colors = [self.pointscolor.get(i, self.pointscolor["_default"]) for i, _ in enumerate(self.geometry.points)]  # type: ignore
+        colors = [
+            self.pointscolor.get(i, self.pointscolor["_default"])  # type: ignore
+            for i, _ in enumerate(self.geometry.points)
+        ]
         elements = [[i] for i in range(len(positions))]
         return positions, colors, elements
 
