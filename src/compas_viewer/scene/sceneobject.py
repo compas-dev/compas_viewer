@@ -104,7 +104,7 @@ class ViewerSceneObject(SceneObject):
 
     """
 
-    LINEARDEFLECTION = 0.5
+    LINEARDEFLECTION = 0.2
 
     def __init__(
         self,

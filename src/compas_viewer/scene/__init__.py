@@ -5,7 +5,7 @@ from matplotlib.patches import Polygon
 from compas.scene import register
 from compas.plugins import plugin
 from .sceneobject import ViewerSceneObject
-from compas.datastructures import Mesh, Network
+from compas.datastructures import Mesh
 from compas.geometry import (
     Point,
     Line,
@@ -43,7 +43,6 @@ from .cylinderobject import CylinderObject
 from .ellipseobject import EllipseObject
 from .coneobject import ConeObject
 from .capsuleobject import CapsuleObject
-from .frameobject import FrameObject
 
 
 @plugin(category="drawing-utils", requires=["compas_viewer"])
@@ -75,7 +74,7 @@ def register_scene_objects():
     register(Ellipse, EllipseObject, context="Viewer")
     register(Cone, ConeObject, context="Viewer")
     register(Capsule, CapsuleObject, context="Viewer")
-    register(Frame, FrameObject, context="Viewer")
+
     try:
         from compas_occ.brep import BRep
         from .brepobject import BRepObject
@@ -118,6 +117,4 @@ __all__ = [
     "ConeObject",
     "Capsule",
     "CapsuleObject",
-    "Frame",
-    "FrameObject",
 ]

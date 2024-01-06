@@ -57,6 +57,16 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
             for vertex in self._mesh.vertices()
         }
 
+    @property
+    def vertex_xyz(self):
+        """
+        Override :class:`compas.scene.MeshObject`'s property since the viewer does not need to transform the vertices.
+        Transformation is handled by the shader.
+        """
+        if self._vertex_xyz is None:
+            points = self.mesh.vertices_attributes("xyz")  # type: ignore
+            self._vertex_xyz = dict(zip(self.mesh.vertices(), points))  # type: ignore
+        return self._vertex_xyz
 
     def _read_points_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
         positions = []

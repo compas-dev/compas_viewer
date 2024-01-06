@@ -15,7 +15,6 @@ from PySide6.QtGui import QWheelEvent
 from PySide6.QtOpenGLWidgets import QOpenGLWidget
 
 from compas_viewer.configurations import RenderConfig
-from compas_viewer.scene import GridObject
 from compas_viewer.scene import TagObject
 from compas_viewer.scene.meshobject import MeshObject
 from compas_viewer.scene.vectorobject import VectorObject
