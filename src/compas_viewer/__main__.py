@@ -1,5 +1,5 @@
 # ==========================================================================
-# python -m compas_viewer -f "path/to/your/geometry.json"
+# python -m compas_viewer -f "file path or directory path"
 # ==========================================================================
 
 import argparse
