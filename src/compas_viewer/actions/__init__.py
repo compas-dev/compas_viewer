@@ -27,6 +27,7 @@ def register_actions():
     register("view_front", ViewFront)
     register("view_top", ViewTop)
     register("view_perspective", ViewPerspective)
+    register("delete_selected", DeleteSelected)
 
 
 def get_action_cls(name: str) -> Any:
@@ -43,6 +44,7 @@ from .zoom_selected import ZoomSelected  # noqa: E402
 from .print_gl_info import GLInfo  # noqa: E402
 from .select_all import SelectAll  # noqa: E402
 from .viewmode import ViewRight, ViewFront, ViewTop, ViewPerspective  # noqa: E402
+from .delete_selected import DeleteSelected  # noqa: E402
 
 register_actions()
 
@@ -55,4 +57,5 @@ ___all__ = [
     "ViewLeft",
     "ViewTop",
     "ViewPerspective",
+    "DeleteSelected",
 ]

@@ -1,4 +1,5 @@
 import time
+from functools import lru_cache
 from typing import TYPE_CHECKING
 from typing import List
 from typing import Tuple
@@ -484,7 +485,10 @@ class Render(QOpenGLWidget):
             transparent_objects, _ = zip(*transparent_objects)
         return opaque_objects + list(transparent_objects)
 
-    def sort_objects_from_category(self) -> Tuple[List[TagObject], List[VectorObject], List[ViewerSceneObject]]:
+    @lru_cache(maxsize=3)
+    def sort_objects_from_category(
+        self, objs: Tuple[ViewerSceneObject]
+    ) -> Tuple[List[TagObject], List[VectorObject], List[ViewerSceneObject]]:
         """Sort objects by their categories
 
         Returns
@@ -493,11 +497,20 @@ class Render(QOpenGLWidget):
         List[:class:`compas_viewer.scene.vectorobject.VectorObject`],
         List[:class:`compas_viewer.scene.sceneobject.ViewerSceneObject`])
             A tuple of sorted objects.
+
+        Notes
+        -----
+        This function is cached to improve the performance.
+
+        References
+        ----------
+        * https://docs.python.org/3/library/functools.html#functools.lru_cache
+        * https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_recently_used_(LRU)
         """
         tag_objs = []
         vector_objs = []
         mesh_objs = []
-        for obj in self.viewer.objects:
+        for obj in objs:
             if obj.is_visible:
                 if isinstance(obj, TagObject):
                     tag_objs.append(obj)
@@ -524,7 +537,7 @@ class Render(QOpenGLWidget):
         viewworld = self.camera.viewworld()
         self.update_projection()
         # Object categorization
-        tag_objs, vector_objs, mesh_objs = self.sort_objects_from_category()
+        tag_objs, vector_objs, mesh_objs = self.sort_objects_from_category(tuple(self.viewer.objects))
 
         # Draw grid
         if self.config.show_grid:
@@ -583,7 +596,7 @@ class Render(QOpenGLWidget):
         viewworld = self.camera.viewworld()
         self.update_projection()
         # Object categorization
-        _, _, mesh_objs = self.sort_objects_from_category()
+        _, _, mesh_objs = self.sort_objects_from_category(tuple(self.viewer.objects))
         # Draw instance maps
         GL.glDisable(GL.GL_POINT_SMOOTH)
         GL.glDisable(GL.GL_LINE_SMOOTH)
