@@ -1,14 +1,9 @@
-from typing import List
-from typing import Optional
-from typing import Tuple
-
-from compas.colors import Color
 from compas.geometry import Frame
 from compas.geometry import Plane
 from compas.geometry import Point
 from compas.scene import GeometryObject
 
-from .sceneobject import ViewerSceneObject
+from .sceneobject import ViewerSceneObject, DataType
 
 
 class PlaneObject(ViewerSceneObject, GeometryObject):
@@ -36,7 +31,7 @@ class PlaneObject(ViewerSceneObject, GeometryObject):
             Point(*self.frame.to_world_coordinates([-self.planesize, self.planesize, 0])),
         ]
 
-    def _read_lines_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
+    def _read_lines_data(self) -> DataType:
         positions = [
             Point(*self.frame.to_world_coordinates([0, 0, 0])),
             Point(*self.frame.to_world_coordinates([0, 0, self.planesize])),
@@ -50,8 +45,8 @@ class PlaneObject(ViewerSceneObject, GeometryObject):
         """No points data exist for this geometry, Return None."""
         return None
 
-    def _read_frontfaces_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
+    def _read_frontfaces_data(self) -> DataType:
         return self.vertices, [self.facescolor["_default"]] * 4, [[0, 1, 2], [0, 2, 3]]
 
-    def _read_backfaces_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
+    def _read_backfaces_data(self) -> DataType:
         return self.vertices, [self.facescolor["_default"]] * 4, [[2, 1, 0], [3, 2, 0]]

@@ -28,6 +28,9 @@ if TYPE_CHECKING:
     from compas_viewer import Viewer
     from compas_viewer.components.render.shaders import Shader
 
+# Type template of point/line/face data for generating the buffers.
+DataType = Tuple[List[Point], List[Color], List[List[int]]]
+
 
 class ViewerSceneObject(SceneObject):
     """Base class for all Viewer scene objects
@@ -185,10 +188,10 @@ class ViewerSceneObject(SceneObject):
         self._is_collection = False
 
         #  Primitive
-        self._points_data: Optional[Tuple[List[Point], List[Color], List[List[int]]]] = None
-        self._lines_data: Optional[Tuple[List[Point], List[Color], List[List[int]]]] = None
-        self._frontfaces_data: Optional[Tuple[List[Point], List[Color], List[List[int]]]] = None
-        self._backfaces_data: Optional[Tuple[List[Point], List[Color], List[List[int]]]] = None
+        self._points_data: Optional[DataType] = None
+        self._lines_data: Optional[DataType] = None
+        self._frontfaces_data: Optional[DataType] = None
+        self._backfaces_data: Optional[DataType] = None
         self._points_buffer: Optional[Dict[str, Any]] = None
         self._lines_buffer: Optional[Dict[str, Any]] = None
         self._frontfaces_buffer: Optional[Dict[str, Any]] = None
@@ -207,22 +210,22 @@ class ViewerSceneObject(SceneObject):
     # ==========================================================================
 
     @abstractmethod
-    def _read_points_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
+    def _read_points_data(self) -> Optional[DataType]:
         """Read points data from the object."""
         pass
 
     @abstractmethod
-    def _read_lines_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
+    def _read_lines_data(self) -> Optional[DataType]:
         """Read lines data from the object."""
         pass
 
     @abstractmethod
-    def _read_frontfaces_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
+    def _read_frontfaces_data(self) -> Optional[DataType]:
         """Read frontfaces data from the object."""
         pass
 
     @abstractmethod
-    def _read_backfaces_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
+    def _read_backfaces_data(self) -> Optional[DataType]:
         """Read backfaces data from the object."""
         pass
 
@@ -243,7 +246,7 @@ class ViewerSceneObject(SceneObject):
     # buffer
     # ==========================================================================
 
-    def make_buffer_from_data(self, data: Tuple[List[Point], List[Color], List[List[int]]]) -> Dict[str, Any]:
+    def make_buffer_from_data(self, data: DataType) -> Dict[str, Any]:
         """Create buffers from point/line/face data.
 
         Parameters
@@ -266,7 +269,7 @@ class ViewerSceneObject(SceneObject):
 
     def update_buffer_from_data(
         self,
-        data: Tuple[List[Point], List[Color], List[List[int]]],
+        data: DataType,
         buffer: Dict[str, Any],
         update_positions: bool,
         update_colors: bool,

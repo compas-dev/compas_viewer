@@ -1,7 +1,9 @@
 from compas.geometry import NurbsSurface
+from compas.geometry import Point
 from compas.scene import GeometryObject
 from compas.utilities import flatten
 
+from .sceneobject import DataType
 from .sceneobject import ViewerSceneObject
 
 
@@ -17,14 +19,14 @@ class NurbsSurfaceObject(ViewerSceneObject, GeometryObject):
 
         self._triangles = [list(point) for triangle in surface.to_triangles(nu=self.u, nv=self.v) for point in triangle]
 
-    def _read_points_data(self):
-        positions = [list(pt) for pt in flatten(self.geometry.points)]
+    def _read_points_data(self) -> DataType:
+        positions = [Point(*pt) for pt in flatten(self.geometry.points)]
         colors = [self.pointscolor.get(i, self.pointscolor["_default"]) for i in range(len(positions))]  # type: ignore
         elements = [[i] for i in range(len(positions))]
         return positions, colors, elements
 
-    def _read_lines_data(self):
-        positions = [list(pt) for pt in flatten(self.geometry.points)]
+    def _read_lines_data(self) -> DataType:
+        positions = [Point(*pt) for pt in flatten(self.geometry.points)]
         colors = [self.linescolor.get(i, self.linescolor["_default"]) for i in range(len(positions))]  # type: ignore
         count = 0
 
@@ -44,8 +46,8 @@ class NurbsSurfaceObject(ViewerSceneObject, GeometryObject):
                 elements.append([col[i], col[i + 1]])
         return positions, colors, elements
 
-    def _read_frontfaces_data(self):
-        positions = self._triangles
+    def _read_frontfaces_data(self) -> DataType:
+        positions = [Point(*triangle) for triangle in self._triangles]
         colors = [
             self.facescolor.get(i, self.facescolor["_default"]) for i in range(len(self._triangles))  # type: ignore
         ]

@@ -8,6 +8,7 @@ from compas.geometry import Point
 from compas.geometry import Transformation
 from compas.scene import GeometryObject
 
+from .sceneobject import DataType
 from .sceneobject import ViewerSceneObject
 
 
@@ -63,7 +64,7 @@ class FrameObject(ViewerSceneObject, GeometryObject):
         if self.nx % 2 != 0 or self.ny % 2 != 0:
             raise ValueError("The number of grid cells in the X and Y directions must be even numbers.")
 
-    def _read_lines_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
+    def _read_lines_data(self) -> DataType:
         trans = Transformation.from_frame_to_frame(Frame.worldXY(), self.geometry)
 
         positions = []

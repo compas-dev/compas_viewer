@@ -1,14 +1,9 @@
-from typing import List
-from typing import Optional
-from typing import Tuple
 
-from compas.colors import Color
-from compas.geometry import Point
 from compas.geometry import Polyline
 from compas.scene import GeometryObject
 from compas.utilities import pairwise
 
-from .sceneobject import ViewerSceneObject
+from .sceneobject import ViewerSceneObject, DataType
 
 
 class PolylineObject(ViewerSceneObject, GeometryObject):
@@ -18,7 +13,7 @@ class PolylineObject(ViewerSceneObject, GeometryObject):
         super(PolylineObject, self).__init__(geometry=polyline, **kwargs)
         self.geometry: Polyline
 
-    def _read_points_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
+    def _read_points_data(self) -> DataType:
         positions = [point for point in self.geometry.points]
         colors = [
             self.pointscolor.get(i, self.pointscolor["_default"])  # type: ignore
@@ -27,7 +22,7 @@ class PolylineObject(ViewerSceneObject, GeometryObject):
         elements = [[i] for i in range(len(positions))]
         return positions, colors, elements
 
-    def _read_lines_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
+    def _read_lines_data(self) -> DataType:
         positions = []
         colors = []
         elements = []

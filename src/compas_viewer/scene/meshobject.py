@@ -1,15 +1,13 @@
-from typing import List
 from typing import Optional
-from typing import Tuple
 
 from compas.colors import Color
 from compas.datastructures import Mesh
-from compas.geometry import Point
 from compas.geometry import centroid_points
 from compas.geometry import is_coplanar
 from compas.scene import MeshObject as BaseMeshObject
 from compas.utilities import pairwise
 
+from .sceneobject import DataType
 from .sceneobject import ViewerSceneObject
 
 
@@ -68,7 +66,7 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
             self._vertex_xyz = dict(zip(self.mesh.vertices(), points))  # type: ignore
         return self._vertex_xyz
 
-    def _read_points_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
+    def _read_points_data(self) -> DataType:
         positions = []
         colors = []
         elements = []
@@ -82,7 +80,7 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
             i += 1
         return positions, colors, elements
 
-    def _read_lines_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
+    def _read_lines_data(self) -> DataType:
         positions = []
         colors = []
         elements = []
@@ -109,7 +107,7 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
             i += 2
         return positions, colors, elements
 
-    def _read_frontfaces_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
+    def _read_frontfaces_data(self) -> DataType:
         positions = []
         colors = []
         elements = []
@@ -179,7 +177,7 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
 
         return positions, colors, elements
 
-    def _read_backfaces_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
+    def _read_backfaces_data(self) -> DataType:
         if self.use_vertexcolors:
             self.vertexcolor = {
                 vertex: self._mesh.vertex_attribute(vertex, "color") or Color.grey() for vertex in self._mesh.vertices()

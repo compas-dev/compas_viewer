@@ -1,13 +1,8 @@
-from typing import List
-from typing import Optional
-from typing import Tuple
-
-from compas.colors import Color
-from compas.geometry import Point
 from compas.geometry import Polyline
 from compas.utilities import pairwise
 
 from .meshobject import MeshObject
+from .sceneobject import DataType
 
 try:
     from compas_occ.brep import BRep
@@ -29,7 +24,7 @@ try:
             super().__init__(mesh=mesh, **kwargs)
             self.boundaries = boundaries
 
-        def _read_lines_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
+        def _read_lines_data(self) -> DataType:
             positions = []
             colors = []
             elements = []

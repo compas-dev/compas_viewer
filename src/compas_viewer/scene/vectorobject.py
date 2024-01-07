@@ -1,16 +1,14 @@
 from typing import Any
 from typing import Dict
-from typing import List
 from typing import Optional
-from typing import Tuple
 
-from compas.colors import Color
 from compas.geometry import Point
 from compas.geometry import Vector
 from compas.scene import GeometryObject
 
 from compas_viewer.components.render.shaders.shader import Shader
 
+from .sceneobject import DataType
 from .sceneobject import ViewerSceneObject
 
 
@@ -44,7 +42,7 @@ class VectorObject(ViewerSceneObject, GeometryObject):
         super(VectorObject, self).__init__(geometry=vector, **kwargs)
         self.arrow_buffer: Dict[str, Any]
 
-    def _read_lines_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
+    def _read_lines_data(self) -> DataType:
         arrow_end = self._anchor + self.geometry * (1 - self.config.vectorsize)
         arrow_width = self.config.vectorsize * self.config.vectorsize * self.geometry.length
         positions = [
