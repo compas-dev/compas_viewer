@@ -1,5 +1,4 @@
 import sys
-from os import path
 from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Any
@@ -16,23 +15,22 @@ from compas.datastructures import Mesh
 from compas.geometry import Frame
 from compas.geometry import Geometry
 from compas.scene import Scene
-from PySide6 import QtCore
-from PySide6 import QtGui
-from PySide6 import QtWidgets
 from PySide6.QtCore import QCoreApplication
-from PySide6.QtGui import QIcon
+from PySide6.QtCore import QTimer
+from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QMainWindow
 
-from compas_viewer import DATA
 from compas_viewer.actions import Action
 from compas_viewer.actions import register
 from compas_viewer.components import Render
 from compas_viewer.configurations import ActionConfig
 from compas_viewer.configurations import ActionConfigType
 from compas_viewer.configurations import ControllerConfig
+from compas_viewer.configurations import LayoutConfig
 from compas_viewer.configurations import RenderConfig
 from compas_viewer.configurations import SceneConfig
-from compas_viewer.configurations import ViewerConfig
 from compas_viewer.controller import Controller
+from compas_viewer.layout import Layout
 from compas_viewer.scene import FrameObject
 from compas_viewer.scene import ViewerSceneObject
 
@@ -56,7 +54,7 @@ class Timer:
     """
 
     def __init__(self, interval: int, callback: Callable, singleshot: bool = False):
-        self.timer = QtCore.QTimer()
+        self.timer = QTimer()
         self.timer.setInterval(interval)
         self.timer.timeout.connect(callback)
         self.timer.setSingleShot(singleshot)
@@ -92,8 +90,12 @@ class Viewer(Scene):
 
     Attributes
     ----------
-    config : :class:`compas_viewer.configurations.ViewerConfig`
-        The configuration for the viewer.
+    render : :class:`compas_viewer.components.render.Render`
+        The render component of the viewer.
+    controller : :class:`compas_viewer.controller.Controller`
+        The controller component of the viewer.
+    layout : :class:`compas_viewer.layouts.Layout`
+        The layout component of the viewer.
 
     Notes
     -----
@@ -110,6 +112,10 @@ class Viewer(Scene):
     >>> viewer = Viewer() # doctest: +SKIP
     >>> viewer.show() # doctest: +SKIP
 
+    See Also
+    --------
+    :class:`compas.scene.Scene`
+
     """
 
     def __init__(
@@ -124,30 +130,28 @@ class Viewer(Scene):
         configpath: Optional[str] = None,
     ):
         super(Viewer, self).__init__()
+
         # Custom or default config
         if configpath is None:
-            self.config = ViewerConfig.from_default()
             self.render_config = RenderConfig.from_default()
             self.scene_config = SceneConfig.from_default()
             self.controller_config = ControllerConfig.from_default()
+            self.layout_config = LayoutConfig.from_default()
         else:
-            self.config = ViewerConfig.from_json(Path(configpath, "viewer.json"))
             self.render_config = RenderConfig.from_json(Path(configpath, "render.json"))
             self.scene_config = SceneConfig.from_json(Path(configpath, "scene.json"))
             self.controller_config = ControllerConfig.from_json(Path(configpath, "controller.json"))
-
-        # Controller
-        self.controller = Controller(self, self.controller_config)
+            self.layout_config = LayoutConfig.from_json(Path(configpath, "layout.json"))
 
         #  In-code config
         if title is not None:
-            self.config.title = title
+            self.layout_config.title = title
         if fullscreen is not None:
-            self.config.fullscreen = fullscreen
+            self.layout_config.fullscreen = fullscreen
         if width is not None:
-            self.config.width = width
+            self.layout_config.width = width
         if height is not None:
-            self.config.height = height
+            self.layout_config.height = height
         if rendermode is not None:
             self.render_config.rendermode = rendermode
         if viewmode is not None:
@@ -155,40 +159,11 @@ class Viewer(Scene):
         if show_grid is not None:
             self.render_config.show_grid = show_grid
 
-        # `on` function
-        self.timer: Timer
-        self.frame_count: int = 0
+        #  Application
+        self.app = QCoreApplication.instance() or QApplication(sys.argv)
+        self.window = QMainWindow()
 
-        #  Selection
-        self.instance_colors: Dict[Tuple[int, int, int], ViewerSceneObject] = {}
-
-        #  Primitive
-        self.objects: List[ViewerSceneObject]
-
-        self._init()
-
-    def __new__(cls, *args, **kwargs):
-        instance = super(Viewer, cls).__new__(cls)
-        Scene.viewerinstance = instance  # type: ignore
-        return instance
-
-    # ==========================================================================
-    # Init functions
-    # ==========================================================================
-
-    def _init(self):
-        """Initialize the components of the user interface."""
-        self._glFormat = QtGui.QSurfaceFormat()
-        self._glFormat.setVersion(2, 1)
-        self._glFormat.setProfile(QtGui.QSurfaceFormat.OpenGLContextProfile.CompatibilityProfile)
-        self._glFormat.setDefaultFormat(self._glFormat)
-        QtGui.QSurfaceFormat.setDefaultFormat(self._glFormat)
-        self._app = QCoreApplication.instance() or QtWidgets.QApplication(sys.argv)
-        self._app.references = set()  # type: ignore
-        self._window = QtWidgets.QMainWindow()
-        self._icon = QIcon(path.join(DATA, "compas_icon_white.png"))
-        self._app.setWindowIcon(self._icon)  # type: ignore
-        self._app.setApplicationName(self.config.title)
+        # Render
         self.grid = FrameObject(
             Frame.worldXY(),
             framesize=self.render_config.gridsize,
@@ -200,150 +175,27 @@ class Viewer(Scene):
             config=self.scene_config,
         )
         self.render = Render(self, self.render_config)
-        self._window.setCentralWidget(self.render)
-        self._window.setContentsMargins(0, 0, 0, 0)
-        self._app.references.add(self._window)  # type: ignore
-        self._window.resize(self.config.width, self.config.height)
-        if self.config.fullscreen:
-            self._window.setWindowState(self._window.windowState() | QtCore.Qt.WindowState.WindowMaximized)
-        self._init_statusbar()
 
-    def _init_statusbar(self):
-        self.statusbar = self._window.statusBar()
-        self.statusbar.setContentsMargins(0, 0, 0, 0)
-        self.statusText = QtWidgets.QLabel(self.config.statusbar)
-        self.statusbar.addWidget(self.statusText, 1)
-        if self.config.show_fps:
-            self.statusFps = QtWidgets.QLabel("fps: ")
-            self.statusbar.addWidget
+        # Layout
+        self.layout = Layout(self, self.layout_config)
 
-    def _resize(self, width: int, height: int):
-        """Resize the main window programmatically.
+        # Controller
+        self.controller = Controller(self, self.controller_config)
 
-        Parameters
-        ----------
-        width: int
-            Width of the viewer window.
-        height: int
-            Height of the viewer window.
+        # `on` function
+        self.timer: Timer
+        self.frame_count: int = 0
 
-        """
-        self._window.resize(width, height)
-        desktop = self._app.desktop()  # type: ignore
-        rect = desktop.availableGeometry()
-        x = int(0.5 * (rect.width() - width))
-        y = int(0.5 * (rect.height() - height))
-        self._window.setGeometry(x, y, width, height)
-        self.config.width = width
-        self.config.height = height
+        #  Selection
+        self.instance_colors: Dict[Tuple[int, int, int], ViewerSceneObject] = {}
 
-    # ==========================================================================
-    # Messages
-    # ==========================================================================
+        #  Primitive
+        self.objects: List[ViewerSceneObject]
 
-    def about(self):
-        """Display the about message as defined in the config file."""
-        QtWidgets.QMessageBox.about(self._window, "About", self.config.about)
-
-    def info(self, message: str):
-        """Display info.
-
-        Parameters
-        ----------
-        message : str
-            An info message.
-
-        """
-        QtWidgets.QMessageBox.information(self._window, "Info", message)
-
-    def warning(self, message: str):
-        """Display a warning.
-
-        Parameters
-        ----------
-        message : str
-            A warning message.
-
-        """
-        QtWidgets.QMessageBox.warning(self._window, "Warning", message)
-
-    def critical(self, message: str):
-        """Display a critical warning.
-
-        Parameters
-        ----------
-        message : str
-            A critical warning message.
-
-        """
-        QtWidgets.QMessageBox.critical(self._window, "Critical", message)
-
-    def question(self, message: str) -> bool:
-        """Ask a question.
-
-        Parameters
-        ----------
-        message : str
-            A question.
-
-        """
-        flags = QtWidgets.QMessageBox.StandardButton.Yes
-        flags |= QtWidgets.QMessageBox.StandardButton.No
-        response = QtWidgets.QMessageBox.question(self._window, "Question", message, flags)  # type: ignore
-        if response == QtWidgets.QMessageBox.StandardButton.Yes:
-            return True
-        return False
-
-    def confirm(self, message: str) -> bool:
-        """Confirm the execution of an action.
-
-        Parameters
-        ----------
-        message : str
-            Message to inform the user.
-
-        Returns
-        -------
-        bool
-            True if the user confirms.
-            False otherwise.
-
-        Examples
-        --------
-        .. code-block:: python
-
-            if viewer.confirm("Should i continue?"):
-                continue
-
-        """
-        flags = QtWidgets.QMessageBox.StandardButton.Ok
-        flags |= QtWidgets.QMessageBox.StandardButton.Cancel
-        response = QtWidgets.QMessageBox.warning(self._window, "Confirmation", message, flags)
-        if response == QtWidgets.QMessageBox.StandardButton.Ok:
-            return True
-        return False
-
-    def status(self, message: str):
-        """Display a message in the status bar.
-
-        Parameters
-        ----------
-        message : str
-            A status message.
-
-        """
-        self.statusText.setText(message)
-
-    def fps(self, fps: int):
-        """Update fps info in the status bar.
-
-        Parameters
-        ----------
-        fps : int
-            The number of frames per second.
-
-        """
-        self.statusFps.setText("fps: {}".format(fps))
+    def __new__(cls, *args, **kwargs):
+        instance = super(Viewer, cls).__new__(cls)
+        Scene.viewerinstance = instance  # type: ignore
+        return instance
 
     # ==========================================================================
     # Runtime
@@ -353,9 +205,9 @@ class Viewer(Scene):
         """Show the viewer window."""
 
         self.started = True
-        self._window.show()
+        self.layout.window.show()
         # stop point of the main thread:
-        self._app.exec_()
+        self.app.exec_()
 
     def on(self, interval: int, timeout: Optional[int] = None, frames: Optional[int] = None) -> Callable:
         """Decorator for callbacks of a dynamic drawing process.

@@ -62,7 +62,6 @@ class Selector(QObject):
         super().__init__()
         self.render = render
         self.viewer = render.viewer
-        self.controller = render.viewer.controller
         self.selectioncolor = render.config.selector.selectioncolor
 
         #  Drag selection
@@ -83,8 +82,8 @@ class Selector(QObject):
         for _, obj in self.render.viewer.instance_colors.items():
             obj.is_selected = False
 
-        x = self.controller.mouse.last_pos.x()
-        y = self.controller.mouse.last_pos.y()
+        x = self.render.viewer.controller.mouse.last_pos.x()
+        y = self.render.viewer.controller.mouse.last_pos.y()
         instance_color = self.read_instance_color((x, y, x, y))
         unique_color = unique(instance_color, axis=0, return_counts=False)
 
@@ -95,8 +94,8 @@ class Selector(QObject):
     def deselect_action(self):
         """Deselect the object under the mouse cursor."""
 
-        x = self.controller.mouse.last_pos.x()
-        y = self.controller.mouse.last_pos.y()
+        x = self.render.viewer.controller.mouse.last_pos.x()
+        y = self.render.viewer.controller.mouse.last_pos.y()
         instance_color = self.read_instance_color((x, y, x, y))
         unique_color = unique(instance_color, axis=0, return_counts=False)
 
@@ -111,8 +110,8 @@ class Selector(QObject):
         --------
         :func:`compas_viewer.components.render.selector.Selector.select_action`
         """
-        x = self.controller.mouse.last_pos.x()
-        y = self.controller.mouse.last_pos.y()
+        x = self.render.viewer.controller.mouse.last_pos.x()
+        y = self.render.viewer.controller.mouse.last_pos.y()
         instance_color = self.read_instance_color((x, y, x, y))
         unique_color = unique(instance_color, axis=0, return_counts=False)
 
@@ -198,7 +197,7 @@ class Selector(QObject):
 
         # 0. Get the rectangle area.
         x1, y1, x2, y2 = box
-        x, y = min(x1, x2), self.viewer.config.height - max(y1, y2)
+        x, y = min(x1, x2), self.viewer.layout.config.height - max(y1, y2)
         width = max(self.PIXEL_SELECTION_INCREMENTAL, abs(x1 - x2))
         height = max(self.PIXEL_SELECTION_INCREMENTAL, abs(y1 - y2))
         r = self.render.devicePixelRatio()
