@@ -14,7 +14,8 @@
             "view_top": { "key": "f3" },
             "view_perspective": { "key": "f4" },
             "view_front": { "key": "f5" },
-            "view_right": { "key": "f6" }
+            "view_right": { "key": "f6" },
+            "delete_selected": { "key": "delete" }
         }
     },
     "guid": "5088a780-910d-4df3-a1b3-d389e0e9c7f2"
