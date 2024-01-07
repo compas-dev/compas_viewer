@@ -28,6 +28,9 @@ if TYPE_CHECKING:
     from compas_viewer import Viewer
     from compas_viewer.components.render.shaders import Shader
 
+# Type template of point/line/face data for generating the buffers.
+DataType = Tuple[List[Point], List[Color], List[List[int]]]
+
 
 class ViewerSceneObject(SceneObject):
     """Base class for all Viewer scene objects
@@ -103,9 +106,6 @@ class ViewerSceneObject(SceneObject):
         The center of object bounding box, as a point.
 
     """
-
-    # Enhance line width for selection only.
-    LINEWIDTH_SELECTION_INCREMENTAL = 2
 
     LINEARDEFLECTION = 0.2
 
@@ -185,10 +185,10 @@ class ViewerSceneObject(SceneObject):
         self._is_collection = False
 
         #  Primitive
-        self._points_data: Optional[Tuple[List[Point], List[Color], List[List[int]]]] = None
-        self._lines_data: Optional[Tuple[List[Point], List[Color], List[List[int]]]] = None
-        self._frontfaces_data: Optional[Tuple[List[Point], List[Color], List[List[int]]]] = None
-        self._backfaces_data: Optional[Tuple[List[Point], List[Color], List[List[int]]]] = None
+        self._points_data: Optional[DataType] = None
+        self._lines_data: Optional[DataType] = None
+        self._frontfaces_data: Optional[DataType] = None
+        self._backfaces_data: Optional[DataType] = None
         self._points_buffer: Optional[Dict[str, Any]] = None
         self._lines_buffer: Optional[Dict[str, Any]] = None
         self._frontfaces_buffer: Optional[Dict[str, Any]] = None
@@ -207,22 +207,22 @@ class ViewerSceneObject(SceneObject):
     # ==========================================================================
 
     @abstractmethod
-    def _read_points_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
+    def _read_points_data(self) -> Optional[DataType]:
         """Read points data from the object."""
         pass
 
     @abstractmethod
-    def _read_lines_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
+    def _read_lines_data(self) -> Optional[DataType]:
         """Read lines data from the object."""
         pass
 
     @abstractmethod
-    def _read_frontfaces_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
+    def _read_frontfaces_data(self) -> Optional[DataType]:
         """Read frontfaces data from the object."""
         pass
 
     @abstractmethod
-    def _read_backfaces_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
+    def _read_backfaces_data(self) -> Optional[DataType]:
         """Read backfaces data from the object."""
         pass
 
@@ -243,7 +243,7 @@ class ViewerSceneObject(SceneObject):
     # buffer
     # ==========================================================================
 
-    def make_buffer_from_data(self, data: Tuple[List[Point], List[Color], List[List[int]]]) -> Dict[str, Any]:
+    def make_buffer_from_data(self, data: DataType) -> Dict[str, Any]:
         """Create buffers from point/line/face data.
 
         Parameters
@@ -266,7 +266,7 @@ class ViewerSceneObject(SceneObject):
 
     def update_buffer_from_data(
         self,
-        data: Tuple[List[Point], List[Color], List[List[int]]],
+        data: DataType,
         buffer: Dict[str, Any],
         update_positions: bool,
         update_colors: bool,
@@ -450,7 +450,7 @@ class ViewerSceneObject(SceneObject):
         if self._lines_buffer is not None and (self.show_lines or wireframe):
             shader.bind_attribute("position", self._lines_buffer["positions"])
             shader.draw_lines(
-                width=self.lineswidth + self.LINEWIDTH_SELECTION_INCREMENTAL,
+                width=self.lineswidth + self.viewer.render.selector.PIXEL_SELECTION_INCREMENTAL,
                 elements=self._lines_buffer["elements"],
                 n=self._lines_buffer["n"],
             )

@@ -1,14 +1,10 @@
 import math
-from typing import List
-from typing import Optional
-from typing import Tuple
 
-from compas.colors import Color
 from compas.geometry import Circle
-from compas.geometry import Point
 from compas.scene import GeometryObject
 from compas.utilities import pairwise
 
+from .sceneobject import DataType
 from .sceneobject import ViewerSceneObject
 
 
@@ -33,7 +29,7 @@ class CircleObject(ViewerSceneObject, GeometryObject):
             for i in range(self.u)
         ]
 
-    def _read_points_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
+    def _read_points_data(self) -> DataType:
         positions = []
         colors = []
         elements = []
@@ -47,7 +43,7 @@ class CircleObject(ViewerSceneObject, GeometryObject):
 
         return positions, colors, elements
 
-    def _read_lines_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
+    def _read_lines_data(self) -> DataType:
         positions = []
         colors = []
         elements = []
