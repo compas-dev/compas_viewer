@@ -1,9 +1,9 @@
-
 from compas.geometry import Polyline
 from compas.scene import GeometryObject
 from compas.utilities import pairwise
 
-from .sceneobject import ViewerSceneObject, DataType
+from .sceneobject import DataType
+from .sceneobject import ViewerSceneObject
 
 
 class PolylineObject(ViewerSceneObject, GeometryObject):

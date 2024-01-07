@@ -1,5 +1,5 @@
-from math import ceil
 from typing import TYPE_CHECKING
+from typing import Tuple
 
 from numpy import all
 from numpy import any
@@ -7,11 +7,10 @@ from numpy import array
 from numpy import frombuffer
 from numpy import uint8
 from numpy import unique
-from numpy.typing import NDArray
+from OpenGL import GL
 from PySide6.QtCore import QObject
 from PySide6.QtCore import QPoint
 from PySide6.QtCore import Signal
-from scipy.ndimage import zoom
 
 if TYPE_CHECKING:
     from .render import Render
@@ -43,6 +42,9 @@ class Selector(QObject):
 
     # The anti-aliasing factor for the drag selection.
     ANTI_ALIASING_FACTOR = 10
+
+    # Enhance pixel  width for selection.
+    PIXEL_SELECTION_INCREMENTAL = 2
 
     select = Signal()
     deselect = Signal()
@@ -83,19 +85,22 @@ class Selector(QObject):
 
         x = self.controller.mouse.last_pos.x()
         y = self.controller.mouse.last_pos.y()
-        instance_color = tuple(self.read_instance_map()[y][x])
+        instance_color = self.read_instance_color((x, y, x, y))
+        unique_color = unique(instance_color, axis=0, return_counts=False)
 
-        selected_obj = self.render.viewer.instance_colors.get(instance_color)  # type: ignore
+        selected_obj = self.render.viewer.instance_colors.get(tuple(unique_color[0]))  # type: ignore
         if selected_obj:
             selected_obj.is_selected = True
 
     def deselect_action(self):
         """Deselect the object under the mouse cursor."""
+
         x = self.controller.mouse.last_pos.x()
         y = self.controller.mouse.last_pos.y()
-        instance_color = tuple(self.read_instance_map()[y][x])
+        instance_color = self.read_instance_color((x, y, x, y))
+        unique_color = unique(instance_color, axis=0, return_counts=False)
 
-        selected_obj = self.render.viewer.instance_colors.get(instance_color)  # type: ignore
+        selected_obj = self.render.viewer.instance_colors.get(tuple(unique_color[0]))  # type: ignore
         if selected_obj:
             selected_obj.is_selected = False
 
@@ -106,14 +111,14 @@ class Selector(QObject):
         --------
         :func:`compas_viewer.components.render.selector.Selector.select_action`
         """
-
         x = self.controller.mouse.last_pos.x()
         y = self.controller.mouse.last_pos.y()
-        instance_color = tuple(self.read_instance_map()[y][x])
+        instance_color = self.read_instance_color((x, y, x, y))
+        unique_color = unique(instance_color, axis=0, return_counts=False)
 
-        selected_obj = self.render.viewer.instance_colors.get(instance_color)  # type: ignore
+        selected_obj = self.render.viewer.instance_colors.get(tuple(unique_color[0]))  # type: ignore
         if selected_obj:
-            selected_obj.is_selected = not selected_obj.is_selected
+            selected_obj.is_selected = True
 
     def drag_selection_action(self):
         """Drag select the objects in the rectangle area."""
@@ -122,13 +127,10 @@ class Selector(QObject):
         for _, obj in self.render.viewer.instance_colors.items():
             obj.is_selected = False
 
-        instance_map = self.read_instance_map()
-        box_map = instance_map[
-            self.drag_start_pt.y() : self.drag_end_pt.y(),  # noqa: E203
-            self.drag_start_pt.x() : self.drag_end_pt.x(),  # noqa: E203
-        ]
-
-        unique_colors = unique(box_map.reshape(box_map.shape[0] * box_map.shape[1], 3), axis=0, return_counts=True)
+        instance_color = self.read_instance_color(
+            (self.drag_start_pt.x(), self.drag_start_pt.y(), self.drag_end_pt.x(), self.drag_end_pt.y())
+        )
+        unique_colors = unique(instance_color, axis=0, return_counts=True)
         unique_colors = array(
             [unique_colors[0][i] for i, count in enumerate(unique_colors[1]) if count > self.ANTI_ALIASING_FACTOR]
         )
@@ -146,13 +148,10 @@ class Selector(QObject):
         :func:`compas_viewer.components.render.selector.Selector.drag_selection_action`
         """
 
-        instance_map = self.read_instance_map()
-        box_map = instance_map[
-            self.drag_start_pt.y() : self.drag_end_pt.y(),  # noqa: E203
-            self.drag_start_pt.x() : self.drag_end_pt.x(),  # noqa: E203
-        ]
-
-        unique_colors = unique(box_map.reshape(box_map.shape[0] * box_map.shape[1], 3), axis=0, return_counts=True)
+        instance_color = self.read_instance_color(
+            (self.drag_start_pt.x(), self.drag_start_pt.y(), self.drag_end_pt.x(), self.drag_end_pt.y())
+        )
+        unique_colors = unique(instance_color, axis=0, return_counts=True)
         unique_colors = array(
             [unique_colors[0][i] for i, count in enumerate(unique_colors[1]) if count > self.ANTI_ALIASING_FACTOR]
         )
@@ -162,16 +161,22 @@ class Selector(QObject):
                 obj.is_selected = False
                 continue
 
-    def read_instance_map(self) -> NDArray:
-        """Compile the instance buffer into instance map.
+    def read_instance_color(self, box: Tuple[int, int, int, int]):
+        """
+        Paint the instance map quickly, and then read the color of the specified area.
 
-        Returns
-        -------
-        instance_color : NDArray
-            The instance map.
+        Parameters
+        ----------
+        box : Tuple[int, int, int, int]
+            The box area [x1, y1, x2, y2] to be read. x1=x2 and y1=y2 means a single point.
 
         Notes
         -----
+        The instance map is used by the selector to identify selected objects.
+        The mechanism of a :class:`compas_viewer.components.render.selector.Selector`
+        is picking the color from instance map and then find the corresponding object.
+        Anti aliasing, which is always force opened in many machines,  can cause color picking inaccuracy.
+
         The instance buffer created by the GL is based on the "device-independent pixels",
         while "physical pixels" is the common unit. The method :func:`PySide6.QtGui.QPaintDevice.devicePixelRatio()`
         plays a role in the conversion between the two units, which is different on different devices.
@@ -179,16 +184,34 @@ class Selector(QObject):
         This method contains an uniform-sampling-similar math operation,
         which is not absolutely accurate but enough for the selection.
 
+        See Also
+        --------
+        :func:`compas_viewer.components.render.selector.Selector.ANTI_ALIASING_FACTOR`
+        :attr:`compas_viewer.components.render.rendermode`
+
         References
         ----------
         * https://doc.qt.io/qt-6/qscreen.html#devicePixelRatio-prop
+        * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glReadPixels.xhtml
+        * https://doc.qt.io/qt-6/qopenglwidget.html#makeCurrent
         """
+
+        # 0. Get the rectangle area.
+        x1, y1, x2, y2 = box
+        x, y = min(x1, x2), self.viewer.config.height - max(y1, y2)
+        width = max(self.PIXEL_SELECTION_INCREMENTAL, abs(x1 - x2))
+        height = max(self.PIXEL_SELECTION_INCREMENTAL, abs(y1 - y2))
         r = self.render.devicePixelRatio()
-        x_ratio = self.viewer.config.width / ceil(r * self.viewer.config.width)
-        y_ratio = self.viewer.config.height / ceil(r * self.viewer.config.height)
-        instance_map = frombuffer(buffer=self.render.instance_buffer, dtype=uint8).reshape(
-            ceil(r * self.viewer.config.height), ceil(r * self.viewer.config.width), 3
-        )
-        instance_map = zoom(instance_map, (x_ratio, y_ratio, 1), order=1)
-        instance_map = instance_map[::-1, ::1, :]
+
+        # 1. Repaint the canvas with instance color.
+        self.render.makeCurrent()
+        self.render.paintGL(is_instance=True)
+
+        # 2. Read the instance buffer.
+        instance_buffer = GL.glReadPixels(x * r, y * r, width * r, height * r, GL.GL_RGB, GL.GL_UNSIGNED_BYTE)
+
+        # 3. Return the instance color.
+        #      From 1-3, the canvas goes through a quick repaint process, which should be not noticeable to the user.
+        instance_map = frombuffer(buffer=instance_buffer, dtype=uint8).reshape(-1, 3)
+
         return instance_map

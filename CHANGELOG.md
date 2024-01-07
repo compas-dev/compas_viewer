@@ -44,6 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added `NetworkObject`.
 
 ### Changed
+* Refactored the `Selector` and the instance_map structure, the main frame rate is higher and selection action is faster.
 * Fixed the bug of the `Selector`, drag selection is now more accurate.
 * More performative instance map and QObject-based selection architecture.
 * Naming of the keys, mouses, and modifiers are changed. The key string which is the same as what it was called in the PySide6.QtCore.Qt, with lowercases and with prefix&underscores removed.
