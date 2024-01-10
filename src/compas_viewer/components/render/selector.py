@@ -135,6 +135,9 @@ class Selector(QObject):
             [unique_colors[0][i] for i, count in enumerate(unique_colors[1]) if count > self.ANTI_ALIASING_FACTOR]
         )
 
+        if len(unique_colors) == 0:
+            return
+
         for color, obj in self.render.viewer.instance_colors.items():
             if any(all(color == unique_colors, axis=1)):
                 obj.is_selected = True
@@ -156,8 +159,11 @@ class Selector(QObject):
             [unique_colors[0][i] for i, count in enumerate(unique_colors[1]) if count > self.ANTI_ALIASING_FACTOR]
         )
 
+        if len(unique_colors) == 0:
+            return
+
         for color, obj in self.render.viewer.instance_colors.items():
-            if color in unique_colors:
+            if any(all(color == unique_colors, axis=1)):
                 obj.is_selected = False
                 continue
 
