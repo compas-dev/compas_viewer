@@ -60,8 +60,6 @@ class Layout:
     """
     The :class:`compas_viewer.layouts.Layout` class manages all the layout and other UI-related information of the viewer.
 
-    This is the abstract class for all the layout classes.
-
     Parameters
     ----------
     config : :class:`compas_viewer.configurations.layout_config.LayoutConfig`
