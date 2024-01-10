@@ -109,7 +109,7 @@ class Render(QOpenGLWidget):
         self.config.viewmode = viewmode
         self.shader_model.bind()
         self.shader_model.uniform4x4(
-            "projection", self.camera.projection(self.viewer.layout.config.width, self.viewer.layout.config.height)
+            "projection", self.camera.projection(self.viewer.layout.config.window.width, self.viewer.layout.config.window.height)
         )
         self.shader_model.release()
         self.camera.reset_position()
@@ -183,8 +183,8 @@ class Render(QOpenGLWidget):
         ----------
         * https://doc.qt.io/qtforpython-6/PySide6/QtOpenGL/QOpenGLWindow.html#PySide6.QtOpenGL.PySide6.QtOpenGL.QOpenGLWindow.resizeGL # noqa: E501
         """
-        self.viewer.layout.config.width = w
-        self.viewer.layout.config.height = h
+        self.viewer.layout.config.window.width = w
+        self.viewer.layout.config.window.height = h
         GL.glViewport(0, 0, w, h)
         self.resize(w, h)
 
@@ -215,7 +215,7 @@ class Render(QOpenGLWidget):
         self._frames += 1
         if time.time() - self._now > 1:
             self._now = time.time()
-            self.viewer.layout.fps(self._frames)
+            # self.viewer.layout.fps(self._frames)
             self._frames = 0
 
     # ==========================================================================
@@ -359,7 +359,7 @@ class Render(QOpenGLWidget):
         for obj in self.viewer.objects:
             obj.init()
 
-        projection = self.camera.projection(self.viewer.layout.config.width, self.viewer.layout.config.height)
+        projection = self.camera.projection(self.viewer.layout.config.window.width, self.viewer.layout.config.window.height)
         viewworld = self.camera.viewworld()
         transform = list(identity(4, dtype=float32))
         # create the program
@@ -388,7 +388,7 @@ class Render(QOpenGLWidget):
         self.shader_arrow.uniform4x4("viewworld", viewworld)
         self.shader_arrow.uniform4x4("transform", transform)
         self.shader_arrow.uniform1f("opacity", self.opacity)
-        self.shader_arrow.uniform1f("aspect", self.viewer.layout.config.width / self.viewer.layout.config.height)
+        self.shader_arrow.uniform1f("aspect", self.viewer.layout.config.window.width / self.viewer.layout.config.window.height)
         self.shader_arrow.release()
 
         self.shader_instance = Shader(name="instance")
@@ -416,8 +416,8 @@ class Render(QOpenGLWidget):
         h : int, optional
             The height of the render, by default None.
         """
-        w = w or self.viewer.layout.config.width
-        h = h or self.viewer.layout.config.height
+        w = w or self.viewer.layout.config.window.width
+        h = h or self.viewer.layout.config.window.height
 
         projection = self.camera.projection(w, h)
         self.shader_model.bind()
@@ -576,8 +576,8 @@ class Render(QOpenGLWidget):
                     self.viewer.controller.mouse.last_pos.x(),
                     self.viewer.controller.mouse.last_pos.y(),
                 ),
-                self.viewer.layout.config.width,
-                self.viewer.layout.config.height,
+                self.viewer.layout.config.window.width,
+                self.viewer.layout.config.window.height,
             )
 
     def paint_instance(self):

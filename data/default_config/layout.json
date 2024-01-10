@@ -2,14 +2,59 @@
     "dtype": "compas_viewer.configurations/LayoutConfig",
     "data": {
         "window": {
-            "about": "compas_viewer is the standalone viewer for COMPAS.",
-            "title": "COMPAS VIEWER",
-            "width": 800,
-            "height": 800,
-            "fullscreen": false
+            "dtype": "compas_viewer.configurations/WindowConfig",
+            "data": {
+                "about": "compas_viewer is the standalone viewer for COMPAS.",
+                "title": "COMPAS VIEWER",
+                "width": 800,
+                "height": 800,
+                "fullscreen": false
+            },
+            "guid": "52a481b3-0a86-45df-92b1-dbd59e9cb7a6"
         },
 
-        "statusbar": { "text": "compas_viewer", "show_fps": true }
+        "statusbar": {
+            "dtype": "compas_viewer.configurations/StatusBarConfig",
+            "data": {
+                "text": "compas_viewer",
+                "show_fps": true
+            },
+            "guid": "52a481b3-0a86-45df-92b2-dbd59e9cb7a6"
+        },
+
+        "menubar": {
+            "dtype": "compas_viewer.configurations/MenuBarConfig",
+
+            "data": {
+                "File": {
+                    "Import": {
+                        "action": "import_file"
+                    },
+                    "Export": {
+                        "action": "export_file"
+                    }
+                },
+
+                "About": {
+                    "COMPAS Framework": {
+                        "action": "url",
+                        "kwargs": { "url": "https://compas.dev/" }
+                    },
+
+                    "COMPAS Viewer": {
+                        "action": "url",
+                        "kwargs": { "url": "https://compas.dev/compas_viewer/latest/" }
+                    },
+
+                    "COMPAS Core": {
+                        "action": "url",
+                        "kwargs": { "url": "https://compas.dev/compas_viewer/latest/" }
+                    }
+                }
+            },
+            "guid": "52a481b2-0a86-46df-92b2-dbd59e9cb7a6"
+        },
+        "guid": "52a481b2-0a86-45df-92b2-dbd59e9cb7a6"
     },
     "guid": "52a481b3-0a86-45df-92b0-dbd59e9cb7a6"
 }

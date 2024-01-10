@@ -145,13 +145,13 @@ class Viewer(Scene):
 
         #  In-code config
         if title is not None:
-            self.layout_config.title = title
+            self.layout_config.window.title = title
         if fullscreen is not None:
-            self.layout_config.fullscreen = fullscreen
+            self.layout_config.window.fullscreen = fullscreen
         if width is not None:
-            self.layout_config.width = width
+            self.layout_config.window.width = width
         if height is not None:
-            self.layout_config.height = height
+            self.layout_config.window.height = height
         if rendermode is not None:
             self.render_config.rendermode = rendermode
         if viewmode is not None:
@@ -176,11 +176,12 @@ class Viewer(Scene):
         )
         self.render = Render(self, self.render_config)
 
-        # Layout
-        self.layout = Layout(self, self.layout_config)
-
         # Controller
         self.controller = Controller(self, self.controller_config)
+
+        # Layout
+        self.layout = Layout(self, self.layout_config)
+        self.layout.init()
 
         # `on` function
         self.timer: Timer
@@ -205,7 +206,7 @@ class Viewer(Scene):
         """Show the viewer window."""
 
         self.started = True
-        self.layout.window.show()
+        self.window.show()
         # stop point of the main thread:
         self.app.exec_()
 

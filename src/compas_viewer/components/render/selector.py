@@ -197,7 +197,7 @@ class Selector(QObject):
 
         # 0. Get the rectangle area.
         x1, y1, x2, y2 = box
-        x, y = min(x1, x2), self.viewer.layout.config.height - max(y1, y2)
+        x, y = min(x1, x2), self.viewer.layout.config.window.height - max(y1, y2)
         width = max(self.PIXEL_SELECTION_INCREMENTAL, abs(x1 - x2))
         height = max(self.PIXEL_SELECTION_INCREMENTAL, abs(y1 - y2))
         r = self.render.devicePixelRatio()

@@ -28,6 +28,9 @@ def register_actions():
     register("view_top", ViewTop)
     register("view_perspective", ViewPerspective)
     register("delete_selected", DeleteSelected)
+    register("import_file", ImportFile)
+    register("export_file", ExportFile)
+    register("url", OpenURL)
 
 
 def get_action_cls(name: str) -> Any:
@@ -45,6 +48,7 @@ from .print_gl_info import GLInfo  # noqa: E402
 from .select_all import SelectAll  # noqa: E402
 from .viewmode import ViewRight, ViewFront, ViewTop, ViewPerspective  # noqa: E402
 from .delete_selected import DeleteSelected  # noqa: E402
+from .file import ImportFile, ExportFile, OpenURL  # noqa: E402
 
 register_actions()
 
@@ -58,4 +62,7 @@ ___all__ = [
     "ViewTop",
     "ViewPerspective",
     "DeleteSelected",
+    "ImportFile",
+    "ExportFile",
+    "OpenURL",
 ]
