@@ -7,7 +7,12 @@ from .meshobject import MeshObject
 
 
 class SphereObject(MeshObject):
-    """Viewer scene object for displaying COMPAS :class:`compas.geometry.Sphere` geometry."""
+    """Viewer scene object for displaying COMPAS Sphere geometry.
+
+    See Also
+    --------
+    :class:`compas.geometry.Sphere`
+    """
 
     def __init__(self, sphere: Sphere, **kwargs):
         self.u = kwargs.get("u", int(2 * pi * sphere.radius / self.LINEARDEFLECTION))

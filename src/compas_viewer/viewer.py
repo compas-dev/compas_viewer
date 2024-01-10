@@ -4,11 +4,8 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import Callable
-from typing import Dict
-from typing import List
 from typing import Literal
 from typing import Optional
-from typing import Tuple
 from typing import Union
 
 from compas.colors import Color
@@ -25,7 +22,7 @@ from PySide6.QtGui import QIcon
 from compas_viewer import DATA
 from compas_viewer.actions import Action
 from compas_viewer.actions import register
-from compas_viewer.components import Render
+from compas_viewer.components import Renderer
 from compas_viewer.configurations import ActionConfig
 from compas_viewer.configurations import ActionConfigType
 from compas_viewer.configurations import ControllerConfig
@@ -133,7 +130,7 @@ class Viewer(Scene):
             self.controller_config = ControllerConfig.from_default()
         else:
             self.config = ViewerConfig.from_json(Path(configpath, "viewer.json"))
-            self.render_config = RenderConfig.from_json(Path(configpath, "render.json"))
+            self.render_config = RenderConfig.from_json(Path(configpath, "renderer.json"))
             self.scene_config = SceneConfig.from_json(Path(configpath, "scene.json"))
             self.controller_config = ControllerConfig.from_json(Path(configpath, "controller.json"))
 
@@ -161,10 +158,10 @@ class Viewer(Scene):
         self.frame_count: int = 0
 
         #  Selection
-        self.instance_colors: Dict[Tuple[int, int, int], ViewerSceneObject] = {}
+        self.instance_colors: dict[tuple[int, int, int], ViewerSceneObject] = {}
 
         #  Primitive
-        self.objects: List[ViewerSceneObject]
+        self.objects: list[ViewerSceneObject]
 
         self._init()
 
@@ -200,8 +197,8 @@ class Viewer(Scene):
             is_visible=True,
             config=self.scene_config,
         )
-        self.render = Render(self, self.render_config)
-        self._window.setCentralWidget(self.render)
+        self.renderer = Renderer(self, self.render_config)
+        self._window.setCentralWidget(self.renderer)
         self._window.setContentsMargins(0, 0, 0, 0)
         self._app.references.add(self._window)  # type: ignore
         self._window.resize(self.config.width, self.config.height)
@@ -399,17 +396,17 @@ class Viewer(Scene):
             raise ValueError("Must specify either interval or timeout.")
 
         def outer(func: Callable):
-            def render():
+            def renderer():
                 func(self.frame_count)
-                self.render.update()
+                self.renderer.update()
                 self.frame_count += 1
                 if frames is not None and self.frame_count >= frames:
                     self.timer.stop()
 
             if interval:
-                self.timer = Timer(interval=interval, callback=render)
+                self.timer = Timer(interval=interval, callback=renderer)
             if timeout:
-                self.timer = Timer(interval=timeout, callback=render, singleshot=True)
+                self.timer = Timer(interval=timeout, callback=renderer, singleshot=True)
 
             self.frame_count = 0
 
@@ -429,9 +426,9 @@ class Viewer(Scene):
         show_points: Optional[bool] = None,
         show_lines: Optional[bool] = None,
         show_faces: Optional[bool] = None,
-        pointscolor: Optional[Union[Color, Dict[Any, List[float]]]] = None,
-        linescolor: Optional[Union[Color, Dict[Any, List[float]]]] = None,
-        facescolor: Optional[Union[Color, Dict[Any, List[float]]]] = None,
+        pointscolor: Optional[Union[Color, dict[Any, list[float]]]] = None,
+        linescolor: Optional[Union[Color, dict[Any, list[float]]]] = None,
+        facescolor: Optional[Union[Color, dict[Any, list[float]]]] = None,
         lineswidth: Optional[float] = None,
         pointssize: Optional[float] = None,
         opacity: Optional[float] = None,
@@ -467,13 +464,13 @@ class Viewer(Scene):
         show_faces : bool, optional
             Whether to show faces of the object.
             It will override the value in the scene config file.
-        pointscolor : Union[:class:`compas.colors.Color`, Dict[Any, :class:`compas.colors.Color`], optional
+        pointscolor : Union[:class:`compas.colors.Color`, dict[Any, :class:`compas.colors.Color`], optional
             The color or the dict of colors of the points.
             It will override the value in the scene config file.
-        linescolor : Union[:class:`compas.colors.Color`, Dict[Any, :class:`compas.colors.Color`], optional
+        linescolor : Union[:class:`compas.colors.Color`, dict[Any, :class:`compas.colors.Color`], optional
             The color or the dict of colors of the lines.
             It will override the value in the scene config file.
-        facescolor : Union[:class:`compas.colors.Color`, Dict[Any, :class:`compas.colors.Color`], optional
+        facescolor : Union[:class:`compas.colors.Color`, dict[Any, :class:`compas.colors.Color`], optional
             The color or the dict of colors the faces.
             It will override the value in the scene config file.
         lineswidth : float, optional
@@ -491,7 +488,7 @@ class Viewer(Scene):
         use_vertexcolors : bool, optional
             Whether to use vertex color.
             It will override the value in the scene config file.
-        **kwargs : Dict, optional
+        **kwargs : dict, optional
             The other possible parameters to be passed to the object.
 
         Returns
@@ -583,7 +580,7 @@ class Viewer(Scene):
             name = pressed_action.__name__
         if modifier is None:
             modifier = "no"
-        config: ActionConfigType = {"key": key, "modifier": modifier}
+        config = ActionConfigType({"key": key, "modifier": modifier})
 
         class CustomAction(Action):
             def pressed_action(self):

@@ -38,7 +38,7 @@ def make_vertex_buffer(data, dynamic=False):
 
     Parameters
     ----------
-    data : List[float]
+    data : list[float]
         A flat list of floats.
     dynamic : bool, optional
         If True, the buffer is optimized for dynamic access.
@@ -71,7 +71,7 @@ def make_index_buffer(data, dynamic=False):
 
     Parameters
     ----------
-    data : List[int]
+    data : list[int]
         A flat list of ints.
     dynamic : bool, optional
         If True, the buffer is optimized for dynamic access.
@@ -104,7 +104,7 @@ def update_vertex_buffer(data, buffer):
 
     Parameters
     ----------
-    data : List[float]
+    data : list[float]
         A flat list of floats.
     buffer : int
         The ID of the buffer.
@@ -123,7 +123,7 @@ def update_index_buffer(data, buffer):
 
     Parameters
     ----------
-    data : List[int]
+    data : list[int]
         A flat list of ints.
     buffer : int
         The ID of the buffer.

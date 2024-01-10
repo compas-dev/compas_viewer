@@ -9,7 +9,7 @@ from .sceneobject import ViewerSceneObject
 
 class PlaneObject(ViewerSceneObject, GeometryObject):
     """
-    Viewer scene object for displaying COMPAS :class:`compas.geometry.Plane` geometry.
+    Viewer scene object for displaying COMPAS Plane geometry.
 
     Parameters
     ----------
@@ -18,6 +18,10 @@ class PlaneObject(ViewerSceneObject, GeometryObject):
     planesize : float
         The size of the plane.
         Default is 1.
+
+    See Also
+    --------
+    :class:`compas.geometry.Plane`
     """
 
     def __init__(self, plane: Plane, planesize: float = 1, **kwargs):

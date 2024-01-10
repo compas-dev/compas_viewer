@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import sphinx_compas2_theme
-
 from sphinx.writers import html
 from sphinx.writers import html5
 
@@ -77,10 +76,9 @@ plot_html_show_formats = False
 plot_formats = ["png"]
 
 # intersphinx options
-
 intersphinx_mapping = {
     "python": ("https://docs.python.org/", None),
-    "compas": ("https://compas.dev/compas/latest/", None)
+    "compas": ("https://compas.dev/compas/latest/", None),
 }
 
 # linkcode
@@ -89,7 +87,11 @@ linkcode_resolve = sphinx_compas2_theme.get_linkcode_resolve(organization, packa
 
 # extlinks
 
-extlinks = {}
+extlinks = {
+    "gl": ("https://pyopengl.sourceforge.net/documentation/manual-3.0/%s.html", "%s"),
+    "QtCore": ("https://doc.qt.io/qtforpython-6/PySide6/QtCore/Qt.html#PySide6.QtCore.%s", "%s"),
+    # "QtCore": ("https://doc.qt.io/qtforpython-6/PySide6/QtCore/Qt.html#%s", "%s"),
+}
 
 # from pytorch
 
@@ -97,8 +99,8 @@ sphinx_compas2_theme.replace(html.HTMLTranslator)
 sphinx_compas2_theme.replace(html5.HTML5Translator)
 
 # -- Options for HTML output ----------------------------------------------
-
-html_theme = "sidebaronly"
+html_sidebars = {"index": []}
+html_theme = "multisection"
 html_title = project
 
 favicons = [
@@ -109,6 +111,9 @@ favicons = [
 ]
 
 html_theme_options = {
+    "external_links": [
+        {"name": "COMPAS Framework", "url": "https://compas.dev"},
+    ],
     "icon_links": [
         {
             "name": "GitHub",
@@ -138,6 +143,7 @@ html_theme_options = {
         "image_dark": "_static/compas_icon_white.png",  # relative to parent of conf.py
         "text": project,
     },
+    "navigation_depth": 2,
 }
 
 html_context = {

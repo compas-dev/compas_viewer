@@ -3,9 +3,9 @@ from math import radians
 from math import tan
 from typing import TYPE_CHECKING
 from typing import Callable
-from typing import List
+
 from typing import Optional
-from typing import Tuple
+
 
 from compas.geometry import Rotation
 from compas.geometry import Transformation
@@ -21,7 +21,7 @@ from numpy.linalg import norm
 
 if TYPE_CHECKING:
     # https://peps.python.org/pep-0484/#runtime-or-type-checking
-    from .render import Render
+    from .renderer import Renderer
 
 
 class Position(Vector):
@@ -30,14 +30,14 @@ class Position(Vector):
 
     Parameters
     ----------
-    vector : Tuple[float, float, float]
+    vector : tuple[float, float, float]
         The position of the camera.
     on_update : Callable
         A callback function that is called when the position changes.
 
     """
 
-    def __init__(self, vector: Tuple[float, float, float], on_update: Optional[Callable] = None):
+    def __init__(self, vector: tuple[float, float, float], on_update: Optional[Callable] = None):
         self.on_update = on_update
         self.pause_update = True
         super().__init__(*vector)
@@ -91,8 +91,8 @@ class Camera:
 
     Parameters
     ----------
-    render : :class:`compas_viewer.components.render.Render`,
-        The parent render of the camera.
+    renderer : :class:`compas_viewer.components.renderer.Renderer`,
+        The parent renderer of the camera.
 
     Attributes
     ----------
@@ -109,11 +109,11 @@ class Camera:
         The location of the "near" clipping plane.
     far : float
         The location of the "far" clipping plane.
-    position : :class:`compas_viewer.components.render.camera.Position`
+    position : :class:`compas_viewer.components.renderer.camera.Position`
         The location the camera.
-    rotation : :class:`compas_viewer.components.render.camera.RotationEuler`
+    rotation : :class:`compas_viewer.components.renderer.camera.RotationEuler`
         The euler rotation of camera.
-    target : :class:`compas_viewer.components.render.camera.Position`
+    target : :class:`compas_viewer.components.renderer.camera.Position`
         The viewing target.
         Default is the origin of the world coordinate system.
     distance : float
@@ -128,9 +128,9 @@ class Camera:
         The scale factor for camera's near, far and pan_delta.
     """
 
-    def __init__(self, render: "Render"):
-        self.render = render
-        self.config = render.config.camera
+    def __init__(self, renderer: "Renderer"):
+        self.renderer = renderer
+        self.config = renderer.config.camera
         self._position = Position((0.0, 0.0, 10.0 * self.config.scale), on_update=self._on_position_update)
         self._rotation = RotationEuler((0, 0, 0), on_update=self._on_rotation_update)
         self._target = Position((0, 0, 0), on_update=self._on_target_update)
@@ -139,7 +139,7 @@ class Camera:
         self._target.pause_update = False
         # Camera position only modifiable in perspective view mode.
         self.reset_position()
-        if self.render.config.viewmode == "perspective":
+        if self.renderer.config.viewmode == "perspective":
             self.position = Position(self.config.position)
         self.target = Position(self.config.target)
 
@@ -307,13 +307,13 @@ class Camera:
     def reset_position(self):
         """Reset the position of the camera based current view type."""
         self.target.set(0, 0, 0, False)
-        if self.render.viewmode == "perspective":
+        if self.renderer.viewmode == "perspective":
             self.rotation.set(pi / 4, 0, -pi / 4, False)
-        if self.render.viewmode == "top":
+        if self.renderer.viewmode == "top":
             self.rotation.set(0, 0, 0, False)
-        if self.render.viewmode == "front":
+        if self.renderer.viewmode == "front":
             self.rotation.set(pi / 2, 0, 0, False)
-        if self.render.viewmode == "right":
+        if self.renderer.viewmode == "right":
             self.rotation.set(pi / 2, 0, pi / 2, False)
 
     def rotate(self, dx: float, dy: float):
@@ -331,10 +331,10 @@ class Camera:
         Notes
         -----
         Camera rotations are only available if the current view mode
-        is a perspective view (``camera.render.config.viewmode == "perspective"``).
+        is a perspective view (``camera.renderer.config.viewmode == "perspective"``).
 
         """
-        if self.render.config.viewmode == "perspective":
+        if self.renderer.config.viewmode == "perspective":
             self.rotation += [-self.config.rotationdelta * dy, 0, -self.config.rotationdelta * dx]
 
     def pan(self, dx: float, dy: float):
@@ -364,12 +364,12 @@ class Camera:
         ----------
         steps : int
             The number of zoom increments, with each increment the size
-            of :attr:`compas_viewer.components.render.Camera.config.zoomdelta`.
+            of :attr:`compas_viewer.components.renderer.Camera.config.zoomdelta`.
 
         """
         self.distance -= steps * self.config.zoomdelta * self.distance
 
-    def projection(self, width: int, height: int) -> List[List[float]]:
+    def projection(self, width: int, height: int) -> list[list[float]]:
         """Compute the projection matrix corresponding to the current camera settings.
 
         Parameters
@@ -381,7 +381,7 @@ class Camera:
 
         Returns
         -------
-        List[List[float]]
+        list[list[float]]
             The transformation matrix as a `numpy` array in column-major order.
 
         Notes
@@ -390,7 +390,7 @@ class Camera:
 
         """
         aspect = width / height
-        if self.render.viewmode == "perspective":
+        if self.renderer.viewmode == "perspective":
             P = self.perspective(
                 self.config.fov, aspect, self.config.near * self.config.scale, self.config.far * self.config.scale
             )
@@ -404,12 +404,12 @@ class Camera:
             )
         return list(asfortranarray(P, dtype=float32))
 
-    def viewworld(self) -> List[List[float]]:
+    def viewworld(self) -> list[list[float]]:
         """Compute the view-world matrix corresponding to the current camera settings.
 
         Returns
         -------
-        List[List[float]]
+        list[list[float]]
             The transformation matrix in column-major order.
 
         Notes

@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Tuple
+
 from typing import TypedDict
 
 from compas.colors import Color
@@ -24,20 +24,24 @@ class SceneConfigType(TypedDict):
     opacity: float
     hide_coplanaredges: bool
     use_vertexcolors: bool
-    framesize: Tuple[float, int, float, int]
+    framesize: tuple[float, int, float, int]
     show_framez: bool
     vectorsize: float
 
 
 class SceneConfig(Config):
     """
-    The class representation for the `scene.json` of the class :class:`compas_viewer.scene.ViewerSceneObject`
+    The class representation for the `scene.json` of the class ViewerSceneObject.
     The scene.json contains all the settings about the general (default) appearance of the scene objects.
 
     Parameters
     ----------
     config : :class:`SceneConfigType`
         A TypedDict with defined keys and types.
+
+    See Also
+    --------
+    :class:`compas_viewer.scene.ViewerSceneObject`
 
     """
 

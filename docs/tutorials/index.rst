@@ -1,5 +1,11 @@
+
 ********************************************************************************
-License
+Tutorials
 ********************************************************************************
 
-.. literalinclude:: ../LICENSE
+.. toctree::
+    :maxdepth: 1
+    :titlesonly:
+    :caption: Tutorials
+
+    configuratins

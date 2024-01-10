@@ -1,6 +1,5 @@
 from pathlib import Path
 from typing import Literal
-from typing import Tuple
 from typing import TypedDict
 
 from compas.colors import Color
@@ -16,13 +15,17 @@ class SelectorConfigType(TypedDict):
 
 class SelectorConfig(Config):
     """
-    The class representation of a selector class :class:`compas_viewer.components.render.selector.Selector`
+    The class representation of a selector class Selector.
     It contains all the settings about the selector: enable_selector, selectioncolor, ...
 
     Parameters
     ----------
     config : SelectorConfigType
         A TypedDict with defined keys and types.
+
+    See Also
+    --------
+    :class:`compas_viewer.components.renderer.selector.Selector`
 
     """
 
@@ -42,8 +45,8 @@ class CameraConfigType(TypedDict):
     fov: float
     near: float
     far: float
-    position: Tuple[float, float, float]
-    target: Tuple[float, float, float]
+    position: tuple[float, float, float]
+    target: tuple[float, float, float]
     scale: float
     zoomdelta: float
     rotationdelta: float
@@ -52,13 +55,17 @@ class CameraConfigType(TypedDict):
 
 class CameraConfig(Config):
     """
-    The class representation of a camera class :class:`compas_viewer.components.render.camera.Camera`
+    The class representation of a camera class Camera.
     It contains all the settings about the camera: fov, near, far, position, target, ...
 
     Parameters
     ----------
     config : CameraConfigType
         A TypedDict with defined keys and types.
+
+    See Also
+    --------
+    :class:`compas_viewer.components.renderer.camera.Camera`
 
     """
 
@@ -83,7 +90,7 @@ class CameraConfig(Config):
 
 class RenderConfigType(TypedDict):
     show_grid: bool
-    gridsize: Tuple[float, int, float, int]
+    gridsize: tuple[float, int, float, int]
     show_gridz: bool
     viewmode: Literal["front", "right", "top", "perspective"]
     rendermode: Literal["wireframe", "shaded", "ghosted", "lighted", "instance"]
@@ -95,13 +102,17 @@ class RenderConfigType(TypedDict):
 
 class RenderConfig(Config):
     """
-    The class representation for the `render.json` of the class :class:`compas_viewer.components.render.Render`
-    The render.json contains all the settings about the render: background color, selection color, ...
+    The class representation for the `renderer.json` of the class Renderer.
+    The renderer.json contains all the settings about the renderer: background color, selection color, ...
 
     Parameters
     ----------
     config : :class:`RenderConfigType`
         A TypedDict with defined keys and types.
+
+    See Also
+    --------
+    :class:`compas_viewer.components.renderer.Renderer`
 
     """
 
@@ -122,7 +133,7 @@ class RenderConfig(Config):
         """
         Load the default configuration.
         """
-        render_config = RenderConfig.from_json(Path(DATA, "default_config", "render.json"))
+        render_config = RenderConfig.from_json(Path(DATA, "default_config", "renderer.json"))
         assert isinstance(render_config, RenderConfig)
         return render_config
 

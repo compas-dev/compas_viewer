@@ -14,19 +14,19 @@ def key_mapper(
     Parameters
     ----------
     key : str
-        The key string which is the same as what it was called in the :class:`PySide6.QtCore.Qt`,
+        The key string which is the same as what it was called in the :QtCore:`PySide6.QtCore.Qt`,
         with **lowercases and with prefix&underscores removed**.
         Check out the reference page to find out the supported keys and the original names.
     type : Literal[0, 1, 2]
         The type of the key for mapping.
 
-        * 0 for :class:`PySide6.QtCore.Qt.Key`,
-        * 1 for :class:`PySide6.QtCore.Qt.KeyboardModifier`,
-        * 2 for :class:`PySide6.QtCore.Qt.MouseButton`.
+        * 0 for :QtCore:`PySide6.QtCore.Qt.Key`,
+        * 1 for :QtCore:`PySide6.QtCore.Qt.KeyboardModifier`,
+        * 2 for :QtCore:`PySide6.QtCore.Qt.MouseButton`.
 
     Returns
     -------
-    Literal[:class:`Qt.Key`, :class:`Qt.KeyboardModifier`, :class:`Qt.MouseButton`]
+    Literal[:QtCore:`PySide6.QtCore.Qt.Key`, :QtCore:`PySide6.QtCore.Qt.KeyboardModifier`, :QtCore:`PySide6.QtCore.Qt.MouseButton`]
         The mapped Qt key.
 
     Notes
@@ -36,9 +36,9 @@ def key_mapper(
 
     This function handles:
 
-    * :class:`PySide6.QtCore.Qt.Key`
-    * :class:`PySide6.QtCore.Qt.KeyboardModifier`
-    * :class:`PySide6.QtCore.Qt.MouseButton`
+    * :QtCore:`PySide6.QtCore.Qt.Key`
+    * :QtCore:`PySide6.QtCore.Qt.KeyboardModifier`
+    * :QtCore:`PySide6.QtCore.Qt.MouseButton`
 
     Examples
     --------

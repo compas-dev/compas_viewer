@@ -14,7 +14,7 @@ from PySide6.QtCore import Signal
 from scipy.ndimage import zoom
 
 if TYPE_CHECKING:
-    from .render import Render
+    from .renderer import Renderer
 
 
 class Selector(QObject):
@@ -22,13 +22,13 @@ class Selector(QObject):
 
     Parameters
     ----------
-    render : :class:`compas_viewer.components.render.Render`
-        The render instance.
+    renderer : :class:`compas_viewer.components.renderer.Renderer`
+        The renderer instance.
 
     Attributes
     ----------
-    render : :class:`compas_viewer.components.render.Render`
-        The render instance.
+    renderer : :class:`compas_viewer.components.renderer.Renderer`
+        The renderer instance.
     enable_selector : bool
         Enable the selector.
     selectioncolor : :class:`compas.colors.Color`
@@ -52,16 +52,16 @@ class Selector(QObject):
 
     def __init__(
         self,
-        render: "Render",
+        renderer: "Renderer",
     ):
-        self.enable_selector = render.config.selector.enable_selector
+        self.enable_selector = renderer.config.selector.enable_selector
         if not self.enable_selector:
             return
         super().__init__()
-        self.render = render
-        self.viewer = render.viewer
-        self.controller = render.viewer.controller
-        self.selectioncolor = render.config.selector.selectioncolor
+        self.renderer = renderer
+        self.viewer = renderer.viewer
+        self.controller = renderer.viewer.controller
+        self.selectioncolor = renderer.config.selector.selectioncolor
 
         #  Drag selection
         self.on_drag_selection: bool = False
@@ -78,14 +78,14 @@ class Selector(QObject):
         """Select the object under the mouse cursor."""
 
         # Deselect all objects first
-        for _, obj in self.render.viewer.instance_colors.items():
+        for _, obj in self.renderer.viewer.instance_colors.items():
             obj.is_selected = False
 
         x = self.controller.mouse.last_pos.x()
         y = self.controller.mouse.last_pos.y()
         instance_color = tuple(self.read_instance_map()[y][x])
 
-        selected_obj = self.render.viewer.instance_colors.get(instance_color)  # type: ignore
+        selected_obj = self.renderer.viewer.instance_colors.get(instance_color)  # type: ignore
         if selected_obj:
             selected_obj.is_selected = True
 
@@ -95,7 +95,7 @@ class Selector(QObject):
         y = self.controller.mouse.last_pos.y()
         instance_color = tuple(self.read_instance_map()[y][x])
 
-        selected_obj = self.render.viewer.instance_colors.get(instance_color)  # type: ignore
+        selected_obj = self.renderer.viewer.instance_colors.get(instance_color)  # type: ignore
         if selected_obj:
             selected_obj.is_selected = False
 
@@ -104,14 +104,14 @@ class Selector(QObject):
 
         See Also
         --------
-        :func:`compas_viewer.components.render.selector.Selector.select_action`
+        :func:`compas_viewer.components.renderer.selector.Selector.select_action`
         """
 
         x = self.controller.mouse.last_pos.x()
         y = self.controller.mouse.last_pos.y()
         instance_color = tuple(self.read_instance_map()[y][x])
 
-        selected_obj = self.render.viewer.instance_colors.get(instance_color)  # type: ignore
+        selected_obj = self.renderer.viewer.instance_colors.get(instance_color)  # type: ignore
         if selected_obj:
             selected_obj.is_selected = not selected_obj.is_selected
 
@@ -119,7 +119,7 @@ class Selector(QObject):
         """Drag select the objects in the rectangle area."""
 
         # Deselect all objects first
-        for _, obj in self.render.viewer.instance_colors.items():
+        for _, obj in self.renderer.viewer.instance_colors.items():
             obj.is_selected = False
 
         instance_map = self.read_instance_map()
@@ -133,7 +133,7 @@ class Selector(QObject):
             [unique_colors[0][i] for i, count in enumerate(unique_colors[1]) if count > self.ANTI_ALIASING_FACTOR]
         )
 
-        for color, obj in self.render.viewer.instance_colors.items():
+        for color, obj in self.renderer.viewer.instance_colors.items():
             if any(all(color == unique_colors, axis=1)):
                 obj.is_selected = True
                 continue
@@ -143,7 +143,7 @@ class Selector(QObject):
 
         See Also
         --------
-        :func:`compas_viewer.components.render.selector.Selector.drag_selection_action`
+        :func:`compas_viewer.components.renderer.selector.Selector.drag_selection_action`
         """
 
         instance_map = self.read_instance_map()
@@ -157,7 +157,7 @@ class Selector(QObject):
             [unique_colors[0][i] for i, count in enumerate(unique_colors[1]) if count > self.ANTI_ALIASING_FACTOR]
         )
 
-        for color, obj in self.render.viewer.instance_colors.items():
+        for color, obj in self.renderer.viewer.instance_colors.items():
             if color in unique_colors:
                 obj.is_selected = False
                 continue
@@ -183,10 +183,10 @@ class Selector(QObject):
         ----------
         * https://doc.qt.io/qt-6/qscreen.html#devicePixelRatio-prop
         """
-        r = self.render.devicePixelRatio()
+        r = self.renderer.devicePixelRatio()
         x_ratio = self.viewer.config.width / ceil(r * self.viewer.config.width)
         y_ratio = self.viewer.config.height / ceil(r * self.viewer.config.height)
-        instance_map = frombuffer(buffer=self.render.instance_buffer, dtype=uint8).reshape(
+        instance_map = frombuffer(buffer=self.renderer.instance_buffer, dtype=uint8).reshape(
             ceil(r * self.viewer.config.height), ceil(r * self.viewer.config.width), 3
         )
         instance_map = zoom(instance_map, (x_ratio, y_ratio, 1), order=1)

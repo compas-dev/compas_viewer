@@ -1,8 +1,8 @@
 *******************************************************************************
-compas_viewer.components.render
+compas_viewer.components.renderer
 *******************************************************************************
 
-.. currentmodule:: compas_viewer.components.render
+.. currentmodule:: compas_viewer.components.renderer
 
 Classes
 =======
@@ -11,14 +11,14 @@ Classes
     :toctree: ./generated
     :nosignatures:
 
-    Render
+    Renderer
     Camera
     Shader
     Selector
-    Render.mouseMoveEvent
-    Render.mousePressEvent
-    Render.mouseReleaseEvent
-    Render.wheelEvent
-    Render.keyPressEvent
-    Render.keyReleaseEvent
+    Renderer.mouseMoveEvent
+    Renderer.mousePressEvent
+    Renderer.mouseReleaseEvent
+    Renderer.wheelEvent
+    Renderer.keyPressEvent
+    Renderer.keyReleaseEvent
 

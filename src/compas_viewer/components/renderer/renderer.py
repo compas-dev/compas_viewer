@@ -2,7 +2,7 @@ import time
 from math import ceil
 from typing import TYPE_CHECKING
 from typing import Any
-from typing import List
+
 
 from compas.geometry import transform_points_numpy
 from numpy import float32
@@ -28,9 +28,9 @@ if TYPE_CHECKING:
     from compas_viewer import Viewer
 
 
-class Render(QOpenGLWidget):
+class Renderer(QOpenGLWidget):
     """
-    Render class for 3D rendering of COMPAS geometry.
+    Renderer class for 3D rendering of COMPAS geometry.
     We constantly use OpenGL version 2.1 and GLSL 120 with a Compatibility Profile at the moment.
     The width and height are not in its configuration since they are set by the parent layout.
 
@@ -39,7 +39,7 @@ class Render(QOpenGLWidget):
     viewer : :class:`compas_viewer.viewer.Viewer`
         The viewer instance.
     config : :class:`compas_viewer.configurations.RenderConfig`
-        The render configuration.
+        The renderer configuration.
     """
 
     def __init__(self, viewer: "Viewer", config: RenderConfig):
@@ -72,11 +72,11 @@ class Render(QOpenGLWidget):
     @property
     def rendermode(self):
         """
-        The render mode of the view.
+        The renderer mode of the view.
 
         Returns
         -------
-            The render mode of the view.
+            The renderer mode of the view.
         """
         return self._rendermode
 
@@ -344,7 +344,7 @@ class Render(QOpenGLWidget):
     # ==========================================================================
 
     def init(self):
-        """Initialize the render."""
+        """Initialize the renderer."""
         # Init the grid
         self.grid.init()
 
@@ -405,9 +405,9 @@ class Render(QOpenGLWidget):
         Parameters
         ----------
         w : int, optional
-            The width of the render, by default None.
+            The width of the renderer, by default None.
         h : int, optional
-            The height of the render, by default None.
+            The height of the renderer, by default None.
         """
         w = w or self.viewer.config.width
         h = h or self.viewer.config.height
@@ -436,25 +436,25 @@ class Render(QOpenGLWidget):
 
     def resize(self, w: int, h: int):
         """
-        Resize the render.
+        Resize the renderer.
 
         Parameters
         ----------
         w : int
-            The width of the render.
+            The width of the renderer.
         h : int
-            The height of the render.
+            The height of the renderer.
         """
         self.update_projection(w, h)
 
-    def sort_objects_from_viewworld(self, objects: List[MeshObject], viewworld: List[List[float]]):
+    def sort_objects_from_viewworld(self, objects: list[MeshObject], viewworld: list[list[float]]):
         """Sort objects by the distances from their bounding box centers to camera location
 
         Parameters
         ----------
-        objects : List[:class:`compas_viewer.scene.meshobject.MeshObject`]
+        objects : list[:class:`compas_viewer.scene.meshobject.MeshObject`]
             The objects to be sorted.
-        viewworld : List[List[float]]
+        viewworld : list[list[float]]
             The viewworld matrix.
 
         Returns
@@ -479,9 +479,9 @@ class Render(QOpenGLWidget):
 
     def paint(self):
         """
-        Paint all the items in the render, which only be called by the paintGL function
+        Paint all the items in the renderer, which only be called by the paintGL function
         and determines the performance of the renders
-        This function introduces decision tree for different render modes and settings.
+        This function introduces decision tree for different renderer modes and settings.
         """
 
         #  Matrix update
@@ -557,18 +557,18 @@ class Render(QOpenGLWidget):
 
     def paint_instance_map(self):
         """
-        Paint the instance map for the selection or the instance render mode.
+        Paint the instance map for the selection or the instance renderer mode.
 
         Notes
         -----
         The instance map is used by the selector to identify selected objects.
-        The mechanism of a :class:`compas_viewer.components.render.selector.Selector`
+        The mechanism of a :class:`compas_viewer.components.renderer.selector.Selector`
         is picking the color from instance map and then find the corresponding object.
         Anti aliasing, which is always force opened in many machines,  can cause color picking inaccuracy.
 
         See Also
         --------
-        :func:`compas_viewer.components.render.selector.Selector.ANTI_ALIASING_FACTOR`
+        :func:`compas_viewer.components.renderer.selector.Selector.ANTI_ALIASING_FACTOR`
         """
         GL.glDisable(GL.GL_POINT_SMOOTH)
         GL.glDisable(GL.GL_LINE_SMOOTH)
