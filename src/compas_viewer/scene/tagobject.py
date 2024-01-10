@@ -196,19 +196,3 @@ class TagObject(ViewerSceneObject, GeometryObject):
         shader.uniform1i("is_text", 0)
         shader.uniform1f("object_opacity", 1)
         shader.disable_attribute("position")
-
-    def _read_points_data(self):
-        """No point data exist for this geometry, Return None."""
-        return None
-
-    def _read_lines_data(self):
-        """No line data exist for this geometry, Return None."""
-        return None
-
-    def _read_frontfaces_data(self):
-        """No frontfaces data exist for this geometry, Return None."""
-        return None
-
-    def _read_backfaces_data(self):
-        """No backfaces data exist for this geometry, Return None."""
-        return None

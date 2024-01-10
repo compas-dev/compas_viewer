@@ -209,22 +209,18 @@ class ViewerSceneObject(SceneObject):
     # Reading geometric data, downstream classes should implement these properties.
     # ==========================================================================
 
-    @abstractmethod
     def _read_points_data(self) -> Optional[DataType]:
         """Read points data from the object."""
         pass
 
-    @abstractmethod
     def _read_lines_data(self) -> Optional[DataType]:
         """Read lines data from the object."""
         pass
 
-    @abstractmethod
     def _read_frontfaces_data(self) -> Optional[DataType]:
         """Read frontfaces data from the object."""
         pass
 
-    @abstractmethod
     def _read_backfaces_data(self) -> Optional[DataType]:
         """Read backfaces data from the object."""
         pass

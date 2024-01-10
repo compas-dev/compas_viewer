@@ -78,15 +78,3 @@ class VectorObject(ViewerSceneObject, GeometryObject):
         shader.draw_triangles(elements=self.arrow_buffer["elements"], n=self.arrow_buffer["n"], background=True)
         shader.disable_attribute("position")
         shader.disable_attribute("color")
-
-    def _read_points_data(self):
-        """No point data exist for this geometry, Return None."""
-        return None
-
-    def _read_frontfaces_data(self):
-        """No frontfaces data exist for this geometry, Return None."""
-        return None
-
-    def _read_backfaces_data(self):
-        """No backfaces data exist for this geometry, Return None."""
-        return None

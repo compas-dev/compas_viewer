@@ -3,7 +3,8 @@ from compas.geometry import Plane
 from compas.geometry import Point
 from compas.scene import GeometryObject
 
-from .sceneobject import ViewerSceneObject, DataType
+from .sceneobject import DataType
+from .sceneobject import ViewerSceneObject
 
 
 class PlaneObject(ViewerSceneObject, GeometryObject):
@@ -40,10 +41,6 @@ class PlaneObject(ViewerSceneObject, GeometryObject):
         elements = [[0, 1]]
 
         return positions, colors, elements
-
-    def _read_points_data(self):
-        """No points data exist for this geometry, Return None."""
-        return None
 
     def _read_frontfaces_data(self) -> DataType:
         return self.vertices, [self.facescolor["_default"]] * 4, [[0, 1, 2], [0, 2, 3]]
