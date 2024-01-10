@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
+* Added `DataType` as the data type template for generating the buffer.
+* Added `NetworkObject` for the scene objects.
+* Added `compas_viewer.scene.ViewerSceneObject.LINEWIDTH_SELECTION_INCREMENTAL` to enhance line width for selection only.
+* Added `BRepObject`, `CapsuleObject`, `ConeObject`, `CylinderObject`, `PlaneObject`, `SphereObject`, `EllipseObject`, `TorusObject`, `PolygonObject`, `PolylineObject`, `BoxObject`. The geometric resolution is handled by the `compas_viewer.scene.ViewerSceneObject.LINEARDEFLECTION`.
 * Added `VectorObject` for the scene objects with mesh-based display for better visual effect.
 * Added "instance" render mode for debugging and geometric analysis.
 * Added contents in the `README.md`.
@@ -40,7 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added `NetworkObject`.
 
 ### Changed
-
+* Fixed the bug of the `Selector`, drag selection is now more accurate.
 * More performative instance map and QObject-based selection architecture.
 * Naming of the keys, mouses, and modifiers are changed. The key string which is the same as what it was called in the PySide6.QtCore.Qt, with lowercases and with prefix&underscores removed.
 * `Grid` object inherits from `compas.data.Data`.
@@ -54,3 +58,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 * Removed `self.objects` from the `Render` class.`
+* Replace the `Grid` and `GridObject` but by `FrameObject`, which also hooks the `Frame` in compas.

@@ -1,6 +1,8 @@
 from math import ceil
 from typing import TYPE_CHECKING
 
+from numpy import all
+from numpy import any
 from numpy import array
 from numpy import frombuffer
 from numpy import uint8
@@ -132,7 +134,7 @@ class Selector(QObject):
         )
 
         for color, obj in self.render.viewer.instance_colors.items():
-            if color in unique_colors:
+            if any(all(color == unique_colors, axis=1)):
                 obj.is_selected = True
                 continue
 

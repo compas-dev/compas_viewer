@@ -77,7 +77,7 @@ class Tag(Geometry):
         self,
         text: str,
         position: Union[Point, Tuple[float, float, float]],
-        color: Color = Color(1.0, 1.0, 1.0),
+        color: Color = Color(0.0, 0.0, 0.0),
         height: float = 50,
         absolute_height: bool = False,
         font: Optional[PathLike] = None,
@@ -116,29 +116,25 @@ class TagObject(ViewerSceneObject, GeometryObject):
     """
 
     def __init__(self, tag: Tag, **kwargs):
-        super(TagObject, self).__init__(geometry=Tag, **kwargs)
-        self._tag = tag
-
-    def init(self):
-        self.make_buffers()
+        super(TagObject, self).__init__(geometry=tag, **kwargs)
 
     def make_buffers(self):
         self._text_buffer = {
-            "positions": make_vertex_buffer(self._tag.position),
+            "positions": make_vertex_buffer(self.geometry.position),
             "elements": make_index_buffer([0]),
             "text_texture": self.make_text_texture(),
             "n": 1,
         }
 
     def make_text_texture(self):
-        face = Face(self._tag.font)
+        face = Face(self.geometry.font)
 
         char_width = 48
         char_height = 80
         # the size is specified in 1/64 pixel
         face.set_char_size(64 * char_width)
 
-        text = self._tag.text
+        text = self.geometry.text
         string_buffer = zeros(shape=(char_height, char_width * len(text)))
 
         for i, c in enumerate(text):
@@ -172,18 +168,18 @@ class TagObject(ViewerSceneObject, GeometryObject):
         return texture
 
     def _calculate_text_height(self, camera_position):
-        if self._tag.absolute_height:
+        if self.geometry.absolute_height:
             return int(
-                (10 * self._tag.height)
+                (10 * self.geometry.height)
                 / float(
                     linalg.norm(
-                        array(self._tag.position) - array([camera_position.x, camera_position.y, camera_position.z])
+                        array(self.geometry.position) - array([camera_position.x, camera_position.y, camera_position.z])
                     )
                 )
             )
 
         else:
-            return self._tag.height
+            return self.geometry.height
 
     def draw(self, shader, camera_position):
         """Draw the object from its buffers"""
@@ -192,7 +188,7 @@ class TagObject(ViewerSceneObject, GeometryObject):
             shader.uniform4x4("transform", self.worldtransformation.matrix)
         shader.uniform1f("object_opacity", self.opacity)
         shader.uniform1i("text_height", self._calculate_text_height(camera_position))
-        shader.uniform1i("text_num", len(self._tag.text))
+        shader.uniform1i("text_num", len(self.geometry.text))
         shader.uniform3f("text_color", self.color)
         shader.uniformText("text_texture", self._text_buffer["text_texture"])
         shader.bind_attribute("position", self._text_buffer["positions"])
@@ -200,7 +196,3 @@ class TagObject(ViewerSceneObject, GeometryObject):
         shader.uniform1i("is_text", 0)
         shader.uniform1f("object_opacity", 1)
         shader.disable_attribute("position")
-
-    def update(self):
-        super()._update_matrix()
-        self.init()

@@ -15,7 +15,6 @@ from PySide6.QtGui import QWheelEvent
 from PySide6.QtOpenGLWidgets import QOpenGLWidget
 
 from compas_viewer.configurations import RenderConfig
-from compas_viewer.scene import GridObject
 from compas_viewer.scene import TagObject
 from compas_viewer.scene.meshobject import MeshObject
 from compas_viewer.scene.vectorobject import VectorObject
@@ -497,7 +496,7 @@ class Render(QOpenGLWidget):
             if obj.is_visible:
                 if isinstance(obj, TagObject):
                     tag_objs.append(obj)
-                if isinstance(obj, VectorObject):
+                elif isinstance(obj, VectorObject):
                     vector_objs.append(obj)
                 else:
                     mesh_objs.append(obj)
@@ -518,7 +517,7 @@ class Render(QOpenGLWidget):
         if self.config.show_grid:
             self.shader_grid.bind()
             self.shader_grid.uniform4x4("viewworld", viewworld)
-            self.grid.draw(self.shader_grid)
+            self.grid.draw(self.shader_grid, self.config.rendermode == "wireframe", self.config.rendermode == "lighted")
             self.shader_grid.release()
 
         # Draw model objects in the scene
@@ -571,7 +570,8 @@ class Render(QOpenGLWidget):
         --------
         :func:`compas_viewer.components.render.selector.Selector.ANTI_ALIASING_FACTOR`
         """
-
+        GL.glDisable(GL.GL_POINT_SMOOTH)
+        GL.glDisable(GL.GL_LINE_SMOOTH)
         for obj in self.viewer.objects:
             if obj.is_visible and not obj.is_locked:
                 obj.draw_instance(self.shader_instance, self.rendermode == "wireframe")
@@ -585,3 +585,5 @@ class Render(QOpenGLWidget):
             GL.GL_RGB,
             GL.GL_UNSIGNED_BYTE,
         )
+        GL.glEnable(GL.GL_POINT_SMOOTH)
+        GL.glEnable(GL.GL_LINE_SMOOTH)

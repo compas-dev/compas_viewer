@@ -23,7 +23,10 @@
         "pointssize": 10.0,
         "opacity": 1.0,
         "hide_coplanaredges": false,
-        "use_vertexcolors": true
+        "use_vertexcolors": true,
+        "framesize": [0.1, 10, 0.1, 10],
+        "show_framez": true,
+        "vectorsize": 0.2
     },
     "guid": "4ffff417-3578-4260-aef6-45ea7a480ff9"
 }

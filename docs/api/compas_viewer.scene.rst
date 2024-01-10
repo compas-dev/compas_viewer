@@ -13,10 +13,21 @@ Classes
 
     ViewerSceneObject
     MeshObject
-    LineObject
     PointObject
-    TagObject
-    Tag
-    GridObject
-    Grid
+    LineObject
     VectorObject
+    Tag
+    TagObject
+    FrameObject
+    CircleObject
+    BoxObject
+    TorusObject
+    PolylineObject
+    PolygonObject
+    SphereObject
+    PlaneObject
+    CylinderObject
+    EllipseObject
+    ConeObject
+    CapsuleObject
+    NurbsSurfaceObject

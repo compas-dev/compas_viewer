@@ -1,5 +1,5 @@
+from abc import abstractmethod
 from random import randint
-from random import random
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import Dict
@@ -27,6 +27,9 @@ from compas_viewer.utilities.gl import update_vertex_buffer
 if TYPE_CHECKING:
     from compas_viewer import Viewer
     from compas_viewer.components.render.shaders import Shader
+
+# Type template of point/line/face data for generating the buffers.
+DataType = Tuple[List[Point], List[Color], List[List[int]]]
 
 
 class ViewerSceneObject(SceneObject):
@@ -104,6 +107,11 @@ class ViewerSceneObject(SceneObject):
 
     """
 
+    # Enhance line width for selection only.
+    LINEWIDTH_SELECTION_INCREMENTAL = 2
+
+    LINEARDEFLECTION = 0.2
+
     def __init__(
         self,
         viewer: "Viewer",
@@ -180,10 +188,10 @@ class ViewerSceneObject(SceneObject):
         self._is_collection = False
 
         #  Primitive
-        self._points_data: Optional[Tuple[List[Point], List[Color], List[List[int]]]] = None
-        self._lines_data: Optional[Tuple[List[Point], List[Color], List[List[int]]]] = None
-        self._frontfaces_data: Optional[Tuple[List[Point], List[Color], List[List[int]]]] = None
-        self._backfaces_data: Optional[Tuple[List[Point], List[Color], List[List[int]]]] = None
+        self._points_data: Optional[DataType] = None
+        self._lines_data: Optional[DataType] = None
+        self._frontfaces_data: Optional[DataType] = None
+        self._backfaces_data: Optional[DataType] = None
         self._points_buffer: Optional[Dict[str, Any]] = None
         self._lines_buffer: Optional[Dict[str, Any]] = None
         self._frontfaces_buffer: Optional[Dict[str, Any]] = None
@@ -196,6 +204,26 @@ class ViewerSceneObject(SceneObject):
     @property
     def bounding_box_center(self):
         return self._bounding_box_center
+
+    # ==========================================================================
+    # Reading geometric data, downstream classes should implement these properties.
+    # ==========================================================================
+
+    def _read_points_data(self) -> Optional[DataType]:
+        """Read points data from the object."""
+        pass
+
+    def _read_lines_data(self) -> Optional[DataType]:
+        """Read lines data from the object."""
+        pass
+
+    def _read_frontfaces_data(self) -> Optional[DataType]:
+        """Read frontfaces data from the object."""
+        pass
+
+    def _read_backfaces_data(self) -> Optional[DataType]:
+        """Read backfaces data from the object."""
+        pass
 
     # ==========================================================================
     # general
@@ -214,7 +242,7 @@ class ViewerSceneObject(SceneObject):
     # buffer
     # ==========================================================================
 
-    def make_buffer_from_data(self, data: Tuple[List[Point], List[Color], List[List[int]]]) -> Dict[str, Any]:
+    def make_buffer_from_data(self, data: DataType) -> Dict[str, Any]:
         """Create buffers from point/line/face data.
 
         Parameters
@@ -237,7 +265,7 @@ class ViewerSceneObject(SceneObject):
 
     def update_buffer_from_data(
         self,
-        data: Tuple[List[Point], List[Color], List[List[int]]],
+        data: DataType,
         buffer: Dict[str, Any],
         update_positions: bool,
         update_colors: bool,
@@ -309,6 +337,10 @@ class ViewerSceneObject(SceneObject):
 
     def init(self):
         """Initialize the object"""
+        self._points_data = self._read_points_data() if self.show_points else None
+        self._lines_data = self._read_lines_data() if self.show_lines else None
+        self._frontfaces_data = self._read_frontfaces_data() if self.show_faces else None
+        self._backfaces_data = self._read_backfaces_data() if self.show_faces else None
         self.make_buffers()
         self._update_matrix()
 
@@ -416,7 +448,11 @@ class ViewerSceneObject(SceneObject):
             )
         if self._lines_buffer is not None and (self.show_lines or wireframe):
             shader.bind_attribute("position", self._lines_buffer["positions"])
-            shader.draw_lines(width=self.lineswidth, elements=self._lines_buffer["elements"], n=self._lines_buffer["n"])
+            shader.draw_lines(
+                width=self.lineswidth + self.LINEWIDTH_SELECTION_INCREMENTAL,
+                elements=self._lines_buffer["elements"],
+                n=self._lines_buffer["n"],
+            )
         if self._frontfaces_buffer is not None and not wireframe:
             shader.bind_attribute("position", self._frontfaces_buffer["positions"])
             shader.draw_triangles(elements=self._frontfaces_buffer["elements"], n=self._frontfaces_buffer["n"])

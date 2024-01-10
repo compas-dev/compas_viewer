@@ -1,6 +1,7 @@
 import sys
 from os import path
 from pathlib import Path
+from typing import TYPE_CHECKING
 from typing import Any
 from typing import Callable
 from typing import Dict
@@ -12,6 +13,7 @@ from typing import Union
 
 from compas.colors import Color
 from compas.datastructures import Mesh
+from compas.geometry import Frame
 from compas.geometry import Geometry
 from compas.scene import Scene
 from PySide6 import QtCore
@@ -31,9 +33,12 @@ from compas_viewer.configurations import RenderConfig
 from compas_viewer.configurations import SceneConfig
 from compas_viewer.configurations import ViewerConfig
 from compas_viewer.controller import Controller
-from compas_viewer.scene import Grid
-from compas_viewer.scene import GridObject
+from compas_viewer.scene import FrameObject
 from compas_viewer.scene import ViewerSceneObject
+
+if TYPE_CHECKING:
+    from compas.datastructures import Network
+    from compas_occ.brep import BRep
 
 
 class Timer:
@@ -185,8 +190,10 @@ class Viewer(Scene):
         self._icon = QIcon(path.join(DATA, "compas_icon_white.png"))
         self._app.setWindowIcon(self._icon)  # type: ignore
         self._app.setApplicationName(self.config.title)
-        self.grid = GridObject(
-            Grid(self.render_config.gridsize, self.render_config.show_gridz),
+        self.grid = FrameObject(
+            Frame.worldXY(),
+            framesize=self.render_config.gridsize,
+            show_framez=self.render_config.show_gridz,
             viewer=self,
             is_selected=False,
             is_locked=True,
@@ -414,7 +421,7 @@ class Viewer(Scene):
 
     def add(
         self,
-        item: Union[Mesh, Geometry, Grid],
+        item: Union[Mesh, Geometry, "BRep", "Network"],
         parent: Optional[ViewerSceneObject] = None,
         is_selected: bool = False,
         is_locked: bool = False,
@@ -515,7 +522,10 @@ class Viewer(Scene):
             **kwargs
         )
         assert isinstance(sceneobject, ViewerSceneObject)
-        if self.instance_colors.get(sceneobject.instance_color.rgb255):
+        if (
+            self.instance_colors.get(sceneobject.instance_color.rgb255)
+            or sceneobject.instance_color.rgb255 == self.render_config.backgroundcolor.rgb255
+        ):
             raise ValueError(
                 "Program error: Instance color is not unique."
                 + "Scene object might exceed the limit of 16,581,375 or rerun the program."

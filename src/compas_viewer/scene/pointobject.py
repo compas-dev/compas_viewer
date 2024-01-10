@@ -1,42 +1,23 @@
-from typing import List
-from typing import Optional
-from typing import Tuple
-
-from compas.colors import Color
 from compas.geometry import Point
 from compas.scene import GeometryObject
 
+from .sceneobject import DataType
 from .sceneobject import ViewerSceneObject
 
 
 class PointObject(ViewerSceneObject, GeometryObject):
-    """Object for displaying COMPAS point geometry.
-
-    Parameters
-    ----------
-    point : :class:`compas.geometry.Point`
-        The point geometry.
-    **kwargs : Dict, optional
-        Additional options for the :class:`compas_viewer.scene.ViewerSceneObject`.
-
-    Attributes
-    ----------
-    point : :class:`compas.geometry.Point`
-        The point geometry.
-    """
+    """Viewer scene object for displaying COMPAS :class:`compas.geometry.Point` geometry."""
 
     def __init__(self, point: Point, **kwargs):
         super(PointObject, self).__init__(geometry=point, **kwargs)
-        self._point = point
+        self.geometry: Point
 
-        self._points_data = self._get_points_data()
-
-    def _get_points_data(self) -> Optional[Tuple[List[Point], List[Color], List[List[int]]]]:
-        positions = [self._point]
+    def _read_points_data(self) -> DataType:
+        positions = [self.geometry]
         colors = [self.pointscolor["_default"]]
         elements = [[0]]
         return positions, colors, elements
 
-    @classmethod
-    def create_default(cls) -> Point:
-        return Point(0, 0, 0)
+    def _read_lines_data(self):
+        """No line data exist for this geometry, Return None."""
+        return None
