@@ -17,7 +17,7 @@ class EllipseObject(ViewerSceneObject, GeometryObject):
 
     def __init__(self, ellipse: Ellipse, **kwargs):
         self.geometry = ellipse
-        self.u = int(self._proximate_circumference / self.LINEARDEFLECTION)
+        self.u = kwargs.get("u",int(self._proximate_circumference / self.LINEARDEFLECTION))
         self.u_points = self._calculate_ellipse_points(ellipse)
         super().__init__(geometry=ellipse, close=True, **kwargs)
 

@@ -13,7 +13,7 @@ class CircleObject(ViewerSceneObject, GeometryObject):
 
     def __init__(self, circle: Circle, **kwargs):
         self.geometry: Circle
-        self.u = int(circle.circumference / self.LINEARDEFLECTION)
+        self.u = kwargs.get("u",int(circle.circumference / self.LINEARDEFLECTION))
         self.u_points = self._calculate_circle_points(circle)
         super().__init__(geometry=circle, **kwargs)
 

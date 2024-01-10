@@ -37,6 +37,7 @@ from compas_viewer.scene import FrameObject
 from compas_viewer.scene import ViewerSceneObject
 
 if TYPE_CHECKING:
+    from compas.datastructures import Network
     from compas_occ.brep import BRep
 
 
@@ -420,7 +421,7 @@ class Viewer(Scene):
 
     def add(
         self,
-        item: Union[Mesh, Geometry, "BRep"],
+        item: Union[Mesh, Geometry, "BRep", "Network"],
         parent: Optional[ViewerSceneObject] = None,
         is_selected: bool = False,
         is_locked: bool = False,

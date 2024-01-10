@@ -10,6 +10,6 @@ class CapsuleObject(MeshObject):
     """Viewer scene object for displaying COMPAS :class:`compas.geometry.Capsule` geometry."""
 
     def __init__(self, capsule: Capsule, **kwargs):
-        self.u = int(2 * pi * capsule.radius / self.LINEARDEFLECTION)
+        self.u =kwargs.get("u", int(2 * pi * capsule.radius / self.LINEARDEFLECTION))
 
         super(CapsuleObject, self).__init__(mesh=Mesh.from_shape(capsule, u=self.u), **kwargs)

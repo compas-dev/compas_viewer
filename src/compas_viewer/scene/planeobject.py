@@ -8,7 +8,7 @@ from .sceneobject import ViewerSceneObject, DataType
 
 class PlaneObject(ViewerSceneObject, GeometryObject):
     """
-    The scene object of the :class:`compas.geometry.Plane` geometry.
+    Viewer scene object for displaying COMPAS :class:`compas.geometry.Plane` geometry.
 
     Parameters
     ----------

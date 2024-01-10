@@ -14,8 +14,8 @@ class NurbsSurfaceObject(ViewerSceneObject, GeometryObject):
         super().__init__(geometry=surface, **kwargs)
 
         # LINEARDEFLECTION not implemented in NurbsSurface.
-        self.u = int(16 + (0 * self.LINEARDEFLECTION))
-        self.v = int(16 + (0 * self.LINEARDEFLECTION))
+        self.u = kwargs.get("u",int(16 + (0 * self.LINEARDEFLECTION)))
+        self.v = kwargs.get("v",int(16 + (0 * self.LINEARDEFLECTION)))
 
         self._triangles = [list(point) for triangle in surface.to_triangles(nu=self.u, nv=self.v) for point in triangle]
 
