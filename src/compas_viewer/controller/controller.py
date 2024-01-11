@@ -60,7 +60,7 @@ class Controller:
         ----------
         renderer : :class:`compas_viewer.components.renderer.Renderer`
             The renderer object.
-        event : :class:`PySide6.QtGui.QMouseEvent`
+        event : :PySide6:`PySide6/QtGui/QMouseEvent`
             The Qt event.
         """
 
@@ -101,7 +101,7 @@ class Controller:
         ----------
         renderer : :class:`compas_viewer.components.renderer.Renderer`
             The renderer object.
-        event : :class:`PySide6.QtGui.QMouseEvent`
+        event : :PySide6:`PySide6/QtGui/QMouseEvent`
             The Qt event.
         """
         self.mouse.last_pos = event.pos()
@@ -148,7 +148,7 @@ class Controller:
         ----------
         renderer : :class:`compas_viewer.components.renderer.Renderer`
             The renderer object.
-        event : :class:`PySide6.QtGui.QMouseEvent`
+        event : :PySide6:`PySide6/QtGui/QMouseEvent`
             The Qt event.
         """
 
@@ -175,7 +175,7 @@ class Controller:
         ----------
         renderer : :class:`compas_viewer.components.renderer.Renderer`
             The renderer object.
-        event : :class:`PySide6.QtGui.QWheelEvent`
+        event : :PySide6:`PySide6/QtGui/QWheelEvent`
             The Qt event.
         """
         degrees = event.angleDelta().y() / 8
@@ -191,7 +191,7 @@ class Controller:
         ----------
         renderer : :class:`compas_viewer.components.renderer.Renderer`
             The renderer object.
-        event : :class:`PySide6.QtGui.QKeyEvent`
+        event : :PySide6:`PySide6/QtGui/QKeyEvent`
             The Qt event.
         """
         for action in self.actions.values():
@@ -208,7 +208,7 @@ class Controller:
         ----------
         renderer : :class:`compas_viewer.components.renderer.Renderer`
             The renderer object.
-        event : :class:`PySide6.QtGui.QKeyEvent`
+        event : :PySide6:`PySide6/QtGui/QKeyEvent`
             The Qt event.
         """
         for action in self.actions.values():

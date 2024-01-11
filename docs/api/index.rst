@@ -3,52 +3,61 @@
 API Reference
 ********************************************************************************
 
-This pacakge provides a viewer for COMPAS.
+This package provides a viewer for COMPAS.
 
-.. Viewer
-.. ------
+Viewer
+------
 
-.. .. toctree::
-..     :maxdepth: 1
-..     :titlesonly:
+.. toctree::
+    :maxdepth: 1
+    :titlesonly:
 
-..     compas_viewer.viewer
-
-
-.. Scene and Objects
-.. -----------------
-
-.. .. toctree::
-..     :maxdepth: 1
-..     :titlesonly:
-
-..     compas_viewer.scene
+    compas_viewer.viewer
 
 
-.. Controller and Actions
-.. ----------------------
+Scene and Objects
+-----------------
 
-.. .. toctree::
-..     :maxdepth: 1
-..     :titlesonly:
+.. toctree::
+    :maxdepth: 1
+    :titlesonly:
 
-..     compas_viewer.controller
-..     compas_viewer.actions
-
-
-.. Components and Configurations
-.. -----------------------------
-
-.. .. toctree::
-..     :maxdepth: 1
-..     :titlesonly:
-
-..     compas_viewer.components
-..     compas_viewer.configurations
+    compas_viewer.scene
 
 
-Layout and Utilities
+Controller and Actions
+----------------------
+
+.. toctree::
+    :maxdepth: 1
+    :titlesonly:
+
+    compas_viewer.controller
+    compas_viewer.actions
+
+
+Components and Configurations
+-----------------------------
+
+.. toctree::
+    :maxdepth: 1
+    :titlesonly:
+
+    compas_viewer.components
+    compas_viewer.configurations
+
+
+Layout and UI
 --------------------
+.. toctree::
+    :maxdepth: 1
+    :titlesonly:
+
+    compas_viewer.layout
+
+
+Utilities
+---------
 .. toctree::
     :maxdepth: 1
     :titlesonly:
@@ -56,4 +65,3 @@ Layout and Utilities
     compas_viewer.utilities
 
 
-    .. compas_viewer.layout

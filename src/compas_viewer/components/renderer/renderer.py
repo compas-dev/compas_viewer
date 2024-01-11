@@ -135,7 +135,12 @@ class Renderer(QOpenGLWidget):
     # ==========================================================================
 
     def clear(self):
-        """Clear the view."""
+        """Clear the view.
+
+        See Also
+        --------
+        :GL:`glClear`
+        """
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)  # type: ignore
 
     def initializeGL(self):
@@ -218,12 +223,12 @@ class Renderer(QOpenGLWidget):
     def mouseMoveEvent(self, event: QMouseEvent):
         """
         Callback for the mouse move event which passes the event to the controller.
-        Inherited from :class:`PySide6.QtOpenGLWidgets.QOpenGLWidget`.
+        Inherited from :PySide6:`PySide6/QtOpenGLWidgets/QOpenGLWidget`.
 
 
         Parameters
         ----------
-        event : :class:`PySide6.QtGui.QMouseEvent`
+        event : :PySide6:`PySide6/QtGui/QMouseEvent`
             The Qt event.
 
         See Also
@@ -244,7 +249,7 @@ class Renderer(QOpenGLWidget):
 
         Parameters
         ----------
-        event : :class:`PySide6.QtGui.QMouseEvent`
+        event : :PySide6:`PySide6/QtGui/QMouseEvent`
             The Qt event.
 
         See Also
@@ -265,7 +270,7 @@ class Renderer(QOpenGLWidget):
 
         Parameters
         ----------
-        event : :class:`PySide6.QtGui.QMouseEvent`
+        event : :PySide6:`PySide6/QtGui/QMouseEvent`
             The Qt event.
 
         See Also
@@ -286,7 +291,7 @@ class Renderer(QOpenGLWidget):
 
         Parameters
         ----------
-        event : :class:`PySide6.QtGui.QWheelEvent`
+        event : :PySide6:`PySide6/QtGui/QWheelEvent`
             The Qt event.
 
         See Also
@@ -307,7 +312,7 @@ class Renderer(QOpenGLWidget):
 
         Parameters
         ----------
-        event : :class:`PySide6.QtGui.QKeyEvent`
+        event : :PySide6:`PySide6/QtGui/QKeyEvent`
             The Qt event.
 
         See Also
@@ -326,7 +331,7 @@ class Renderer(QOpenGLWidget):
 
         Parameters
         ----------
-        event : :class:`PySide6.QtGui.QKeyEvent`
+        event : :PySide6:`PySide6/QtGui/QKeyEvent`
             The Qt event.
 
         See Also

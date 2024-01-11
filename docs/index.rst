@@ -3,10 +3,10 @@
 ********************************************************************************
 COMPAS Viewer
 ********************************************************************************
-.. _compas.geomery: https://compas.dev/compas//latest/api/compas.geometry.html
 .. rst-class:: lead
 
 Standalone viewer for COMPAS 2.0 with features:
+
 
 * **Fully COMPAS Support**: Full support for all :compas:`compas.geometry`  (primitives, shapes, network, mesh, assembly, model, etc.) based on :compas:`compas.scene` structure ...
 * **Universal Architecture**: Full support Mac, Windows, and Linux with Python 3.9+. More various platforms are coming soon ...

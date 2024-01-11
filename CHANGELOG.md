@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
+* Added `installation` documentation.
 * Added documentations: index, api, etc. Mockups style is improved.
 * Added `DataType` as the data type template for generating the buffer.
 * Added `NetworkObject` for the scene objects.
@@ -45,6 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added `NetworkObject`.
 
 ### Changed
+* The `Index` page.
 * Typing hints improved, now `compas_viewer` only support Python 3.9+.
 * Fixed the bug of the `Selector`, drag selection is now more accurate.
 * More performative instance map and QObject-based selection architecture.

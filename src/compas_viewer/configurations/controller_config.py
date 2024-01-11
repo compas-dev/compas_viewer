@@ -57,9 +57,9 @@ class ActionConfig:
     ----------
     config : :class:`ActionConfigType`
         A TypedDict with defined keys and types.
-    key : :class:`PySide6.QtCore.Qt.Key`
+    key : :QtCore:`PySide6.QtCore.Qt.Key`
         The Qt key.
-    modifier : :class:`PySide6.QtCore.Qt.KeyboardModifier`
+    modifier : :QtCore:`PySide6.QtCore.Qt.KeyboardModifier`
         The Qt modifier.
     """
 
@@ -85,9 +85,9 @@ class MouseConfig:
     ----------
     config : :class:`MouseConfigType`
         A TypedDict with defined keys and types.
-    mouse : :class:`PySide6.QtCore.Qt.MouseButton`
+    mouse : :QtCore:`PySide6.QtCore.Qt.MouseButton`
         The Qt mouse.
-    modifier : :class:`PySide6.QtCore.Qt.KeyboardModifier`
+    modifier : :QtCore:`PySide6.QtCore.Qt.KeyboardModifier`
         The Qt modifier.
     """
 

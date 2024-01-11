@@ -26,7 +26,8 @@ def key_mapper(
 
     Returns
     -------
-    Literal[:QtCore:`PySide6.QtCore.Qt.Key`, :QtCore:`PySide6.QtCore.Qt.KeyboardModifier`, :QtCore:`PySide6.QtCore.Qt.MouseButton`]
+    Literal[:QtCore:`PySide6.QtCore.Qt.Key`, :QtCore:`PySide6.QtCore.Qt.KeyboardModifier`,
+    :QtCore:`PySide6.QtCore.Qt.MouseButton`]
         The mapped Qt key.
 
     Notes

@@ -8,4 +8,4 @@ Tutorials
     :titlesonly:
     :caption: Tutorials
 
-    configuratins
+    configurations

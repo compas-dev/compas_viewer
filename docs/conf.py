@@ -88,9 +88,10 @@ linkcode_resolve = sphinx_compas2_theme.get_linkcode_resolve(organization, packa
 # extlinks
 
 extlinks = {
-    "gl": ("https://pyopengl.sourceforge.net/documentation/manual-3.0/%s.html", "%s"),
+    "GL": ("https://pyopengl.sourceforge.net/documentation/manual-3.0/%s.html", "%s"),
     "QtCore": ("https://doc.qt.io/qtforpython-6/PySide6/QtCore/Qt.html#PySide6.QtCore.%s", "%s"),
-    # "QtCore": ("https://doc.qt.io/qtforpython-6/PySide6/QtCore/Qt.html#%s", "%s"),
+    "PySide6": ("https://doc.qt.io/qtforpython-6/%s.html", "%s"),
+    "compas": ("https://compas.dev/compas//latest/api/%s.html", "%s"),
 }
 
 # from pytorch
