@@ -140,8 +140,8 @@ html_theme_options = {
         "version_match": version,
     },
     "logo": {
-        "image_light": "_static/compas_icon_white.png",  # relative to parent of conf.py
-        "image_dark": "_static/compas_icon_white.png",  # relative to parent of conf.py
+        "image_light": "_static/compas_icon_white.png",
+        "image_dark": "_static/compas_icon_white.png",
         "text": project,
     },
     "navigation_depth": 2,
