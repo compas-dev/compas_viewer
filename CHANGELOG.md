@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
+* Added `DeleteSelected` action class.
 * Added `DataType` as the data type template for generating the buffer.
 * Added `NetworkObject` for the scene objects.
 * Added `compas_viewer.scene.ViewerSceneObject.LINEWIDTH_SELECTION_INCREMENTAL` to enhance line width for selection only.
@@ -44,6 +45,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added `NetworkObject`.
 
 ### Changed
+* Introduce decorator @lru_cache() to reduce duplicate calculations. 
+* Refactored the `Selector` and the instance_map structure, the main frame rate is higher and selection action is faster.
 * Fixed the bug of the `Selector`, drag selection is now more accurate.
 * More performative instance map and QObject-based selection architecture.
 * Naming of the keys, mouses, and modifiers are changed. The key string which is the same as what it was called in the PySide6.QtCore.Qt, with lowercases and with prefix&underscores removed.

@@ -1,8 +1,8 @@
 import time
-from math import ceil
+from functools import lru_cache
 from typing import TYPE_CHECKING
-from typing import Any
 from typing import List
+from typing import Tuple
 
 from compas.geometry import transform_points_numpy
 from numpy import float32
@@ -16,7 +16,7 @@ from PySide6.QtOpenGLWidgets import QOpenGLWidget
 
 from compas_viewer.configurations import RenderConfig
 from compas_viewer.scene import TagObject
-from compas_viewer.scene.meshobject import MeshObject
+from compas_viewer.scene.sceneobject import ViewerSceneObject
 from compas_viewer.scene.vectorobject import VectorObject
 
 from .camera import Camera
@@ -60,8 +60,6 @@ class Render(QOpenGLWidget):
         self.shader_arrow: Shader
         self.shader_instance: Shader
         self.shader_grid: Shader
-
-        self.instance_buffer: Any
 
         self.camera = Camera(self)
         self.grid = self.viewer.grid
@@ -190,8 +188,13 @@ class Render(QOpenGLWidget):
         GL.glViewport(0, 0, w, h)
         self.resize(w, h)
 
-    def paintGL(self):
+    def paintGL(self, is_instance: bool = False):
         """Paint the OpenGL canvas.
+
+        Parameters
+        ----------
+        is_instance : bool, optional
+            Whether the render is for instance map, by default False.
 
         Notes
         -----
@@ -204,7 +207,11 @@ class Render(QOpenGLWidget):
         * https://doc.qt.io/qtforpython-6/PySide6/QtOpenGL/QOpenGLWindow.html#PySide6.QtOpenGL.PySide6.QtOpenGL.QOpenGLWindow.paintGL # noqa: E501
         """
         self.clear()
-        self.paint()
+        if is_instance or self.rendermode == "instance":
+            self.paint_instance()
+        else:
+            self.paint()
+
         self._frames += 1
         if time.time() - self._now > 1:
             self._now = time.time()
@@ -447,24 +454,25 @@ class Render(QOpenGLWidget):
         """
         self.update_projection(w, h)
 
-    def sort_objects_from_viewworld(self, objects: List[MeshObject], viewworld: List[List[float]]):
+    def sort_objects_from_viewworld(self, objects: List[ViewerSceneObject], viewworld: List[List[float]]):
         """Sort objects by the distances from their bounding box centers to camera location
 
         Parameters
         ----------
-        objects : List[:class:`compas_viewer.scene.meshobject.MeshObject`]
+        objects : List[:class:`compas_viewer.scene.sceneobject.ViewerSceneObject`]
             The objects to be sorted.
         viewworld : List[List[float]]
             The viewworld matrix.
 
         Returns
         -------
-        list
+        List
             A list of sorted objects.
         """
         opaque_objects = []
         transparent_objects = []
         centers = []
+
         for obj in objects:
             if obj.opacity * self.opacity < 1 and obj.bounding_box_center is not None:
                 transparent_objects.append(obj)
@@ -477,22 +485,32 @@ class Render(QOpenGLWidget):
             transparent_objects, _ = zip(*transparent_objects)
         return opaque_objects + list(transparent_objects)
 
-    def paint(self):
-        """
-        Paint all the items in the render, which only be called by the paintGL function
-        and determines the performance of the renders
-        This function introduces decision tree for different render modes and settings.
-        """
+    @lru_cache(maxsize=3)
+    def sort_objects_from_category(
+        self, objs: Tuple[ViewerSceneObject]
+    ) -> Tuple[List[TagObject], List[VectorObject], List[ViewerSceneObject]]:
+        """Sort objects by their categories
 
-        #  Matrix update
-        viewworld = self.camera.viewworld()
-        self.update_projection()
+        Returns
+        -------
+        Tuple(List[:class:`compas_viewer.scene.tagobject.TagObject`],
+        List[:class:`compas_viewer.scene.vectorobject.VectorObject`],
+        List[:class:`compas_viewer.scene.sceneobject.ViewerSceneObject`])
+            A tuple of sorted objects.
 
-        # Object categorization
+        Notes
+        -----
+        This function is cached to improve the performance.
+
+        References
+        ----------
+        * https://docs.python.org/3/library/functools.html#functools.lru_cache
+        * https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_recently_used_(LRU)
+        """
         tag_objs = []
         vector_objs = []
         mesh_objs = []
-        for obj in self.viewer.objects:
+        for obj in objs:
             if obj.is_visible:
                 if isinstance(obj, TagObject):
                     tag_objs.append(obj)
@@ -500,20 +518,28 @@ class Render(QOpenGLWidget):
                     vector_objs.append(obj)
                 else:
                     mesh_objs.append(obj)
+        return tag_objs, vector_objs, mesh_objs
 
-        # Draw instance maps
-        if self.rendermode == "instance" or self.config.selector.enable_selector:
-            self.shader_instance.bind()
-            self.shader_instance.uniform4x4("viewworld", viewworld)
-            self.paint_instance_map()
-            self.shader_instance.release()
-            if not self.rendermode == "instance":
-                self.clear()
+    def paint(self):
+        """
+        Paint all the items in the render, which only be called by the paintGL function
+        and determines the performance of the renders
+        This function introduces decision tree for different render modes and settings.
+        It is only  called by the :class:`compas_viewer.components.render.Render.paintGL` function.
+
+        See Also
+        --------
+        :func:`compas_viewer.components.render.Render.paintGL`
+        :func:`compas_viewer.components.render.Render.paint_instance`
+        """
+
+        #  Matrix update
+        viewworld = self.camera.viewworld()
+        self.update_projection()
+        # Object categorization
+        tag_objs, vector_objs, mesh_objs = self.sort_objects_from_category(tuple(self.viewer.objects))
 
         # Draw grid
-        # if self.app.selector.wait_for_selection_on_plane:
-        # self.paint_plane()
-        #     self.clear()
         if self.config.show_grid:
             self.shader_grid.bind()
             self.shader_grid.uniform4x4("viewworld", viewworld)
@@ -521,12 +547,11 @@ class Render(QOpenGLWidget):
             self.shader_grid.release()
 
         # Draw model objects in the scene
-        if not self.rendermode == "instance":
-            self.shader_model.bind()
-            self.shader_model.uniform4x4("viewworld", viewworld)
-            for obj in self.sort_objects_from_viewworld(mesh_objs, viewworld):
-                obj.draw(self.shader_model, self.rendermode == "wireframe", self.rendermode == "lighted")
-            self.shader_model.release()
+        self.shader_model.bind()
+        self.shader_model.uniform4x4("viewworld", viewworld)
+        for obj in self.sort_objects_from_viewworld(mesh_objs, viewworld):
+            obj.draw(self.shader_model, self.rendermode == "wireframe", self.rendermode == "lighted")
+        self.shader_model.release()
 
         # Draw vector arrows
         self.shader_arrow.bind()
@@ -555,35 +580,32 @@ class Render(QOpenGLWidget):
                 self.viewer.config.height,
             )
 
-    def paint_instance_map(self):
+    def paint_instance(self):
         """
-        Paint the instance map for the selection or the instance render mode.
-
-        Notes
-        -----
-        The instance map is used by the selector to identify selected objects.
-        The mechanism of a :class:`compas_viewer.components.render.selector.Selector`
-        is picking the color from instance map and then find the corresponding object.
-        Anti aliasing, which is always force opened in many machines,  can cause color picking inaccuracy.
+        Independent drawing function for the  instance map,
+        which is only called by the :class:`compas_viewer.components.render.Render.paintGL` function.
 
         See Also
         --------
-        :func:`compas_viewer.components.render.selector.Selector.ANTI_ALIASING_FACTOR`
+        :func:`compas_viewer.components.render.Render.paintGL`
+        :func:`compas_viewer.components.render.Render.paint`
+
         """
+
+        #  Matrix update
+        viewworld = self.camera.viewworld()
+        self.update_projection()
+        # Object categorization
+        _, _, mesh_objs = self.sort_objects_from_category(tuple(self.viewer.objects))
+        # Draw instance maps
         GL.glDisable(GL.GL_POINT_SMOOTH)
         GL.glDisable(GL.GL_LINE_SMOOTH)
-        for obj in self.viewer.objects:
-            if obj.is_visible and not obj.is_locked:
-                obj.draw_instance(self.shader_instance, self.rendermode == "wireframe")
 
-        r = self.devicePixelRatio()
-        self.instance_buffer = GL.glReadPixels(
-            0,
-            0,
-            ceil(r * self.viewer.config.width),
-            ceil(r * self.viewer.config.height),
-            GL.GL_RGB,
-            GL.GL_UNSIGNED_BYTE,
-        )
+        self.shader_instance.bind()
+        self.shader_instance.uniform4x4("viewworld", viewworld)
+        for obj in mesh_objs:
+            obj.draw_instance(self.shader_instance, self.rendermode == "wireframe")
+        self.shader_instance.release()
+
         GL.glEnable(GL.GL_POINT_SMOOTH)
         GL.glEnable(GL.GL_LINE_SMOOTH)
