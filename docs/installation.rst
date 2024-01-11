@@ -31,3 +31,11 @@ Update COMPAS Viewer to the latest version with pip.
 
     pip install --upgrade compas_viewer
 
+Known issues
+============
+For ubuntu users, following dependencies might be required depending on the system version:
+
+.. code-block:: bash
+
+    sudo apt-get install libegl1
+    sudo apt-get install python3-opengl

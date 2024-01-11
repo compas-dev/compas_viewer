@@ -18,7 +18,7 @@ jobs:
         python: [ '3.9', '3.11']
     steps:
       - name: install libegl1
-        run: sudo apt-get install libegl1 python3-opengl
+        run: sudo apt-get install libegl1
       - name: install python3-opengl
         run: sudo apt-get install python3-opengl
       - uses: compas-dev/compas-actions.build@v3
