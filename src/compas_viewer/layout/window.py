@@ -27,7 +27,7 @@ class WindowLayout:
     ----------
     layout : :class:`compas_viewer.layout.Layout`
         The parent layout.
-    viewer : :class:`compas_viewer.Viewer`
+    viewer : :class:`compas_viewer.viewer.Viewer`
         The parent viewer.
     config : :class:`compas_viewer.configurations.WindowConfig`
         The window configuration.
@@ -35,7 +35,10 @@ class WindowLayout:
     See Also
     --------
     :class:`compas_viewer.configurations.layout_config.WindowConfig`
-    :PySide6:`PySide6/QtWidgets/QMainWindow`
+
+    References
+    ----------
+    :PySide6:`PySide6/Qtdgets/QMainWindow`
     """
 
     def __init__(self, layout: "Layout"):

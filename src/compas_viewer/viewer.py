@@ -13,7 +13,6 @@ from compas.geometry import Frame
 from compas.geometry import Geometry
 from compas.scene import Scene
 from PySide6.QtCore import QCoreApplication
-from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import QApplication
 from PySide6.QtWidgets import QMainWindow
 
@@ -30,36 +29,11 @@ from compas_viewer.controller import Controller
 from compas_viewer.layout import Layout
 from compas_viewer.scene import FrameObject
 from compas_viewer.scene import ViewerSceneObject
+from compas_viewer.utilities import Timer
 
 if TYPE_CHECKING:
     from compas.datastructures import Network
     from compas_occ.brep import OCCBrep
-
-
-class Timer:
-    """A simple timer that calls a function at specified intervals.
-
-    Parameters
-    ----------
-    interval : int
-        Interval between subsequent calls to this function, in milliseconds.
-    callback : Callable
-        The function to call.
-    singleshot : bool, optional
-        If True, the timer is a singleshot timer.
-        Default is False.
-
-    """
-
-    def __init__(self, interval: int, callback: Callable, singleshot: bool = False):
-        self.timer = QTimer()
-        self.timer.setInterval(interval)
-        self.timer.timeout.connect(callback)
-        self.timer.setSingleShot(singleshot)
-        self.timer.start()
-
-    def stop(self):
-        self.timer.stop()
 
 
 class Viewer(Scene):
@@ -80,7 +54,7 @@ class Viewer(Scene):
         The display mode of the OpenGL view. It will override the value in the config file.
     viewmode : Literal['front', 'right', 'top', 'perspective'], optional
         The view mode of the OpenGL view. It will override the value in the config file.
-        In `ghosted` mode, all objects have a default opacity of 0.7.
+        In 'ghosted' mode, all objects have a default opacity of 0.7.
     show_grid : bool, optional
         Show the XY plane. It will override the value in the config file.
     configpath : str, optional
@@ -384,6 +358,10 @@ class Viewer(Scene):
             self.instance_colors[sceneobject.instance_color.rgb255] = sceneobject
 
         return sceneobject
+
+    # ==========================================================================
+    # Action
+    # ==========================================================================
 
     def add_action(
         self,

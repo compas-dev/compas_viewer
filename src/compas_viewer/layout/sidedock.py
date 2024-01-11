@@ -21,15 +21,18 @@ class SideDockLayout:
     ----------
     layout : :class:`compas_viewer.layout.Layout`
         The parent layout.
-    viewer : :class:`compas_viewer.Viewer`
+    viewer : :class:`compas_viewer.viewer.Viewer`
         The parent viewer.
     config : :class:`compas_viewer.configurations.WindowConfig`
         The window configuration.
 
     See Also
     --------
-    :class:`compas_viewer.configurations.layout_config.SideDockConfig`
-    :PySide6:`PySide6/QtWidgets/PySide6/QtWidgets/QDockWidget`
+    :class:`compas_viewer.configurations.layout_config.SidedockConfig`
+
+    References
+    ----------
+    :PySide6:`PySide6/QtWidgets/QDockWidget`
     """
 
     def __init__(self, layout: "Layout"):

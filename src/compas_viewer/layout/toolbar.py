@@ -30,7 +30,7 @@ class ToolBarLayout:
     ----------
     layout : :class:`compas_viewer.layout.Layout`
         The parent layout.
-    viewer : :class:`compas_viewer.Viewer`
+    viewer : :class:`compas_viewer.viewer.Viewer`
         The parent viewer.
     config : :class:`compas_viewer.configurations.WindowConfig`
         The window configuration.
@@ -38,6 +38,9 @@ class ToolBarLayout:
     See Also
     --------
     :class:`compas_viewer.configurations.layout_config.ToolBarConfig`
+
+    References
+    ----------
     :PySide6:`PySide6/QtWidgets/QTabWidget`
     """
 

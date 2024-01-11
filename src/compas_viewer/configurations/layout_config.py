@@ -58,7 +58,7 @@ class ToolBarConfigType(TypedDict):
 
 class ToolBarConfig(Config):
     """
-    The class representation for the toolbar configuration of the class :class:`compas_viewer.layout.ToolBarLayout`.
+    The class representation for the toolbar configuration of the Layout class.
     The toolbar configuration contains all the settings about the toolbar itself.
     """
 
@@ -74,8 +74,13 @@ class ToolBarConfig(Config):
 
 class ViewportConfig(Config):
     """
-    The class representation for the menu bar configuration of the class :class:`compas_viewer.layout.ViewportLayout`.
+    The class representation for the viewport configuration of the Layout class.
     The viewport configuration contains all the settings about the viewport itself: render, ...
+
+    Parameters
+    ----------
+    config : :class:`~ViewportConfigType`
+        A TypedDict with defined keys and types.
     """
 
     def __init__(self, config: Dict[str, Dict[str, ViewportConfigType]]):
@@ -90,8 +95,13 @@ class ViewportConfig(Config):
 
 class MenuBarConfig(Config):
     """
-    The class representation for the menu bar configuration of the class :class:`compas_viewer.layout.Layout`.
+    The class representation for the menu bar configuration of the Layout class.
     The menu bar configuration contains all the settings about the menu bar itself: items, ...
+
+    Parameters
+    ----------
+    config : :class:`~MenuBarConfigType`
+        A TypedDict with defined keys and types.
     """
 
     def __init__(self, config: Dict[str, Dict[str, MenuBarConfigType]]):
@@ -106,12 +116,12 @@ class MenuBarConfig(Config):
 
 class StatusBarConfig(Config):
     """
-    The class representation for the status bar configuration of the class :class:`compas_viewer.layout.Layout`.
+    The class representation for the status bar configuration of the Layout class.
     The status bar configuration contains all the settings about the status bar itself: text, show_fps, ...
 
     Parameters
     ----------
-    config : :class:`StatusBarConfigType`
+    config : :class:`~StatusBarConfigType`
         A TypedDict with defined keys and types.
     """
 
@@ -129,12 +139,12 @@ class StatusBarConfig(Config):
 
 class WindowConfig(Config):
     """
-    The class representation for the window configuration of the class :class:`compas_viewer.layout.Layout`.
+    The class representation for the window configuration of the Layout class.
     The window configuration contains all the settings about the window itself: width, height, fullscreen, ...
 
     Parameters
     ----------
-    config : :class:`WindowConfigType`
+    config : :class:`~WindowConfigType`
         A TypedDict with defined keys and types.
     """
 
@@ -167,12 +177,12 @@ class LayoutConfigType(TypedDict):
 
 class LayoutConfig(Config):
     """
-    The class representation for the `layout.json` of the class :class:`compas_viewer.layout.Layout`
+    The class representation for the `layout.json` of the Layout class.
     The layout.json contains all the settings about the viewer application it self: width, height, fullscreen, ...
 
     Parameters
     ----------
-    config : :class:`LayoutConfigType`
+    config : :class:`~LayoutConfigType`
         A TypedDict with defined keys and types.
     """
 

@@ -20,7 +20,7 @@ class ViewportLayout:
     ----------
     layout : :class:`compas_viewer.layout.Layout`
         The parent layout.
-    viewer : :class:`compas_viewer.Viewer`
+    viewer : :class:`compas_viewer.viewer.Viewer`
         The parent viewer.
     config : :class:`compas_viewer.configurations.Viewport`
         The window configuration.
@@ -28,6 +28,9 @@ class ViewportLayout:
     See Also
     --------
     :class:`compas_viewer.configurations.layout_config.ViewportConfig`
+
+    References
+    ----------
     :PySide6:`PySide6/QtWidgets/QGridLayout`
     """
 

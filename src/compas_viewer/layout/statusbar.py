@@ -15,7 +15,7 @@ class StatusBarLayout:
     ----------
     layout : :class:`compas_viewer.layout.Layout`
         The parent layout.
-    viewer : :class:`compas_viewer.Viewer`
+    viewer : :class:`compas_viewer.viewer.Viewer`
         The parent viewer.
     config : :class:`compas_viewer.configurations.StatusBarConfig`
         The status bar configuration.
@@ -23,6 +23,9 @@ class StatusBarLayout:
     See Also
     --------
     :class:`compas_viewer.configurations.layout_config.StatusBarConfig`
+
+    References
+    ----------
     :PySide6:`PySide6/QtWidgets/QStatusBar`
     """
 

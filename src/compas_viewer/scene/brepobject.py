@@ -24,7 +24,7 @@ try:
 
         def __init__(self, brep: OCCBrep, **kwargs):
             self.brep = brep
-            mesh, boundaries = self.to_viewmesh()
+            mesh, boundaries = self.brep.to_tesselation(kwargs.get("linear_deflection ", self.LINEARDEFLECTION))
             super().__init__(mesh=mesh, **kwargs)
             self.boundaries = boundaries
 

@@ -29,7 +29,7 @@ class Layout:
     ----------
     config : :class:`compas_viewer.configurations.layout_config.LayoutConfig`
         The configuration object for the layout.
-    viewer : :class:`compas_viewer.Viewer`
+    viewer : :class:`compas_viewer.viewer.Viewer`
         The parent viewer.
     window : :class:`compas_viewer.layout.layout.WindowLayout`
         The window layout.
@@ -47,6 +47,9 @@ class Layout:
     See Also
     --------
     :class:`compas_viewer.configurations.layout_config.LayoutConfig`
+
+    References
+    ----------
     :PySide6:`PySide6/QtWidgets/QLayout`
     """
 

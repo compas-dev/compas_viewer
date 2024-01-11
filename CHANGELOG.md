@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
+* Added basic buildup of `Layout`
 * Added terminal activation of the viewer.
 * Added `installation` documentation.
 * Added documentations: index, api, etc. Mockups style is improved.
