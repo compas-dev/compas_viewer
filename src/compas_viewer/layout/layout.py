@@ -49,6 +49,7 @@ from compas_viewer.configurations.layout_config import LayoutConfig
 from .window import WindowLayout
 from .statusbar import StatusBarLayout
 from .menubar import MenuBarLayout
+from . viewport import ViewportLayout
 
 if TYPE_CHECKING:
     from compas_viewer import Viewer
@@ -81,6 +82,8 @@ class Layout:
         self.window = WindowLayout(self)
         self.statusbar = StatusBarLayout(self)
         self.menubar = MenuBarLayout(self)
+        self.viewport = ViewportLayout(self)
+
 
 
     def init(self):
@@ -100,6 +103,7 @@ class Layout:
         self.window.init()
         self.statusbar.init()
         self.menubar.init()
+        self.viewport.init()
 
 
     # def _resize(self, width: int, height: int):
