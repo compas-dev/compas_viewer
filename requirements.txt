@@ -2,3 +2,4 @@ compas @ git+https://github.com/compas-dev/compas@main
 freetype-py
 pyopengl
 PySide6
+libegl1; sys_platform == 'ubuntu'
