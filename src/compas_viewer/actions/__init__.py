@@ -48,7 +48,7 @@ from .print_gl_info import GLInfo  # noqa: E402
 from .select_all import SelectAll  # noqa: E402
 from .viewmode import ViewRight, ViewFront, ViewTop, ViewPerspective  # noqa: E402
 from .delete_selected import DeleteSelected  # noqa: E402
-from .file import ImportFile, ExportFile, OpenURL  # noqa: E402
+from .io import ImportFile, ExportFile, OpenURL  # noqa: E402
 
 register_actions()
 

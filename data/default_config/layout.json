@@ -48,7 +48,7 @@
 
                     "COMPAS Core": {
                         "action": "url",
-                        "kwargs": { "url": "https://compas.dev/compas_viewer/latest/" }
+                        "kwargs": { "url": "https://compas.dev/compas/latest/" }
                     }
                 }
             },

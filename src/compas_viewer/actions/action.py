@@ -61,14 +61,14 @@ class Action(QObject):
         self.released.connect(self.released_action)
 
     @abstractmethod
-    def pressed_action(self):
+    def pressed_action(self, **kwargs):
         """
         The behavior of the action when the key is pressed.
         """
         self.viewer.renderer.update()
 
     @abstractmethod
-    def released_action(self):
+    def released_action(self, **kwargs):
         """
         The behavior of the action when the key is released.
         """

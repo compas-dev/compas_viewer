@@ -1,3 +1,4 @@
+from functools import partial
 from typing import TYPE_CHECKING
 
 from compas_viewer.actions import Action
@@ -36,5 +37,9 @@ class MenuBarLayout:
             for _k, _i in i.items():
                 action_config = ActionConfig({"key": "no"})  # type: ignore
                 parent.addAction(
-                    _k, "", Action(_i["action"], self.viewer, action_config, **_i.get("kwargs", {})).pressed_action
+                    _k,
+                    partial(
+                        Action(_i["action"], self.viewer, action_config).pressed_action,
+                        **_i.get("kwargs", {}),
+                    ),
                 )
