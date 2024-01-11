@@ -14,3 +14,9 @@ Classes
     Action
     ZoomSelected
     GLInfo
+    SelectAll
+    ViewRight
+    ViewFront
+    ViewTop
+    ViewPerspective
+    DeleteSelected
