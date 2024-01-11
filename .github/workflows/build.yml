@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python: [ '3.9', '3.11','3.13']
+        python: [ '3.9', '3.11']
     steps:
       - uses: compas-dev/compas-actions.build@v3
         with:
@@ -30,7 +30,7 @@ jobs:
     strategy:
       matrix:
         os: [macos-latest, windows-latest]
-        python: [ '3.9', '3.11','3.13']
+        python: [ '3.9', '3.11']
 
     steps:
       - uses: compas-dev/compas-actions.build@v3
