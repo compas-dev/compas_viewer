@@ -13,11 +13,16 @@ from .sceneobject import ViewerSceneObject
 
 
 class EllipseObject(ViewerSceneObject, GeometryObject):
-    """Viewer scene object for displaying COMPAS :class:`compas.geometry.Ellipse` geometry."""
+    """Viewer scene object for displaying COMPAS Ellipse geometry.
+
+    See Also
+    --------
+    :class:`compas.geometry.Ellipse`
+    """
 
     def __init__(self, ellipse: Ellipse, **kwargs):
         self.geometry = ellipse
-        self.u = int(self._proximate_circumference / self.LINEARDEFLECTION)
+        self.u = kwargs.get("u", int(self._proximate_circumference / self.LINEARDEFLECTION))
         self.u_points = self._calculate_ellipse_points(ellipse)
         super().__init__(geometry=ellipse, close=True, **kwargs)
 
@@ -68,11 +73,3 @@ class EllipseObject(ViewerSceneObject, GeometryObject):
             elements.append([count, count + 1])
             count += 2
         return positions, colors, elements
-
-    def _read_frontfaces_data(self):
-        """No frontfaces data exist for this geometry, Return None."""
-        return None
-
-    def _read_backfaces_data(self):
-        """No backfaces data exist for this geometry, Return None."""
-        return None

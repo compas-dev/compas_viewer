@@ -1,8 +1,6 @@
 import time
 from functools import lru_cache
 from typing import TYPE_CHECKING
-from typing import List
-from typing import Tuple
 
 from compas.geometry import transform_points_numpy
 from numpy import float32
@@ -16,7 +14,7 @@ from PySide6.QtOpenGLWidgets import QOpenGLWidget
 
 from compas_viewer.configurations import RenderConfig
 from compas_viewer.scene import TagObject
-from compas_viewer.scene.sceneobject import ViewerSceneObject
+from compas_viewer.scene.meshobject import MeshObject
 from compas_viewer.scene.vectorobject import VectorObject
 
 from .camera import Camera
@@ -28,9 +26,9 @@ if TYPE_CHECKING:
     from compas_viewer import Viewer
 
 
-class Render(QOpenGLWidget):
+class Renderer(QOpenGLWidget):
     """
-    Render class for 3D rendering of COMPAS geometry.
+    Renderer class for 3D rendering of COMPAS geometry.
     We constantly use OpenGL version 2.1 and GLSL 120 with a Compatibility Profile at the moment.
     The width and height are not in its configuration since they are set by the parent layout.
 
@@ -39,7 +37,7 @@ class Render(QOpenGLWidget):
     viewer : :class:`compas_viewer.viewer.Viewer`
         The viewer instance.
     config : :class:`compas_viewer.configurations.RenderConfig`
-        The render configuration.
+        The renderer configuration.
     """
 
     def __init__(self, viewer: "Viewer", config: RenderConfig):
@@ -70,11 +68,11 @@ class Render(QOpenGLWidget):
     @property
     def rendermode(self):
         """
-        The render mode of the view.
+        The renderer mode of the view.
 
         Returns
         -------
-            The render mode of the view.
+            The renderer mode of the view.
         """
         return self._rendermode
 
@@ -133,7 +131,12 @@ class Render(QOpenGLWidget):
     # ==========================================================================
 
     def clear(self):
-        """Clear the view."""
+        """Clear the view.
+
+        See Also
+        --------
+        :GL:`glClear`
+        """
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)  # type: ignore
 
     def initializeGL(self):
@@ -225,12 +228,12 @@ class Render(QOpenGLWidget):
     def mouseMoveEvent(self, event: QMouseEvent):
         """
         Callback for the mouse move event which passes the event to the controller.
-        Inherited from :class:`PySide6.QtOpenGLWidgets.QOpenGLWidget`.
+        Inherited from :PySide6:`PySide6/QtOpenGLWidgets/QOpenGLWidget`.
 
 
         Parameters
         ----------
-        event : :class:`PySide6.QtGui.QMouseEvent`
+        event : :PySide6:`PySide6/QtGui/QMouseEvent`
             The Qt event.
 
         See Also
@@ -251,7 +254,7 @@ class Render(QOpenGLWidget):
 
         Parameters
         ----------
-        event : :class:`PySide6.QtGui.QMouseEvent`
+        event : :PySide6:`PySide6/QtGui/QMouseEvent`
             The Qt event.
 
         See Also
@@ -272,7 +275,7 @@ class Render(QOpenGLWidget):
 
         Parameters
         ----------
-        event : :class:`PySide6.QtGui.QMouseEvent`
+        event : :PySide6:`PySide6/QtGui/QMouseEvent`
             The Qt event.
 
         See Also
@@ -293,7 +296,7 @@ class Render(QOpenGLWidget):
 
         Parameters
         ----------
-        event : :class:`PySide6.QtGui.QWheelEvent`
+        event : :PySide6:`PySide6/QtGui/QWheelEvent`
             The Qt event.
 
         See Also
@@ -314,7 +317,7 @@ class Render(QOpenGLWidget):
 
         Parameters
         ----------
-        event : :class:`PySide6.QtGui.QKeyEvent`
+        event : :PySide6:`PySide6/QtGui/QKeyEvent`
             The Qt event.
 
         See Also
@@ -333,7 +336,7 @@ class Render(QOpenGLWidget):
 
         Parameters
         ----------
-        event : :class:`PySide6.QtGui.QKeyEvent`
+        event : :PySide6:`PySide6/QtGui/QKeyEvent`
             The Qt event.
 
         See Also
@@ -351,7 +354,7 @@ class Render(QOpenGLWidget):
     # ==========================================================================
 
     def init(self):
-        """Initialize the render."""
+        """Initialize the renderer."""
         # Init the grid
         self.grid.init()
 
@@ -412,9 +415,9 @@ class Render(QOpenGLWidget):
         Parameters
         ----------
         w : int, optional
-            The width of the render, by default None.
+            The width of the renderer, by default None.
         h : int, optional
-            The height of the render, by default None.
+            The height of the renderer, by default None.
         """
         w = w or self.viewer.layout.config.window.width
         h = h or self.viewer.layout.config.window.height
@@ -443,30 +446,30 @@ class Render(QOpenGLWidget):
 
     def resize(self, w: int, h: int):
         """
-        Resize the render.
+        Resize the renderer.
 
         Parameters
         ----------
         w : int
-            The width of the render.
+            The width of the renderer.
         h : int
-            The height of the render.
+            The height of the renderer.
         """
         self.update_projection(w, h)
 
-    def sort_objects_from_viewworld(self, objects: List[ViewerSceneObject], viewworld: List[List[float]]):
+    def sort_objects_from_viewworld(self, objects: list[MeshObject], viewworld: list[list[float]]):
         """Sort objects by the distances from their bounding box centers to camera location
 
         Parameters
         ----------
-        objects : List[:class:`compas_viewer.scene.sceneobject.ViewerSceneObject`]
+        objects : list[:class:`compas_viewer.scene.meshobject.MeshObject`]
             The objects to be sorted.
-        viewworld : List[List[float]]
+        viewworld : list[list[float]]
             The viewworld matrix.
 
         Returns
         -------
-        List
+        list
             A list of sorted objects.
         """
         opaque_objects = []
@@ -487,15 +490,15 @@ class Render(QOpenGLWidget):
 
     @lru_cache(maxsize=3)
     def sort_objects_from_category(
-        self, objs: Tuple[ViewerSceneObject]
-    ) -> Tuple[List[TagObject], List[VectorObject], List[ViewerSceneObject]]:
+        self, objs: tuple[MeshObject]
+    ) -> tuple[list[TagObject], list[VectorObject], list[MeshObject]]:
         """Sort objects by their categories
 
         Returns
         -------
-        Tuple(List[:class:`compas_viewer.scene.tagobject.TagObject`],
-        List[:class:`compas_viewer.scene.vectorobject.VectorObject`],
-        List[:class:`compas_viewer.scene.sceneobject.ViewerSceneObject`])
+        tuple(list[:class:`compas_viewer.scene.tagobject.TagObject`],
+        list[:class:`compas_viewer.scene.vectorobject.VectorObject`],
+        list[:class:`compas_viewer.scene.sceneobject.MeshObject`])
             A tuple of sorted objects.
 
         Notes

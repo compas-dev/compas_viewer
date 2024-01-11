@@ -1,11 +1,11 @@
+
 ********************************************************************************
-Tutorials
+Examples
 ********************************************************************************
+
 .. toctree::
-   :maxdepth: 1
-   :titlesonly:
+    :maxdepth: 1
+    :titlesonly:
+    :caption: Basic Examples
 
-   tutorials/file_structure
-
-
-
+    basics

@@ -6,7 +6,12 @@ from .sceneobject import ViewerSceneObject
 
 
 class PointObject(ViewerSceneObject, GeometryObject):
-    """Viewer scene object for displaying COMPAS :class:`compas.geometry.Point` geometry."""
+    """Viewer scene object for displaying COMPAS Point geometry.
+
+    See Also
+    --------
+    :class:`compas.geometry.Point`
+    """
 
     def __init__(self, point: Point, **kwargs):
         super(PointObject, self).__init__(geometry=point, **kwargs)
@@ -20,12 +25,4 @@ class PointObject(ViewerSceneObject, GeometryObject):
 
     def _read_lines_data(self):
         """No line data exist for this geometry, Return None."""
-        return None
-
-    def _read_frontfaces_data(self):
-        """No frontfaces data exist for this geometry, Return None."""
-        return None
-
-    def _read_backfaces_data(self):
-        """No backfaces data exist for this geometry, Return None."""
         return None

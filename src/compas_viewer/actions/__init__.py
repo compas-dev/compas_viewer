@@ -1,8 +1,8 @@
 from collections import defaultdict
-from typing import Any, Callable, Dict
+from typing import Any, Callable
 
 
-ITEM_ACTIONS: Dict[str, Callable] = defaultdict()
+ITEM_ACTIONS: dict[str, Callable] = defaultdict()
 
 
 def register(name: str, action_class: Callable):

@@ -1,5 +1,4 @@
 from typing import TYPE_CHECKING
-from typing import Tuple
 
 from numpy import all
 from numpy import any
@@ -13,7 +12,7 @@ from PySide6.QtCore import QPoint
 from PySide6.QtCore import Signal
 
 if TYPE_CHECKING:
-    from .render import Render
+    from .renderer import Renderer
 
 
 class Selector(QObject):
@@ -21,13 +20,13 @@ class Selector(QObject):
 
     Parameters
     ----------
-    render : :class:`compas_viewer.components.render.Render`
-        The render instance.
+    renderer : :class:`compas_viewer.components.renderer.Renderer`
+        The renderer instance.
 
     Attributes
     ----------
-    render : :class:`compas_viewer.components.render.Render`
-        The render instance.
+    renderer : :class:`compas_viewer.components.renderer.Renderer`
+        The renderer instance.
     enable_selector : bool
         Enable the selector.
     selectioncolor : :class:`compas.colors.Color`
@@ -54,15 +53,16 @@ class Selector(QObject):
 
     def __init__(
         self,
-        render: "Render",
+        renderer: "Renderer",
     ):
-        self.enable_selector = render.config.selector.enable_selector
+        self.enable_selector = renderer.config.selector.enable_selector
         if not self.enable_selector:
             return
         super().__init__()
-        self.render = render
-        self.viewer = render.viewer
-        self.selectioncolor = render.config.selector.selectioncolor
+        self.renderer = renderer
+        self.viewer = renderer.viewer
+        self.controller = renderer.viewer.controller
+        self.selectioncolor = renderer.config.selector.selectioncolor
 
         #  Drag selection
         self.on_drag_selection: bool = False
@@ -79,27 +79,27 @@ class Selector(QObject):
         """Select the object under the mouse cursor."""
 
         # Deselect all objects first
-        for _, obj in self.render.viewer.instance_colors.items():
+        for _, obj in self.renderer.viewer.instance_colors.items():
             obj.is_selected = False
 
-        x = self.render.viewer.controller.mouse.last_pos.x()
-        y = self.render.viewer.controller.mouse.last_pos.y()
+        x = self.renderer.viewer.controller.mouse.last_pos.x()
+        y = self.renderer.viewer.controller.mouse.last_pos.y()
         instance_color = self.read_instance_color((x, y, x, y))
         unique_color = unique(instance_color, axis=0, return_counts=False)
 
-        selected_obj = self.render.viewer.instance_colors.get(tuple(unique_color[0]))  # type: ignore
+        selected_obj = self.renderer.viewer.instance_colors.get(tuple(unique_color[0]))  # type: ignore
         if selected_obj:
             selected_obj.is_selected = True
 
     def deselect_action(self):
         """Deselect the object under the mouse cursor."""
 
-        x = self.render.viewer.controller.mouse.last_pos.x()
-        y = self.render.viewer.controller.mouse.last_pos.y()
+        x = self.renderer.viewer.controller.mouse.last_pos.x()
+        y = self.renderer.viewer.controller.mouse.last_pos.y()
         instance_color = self.read_instance_color((x, y, x, y))
         unique_color = unique(instance_color, axis=0, return_counts=False)
 
-        selected_obj = self.render.viewer.instance_colors.get(tuple(unique_color[0]))  # type: ignore
+        selected_obj = self.renderer.viewer.instance_colors.get(tuple(unique_color[0]))  # type: ignore
         if selected_obj:
             selected_obj.is_selected = False
 
@@ -108,14 +108,14 @@ class Selector(QObject):
 
         See Also
         --------
-        :func:`compas_viewer.components.render.selector.Selector.select_action`
+        :func:`compas_viewer.components.renderer.selector.Selector.select_action`
         """
-        x = self.render.viewer.controller.mouse.last_pos.x()
-        y = self.render.viewer.controller.mouse.last_pos.y()
+        x = self.renderer.viewer.controller.mouse.last_pos.x()
+        y = self.renderer.viewer.controller.mouse.last_pos.y()
         instance_color = self.read_instance_color((x, y, x, y))
         unique_color = unique(instance_color, axis=0, return_counts=False)
 
-        selected_obj = self.render.viewer.instance_colors.get(tuple(unique_color[0]))  # type: ignore
+        selected_obj = self.renderer.viewer.instance_colors.get(tuple(unique_color[0]))  # type: ignore
         if selected_obj:
             selected_obj.is_selected = True
 
@@ -123,7 +123,7 @@ class Selector(QObject):
         """Drag select the objects in the rectangle area."""
 
         # Deselect all objects first
-        for _, obj in self.render.viewer.instance_colors.items():
+        for _, obj in self.renderer.viewer.instance_colors.items():
             obj.is_selected = False
 
         instance_color = self.read_instance_color(
@@ -134,7 +134,10 @@ class Selector(QObject):
             [unique_colors[0][i] for i, count in enumerate(unique_colors[1]) if count > self.ANTI_ALIASING_FACTOR]
         )
 
-        for color, obj in self.render.viewer.instance_colors.items():
+        if len(unique_colors) == 0:
+            return
+
+        for color, obj in self.renderer.viewer.instance_colors.items():
             if any(all(color == unique_colors, axis=1)):
                 obj.is_selected = True
                 continue
@@ -144,7 +147,7 @@ class Selector(QObject):
 
         See Also
         --------
-        :func:`compas_viewer.components.render.selector.Selector.drag_selection_action`
+        :func:`compas_viewer.components.renderer.selector.Selector.drag_selection_action`
         """
 
         instance_color = self.read_instance_color(
@@ -155,24 +158,27 @@ class Selector(QObject):
             [unique_colors[0][i] for i, count in enumerate(unique_colors[1]) if count > self.ANTI_ALIASING_FACTOR]
         )
 
-        for color, obj in self.render.viewer.instance_colors.items():
-            if color in unique_colors:
+        if len(unique_colors) == 0:
+            return
+
+        for color, obj in self.renderer.viewer.instance_colors.items():
+            if any(all(color == unique_colors, axis=1)):
                 obj.is_selected = False
                 continue
 
-    def read_instance_color(self, box: Tuple[int, int, int, int]):
+    def read_instance_color(self, box: tuple[int, int, int, int]):
         """
         Paint the instance map quickly, and then read the color of the specified area.
 
         Parameters
         ----------
-        box : Tuple[int, int, int, int]
+        box : tuple[int, int, int, int]
             The box area [x1, y1, x2, y2] to be read. x1=x2 and y1=y2 means a single point.
 
         Notes
         -----
         The instance map is used by the selector to identify selected objects.
-        The mechanism of a :class:`compas_viewer.components.render.selector.Selector`
+        The mechanism of a :class:`compas_viewer.components.renderer.selector.Selector`
         is picking the color from instance map and then find the corresponding object.
         Anti aliasing, which is always force opened in many machines,  can cause color picking inaccuracy.
 
@@ -185,8 +191,8 @@ class Selector(QObject):
 
         See Also
         --------
-        :func:`compas_viewer.components.render.selector.Selector.ANTI_ALIASING_FACTOR`
-        :attr:`compas_viewer.components.render.rendermode`
+        :func:`compas_viewer.components.renderer.selector.Selector.ANTI_ALIASING_FACTOR`
+        :attr:`compas_viewer.components.renderer.rendermode`
 
         References
         ----------
@@ -200,11 +206,11 @@ class Selector(QObject):
         x, y = min(x1, x2), self.viewer.layout.config.window.height - max(y1, y2)
         width = max(self.PIXEL_SELECTION_INCREMENTAL, abs(x1 - x2))
         height = max(self.PIXEL_SELECTION_INCREMENTAL, abs(y1 - y2))
-        r = self.render.devicePixelRatio()
+        r = self.renderer.devicePixelRatio()
 
         # 1. Repaint the canvas with instance color.
-        self.render.makeCurrent()
-        self.render.paintGL(is_instance=True)
+        self.renderer.makeCurrent()
+        self.renderer.paintGL(is_instance=True)
 
         # 2. Read the instance buffer.
         instance_buffer = GL.glReadPixels(x * r, y * r, width * r, height * r, GL.GL_RGB, GL.GL_UNSIGNED_BYTE)

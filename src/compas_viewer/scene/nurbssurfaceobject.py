@@ -8,14 +8,19 @@ from .sceneobject import ViewerSceneObject
 
 
 class NurbsSurfaceObject(ViewerSceneObject, GeometryObject):
-    """Viewer scene object for displaying COMPAS :class:`compas.geometry.NurbsSurface` geometry."""
+    """Viewer scene object for displaying COMPAS NurbsSurface geometry.
+
+    See Also
+    --------
+    :class:`compas.geometry.NurbsSurface`
+    """
 
     def __init__(self, surface: NurbsSurface, **kwargs):
         super().__init__(geometry=surface, **kwargs)
 
         # LINEARDEFLECTION not implemented in NurbsSurface.
-        self.u = int(16 + (0 * self.LINEARDEFLECTION))
-        self.v = int(16 + (0 * self.LINEARDEFLECTION))
+        self.u = kwargs.get("u", int(16 + (0 * self.LINEARDEFLECTION)))
+        self.v = kwargs.get("v", int(16 + (0 * self.LINEARDEFLECTION)))
 
         self._triangles = [list(point) for triangle in surface.to_triangles(nu=self.u, nv=self.v) for point in triangle]
 

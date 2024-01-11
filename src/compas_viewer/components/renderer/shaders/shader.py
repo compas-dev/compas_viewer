@@ -1,7 +1,5 @@
 from pathlib import Path
 from typing import Any
-from typing import List
-from typing import Tuple
 from typing import Union
 
 from numpy import array
@@ -15,14 +13,14 @@ class Shader:
         self.program = make_shader_program(name)
         self.locations = {}
 
-    def uniform4x4(self, name: str, value: List[List[float]]):
+    def uniform4x4(self, name: str, value: list[list[float]]):
         """Store a uniform 4x4 transformation matrix in the shader program at a named location.
 
         Parameters
         ----------
         name : str
             The name of the location in the shader program.
-        value : List[List[float]]
+        value : list[list[float]]
             A 4x4 transformation matrix.
         """
         _value = array(value)
@@ -55,14 +53,14 @@ class Shader:
         location = GL.glGetUniformLocation(self.program, name)
         GL.glUniform1f(location, value)
 
-    def uniform3f(self, name: str, value: Union[Tuple[float, float, float], List[float]]):
+    def uniform3f(self, name: str, value: Union[tuple[float, float, float], list[float]]):
         """Store a uniform list of 3 floats in the shader program at a named location.
 
         Parameters
         ----------
         name : str
             The name of the location in the shader program.
-        value : Union[Tuple[float, float, float], List[float]]
+        value : Union[tuple[float, float, float], list[float]]
             An iterable of 3 floats.
         """
         location = GL.glGetUniformLocation(self.program, name)
@@ -245,12 +243,12 @@ class Shader:
             GL.glDrawArrays(GL.GL_LINES, 0, GL.GL_BUFFER_SIZE)
         GL.glEnable(GL.GL_POINT_SMOOTH)
 
-    def draw_2d_box(self, box_coords: Tuple[float, float, float, float], width: int, height: int):
+    def draw_2d_box(self, box_coords: tuple[float, float, float, float], width: int, height: int):
         """Draw a 2D box. Mostly used for box selection.
 
         Parameters
         ----------
-        box_coords : Tuple[float, float, float, float]
+        box_coords : tuple[float, float, float, float]
             The coordinates of the box. The coordinates are in the format of (x1, y1, x2, y2).
         width : int
             The width of the viewport.

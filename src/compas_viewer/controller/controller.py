@@ -1,5 +1,5 @@
 from typing import TYPE_CHECKING
-from typing import Dict
+
 
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QKeyEvent
@@ -13,7 +13,7 @@ from compas_viewer.configurations import ControllerConfig
 from .mouse import Mouse
 
 if TYPE_CHECKING:
-    from compas_viewer.components import Render
+    from compas_viewer.components import Renderer
     from compas_viewer.viewer import Viewer
 
 
@@ -43,7 +43,7 @@ class Controller:
         self.viewer = viewer
         self.config = config
         self.mouse = Mouse()
-        self.actions: Dict[str, Action] = {}
+        self.actions: dict[str, Action] = {}
         for k, v in self.config.actions.items():
             self.actions[k] = Action(k, self.viewer, v)
 
@@ -51,16 +51,16 @@ class Controller:
     # Actions
     # ==============================================================================
 
-    def mouse_move_action(self, render: "Render", event: QMouseEvent):
+    def mouse_move_action(self, renderer: "Renderer", event: QMouseEvent):
         """
-        The mouse move action of the render object.
+        The mouse move action of the renderer object.
         This function introduces elif for different actions, meaning only one action can be performed at a time.
 
         Parameters
         ----------
-        render : :class:`compas_viewer.components.render.Render`
-            The render object.
-        event : :class:`PySide6.QtGui.QMouseEvent`
+        renderer : :class:`compas_viewer.components.renderer.Renderer`
+            The renderer object.
+        event : :PySide6:`PySide6/QtGui/QMouseEvent`
             The Qt event.
         """
 
@@ -75,33 +75,33 @@ class Controller:
             event.buttons() == self.config.drag_selection.mouse
             and event.modifiers() == self.config.drag_selection.modifier
         ):
-            render.selector.on_drag_selection = True
+            renderer.selector.on_drag_selection = True
         # Drag deselection
         elif (
             event.buttons() == self.config.drag_deselection.mouse
             and event.modifiers() == self.config.drag_deselection.modifier
         ):
-            render.selector.on_drag_selection = True
+            renderer.selector.on_drag_selection = True
         # Pan
         elif event.buttons() == self.config.pan.mouse and event.modifiers() == self.config.pan.modifier:
-            render.camera.pan(dx, dy)
+            renderer.camera.pan(dx, dy)
         # Rotate
         elif event.buttons() == self.config.rotate.mouse and event.modifiers() == self.config.rotate.modifier:
-            render.camera.rotate(dx, dy)
+            renderer.camera.rotate(dx, dy)
 
         # Record mouse position
         self.mouse.last_pos = event.pos()
 
-    def mouse_press_action(self, render: "Render", event: QMouseEvent):
+    def mouse_press_action(self, renderer: "Renderer", event: QMouseEvent):
         """
-        The mouse press action of the render object.
+        The mouse press action of the renderer object.
         This function introduces elif for different actions, meaning only one action can be performed at a time.
 
         Parameters
         ----------
-        render : :class:`compas_viewer.components.render.Render`
-            The render object.
-        event : :class:`PySide6.QtGui.QMouseEvent`
+        renderer : :class:`compas_viewer.components.renderer.Renderer`
+            The renderer object.
+        event : :PySide6:`PySide6/QtGui/QMouseEvent`
             The Qt event.
         """
         self.mouse.last_pos = event.pos()
@@ -111,23 +111,23 @@ class Controller:
             event.buttons() == self.config.drag_selection.mouse
             and event.modifiers() == self.config.drag_selection.modifier
         ):
-            render.selector.drag_start_pt = event.pos()
+            renderer.selector.drag_start_pt = event.pos()
         # Drag deselection
         elif (
             event.buttons() == self.config.drag_deselection.mouse
             and event.modifiers() == self.config.drag_deselection.modifier
         ):
-            render.selector.drag_start_pt = event.pos()
+            renderer.selector.drag_start_pt = event.pos()
 
         # Select: single left click.
         if event.buttons() == Qt.MouseButton.LeftButton and event.modifiers() == Qt.KeyboardModifier.NoModifier:
-            render.selector.select.emit()
+            renderer.selector.select.emit()
         # Multiselect
         elif event.buttons() == self.config.multiselect.mouse and event.modifiers() == self.config.multiselect.modifier:
-            render.selector.multiselect.emit()
+            renderer.selector.multiselect.emit()
         # Deselect
         elif event.buttons() == self.config.deselect.mouse and event.modifiers() == self.config.deselect.modifier:
-            render.selector.deselect.emit()
+            renderer.selector.deselect.emit()
         # Pan
         elif (
             event.buttons() == self.config.pan.mouse
@@ -139,59 +139,59 @@ class Controller:
         elif event.buttons() == self.config.rotate.mouse and event.modifiers() == self.config.rotate.modifier:
             QApplication.setOverrideCursor(Qt.CursorShape.SizeAllCursor)
 
-    def mouse_release_action(self, render: "Render", event: QMouseEvent):
+    def mouse_release_action(self, renderer: "Renderer", event: QMouseEvent):
         """
-        The mouse release action of the render object.
+        The mouse release action of the renderer object.
         This function introduces elif for different actions, meaning only one action can be performed at a time.
 
         Parameters
         ----------
-        render : :class:`compas_viewer.components.render.Render`
-            The render object.
-        event : :class:`PySide6.QtGui.QMouseEvent`
+        renderer : :class:`compas_viewer.components.renderer.Renderer`
+            The renderer object.
+        event : :PySide6:`PySide6/QtGui/QMouseEvent`
             The Qt event.
         """
 
         # Drag selection
-        if event.modifiers() == self.config.drag_selection.modifier and render.selector.on_drag_selection:
-            render.selector.on_drag_selection = False
-            render.selector.drag_end_pt = event.pos()
-            render.selector.drag_selection.emit()
+        if event.modifiers() == self.config.drag_selection.modifier and renderer.selector.on_drag_selection:
+            renderer.selector.on_drag_selection = False
+            renderer.selector.drag_end_pt = event.pos()
+            renderer.selector.drag_selection.emit()
         # Drag deselection
-        elif event.modifiers() == self.config.drag_deselection.modifier and render.selector.on_drag_selection:
-            render.selector.on_drag_selection = False
-            render.selector.drag_end_pt = event.pos()
-            render.selector.drag_deselection.emit()
+        elif event.modifiers() == self.config.drag_deselection.modifier and renderer.selector.on_drag_selection:
+            renderer.selector.on_drag_selection = False
+            renderer.selector.drag_end_pt = event.pos()
+            renderer.selector.drag_deselection.emit()
 
         if event.buttons() == Qt.KeyboardModifier.NoModifier or event.buttons() == Qt.MouseButton.NoButton:
             QApplication.restoreOverrideCursor()
 
-    def wheel_action(self, render: "Render", event: QWheelEvent):
+    def wheel_action(self, renderer: "Renderer", event: QWheelEvent):
         """
-        The wheel action of the render object.
+        The wheel action of the renderer object.
         It is used from zooming action only.
 
         Parameters
         ----------
-        render : :class:`compas_viewer.components.render.Render`
-            The render object.
-        event : :class:`PySide6.QtGui.QWheelEvent`
+        renderer : :class:`compas_viewer.components.renderer.Renderer`
+            The renderer object.
+        event : :PySide6:`PySide6/QtGui/QWheelEvent`
             The Qt event.
         """
         degrees = event.angleDelta().y() / 8
         steps = degrees / 15
-        render.camera.zoom(int(steps))
+        renderer.camera.zoom(int(steps))
 
-    def key_press_action(self, render: "Render", event: QKeyEvent):
+    def key_press_action(self, renderer: "Renderer", event: QKeyEvent):
         """
-        The key press action of the render object.
+        The key press action of the renderer object.
         This function introduces break for different actions, meaning only one action can be performed at a time.
 
         Parameters
         ----------
-        render : :class:`compas_viewer.components.render.Render`
-            The render object.
-        event : :class:`PySide6.QtGui.QKeyEvent`
+        renderer : :class:`compas_viewer.components.renderer.Renderer`
+            The renderer object.
+        event : :PySide6:`PySide6/QtGui/QKeyEvent`
             The Qt event.
         """
         for action in self.actions.values():
@@ -199,16 +199,16 @@ class Controller:
                 action.pressed.emit()
                 break
 
-    def key_release_action(self, render: "Render", event: QKeyEvent):
+    def key_release_action(self, renderer: "Renderer", event: QKeyEvent):
         """
-        The key release action of the render object.
+        The key release action of the renderer object.
         This function introduces break for different actions, meaning only one action can be performed at a time.
 
         Parameters
         ----------
-        render : :class:`compas_viewer.components.render.Render`
-            The render object.
-        event : :class:`PySide6.QtGui.QKeyEvent`
+        renderer : :class:`compas_viewer.components.renderer.Renderer`
+            The renderer object.
+        event : :PySide6:`PySide6/QtGui/QKeyEvent`
             The Qt event.
         """
         for action in self.actions.values():

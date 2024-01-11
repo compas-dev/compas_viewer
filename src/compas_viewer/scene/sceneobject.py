@@ -1,11 +1,10 @@
-from abc import abstractmethod
 from random import randint
 from typing import TYPE_CHECKING
 from typing import Any
-from typing import Dict
-from typing import List
+
+
 from typing import Optional
-from typing import Tuple
+
 from typing import Union
 
 from compas.colors import Color
@@ -26,14 +25,15 @@ from compas_viewer.utilities.gl import update_vertex_buffer
 
 if TYPE_CHECKING:
     from compas_viewer import Viewer
-    from compas_viewer.components.render.shaders import Shader
+    from compas_viewer.components.renderer.shaders import Shader
 
 # Type template of point/line/face data for generating the buffers.
-DataType = Tuple[List[Point], List[Color], List[List[int]]]
+DataType = tuple[list[Point], list[Color], list[list[int]]]
 
 
 class ViewerSceneObject(SceneObject):
-    """Base class for all Viewer scene objects
+    """
+    Base class for all Viewer scene objects
     which also includes the  GL buffer creation and drawing methods.
 
     Parameters
@@ -52,11 +52,11 @@ class ViewerSceneObject(SceneObject):
         Whether to show lines/edges of the object. It will override the value in the config file.
     show_faces : bool, optional
         Whether to show faces of the object. It will override the value in the config file.
-    pointscolor : Union[:class:`compas.colors.Color`, Dict[Any, :class:`compas.colors.Color`]], optional
+    pointscolor : Union[:class:`compas.colors.Color`, dict[Any, :class:`compas.colors.Color`]], optional
         The color or the dict of colors of the points. It will override the value in the config file.
-    linescolor : Union[:class:`compas.colors.Color`, Dict[Any, :class:`compas.colors.Color`]], optional
+    linescolor : Union[:class:`compas.colors.Color`, dict[Any, :class:`compas.colors.Color`]], optional
         The color or the dict of colors of the lines. It will override the value in the config file.
-    facescolor : Union[:class:`compas.colors.Color`, Dict[Any, :class:`compas.colors.Color`]], optional
+    facescolor : Union[:class:`compas.colors.Color`, dict[Any, :class:`compas.colors.Color`]], optional
         The color or the dict of colors the faces. It will override the value in the config file.
     lineswidth : float, optional
         The line width to be drawn on screen. It will override the value in the config file.
@@ -68,7 +68,7 @@ class ViewerSceneObject(SceneObject):
         The configuration of the scene object. Defaults to None.
         It should be assigned though the :class:`compas_viewer.viewer.Viewer.add` method.
         Otherwise a exception will be raised.
-    **kwargs : Dict, optional
+    **kwargs : dict, optional
         Additional visualization options for specific objects.
 
     Attributes
@@ -86,11 +86,11 @@ class ViewerSceneObject(SceneObject):
         Whether to show lines/edges of the object.
     show_faces : bool
         Whether to show faces of the object.
-    pointscolor : Dict[Any, :class:`compas.colors.Color`]
+    pointscolor : dict[Any, :class:`compas.colors.Color`]
         The color of the points.
-    linescolor : Dict[Any, :class:`compas.colors.Color`]
+    linescolor : dict[Any, :class:`compas.colors.Color`]
         The color of the lines.
-    facescolor : Dict[Any, :class:`compas.colors.Color`]
+    facescolor : dict[Any, :class:`compas.colors.Color`]
         The color of the faces.
     lineswidth : float
         The line width to be drawn on screen
@@ -100,10 +100,14 @@ class ViewerSceneObject(SceneObject):
         The opacity of the object.
     background : bool
         Whether the object is drawn on the background with depth test disabled.
-    bounding_box : List[float], read-only
+    bounding_box : list[float], read-only
         The min and max corners of object bounding box, as a numpy array of shape (2, 3).
     bounding_box_center : :class:`compas.geometry.Point`, read-only
         The center of object bounding box, as a point.
+
+    See Also
+    --------
+    :class:`compas.scene.SceneObject`
 
     """
 
@@ -118,9 +122,9 @@ class ViewerSceneObject(SceneObject):
         show_points: Optional[bool] = None,
         show_lines: Optional[bool] = None,
         show_faces: Optional[bool] = None,
-        pointscolor: Optional[Union[Color, Dict[Any, Color]]] = None,
-        linescolor: Optional[Union[Color, Dict[Any, Color]]] = None,
-        facescolor: Optional[Union[Color, Dict[Any, Color]]] = None,
+        pointscolor: Optional[Union[Color, dict[Any, Color]]] = None,
+        linescolor: Optional[Union[Color, dict[Any, Color]]] = None,
+        facescolor: Optional[Union[Color, dict[Any, Color]]] = None,
         lineswidth: Optional[float] = None,
         pointssize: Optional[float] = None,
         opacity: Optional[float] = None,
@@ -179,8 +183,8 @@ class ViewerSceneObject(SceneObject):
 
         #  Geometric
         self.transformation: Optional[Transformation] = None
-        self._matrix_buffer: Optional[List[List[float]]] = None
-        self._bounding_box: Optional[List[float]] = None
+        self._matrix_buffer: Optional[list[list[float]]] = None
+        self._bounding_box: Optional[list[float]] = None
         self._bounding_box_center: Optional[Point] = None
         self._is_collection = False
 
@@ -189,10 +193,10 @@ class ViewerSceneObject(SceneObject):
         self._lines_data: Optional[DataType] = None
         self._frontfaces_data: Optional[DataType] = None
         self._backfaces_data: Optional[DataType] = None
-        self._points_buffer: Optional[Dict[str, Any]] = None
-        self._lines_buffer: Optional[Dict[str, Any]] = None
-        self._frontfaces_buffer: Optional[Dict[str, Any]] = None
-        self._backfaces_buffer: Optional[Dict[str, Any]] = None
+        self._points_buffer: Optional[dict[str, Any]] = None
+        self._lines_buffer: Optional[dict[str, Any]] = None
+        self._frontfaces_buffer: Optional[dict[str, Any]] = None
+        self._backfaces_buffer: Optional[dict[str, Any]] = None
 
     @property
     def bounding_box(self):
@@ -206,22 +210,18 @@ class ViewerSceneObject(SceneObject):
     # Reading geometric data, downstream classes should implement these properties.
     # ==========================================================================
 
-    @abstractmethod
     def _read_points_data(self) -> Optional[DataType]:
         """Read points data from the object."""
         pass
 
-    @abstractmethod
     def _read_lines_data(self) -> Optional[DataType]:
         """Read lines data from the object."""
         pass
 
-    @abstractmethod
     def _read_frontfaces_data(self) -> Optional[DataType]:
         """Read frontfaces data from the object."""
         pass
 
-    @abstractmethod
     def _read_backfaces_data(self) -> Optional[DataType]:
         """Read backfaces data from the object."""
         pass
@@ -243,17 +243,17 @@ class ViewerSceneObject(SceneObject):
     # buffer
     # ==========================================================================
 
-    def make_buffer_from_data(self, data: DataType) -> Dict[str, Any]:
+    def make_buffer_from_data(self, data: DataType) -> dict[str, Any]:
         """Create buffers from point/line/face data.
 
         Parameters
         ----------
-        data : Tuple[List[:class:`compas.geometry.Point`], List[:class:`compas.colors.Color`], List[int]]
+        data : tuple[list[:class:`compas.geometry.Point`], list[:class:`compas.colors.Color`], list[int]]
             Contains positions, colors, elements for the buffer.
 
         Returns
         -------
-        buffer_dict : Dict[str, Any]
+        buffer_dict : dict[str, Any]
             A dict with created buffer indexes.
         """
         positions, colors, elements = data
@@ -267,7 +267,7 @@ class ViewerSceneObject(SceneObject):
     def update_buffer_from_data(
         self,
         data: DataType,
-        buffer: Dict[str, Any],
+        buffer: dict[str, Any],
         update_positions: bool,
         update_colors: bool,
         update_elements: bool,
@@ -276,9 +276,9 @@ class ViewerSceneObject(SceneObject):
 
         Parameters
         ----------
-        data : Tuple[List[:class:`compas.geometry.Point`], List[:class:`compas.colors.Color`], List[int]]
+        data : tuple[list[:class:`compas.geometry.Point`], list[:class:`compas.colors.Color`], list[int]]
             Contains positions, colors, elements for the buffer.
-        buffer : Dict[str, Any]
+        buffer : dict[str, Any]
             The dict with created buffer indexes
         update_positions : bool
             Whether to update positions in the buffer dict.
@@ -349,9 +349,9 @@ class ViewerSceneObject(SceneObject):
         """Update the object"""
         self._update_matrix()
         self.update_buffers()
-        self.viewer.render.update()
+        self.viewer.renderer.update()
 
-    def _update_bounding_box(self, positions: Optional[List[Point]] = None):
+    def _update_bounding_box(self, positions: Optional[list[Point]] = None):
         """Update the bounding box of the object"""
         if positions is None:
             positions = []
@@ -450,7 +450,7 @@ class ViewerSceneObject(SceneObject):
         if self._lines_buffer is not None and (self.show_lines or wireframe):
             shader.bind_attribute("position", self._lines_buffer["positions"])
             shader.draw_lines(
-                width=self.lineswidth + self.viewer.render.selector.PIXEL_SELECTION_INCREMENTAL,
+                width=self.lineswidth + self.viewer.renderer.selector.PIXEL_SELECTION_INCREMENTAL,
                 elements=self._lines_buffer["elements"],
                 n=self._lines_buffer["n"],
             )

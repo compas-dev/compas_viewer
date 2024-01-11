@@ -1,5 +1,5 @@
 from typing import Optional
-from typing import Tuple
+
 
 from compas.colors import Color
 from compas.geometry import Frame
@@ -13,14 +13,14 @@ from .sceneobject import ViewerSceneObject
 
 class FrameObject(ViewerSceneObject, GeometryObject):
     """
-    The scene object of the :class:`compas.geometry.Frame` geometry.
+    The scene object of the COMPAS Frame geometry.
     With its modifiable cell size and dimension, the world grid is also created from this class.
 
     Parameters
     ----------
     frame : :class:`compas.geometry.Frame`
         The frame geometry.
-    framesize : Tuple[float, int, float, int]
+    framesize : tuple[float, int, float, int]
         The size of the grid in [dx, nx, dy, ny] format.
         Notice that the `nx` and `ny` must be even numbers.
     show_framez : bool
@@ -44,12 +44,16 @@ class FrameObject(ViewerSceneObject, GeometryObject):
     Notes
     -----
     The frame object is always unselectable.
+
+    See Also
+    --------
+    :class:`compas.geometry.Frame`
     """
 
     def __init__(
         self,
         frame: Frame,
-        framesize: Optional[Tuple[float, int, float, int]] = None,
+        framesize: Optional[tuple[float, int, float, int]] = None,
         show_framez: Optional[bool] = None,
         **kwargs
     ):
@@ -123,18 +127,6 @@ class FrameObject(ViewerSceneObject, GeometryObject):
             elements.append([(self.nx + 1) * 4 + (self.ny + 1) * 4, (self.nx + 1) * 4 + (self.ny + 1) * 4 + 1])
 
         return positions, colors, elements
-
-    def _read_points_data(self):
-        """No points data exist for this geometry, Return None."""
-        return None
-
-    def _read_backfaces_data(self):
-        """No backfaces data exist for this geometry, Return None."""
-        return None
-
-    def _read_frontfaces_data(self):
-        """No frontfaces data exist for this geometry, Return None."""
-        return None
 
     def draw_vertices(self):
         pass

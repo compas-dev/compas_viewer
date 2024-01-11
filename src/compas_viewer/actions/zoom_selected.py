@@ -26,9 +26,9 @@ class ZoomSelected(Action):
         center = (max_corner + min_corner) / 2
         distance = max(norm(max_corner - min_corner), 1)
 
-        self.viewer.render.camera.target = center
-        vec = (self.viewer.render.camera.target - self.viewer.render.camera.position) / norm(
-            self.viewer.render.camera.target - self.viewer.render.camera.position
+        self.viewer.renderer.camera.target = center
+        vec = (self.viewer.renderer.camera.target - self.viewer.renderer.camera.position) / norm(
+            self.viewer.renderer.camera.target - self.viewer.renderer.camera.position
         )
-        self.viewer.render.camera.position = self.viewer.render.camera.target - vec * distance * 1.5
-        self.viewer.render.update()
+        self.viewer.renderer.camera.position = self.viewer.renderer.camera.target - vec * distance * 1.5
+        self.viewer.renderer.update()

@@ -6,15 +6,19 @@ from .sceneobject import ViewerSceneObject
 
 
 class NetworkObject(ViewerSceneObject, BaseNetworkObject):
-    """Viewer scene object for displaying COMPAS :class:`compas.datastructures.Network` data.
+    """Viewer scene object for displaying COMPAS Network data.
 
 
     Parameters
     ----------
     network : :class:`compas.datastructures.Network`
         The network data structure.
-    **kwargs : Dict, optional
+    **kwargs : dict, optional
         Additional options for the :class:`compas_viewer.scene.ViewerSceneObject`.
+
+    See Also
+    --------
+    :class:`compas.datastructures.Network`
 
     """
 
@@ -50,11 +54,3 @@ class NetworkObject(ViewerSceneObject, BaseNetworkObject):
             elements.append([i + 0, i + 1])
             i += 2
         return positions, colors, elements
-
-    def _read_frontfaces_data(self):
-        """No frontfaces data exist for this geometry, Return None."""
-        return None
-
-    def _read_backfaces_data(self):
-        """No backfaces data exist for this geometry, Return None."""
-        return None

@@ -1,18 +1,18 @@
 from typing import Any
-from typing import Dict
+
 
 from compas.geometry import Point
 from compas.geometry import Vector
 from compas.scene import GeometryObject
 
-from compas_viewer.components.render.shaders.shader import Shader
+from compas_viewer.components.renderer.shaders.shader import Shader
 
 from .sceneobject import DataType
 from .sceneobject import ViewerSceneObject
 
 
 class VectorObject(ViewerSceneObject, GeometryObject):
-    """Viewer scene object for displaying COMPAS :class:`compas.geometry.Vector` geometry.
+    """Viewer scene object for displaying COMPAS Vector geometry.
 
     Parameters
     ----------
@@ -21,7 +21,7 @@ class VectorObject(ViewerSceneObject, GeometryObject):
     anchor : :class:`compas.geometry.Point`, optional
         The anchor point of the vector.
         Default is the origin point.
-    **kwargs : Dict, optional
+    **kwargs : dict, optional
         Additional options for the :class:`compas_viewer.scene.ViewerSceneObject`.
 
     Notes
@@ -31,6 +31,10 @@ class VectorObject(ViewerSceneObject, GeometryObject):
     that controls the width of the vector,
     the :attr:`compas_viewer.scene.vectorobject.VectorObject.config.vectorsize`
     (float 0-1) controls the size of the arrow.
+
+    See Also
+    --------
+    :class:`compas.geometry.Vector`
     """
 
     # Fixed indices for the arrow faces:
@@ -39,7 +43,7 @@ class VectorObject(ViewerSceneObject, GeometryObject):
     def __init__(self, vector: Vector, anchor: Point = Point(0, 0, 0), **kwargs):
         self._anchor = anchor
         super(VectorObject, self).__init__(geometry=vector, **kwargs)
-        self.arrow_buffer: Dict[str, Any]
+        self.arrow_buffer: dict[str, Any]
 
     def _read_lines_data(self) -> DataType:
         arrow_end = self._anchor + self.geometry * (1 - self.config.vectorsize)
@@ -78,15 +82,3 @@ class VectorObject(ViewerSceneObject, GeometryObject):
         shader.draw_triangles(elements=self.arrow_buffer["elements"], n=self.arrow_buffer["n"], background=True)
         shader.disable_attribute("position")
         shader.disable_attribute("color")
-
-    def _read_points_data(self):
-        """No point data exist for this geometry, Return None."""
-        return None
-
-    def _read_frontfaces_data(self):
-        """No frontfaces data exist for this geometry, Return None."""
-        return None
-
-    def _read_backfaces_data(self):
-        """No backfaces data exist for this geometry, Return None."""
-        return None

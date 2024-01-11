@@ -7,7 +7,12 @@ from .sceneobject import ViewerSceneObject
 
 
 class PolylineObject(ViewerSceneObject, GeometryObject):
-    """Viewer scene object for displaying COMPAS :class:`compas.geometry.Polyline` geometry."""
+    """Viewer scene object for displaying COMPAS Polyline geometry.
+
+    See Also
+    --------
+    :class:`compas.geometry.Polyline`
+    """
 
     def __init__(self, polyline: Polyline, **kwargs):
         super(PolylineObject, self).__init__(geometry=polyline, **kwargs)
@@ -39,11 +44,3 @@ class PolylineObject(ViewerSceneObject, GeometryObject):
             elements.append([count, count + 1])
             count += 2
         return positions, colors, elements
-
-    def _read_frontfaces_data(self):
-        """No frontfaces data exist for this geometry, Return None."""
-        return None
-
-    def _read_backfaces_data(self):
-        """No backfaces data exist for this geometry, Return None."""
-        return None

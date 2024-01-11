@@ -12,7 +12,7 @@ from .sceneobject import ViewerSceneObject
 
 
 class MeshObject(ViewerSceneObject, BaseMeshObject):
-    """Viewer scene object for displaying COMPAS :class:`compas.datastructures.Mesh` geometry.
+    """Viewer scene object for displaying COMPAS Mesh geometry.
 
     Parameters
     ----------
@@ -22,22 +22,26 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
         True to hide the coplanar edges. It will override the value in the config file.
     use_vertexcolors : bool, optional
         True to use vertex color. It will override the value in the config file.
-    **kwargs : Dict, optional
+    **kwargs : dict, optional
         Additional options for the :class:`compas_viewer.scene.ViewerSceneObject`.
 
     Attributes
     ----------
     mesh : :class:`compas.datastructures.Mesh`
         The mesh data structure.
-    vertex_xyz : Dict[int, List[float]]
+    vertex_xyz : dict[int, list[float]]
         View coordinates of the vertices.
         Defaults to the real coordinates.
-    vertexcolor : :class:`compas.colors.ColorDict`
+    vertexcolor : :class:`compas.colors.Colordict`
         Vertex colors.
     use_vertexcolors : bool
         True to use vertex color. Defaults to False.
     hide_coplanaredges : bool
         True to hide the coplanar edges.
+
+    See Also
+    --------
+    :class:`compas.datastructures.Mesh`
     """
 
     def __init__(
