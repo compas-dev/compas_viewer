@@ -3,17 +3,16 @@ Installation
 ********************************************************************************
 COMPAS Viewer can be easily installed on multiple platforms, using popular package managers such as conda or pip.
 
-If you do not have COMPAS installed
+If you don't have COMPAS installed
 ===================================
 Check out the COMPAS installation instructions at https://compas.dev/compas/latest/userguide/installation.html
 
 If you have COMPAS installed
 ============================
-Activate your COMPAS environment install COMPAS Viewer from `pip`.
+Activate your COMPAS environment and install COMPAS Viewer from `pip`.
 
 .. code-block:: bash
 
-    pip install pyside freetype-py pyopengl PySide6
     pip install compas_viewer
 
 Verify the installation
@@ -29,6 +28,6 @@ Update with pip
 Update COMPAS Viewer to the latest version with pip.
 
 .. code-block:: bash
-    
+
     pip install --upgrade compas_viewer
 
