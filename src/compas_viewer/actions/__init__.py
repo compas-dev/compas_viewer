@@ -54,7 +54,7 @@ ___all__ = [
     "GLInfo",
     "SelectAll",
     "ViewRight",
-    "ViewLeft",
+    "ViewFront",
     "ViewTop",
     "ViewPerspective",
     "DeleteSelected",
