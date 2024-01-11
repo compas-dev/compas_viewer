@@ -65,11 +65,11 @@ class Action(QObject):
         """
         The behavior of the action when the key is pressed.
         """
-        pass
+        self.viewer.render.update()
 
     @abstractmethod
     def released_action(self):
         """
         The behavior of the action when the key is released.
         """
-        pass
+        self.viewer.render.update()
