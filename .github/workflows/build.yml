@@ -9,6 +9,7 @@ on:
       - main
 
 jobs:
+
   build_ubuntu:
     if: "!contains(github.event.pull_request.labels.*.name, 'docs-only')"
     runs-on: ubuntu-latest
@@ -18,6 +19,8 @@ jobs:
     steps:
       - name: install libegl1
         run: sudo apt-get install libegl1 python3-opengl
+      - name: install python3-opengl
+        run: sudo apt-get install python3-opengl
       - uses: compas-dev/compas-actions.build@v3
         with:
           python: ${{ matrix.python }}
