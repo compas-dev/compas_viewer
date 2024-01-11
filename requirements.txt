@@ -1,5 +1,5 @@
 compas @ git+https://github.com/compas-dev/compas@main
 freetype-py
-pyopengl = 3.1.7
+pyopengl == 3.1.7
 PySide6
 
