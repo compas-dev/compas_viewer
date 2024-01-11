@@ -89,6 +89,8 @@ def key_mapper(
         for v in Qt.KeyboardModifier:
             if v.name.replace("Modifier", "").lower() == key:
                 return Qt.KeyboardModifier(v.value)
+        if key == "no":
+            return Qt.KeyboardModifier.NoModifier # Some times the no modifier is not recognized.
         raise ValueError(f"Key mapping of {key} not found in Qt.KeyboardModifier. Check your typing?")
     elif type == 2:
         for v in Qt.MouseButton:
