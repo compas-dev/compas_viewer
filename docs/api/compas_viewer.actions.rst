@@ -7,16 +7,16 @@ compas_viewer.actions
 Classes
 =======
 
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
+.. .. autosummary::
+..     :toctree: generated/
+..     :nosignatures:
 
-    Action
-    ZoomSelected
-    GLInfo
-    SelectAll
-    ViewRight
-    ViewFront
-    ViewTop
-    ViewPerspective
-    DeleteSelected
+..     Action
+..     ZoomSelected
+..     GLInfo
+..     SelectAll
+..     ViewRight
+..     ViewFront
+..     ViewTop
+..     ViewPerspective
+..     DeleteSelected
