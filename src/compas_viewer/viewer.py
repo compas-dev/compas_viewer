@@ -161,6 +161,9 @@ class Viewer(Scene):
         self.app = QCoreApplication.instance() or QApplication(sys.argv)
         self.window = QMainWindow()
 
+        # Controller
+        self.controller = Controller(self, self.controller_config)
+
         # Render
         self.grid = FrameObject(
             Frame.worldXY(),
@@ -173,9 +176,6 @@ class Viewer(Scene):
             config=self.scene_config,
         )
         self.renderer = Renderer(self, self.renderer_config)
-
-        # Controller
-        self.controller = Controller(self, self.controller_config)
 
         # Layout
         self.layout = Layout(self, self.layout_config)
