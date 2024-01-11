@@ -6,7 +6,6 @@ if TYPE_CHECKING:
 
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import QGridLayout
 from PySide6.QtWidgets import QLabel
 from PySide6.QtWidgets import QMessageBox
 from PySide6.QtWidgets import QVBoxLayout
@@ -21,23 +20,33 @@ class WindowLayout:
 
     Parameters
     ----------
-    layout : :class:`compas_viewer.layouts.Layout`
+    layout : :class:`compas_viewer.layout.Layout`
         The parent layout.
 
     Attributes
     ----------
-    layout : :class:`compas_viewer.layouts.Layout`
+    layout : :class:`compas_viewer.layout.Layout`
         The parent layout.
     viewer : :class:`compas_viewer.Viewer`
         The parent viewer.
     config : :class:`compas_viewer.configurations.WindowConfig`
         The window configuration.
+
+    See Also
+    --------
+    :class:`compas_viewer.configurations.layout_config.WindowConfig`
+    :PySide6:`PySide6/QtWidgets/QMainWindow`
     """
 
     def __init__(self, layout: "Layout"):
         self.layout = layout
         self.viewer = self.layout.viewer
         self.config = layout.config.window
+
+        #  Window layout: this is usually fixed.
+        self.window_layout = QVBoxLayout(self.layout.central_widget)
+        self.window_layout.setSpacing(0)
+        self.window_layout.setContentsMargins(0, 0, 0, 0)
 
     def init(self):
         """
@@ -48,14 +57,6 @@ class WindowLayout:
             self.viewer.window.setWindowState(self.viewer.window.windowState() | Qt.WindowState.WindowMaximized)
         else:
             self.layout.viewer.window.resize(self.config.width, self.config.height)
-
-        #  Window layout: this is usually fixed.
-        self.window_layout = QVBoxLayout()
-        self.window_layout.setSpacing(0)
-        self.window_layout.setContentsMargins(0, 0, 0, 0)
-        self.body_layout = QGridLayout()
-        self.body_layout.setContentsMargins(1, 1, 1, 1)
-        self.window_layout.addLayout(self.body_layout)
 
         #  Window title
         self.viewer.app.setApplicationName(self.config.title)

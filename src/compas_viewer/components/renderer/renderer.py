@@ -107,7 +107,8 @@ class Renderer(QOpenGLWidget):
         self.config.viewmode = viewmode
         self.shader_model.bind()
         self.shader_model.uniform4x4(
-            "projection", self.camera.projection(self.viewer.layout.config.window.width, self.viewer.layout.config.window.height)
+            "projection",
+            self.camera.projection(self.viewer.layout.config.window.width, self.viewer.layout.config.window.height),
         )
         self.shader_model.release()
         self.camera.reset_position()
@@ -362,7 +363,9 @@ class Renderer(QOpenGLWidget):
         for obj in self.viewer.objects:
             obj.init()
 
-        projection = self.camera.projection(self.viewer.layout.config.window.width, self.viewer.layout.config.window.height)
+        projection = self.camera.projection(
+            self.viewer.layout.config.window.width, self.viewer.layout.config.window.height
+        )
         viewworld = self.camera.viewworld()
         transform = list(identity(4, dtype=float32))
         # create the program
@@ -391,7 +394,9 @@ class Renderer(QOpenGLWidget):
         self.shader_arrow.uniform4x4("viewworld", viewworld)
         self.shader_arrow.uniform4x4("transform", transform)
         self.shader_arrow.uniform1f("opacity", self.opacity)
-        self.shader_arrow.uniform1f("aspect", self.viewer.layout.config.window.width / self.viewer.layout.config.window.height)
+        self.shader_arrow.uniform1f(
+            "aspect", self.viewer.layout.config.window.width / self.viewer.layout.config.window.height
+        )
         self.shader_arrow.release()
 
         self.shader_instance = Shader(name="instance")

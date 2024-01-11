@@ -5,14 +5,14 @@ from .meshobject import MeshObject
 from .sceneobject import DataType
 
 try:
-    from compas_occ.brep import BRep
+    from compas_occ.brep import OCCBrep
 
     class BRepObject(MeshObject):
-        """Viewer scene object for displaying COMPAS BRep geometry.
+        """Viewer scene object for displaying COMPAS OCCBrep geometry.
 
         Attributes
         ----------
-        brep : :class:`compas_occ.brep.BRep`
+        brep : :class:`compas_occ.brep.OCCBrep`
             The compas_occ Brep object.
         mesh : :class:`compas.datastructures.Mesh`
             The tesselation mesh representation of the Brep.
@@ -22,7 +22,7 @@ try:
         :class:`compas_occ.brep.Brep`
         """
 
-        def __init__(self, brep: BRep, **kwargs):
+        def __init__(self, brep: OCCBrep, **kwargs):
             self.brep = brep
             mesh, boundaries = self.to_viewmesh()
             super().__init__(mesh=mesh, **kwargs)
@@ -48,7 +48,7 @@ try:
 
         def to_viewmesh(self, linear_deflection=1):
             """
-            Convert the BRep to a view mesh.
+            Convert the OCCBrep to a view mesh.
             """
             lines = []
             for edge in self.brep.edges:

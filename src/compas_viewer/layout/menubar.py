@@ -3,7 +3,6 @@ from typing import TYPE_CHECKING
 
 from compas_viewer.actions import Action
 from compas_viewer.configurations import ActionConfig
-from compas_viewer.configurations import ActionConfigType
 
 if TYPE_CHECKING:
     from .layout import Layout
@@ -16,12 +15,17 @@ class MenuBarLayout:
 
     Parameters
     ----------
-    layout : :class:`compas_viewer.layouts.Layout`
+    layout : :class:`compas_viewer.layout.Layout`
         The parent layout.
     viewer : :class:`compas_viewer.Viewer`
         The parent viewer.
     config : :class:`compas_viewer.configurations.MenuBarConfig`
         The menu configuration.
+
+    See Also
+    --------
+    :class:`compas_viewer.configurations.layout_config.MenuBarConfig`
+    :PySide6:`PySide6/QtWidgets/QLayout`
     """
 
     def __init__(self, layout: "Layout"):

@@ -2,7 +2,7 @@ from .action import Action
 
 
 class SelectAll(Action):
-    """Look at action."""
+    """Select all objects."""
 
     def pressed_action(self):
         for obj in self.viewer.objects:

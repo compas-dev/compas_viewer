@@ -54,7 +54,30 @@
             },
             "guid": "52a481b2-0a86-46df-92b2-dbd59e9cb7a6"
         },
-        "guid": "52a481b2-0a86-45df-92b2-dbd59e9cb7a6"
+        "viewport": {
+            "dtype": "compas_viewer.configurations/ViewportConfig",
+            "data": {
+                "render_1": {
+                    "category": "render",
+                    "config_path": "render.json"
+                }
+            },
+
+            "guid": "52a481b2-0b86-45df-92b2-dbd59e9cb7a6"
+        },
+        "toolbar": {
+            "dtype": "compas_viewer.configurations/ToolBarConfig",
+            "data": {
+                "basic": {
+                    "view_top": { "action": "view_top", "kwargs": {} }
+                },
+                "view": {
+                    "view_top": { "action": "view_top", "kwargs": {} }
+                }
+            },
+
+            "guid": "42a481b2-0b86-45df-92b2-dbd59e9cb7a6"
+        }
     },
     "guid": "52a481b3-0a86-45df-92b0-dbd59e9cb7a6"
 }

@@ -16,7 +16,9 @@ ap.add_argument(
     "-f",
     "--files",
     required=False,
-    help="The compas.geometry's JSON file, or the compressed JSON file (ZIP), or a the path to a folder containing the JSON files for the viewer to load.",
+    help="""
+    The compas.geometry's JSON file, or the compressed JSON file (ZIP),
+    or a the path to a folder containing the JSON files for the viewer to load.""",
 )
 
 args = vars(ap.parse_args())

@@ -9,3 +9,5 @@ from .layout_config import LayoutConfig, LayoutConfigType  # noqa: F401
 from .layout_config import StatusBarConfig, StatusBarConfigType  # noqa: F401
 from .layout_config import WindowConfig, WindowConfigType  # noqa: F401
 from .layout_config import MenuBarConfig, MenuBarConfigType  # noqa: F401
+from .layout_config import ViewportConfig, ViewportConfigType  # noqa: F401
+from .layout_config import ToolBarConfig, ToolBarConfigType  # noqa: F401

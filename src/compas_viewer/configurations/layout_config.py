@@ -38,6 +38,56 @@ class MenuBarConfigType(TypedDict):
     kwargs: List[str]
 
 
+class ViewportConfigType(TypedDict):
+    """
+    The type template for each single item of the viewport.
+    """
+
+    category: Literal["render"]
+    config_path: str
+
+
+class ToolBarConfigType(TypedDict):
+    """
+    The type template for the each toolbar element.
+    """
+
+    action: str
+    kwargs: dict
+
+
+class ToolBarConfig(Config):
+    """
+    The class representation for the toolbar configuration of the class :class:`compas_viewer.layout.ToolBarLayout`.
+    The toolbar configuration contains all the settings about the toolbar itself.
+    """
+
+    def __init__(self, config: Dict[str, Dict[str, ToolBarConfigType]]):
+        super().__init__(config)
+
+    @classmethod
+    def from_json(cls, filepath) -> "ToolBarConfig":
+        toolbar_config = super().from_json(filepath)
+        assert isinstance(toolbar_config, ToolBarConfig)
+        return toolbar_config
+
+
+class ViewportConfig(Config):
+    """
+    The class representation for the menu bar configuration of the class :class:`compas_viewer.layout.ViewportLayout`.
+    The viewport configuration contains all the settings about the viewport itself: render, ...
+    """
+
+    def __init__(self, config: Dict[str, Dict[str, ViewportConfigType]]):
+        super().__init__(config)
+
+    @classmethod
+    def from_json(cls, filepath) -> "ViewportConfig":
+        viewport_config = super().from_json(filepath)
+        assert isinstance(viewport_config, ViewportConfig)
+        return viewport_config
+
+
 class MenuBarConfig(Config):
     """
     The class representation for the menu bar configuration of the class :class:`compas_viewer.layout.Layout`.
@@ -111,6 +161,8 @@ class LayoutConfigType(TypedDict):
     window: WindowConfig
     statusbar: StatusBarConfig
     menubar: MenuBarConfig
+    viewport: ViewportConfig
+    toolbar: ToolBarConfig
 
 
 class LayoutConfig(Config):
@@ -129,6 +181,8 @@ class LayoutConfig(Config):
         self.window = config["window"]
         self.statusbar = config["statusbar"]
         self.menubar = config["menubar"]
+        self.viewport = config["viewport"]
+        self.toolbar = config["toolbar"]
 
     @classmethod
     def from_default(cls) -> "LayoutConfig":

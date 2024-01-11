@@ -13,12 +13,17 @@ class StatusBarLayout:
 
     Parameters
     ----------
-    layout : :class:`compas_viewer.layouts.Layout`
+    layout : :class:`compas_viewer.layout.Layout`
         The parent layout.
     viewer : :class:`compas_viewer.Viewer`
         The parent viewer.
     config : :class:`compas_viewer.configurations.StatusBarConfig`
         The status bar configuration.
+
+    See Also
+    --------
+    :class:`compas_viewer.configurations.layout_config.StatusBarConfig`
+    :PySide6:`PySide6/QtWidgets/QStatusBar`
     """
 
     def __init__(self, layout: "Layout"):

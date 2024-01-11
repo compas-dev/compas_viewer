@@ -33,7 +33,7 @@ from compas_viewer.scene import ViewerSceneObject
 
 if TYPE_CHECKING:
     from compas.datastructures import Network
-    from compas_occ.brep import BRep
+    from compas_occ.brep import OCCBrep
 
 
 class Timer:
@@ -92,7 +92,7 @@ class Viewer(Scene):
         The render component of the viewer.
     controller : :class:`compas_viewer.controller.Controller`
         The controller component of the viewer.
-    layout : :class:`compas_viewer.layouts.Layout`
+    layout : :class:`compas_viewer.layout.Layout`
         The layout component of the viewer.
 
     Notes
@@ -271,7 +271,7 @@ class Viewer(Scene):
 
     def add(
         self,
-        item: Union[Mesh, Geometry, "BRep", "Network"],
+        item: Union[Mesh, Geometry, "OCCBrep", "Network"],
         parent: Optional[ViewerSceneObject] = None,
         is_selected: bool = False,
         is_locked: bool = False,
