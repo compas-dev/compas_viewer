@@ -16,8 +16,8 @@ jobs:
       matrix:
         python: [ '3.9', '3.11']
     steps:
-      - name: install libglu
-        run: sudo apt-get install libglu
+      - name: install libglu1
+        run: sudo apt-get install libglu1
       - uses: compas-dev/compas-actions.build@v3
         with:
           python: ${{ matrix.python }}
