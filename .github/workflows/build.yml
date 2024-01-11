@@ -16,13 +16,13 @@ jobs:
       matrix:
         python: [ '3.9', '3.11']
     steps:
+      - name: install libglu
+        run: apt-get install libglu
       - uses: compas-dev/compas-actions.build@v3
         with:
           python: ${{ matrix.python }}
           invoke_lint: true
           invoke_test: true
-      - name: install libglu
-        run: apt-get install libglu
 
   build:
     if: "!contains(github.event.pull_request.labels.*.name, 'docs-only')"
