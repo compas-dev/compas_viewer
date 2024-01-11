@@ -1,3 +1,4 @@
+compas
 freetype-py
 pyopengl
 PySide6
