@@ -8,7 +8,7 @@ from PySide6.QtWidgets import QLabel
 
 class StatusBarLayout:
     """
-    The :class:`compas_viewer.layouts.StatusBarLayout` class manages all
+    The StatusBarLayout class manages all
     the layout and other UI-related information of the status bar.
 
     Parameters

@@ -59,7 +59,7 @@ from PySide6.QtWidgets import QMainWindow
 
 class Layout:
     """
-    The :class:`compas_viewer.layouts.Layout` class manages all the layout and other UI-related information of the viewer.
+    The Layout class manages all the layout and other UI-related information of the viewer.
 
     It is the master class that invokes the:`compas_viewer.layouts.layout.WindowLayout`, `compas_viewer.layouts.layout.BodyLayout` and others.
     # TODO

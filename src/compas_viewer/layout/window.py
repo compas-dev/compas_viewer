@@ -16,7 +16,7 @@ from compas_viewer import DATA
 
 class WindowLayout:
     """
-    The :class:`compas_viewer.layouts.WindowLayout` class manages all
+    The WindowLayout class manages all
     the layout and other UI-related information of the window itself.
 
     Parameters

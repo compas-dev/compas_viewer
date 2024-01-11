@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 class MenuBarLayout:
     """
-    The :class:`compas_viewer.layouts.MenuBarLayout` class manages all
+    TheMenuBarLayout class manages all
     the layout and other UI-related information of the menu.
 
     Parameters

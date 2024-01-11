@@ -6,8 +6,8 @@ if TYPE_CHECKING:
 
 class ViewportLayout(Layout):
         """
-    The :class:`compas_viewer.layouts.WindowLayout` class manages all
-    the layout and other UI-related information of the window itself.
+    The ViewportLayout class manages all
+    the layout and other UI-related information of the main viewport.
 
     Parameters
     ----------
