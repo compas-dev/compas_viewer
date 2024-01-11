@@ -8,7 +8,7 @@ try:
     from compas_occ.brep import BRep
 
     class BRepObject(MeshObject):
-        """Viewer scene object for displaying COMPAS :class:`compas_occ.brep.Brep` geometry.
+        """Viewer scene object for displaying COMPAS BRep geometry.
 
         Attributes
         ----------
@@ -16,6 +16,10 @@ try:
             The compas_occ Brep object.
         mesh : :class:`compas.datastructures.Mesh`
             The tesselation mesh representation of the Brep.
+
+        See Also
+        --------
+        :class:`compas_occ.brep.Brep`
         """
 
         def __init__(self, brep: BRep, **kwargs):

@@ -7,4 +7,4 @@ class SelectAll(Action):
     def pressed_action(self):
         for obj in self.viewer.objects:
             obj.is_selected = True
-        self.viewer.render.update()
+        self.viewer.renderer.update()

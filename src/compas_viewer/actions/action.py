@@ -33,9 +33,9 @@ class Action(QObject):
         The viewer object.
     config : :class:`compas_viewer.configurations.controller_config.ActionConfig`
         The action configuration.
-    key : :class:`PySide6.QtCore.Qt.Key`
+    key : :QtCore:`PySide6.QtCore.Qt.Key`
         The key of the action.
-    modifier : :class:`PySide6.QtCore.Qt.KeyboardModifier`
+    modifier : :QtCore:`PySide6.QtCore.Qt.KeyboardModifier`
         The modifier of the action.
 
     References
@@ -65,11 +65,11 @@ class Action(QObject):
         """
         The behavior of the action when the key is pressed.
         """
-        self.viewer.render.update()
+        self.viewer.renderer.update()
 
     @abstractmethod
     def released_action(self):
         """
         The behavior of the action when the key is released.
         """
-        self.viewer.render.update()
+        self.viewer.renderer.update()

@@ -9,11 +9,16 @@ from .sceneobject import ViewerSceneObject
 
 
 class CircleObject(ViewerSceneObject, GeometryObject):
-    """Viewer scene object for displaying COMPAS :class:`compas.geometry.Circle` geometry."""
+    """Viewer scene object for displaying COMPAS Circle geometry.
+
+    See Also
+    --------
+    :class:`compas.geometry.Circle`
+    """
 
     def __init__(self, circle: Circle, **kwargs):
         self.geometry: Circle
-        self.u = kwargs.get("u",int(circle.circumference / self.LINEARDEFLECTION))
+        self.u = kwargs.get("u", int(circle.circumference / self.LINEARDEFLECTION))
         self.u_points = self._calculate_circle_points(circle)
         super().__init__(geometry=circle, **kwargs)
 

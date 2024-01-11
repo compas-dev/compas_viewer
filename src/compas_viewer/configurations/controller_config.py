@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Dict
+
 from typing import Optional
 from typing import TypedDict
 
@@ -40,7 +40,7 @@ class ControllerConfigType(TypedDict):
     drag_deselection: MouseConfigType
     multiselect: MouseConfigType
     deselect: MouseConfigType
-    actions: Dict[str, ActionConfigType]
+    actions: dict[str, ActionConfigType]
 
 
 class ActionConfig:
@@ -57,9 +57,9 @@ class ActionConfig:
     ----------
     config : :class:`ActionConfigType`
         A TypedDict with defined keys and types.
-    key : :class:`PySide6.QtCore.Qt.Key`
+    key : :QtCore:`PySide6.QtCore.Qt.Key`
         The Qt key.
-    modifier : :class:`PySide6.QtCore.Qt.KeyboardModifier`
+    modifier : :QtCore:`PySide6.QtCore.Qt.KeyboardModifier`
         The Qt modifier.
     """
 
@@ -85,9 +85,9 @@ class MouseConfig:
     ----------
     config : :class:`MouseConfigType`
         A TypedDict with defined keys and types.
-    mouse : :class:`PySide6.QtCore.Qt.MouseButton`
+    mouse : :QtCore:`PySide6.QtCore.Qt.MouseButton`
         The Qt mouse.
-    modifier : :class:`PySide6.QtCore.Qt.KeyboardModifier`
+    modifier : :QtCore:`PySide6.QtCore.Qt.KeyboardModifier`
         The Qt modifier.
     """
 
@@ -102,13 +102,17 @@ class MouseConfig:
 class ControllerConfig(Config):
     """
     The class representation for the `controller.json` of
-    the class :class:`compas_viewer.controller.controller.Controller`
+    the class Controller.
     The controller.json contains all the settings about controlling the viewer: mouse, keys, ...
 
     Parameters
     ----------
     config : :class:`ControllerConfigType`
         A TypedDict with defined keys and types.
+
+    See Also
+    --------
+    :class:`compas_viewer.components.controller.Controller`
     """
 
     def __init__(self, config: ControllerConfigType):

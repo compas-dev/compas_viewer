@@ -1,4 +1,3 @@
-from typing import Dict
 from typing import TypedDict
 from typing import Union
 
@@ -10,12 +9,12 @@ class Config(Data):
     The abstract class for different configurations.
     """
 
-    def __init__(self, config: Union[TypedDict, Dict]):
+    def __init__(self, config: Union[TypedDict, dict]):
         super(Config, self).__init__()
         self.config = config
 
     @property
-    def data(self):  # -> Dict[str, Any]:
+    def data(self):  # -> dict[str, Any]:
         return self.config
 
     @classmethod

@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
+* Added `installation` documentation.
+* Added documentations: index, api, etc. Mockups style is improved.
 * Added `DeleteSelected` action class.
 * Added `DataType` as the data type template for generating the buffer.
 * Added `NetworkObject` for the scene objects.
@@ -45,6 +47,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added `NetworkObject`.
 
 ### Changed
+* The `Index` page.
+* Typing hints improved, now `compas_viewer` only support Python 3.9+.
 * Introduce decorator @lru_cache() to reduce duplicate calculations. 
 * Refactored the `Selector` and the instance_map structure, the main frame rate is higher and selection action is faster.
 * Fixed the bug of the `Selector`, drag selection is now more accurate.

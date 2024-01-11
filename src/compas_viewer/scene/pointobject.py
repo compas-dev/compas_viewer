@@ -6,7 +6,12 @@ from .sceneobject import ViewerSceneObject
 
 
 class PointObject(ViewerSceneObject, GeometryObject):
-    """Viewer scene object for displaying COMPAS :class:`compas.geometry.Point` geometry."""
+    """Viewer scene object for displaying COMPAS Point geometry.
+
+    See Also
+    --------
+    :class:`compas.geometry.Point`
+    """
 
     def __init__(self, point: Point, **kwargs):
         super(PointObject, self).__init__(geometry=point, **kwargs)

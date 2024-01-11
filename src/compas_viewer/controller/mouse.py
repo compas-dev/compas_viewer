@@ -7,9 +7,9 @@ class Mouse:
 
     Attributes
     ----------
-    pos : :class:`PySide6.QtCore.QPoint`
+    pos : :PySide6:`PySide6/QtCore/QPoint`
         The current position of the mouse on the screen.
-    last_pos : :class:`PySide6.QtCore.QPoint`
+    last_pos : :PySide6:`PySide6/QtCore/QPoint`
         The last recorded position of the mouse on the screen.
     """
 

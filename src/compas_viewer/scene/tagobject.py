@@ -1,7 +1,7 @@
 from os import PathLike
 from os import path
 from typing import Optional
-from typing import Tuple
+
 from typing import Union
 
 from compas.colors import Color
@@ -31,7 +31,7 @@ class Tag(Geometry):
     ----------
     text : str
         The text of the tag.
-    position : Union[:class:`compas.geometry.Point`, Tuple[float, float, float]]
+    position : Union[:class:`compas.geometry.Point`, tuple[float, float, float]]
         The position of the tag.
     color : :class:`compas.colors.Color`, optional
         The color of the tag.
@@ -76,7 +76,7 @@ class Tag(Geometry):
     def __init__(
         self,
         text: str,
-        position: Union[Point, Tuple[float, float, float]],
+        position: Union[Point, tuple[float, float, float]],
         color: Color = Color(0.0, 0.0, 0.0),
         height: float = 50,
         absolute_height: bool = False,
@@ -104,15 +104,19 @@ class Tag(Geometry):
 
 class TagObject(ViewerSceneObject, GeometryObject):
     """
-    The scene object of the :class:`compas_viewer.scene.Tag` geometry.
+    The scene object of the viewer tag geometry.
     Unlike :class:`compas_viewer.scene.TextObject`, tag object is a sprite always facing the camera.
 
     Parameters
     ----------
     tag : :class:`compas_viewer.scene.Tag`
         The tag geometry.
-    **kwargs : Dict, optional
+    **kwargs : dict, optional
         Additional options for the :class:`compas_viewer.scene.ViewerSceneObject`.
+
+    See Also
+    --------
+    :class:`compas_viewer.scene.Tag`
     """
 
     def __init__(self, tag: Tag, **kwargs):

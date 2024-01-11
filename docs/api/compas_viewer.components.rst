@@ -5,5 +5,5 @@ compas_viewer.components
 .. toctree::
     :maxdepth: 1
 
-    components/render
+    components/renderer
 
