@@ -31,6 +31,7 @@ def register_actions():
     register("import_file", ImportFile)
     register("export_file", ExportFile)
     register("url", OpenURL)
+    register("camera_info", CameraInfo)
 
 
 def get_action_cls(name: str) -> Any:
@@ -44,11 +45,11 @@ def get_action_cls(name: str) -> Any:
 # Putting imports here to avoid circular imports
 from .action import Action  # noqa: F401 E402
 from .zoom_selected import ZoomSelected  # noqa: E402
-from .print_gl_info import GLInfo  # noqa: E402
 from .select_all import SelectAll  # noqa: E402
 from .viewmode import ViewRight, ViewFront, ViewTop, ViewPerspective  # noqa: E402
 from .delete_selected import DeleteSelected  # noqa: E402
 from .io import ImportFile, ExportFile, OpenURL  # noqa: E402
+from .info import GLInfo, CameraInfo  # noqa: E402
 
 register_actions()
 
@@ -65,4 +66,5 @@ ___all__ = [
     "ImportFile",
     "ExportFile",
     "OpenURL",
+    "CameraInfo"
 ]

@@ -6,8 +6,8 @@
             "data": {
                 "about": "compas_viewer is the standalone viewer for COMPAS.",
                 "title": "COMPAS VIEWER",
-                "width": 800,
-                "height": 800,
+                "width": 1600,
+                "height": 900,
                 "fullscreen": false
             },
             "guid": "52a481b3-0a86-45df-92b1-dbd59e9cb7a6"
