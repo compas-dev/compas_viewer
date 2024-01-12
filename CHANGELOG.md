@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added `info` actions.
 * Added basic buildup of `Layout`
 * Added terminal activation of the viewer.
+* Added `PyOpenGL_accelerate` dependency.
+* Added repo images. 
 * Added `installation` documentation.
 * Added documentations: index, api, etc. Mockups style is improved.
 * Added `DeleteSelected` action class.
@@ -51,6 +53,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 * Fixed opacity mode bug.
+* Fixed main page link.
 * Update the dependency of `compas`.
 * The `Index` page.
 * Typing hints improved, now `compas_viewer` only support Python 3.9+.
