@@ -13,8 +13,8 @@ Classes
 
     Layout
     WindowLayout
-    MenuBarLayout
-    ToolBarLayout
-    StatusBarLayout
-    SideDockLayout
+    MenubarLayout
+    ToolbarLayout
+    StatusbarLayout
+    SidedockLayout
     ViewportLayout

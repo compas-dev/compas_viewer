@@ -5,10 +5,10 @@ from PySide6.QtWidgets import QWidget
 
 from compas_viewer.configurations.layout_config import LayoutConfig
 
-from .menubar import MenuBarLayout
-from .sidedock import SideDockLayout
-from .statusbar import StatusBarLayout
-from .toolbar import ToolBarLayout
+from .menubar import MenubarLayout
+from .sidedock import SidedockLayout
+from .statusbar import StatusbarLayout
+from .toolbar import ToolbarLayout
 from .viewport import ViewportLayout
 from .window import WindowLayout
 
@@ -33,15 +33,15 @@ class Layout:
         The parent viewer.
     window : :class:`compas_viewer.layout.layout.WindowLayout`
         The window layout.
-    statusbar : :class:`compas_viewer.layout.layout.StatusBarLayout`
+    statusbar : :class:`compas_viewer.layout.layout.StatusbarLayout`
         The status bar layout.
-    menubar : :class:`compas_viewer.layout.layout.MenuBarLayout`
+    menubar : :class:`compas_viewer.layout.layout.MenubarLayout`
         The menu bar layout.
     viewport : :class:`compas_viewer.layout.layout.ViewportLayout`
         The viewport layout.
-    toolbar : :class:`compas_viewer.layout.layout.ToolBarLayout`
+    toolbar : :class:`compas_viewer.layout.layout.ToolbarLayout`
         The tool bar layout.
-    sidedock : :class:`compas_viewer.layout.layout.SideDockLayout`
+    sidedock : :class:`compas_viewer.layout.layout.SidedockLayout`
         The side dock layout.
 
     See Also
@@ -61,11 +61,11 @@ class Layout:
         # Widgets
         self.central_widget = QWidget(self.viewer.window)
         self.window = WindowLayout(self)
-        self.statusbar = StatusBarLayout(self)
-        self.menubar = MenuBarLayout(self)
+        self.statusbar = StatusbarLayout(self)
+        self.menubar = MenubarLayout(self)
         self.viewport = ViewportLayout(self)
-        self.toolbar = ToolBarLayout(self)
-        self.sidedock = SideDockLayout(self)
+        self.toolbar = ToolbarLayout(self)
+        self.sidedock = SidedockLayout(self)
 
     def init(self):
         """

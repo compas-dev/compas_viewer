@@ -7,9 +7,9 @@ if TYPE_CHECKING:
     from .layout import Layout
 
 
-class SideDockLayout:
+class SidedockLayout:
     """
-    The SideDockLayout class manages all
+    The SidedockLayout class manages all
     the layout and other UI-related information of the side dock itself.
 
     Parameters

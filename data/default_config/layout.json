@@ -14,7 +14,7 @@
         },
 
         "statusbar": {
-            "dtype": "compas_viewer.configurations/StatusBarConfig",
+            "dtype": "compas_viewer.configurations/StatusbarConfig",
             "data": {
                 "text": "compas_viewer",
                 "show_fps": true
@@ -23,7 +23,7 @@
         },
 
         "menubar": {
-            "dtype": "compas_viewer.configurations/MenuBarConfig",
+            "dtype": "compas_viewer.configurations/MenubarConfig",
 
             "data": {
                 "File": {
@@ -66,7 +66,7 @@
             "guid": "52a481b2-0b86-45df-92b2-dbd59e9cb7a6"
         },
         "toolbar": {
-            "dtype": "compas_viewer.configurations/ToolBarConfig",
+            "dtype": "compas_viewer.configurations/ToolbarConfig",
             "data": {
                 "basic": {
                     "view_top": { "action": "view_top", "kwargs": {} }

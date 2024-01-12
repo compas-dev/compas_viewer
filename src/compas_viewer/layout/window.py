@@ -38,7 +38,7 @@ class WindowLayout:
 
     References
     ----------
-    :PySide6:`PySide6/Qtdgets/QMainWindow`
+    :PySide6:`PySide6/QtWidgets/QMainWindow`
     """
 
     def __init__(self, layout: "Layout"):

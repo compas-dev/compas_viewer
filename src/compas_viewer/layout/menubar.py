@@ -8,9 +8,9 @@ if TYPE_CHECKING:
     from .layout import Layout
 
 
-class MenuBarLayout:
+class MenubarLayout:
     """
-    TheMenuBarLayout class manages all
+    The MenubarLayout class manages all
     the layout and other UI-related information of the menu.
 
     Parameters
@@ -19,12 +19,12 @@ class MenuBarLayout:
         The parent layout.
     viewer : :class:`compas_viewer.viewer.Viewer`
         The parent viewer.
-    config : :class:`compas_viewer.configurations.MenuBarConfig`
+    config : :class:`compas_viewer.configurations.MenubarConfig`
         The menu configuration.
 
     See Also
     --------
-    :class:`compas_viewer.configurations.layout_config.MenuBarConfig`
+    :class:`compas_viewer.configurations.layout_config.MenubarConfig`
 
     References
     ----------

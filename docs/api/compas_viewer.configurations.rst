@@ -36,9 +36,9 @@ UI
     :nosignatures:
 
     LayoutConfig
-    StatusBarConfig
+    StatusbarConfig
     WindowConfig
-    MenuBarConfig
+    MenubarConfig
     ViewportConfig
-    ToolBarConfig
+    ToolbarConfig
 

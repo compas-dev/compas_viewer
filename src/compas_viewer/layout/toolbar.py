@@ -16,9 +16,9 @@ from compas_viewer.actions import Action
 from compas_viewer.configurations import ActionConfig
 
 
-class ToolBarLayout:
+class ToolbarLayout:
     """
-    The ToolBarLayout class manages all
+    The ToolbarLayout class manages all
     the layout and other UI-related information of the toolbar itself.
 
     Parameters
@@ -37,7 +37,7 @@ class ToolBarLayout:
 
     See Also
     --------
-    :class:`compas_viewer.configurations.layout_config.ToolBarConfig`
+    :class:`compas_viewer.configurations.layout_config.ToolbarConfig`
 
     References
     ----------

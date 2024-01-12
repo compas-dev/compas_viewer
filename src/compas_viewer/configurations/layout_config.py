@@ -8,7 +8,7 @@ from compas_viewer import DATA
 from compas_viewer.configurations import Config
 
 
-class StatusBarConfigType(TypedDict):
+class StatusbarConfigType(TypedDict):
     """
     The type template for the status bar only.
     """
@@ -29,7 +29,7 @@ class WindowConfigType(TypedDict):
     fullscreen: bool
 
 
-class MenuBarConfigType(TypedDict):
+class MenubarConfigType(TypedDict):
     """
     The type template for each single item of the menu.
     """
@@ -47,7 +47,7 @@ class ViewportConfigType(TypedDict):
     config_path: str
 
 
-class ToolBarConfigType(TypedDict):
+class ToolbarConfigType(TypedDict):
     """
     The type template for the each toolbar element.
     """
@@ -56,19 +56,19 @@ class ToolBarConfigType(TypedDict):
     kwargs: dict
 
 
-class ToolBarConfig(Config):
+class ToolbarConfig(Config):
     """
     The class representation for the toolbar configuration of the Layout class.
     The toolbar configuration contains all the settings about the toolbar itself.
     """
 
-    def __init__(self, config: Dict[str, Dict[str, ToolBarConfigType]]):
+    def __init__(self, config: Dict[str, Dict[str, ToolbarConfigType]]):
         super().__init__(config)
 
     @classmethod
-    def from_json(cls, filepath) -> "ToolBarConfig":
+    def from_json(cls, filepath) -> "ToolbarConfig":
         toolbar_config = super().from_json(filepath)
-        assert isinstance(toolbar_config, ToolBarConfig)
+        assert isinstance(toolbar_config, ToolbarConfig)
         return toolbar_config
 
 
@@ -93,47 +93,47 @@ class ViewportConfig(Config):
         return viewport_config
 
 
-class MenuBarConfig(Config):
+class MenubarConfig(Config):
     """
     The class representation for the menu bar configuration of the Layout class.
     The menu bar configuration contains all the settings about the menu bar itself: items, ...
 
     Parameters
     ----------
-    config : :class:`~MenuBarConfigType`
+    config : :class:`~MenubarConfigType`
         A TypedDict with defined keys and types.
     """
 
-    def __init__(self, config: Dict[str, Dict[str, MenuBarConfigType]]):
+    def __init__(self, config: Dict[str, Dict[str, MenubarConfigType]]):
         super().__init__(config)
 
     @classmethod
-    def from_json(cls, filepath) -> "MenuBarConfig":
+    def from_json(cls, filepath) -> "MenubarConfig":
         menu_config = super().from_json(filepath)
-        assert isinstance(menu_config, MenuBarConfig)
+        assert isinstance(menu_config, MenubarConfig)
         return menu_config
 
 
-class StatusBarConfig(Config):
+class StatusbarConfig(Config):
     """
     The class representation for the status bar configuration of the Layout class.
     The status bar configuration contains all the settings about the status bar itself: text, show_fps, ...
 
     Parameters
     ----------
-    config : :class:`~StatusBarConfigType`
+    config : :class:`~StatusbarConfigType`
         A TypedDict with defined keys and types.
     """
 
-    def __init__(self, config: StatusBarConfigType):
+    def __init__(self, config: StatusbarConfigType):
         super().__init__(config)
         self.text = config["text"]
         self.show_fps = config["show_fps"]
 
     @classmethod
-    def from_json(cls, filepath) -> "StatusBarConfig":
+    def from_json(cls, filepath) -> "StatusbarConfig":
         statusbar_config = super().from_json(filepath)
-        assert isinstance(statusbar_config, StatusBarConfig)
+        assert isinstance(statusbar_config, StatusbarConfig)
         return statusbar_config
 
 
@@ -169,10 +169,10 @@ class LayoutConfigType(TypedDict):
     """
 
     window: WindowConfig
-    statusbar: StatusBarConfig
-    menubar: MenuBarConfig
+    statusbar: StatusbarConfig
+    menubar: MenubarConfig
     viewport: ViewportConfig
-    toolbar: ToolBarConfig
+    toolbar: ToolbarConfig
 
 
 class LayoutConfig(Config):

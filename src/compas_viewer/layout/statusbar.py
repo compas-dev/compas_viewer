@@ -6,9 +6,9 @@ if TYPE_CHECKING:
 from PySide6.QtWidgets import QLabel
 
 
-class StatusBarLayout:
+class StatusbarLayout:
     """
-    The StatusBarLayout class manages all
+    The StatusbarLayout class manages all
     the layout and other UI-related information of the status bar.
 
     Parameters
@@ -17,16 +17,16 @@ class StatusBarLayout:
         The parent layout.
     viewer : :class:`compas_viewer.viewer.Viewer`
         The parent viewer.
-    config : :class:`compas_viewer.configurations.StatusBarConfig`
+    config : :class:`compas_viewer.configurations.StatusbarConfig`
         The status bar configuration.
 
     See Also
     --------
-    :class:`compas_viewer.configurations.layout_config.StatusBarConfig`
+    :class:`compas_viewer.configurations.layout_config.StatusbarConfig`
 
     References
     ----------
-    :PySide6:`PySide6/QtWidgets/QStatusBar`
+    :PySide6:`PySide6/QtWidgets/QStatusbar`
     """
 
     def __init__(self, layout: "Layout"):
