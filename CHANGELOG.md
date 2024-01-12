@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
+* Added `PyOpenGL_accelerate` dependency.
 * Added repo images. 
 * Added `installation` documentation.
 * Added documentations: index, api, etc. Mockups style is improved.
