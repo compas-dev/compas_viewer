@@ -10,11 +10,3 @@ Classes
 .. autosummary::
     :toctree: generated/
     :nosignatures:
-
-    Layout
-    WindowLayout
-    MenubarLayout
-    ToolbarLayout
-    StatusbarLayout
-    SidedockLayout
-    ViewportLayout

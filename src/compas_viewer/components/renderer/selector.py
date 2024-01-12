@@ -82,8 +82,8 @@ class Selector(QObject):
         for _, obj in self.renderer.viewer.instance_colors.items():
             obj.is_selected = False
 
-        x = self.renderer.viewer.controller.mouse.last_pos.x()
-        y = self.renderer.viewer.controller.mouse.last_pos.y()
+        x = self.controller.mouse.last_pos.x()
+        y = self.controller.mouse.last_pos.y()
         instance_color = self.read_instance_color((x, y, x, y))
         unique_color = unique(instance_color, axis=0, return_counts=False)
 
@@ -94,8 +94,8 @@ class Selector(QObject):
     def deselect_action(self):
         """Deselect the object under the mouse cursor."""
 
-        x = self.renderer.viewer.controller.mouse.last_pos.x()
-        y = self.renderer.viewer.controller.mouse.last_pos.y()
+        x = self.controller.mouse.last_pos.x()
+        y = self.controller.mouse.last_pos.y()
         instance_color = self.read_instance_color((x, y, x, y))
         unique_color = unique(instance_color, axis=0, return_counts=False)
 
@@ -110,8 +110,8 @@ class Selector(QObject):
         --------
         :func:`compas_viewer.components.renderer.selector.Selector.select_action`
         """
-        x = self.renderer.viewer.controller.mouse.last_pos.x()
-        y = self.renderer.viewer.controller.mouse.last_pos.y()
+        x = self.controller.mouse.last_pos.x()
+        y = self.controller.mouse.last_pos.y()
         instance_color = self.read_instance_color((x, y, x, y))
         unique_color = unique(instance_color, axis=0, return_counts=False)
 
