@@ -52,7 +52,6 @@ class Layout:
 
         self.viewport = ViewportLayout(self)
 
-
     def init(self):
         """
         Set up the layout.

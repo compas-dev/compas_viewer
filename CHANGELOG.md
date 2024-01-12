@@ -8,8 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
-* Added `info` actions.
-* Added basic buildup of `Layout`
+* Added Actions: delete_selected, camera_info, selection_info.
+* Added basic buildup of `Layout`'s configurations. The .json template and the configuration classes.
+* `Layout` class basic buildup: `Layout`, `ViewportLayout`, `WindowLayout`.
 * Added terminal activation of the viewer.
 * Added `PyOpenGL_accelerate` dependency.
 * Added repo images. 
@@ -52,7 +53,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added `NetworkObject`.
 
 ### Changed
-* Fixed opacity mode bug.
+* `Timer` is moved to utilities.
+* Updated `BRepObject` to connect the latest OCC package, close [#48](https://github.com/compas-dev/compas_viewer/issues/48).
+* Fixed opacity bug in shaded mode.
 * Fixed main page link.
 * Fixed issue [#17](https://github.com/compas-dev/compas_viewer/issues/17) and avoid using `vertex_xyz`.
 * Update the dependency of `compas`.

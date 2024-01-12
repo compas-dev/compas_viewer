@@ -48,7 +48,7 @@ class Renderer(QOpenGLWidget):
 
         self._viewmode = self.config.viewmode
         self._rendermode = self.config.rendermode
-        self._opacity  = self.config.ghostopacity if self.rendermode == "ghosted" else 1.0
+        self._opacity = self.config.ghostopacity if self.rendermode == "ghosted" else 1.0
 
         self._frames = 0
         self._now = time.time()
