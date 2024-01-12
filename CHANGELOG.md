@@ -50,6 +50,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added `NetworkObject`.
 
 ### Changed
+* Fixed opacity mode bug.
 * Update the dependency of `compas`.
 * The `Index` page.
 * Typing hints improved, now `compas_viewer` only support Python 3.9+.

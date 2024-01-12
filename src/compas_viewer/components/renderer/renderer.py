@@ -48,10 +48,10 @@ class Renderer(QOpenGLWidget):
 
         self._viewmode = self.config.viewmode
         self._rendermode = self.config.rendermode
-        self._opacity = 1.0
+        self._opacity  = self.config.ghostopacity if self.rendermode == "ghosted" else 1.0
+
         self._frames = 0
         self._now = time.time()
-        self._shader_model = None
 
         self.shader_model: Shader
         self.shader_tag: Shader
@@ -84,10 +84,10 @@ class Renderer(QOpenGLWidget):
             self._opacity = self.config.ghostopacity
         else:
             self._opacity = 1.0
-        if self._shader_model:
-            self._shader_model.bind()
-            self._shader_model.uniform1f("opacity", self._opacity)
-            self._shader_model.release()
+        if self.shader_model:
+            self.shader_model.bind()
+            self.shader_model.uniform1f("opacity", self._opacity)
+            self.shader_model.release()
             self.update()
 
     @property
