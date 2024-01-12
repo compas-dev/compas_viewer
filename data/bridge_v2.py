@@ -27,6 +27,6 @@ for i, mesh in enumerate(meshes):
                 linescolor=Color.from_i(color_param),
             )
 
-viewer.objects[972].is_selected = True
+viewer.objects[1091].is_selected = True
 
 viewer.show()
