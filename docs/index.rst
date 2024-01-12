@@ -3,6 +3,11 @@
 ********************************************************************************
 COMPAS Viewer
 ********************************************************************************
+
+.. figure:: /_images/compas-viewer.jpg
+     :figclass: figure
+     :class: figure-img img-fluid
+     
 .. rst-class:: lead
 
 Standalone viewer for COMPAS 2.0 with features:
@@ -14,10 +19,6 @@ Standalone viewer for COMPAS 2.0 with features:
 * **Flexible Customization**: Flexible customize your own UI layout with buttons, render display with colors, action with keyboard preferences ...
 * **Data-driven Visualization**: Visualize your assembly data, mesh data, network data, and more with :compas:`compas.datastructures` ...
 * **Easy-to-use Interaction**: Action-based interaction with mouse and keyboard, and easy-to-use API for your own interaction ...
-
-.. figure:: /_images/PLACEHOLDER.png
-     :figclass: figure
-     :class: figure-img img-fluid
 
 Installation
 ============
