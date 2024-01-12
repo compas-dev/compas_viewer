@@ -2,6 +2,8 @@
 
 Standalone viewer for COMPAS 2.0
 
+More information is available in the docs: https://compas.dev/compas-viewer/
+
 
 ## Features
 -   Performative and easy-to-use new architecture based on [compas_v1](https://compas.dev/compas/1.17.9/)'s [compas_view2](https://compas.dev/compas_view2/).
