@@ -4,10 +4,10 @@
 COMPAS Viewer
 ********************************************************************************
 
-.. figure:: /_images/compas-viewer.jpg
+.. figure:: /_images/compas-viewer.png
      :figclass: figure
      :class: figure-img img-fluid
-     
+
 .. rst-class:: lead
 
 Standalone viewer for COMPAS 2.0 with features:
