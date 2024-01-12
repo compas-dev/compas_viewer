@@ -2,7 +2,7 @@
 
 Standalone viewer for COMPAS 2.0
 
-More information is available in the docs: https://compas.dev/compas-viewer/
+More information is available in the docs: https://compas.dev/compas_viewer/
 
 
 ## Features
