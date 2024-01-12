@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
-* Added `info` Actions.
+* Added `info` actions.
 * Added basic buildup of `Layout`
 * Added terminal activation of the viewer.
 * Added `installation` documentation.
