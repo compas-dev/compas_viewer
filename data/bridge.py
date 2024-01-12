@@ -9,7 +9,7 @@ meshes = json_load(r"data\viewobjects.json")
 param = 0.8
 
 
-viewer = Viewer()
+viewer = Viewer(rendermode="shaded")
 
 for i, mesh in enumerate(meshes):
     viewer.add(mesh, use_vertexcolors=False, show_lines=True, show_points=False)
