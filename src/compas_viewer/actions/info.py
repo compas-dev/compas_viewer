@@ -1,3 +1,5 @@
+from numpy import info
+
 from compas_viewer.utilities import gl_info
 
 from .action import Action
@@ -10,7 +12,7 @@ class CameraInfo(Action):
 
     def pressed_action(self):
         self.viewer.renderer.update()
-        info= f"""
+        info = f"""
         Camera position: {self.viewer.renderer.camera.position}
         Camera target: {self.viewer.renderer.camera.target}
         Camera distance: {self.viewer.renderer.camera.distance}
@@ -22,6 +24,21 @@ class CameraInfo(Action):
         Camera rotationdelta : {self.viewer.renderer.camera.config.rotationdelta}
         Camera pan_delta : {self.viewer.renderer.camera.config.pan_delta}
         """
+        self.viewer.layout.window.info(info)
+
+
+class SelectionInfo(Action):
+    """
+    Pop up a window with selection information.
+    """
+
+    def pressed_action(self):
+        info = "Selected objects: /n"
+
+        for i, obj in enumerate(self.viewer.objects):
+            if obj.is_selected:
+                info += f"Object {i}: {obj} /n"
+
         self.viewer.layout.window.info(info)
 
 
