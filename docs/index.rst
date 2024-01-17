@@ -20,48 +20,22 @@ Standalone viewer for COMPAS 2.0 with features:
 * **Data-driven Visualization**: Visualize your assembly data, mesh data, network data, and more with `compas.datastructures <https://compas.dev/compas/latest/api/compas.datastructures.html>`_ ...
 * **Easy-to-use Interaction**: Action-based interaction with mouse and keyboard, and easy-to-use API for your own interaction ...
 
-Installation
-============
+COMPAS Viewer is the next generation of `compas_view2 <hhttps://compas.dev/compas_view2>`_ which is based on the 1.0 version of compas.
+
+Table of Contents
+=================
 
 .. toctree::
-	:maxdepth: 1
-	:titlesonly:
+   :maxdepth: 3
+   :titlesonly:
 
-	installation
-
-
-Tutorials
-=========
-
-.. toctree::
-	:maxdepth: 2
-	:titlesonly:
-
-	tutorials/index
-
-
-Examples
-========
-
-.. toctree::
-    :maxdepth: 2
-    :titlesonly:
-
-    examples/index
-
-
-API Reference
-=============
-
-.. toctree::
-    :maxdepth: 2
-
-    api/index
-
-History
-=======
-COMPAS Viewer is the next generation of :mod:`compas_view2` which is beased on the 1.0 version of :mod:`compas`.
-Experiencing years' iteraions, this new version of COMPAS Viewer is stabliy designed for wider senarios and use cases.
+   Introduction <self>
+   installation
+   tutorials/index
+   examples/index
+   api/index
+   license
+   acknowledgements
 
 
 Indices and tables

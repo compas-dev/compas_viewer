@@ -99,8 +99,8 @@ sphinx_compas2_theme.replace(html.HTMLTranslator)
 sphinx_compas2_theme.replace(html5.HTML5Translator)
 
 # -- Options for HTML output ----------------------------------------------
-html_sidebars = {"index": []}
-html_theme = "multisection"
+
+html_theme = "sidebaronly"
 html_title = project
 
 favicons = [
