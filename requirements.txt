@@ -1,5 +1,6 @@
 compas @ git+https://github.com/compas-dev/compas@main
 freetype-py
-pyopengl
+PyOpenGL
+PyOpenGL_accelerate
 PySide6
 

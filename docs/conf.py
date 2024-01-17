@@ -91,7 +91,6 @@ extlinks = {
     "GL": ("https://pyopengl.sourceforge.net/documentation/manual-3.0/%s.html", "%s"),
     "QtCore": ("https://doc.qt.io/qtforpython-6/PySide6/QtCore/Qt.html#PySide6.QtCore.%s", "%s"),
     "PySide6": ("https://doc.qt.io/qtforpython-6/%s.html", "%s"),
-    "compas": ("https://compas.dev/compas//latest/api/%s.html", "%s"),
 }
 
 # from pytorch
