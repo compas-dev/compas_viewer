@@ -496,20 +496,19 @@ document.write(`
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="compas_viewer.configurations.html">compas_viewer.configurations</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.Config.html">Config</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.ViewerConfig.html">ViewerConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.ViewerConfigType.html">ViewerConfigType</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.ControllerConfig.html">ControllerConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.ControllerConfigType.html">ControllerConfigType</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.ActionConfig.html">ActionConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.ActionConfigType.html">ActionConfigType</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.MouseConfig.html">MouseConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.MouseConfigType.html">MouseConfigType</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.RenderConfig.html">RenderConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.RenderConfigType.html">RenderConfigType</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.CameraConfig.html">CameraConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.CameraConfigType.html">CameraConfigType</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.SelectorConfig.html">SelectorConfig</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.SceneConfig.html">SceneConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.SceneConfigType.html">SceneConfigType</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.ControllerConfig.html">ControllerConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.MouseConfig.html">MouseConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.ActionConfig.html">ActionConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.LayoutConfig.html">LayoutConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.StatusbarConfig.html">StatusbarConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.WindowConfig.html">WindowConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.MenubarConfig.html">MenubarConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.ViewportConfig.html">ViewportConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.ToolbarConfig.html">ToolbarConfig</a></li>
 </ul>
 </li>
 </ul>
@@ -526,6 +525,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.utilities.update_vertex_buffer.html">update_vertex_buffer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.utilities.update_index_buffer.html">update_index_buffer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.utilities.key_mapper.html">key_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.utilities.Timer.html">Timer</a></li>
 </ul>
 </li>
 </ul>
@@ -587,6 +587,7 @@ document.write(`
 <p>This package provides a viewer for COMPAS.</p>
 <section id="viewer">
 <h2>Viewer</h2>
+<p>The Viewer class is the main entry of COMPAS Viewer`. It organizes the scene and create the GUI application.</p>
 <div class="toctree-wrapper compound">
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">viewer</span></p>
 <ul>
@@ -596,6 +597,7 @@ document.write(`
 </section>
 <section id="scene-and-objects">
 <h2>Scene and Objects</h2>
+<p>Classes for all scene objects.</p>
 <div class="toctree-wrapper compound">
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Scene and Objects</span></p>
 <ul>
@@ -605,6 +607,8 @@ document.write(`
 </section>
 <section id="controller-and-actions">
 <h2>Controller and Actions</h2>
+<p>The Controller class is the main entry of all the key and mouse events.
+Actions are functions that are called when a certain event happens, such as mouse and keyboard click.</p>
 <div class="toctree-wrapper compound">
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Controller and Actions</span></p>
 <ul>
@@ -615,6 +619,7 @@ document.write(`
 </section>
 <section id="components-and-configurations">
 <h2>Components and Configurations</h2>
+<p>Components and the corresponding configurations of them.</p>
 <div class="toctree-wrapper compound">
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Components and Configurations</span></p>
 <ul>
@@ -625,6 +630,7 @@ document.write(`
 </section>
 <section id="layout-and-ui">
 <h2>Layout and UI</h2>
+<p>The layout and UI of the viewer.</p>
 <div class="toctree-wrapper compound">
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Layout and UI</span></p>
 <ul>
@@ -634,6 +640,7 @@ document.write(`
 </section>
 <section id="utilities">
 <h2>Utilities</h2>
+<p>Useful functions and other helper classes.</p>
 <div class="toctree-wrapper compound">
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Utilities</span></p>
 <ul>

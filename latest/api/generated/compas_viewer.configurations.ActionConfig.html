@@ -59,8 +59,8 @@
         </script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="ActionConfigType" href="compas_viewer.configurations.ActionConfigType.html" />
-    <link rel="prev" title="ControllerConfigType.values" href="compas_viewer.configurations.ControllerConfigType.values.html" />
+    <link rel="next" title="LayoutConfig" href="compas_viewer.configurations.LayoutConfig.html" />
+    <link rel="prev" title="MouseConfig" href="compas_viewer.configurations.MouseConfig.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -496,20 +496,19 @@ document.write(`
 </li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="../compas_viewer.configurations.html">compas_viewer.configurations</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.Config.html">Config</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.ViewerConfig.html">ViewerConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.ViewerConfigType.html">ViewerConfigType</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.ControllerConfig.html">ControllerConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.ControllerConfigType.html">ControllerConfigType</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">ActionConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.ActionConfigType.html">ActionConfigType</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.MouseConfig.html">MouseConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.MouseConfigType.html">MouseConfigType</a></li>
 <li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.RenderConfig.html">RenderConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.RenderConfigType.html">RenderConfigType</a></li>
 <li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.CameraConfig.html">CameraConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.CameraConfigType.html">CameraConfigType</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.SelectorConfig.html">SelectorConfig</a></li>
 <li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.SceneConfig.html">SceneConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.SceneConfigType.html">SceneConfigType</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.ControllerConfig.html">ControllerConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.MouseConfig.html">MouseConfig</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">ActionConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.LayoutConfig.html">LayoutConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.StatusbarConfig.html">StatusbarConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.WindowConfig.html">WindowConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.MenubarConfig.html">MenubarConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.ViewportConfig.html">ViewportConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.ToolbarConfig.html">ToolbarConfig</a></li>
 </ul>
 </li>
 </ul>
@@ -526,6 +525,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="compas_viewer.utilities.update_vertex_buffer.html">update_vertex_buffer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="compas_viewer.utilities.update_index_buffer.html">update_index_buffer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="compas_viewer.utilities.key_mapper.html">key_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compas_viewer.utilities.Timer.html">Timer</a></li>
 </ul>
 </li>
 </ul>
@@ -592,20 +592,20 @@ document.write(`
 <h1>ActionConfig</h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="compas_viewer.configurations.ActionConfig">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ActionConfig</span></span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/977669c/src/compas_viewer/configurations/controller_config.py#L46"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ActionConfig</span></span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/07b2b94/src/compas_viewer/configurations/controller_config.py#L45"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>The class representation  of the key-based action configuration.
 The action config contains two elements, “key” and “modifier”.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>config</strong><span class="classifier"><a class="reference internal" href="compas_viewer.configurations.ActionConfigType.html#compas_viewer.configurations.ActionConfigType" title="compas_viewer.configurations.ActionConfigType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ActionConfigType</span></code></a></span></dt><dd><p>A TypedDict with defined keys and types.</p>
+<dt><strong>config</strong><span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">ActionConfigType</span></code></span></dt><dd><p>A TypedDict with defined keys and types.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Attributes<span class="colon">:</span></dt>
 <dd class="field-even"><dl>
-<dt><strong>config</strong><span class="classifier"><a class="reference internal" href="compas_viewer.configurations.ActionConfigType.html#compas_viewer.configurations.ActionConfigType" title="compas_viewer.configurations.ActionConfigType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ActionConfigType</span></code></a></span></dt><dd><p>A TypedDict with defined keys and types.</p>
+<dt><strong>config</strong><span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">ActionConfigType</span></code></span></dt><dd><p>A TypedDict with defined keys and types.</p>
 </dd>
 <dt><strong>key</strong><span class="classifier"><a class="reference external" href="https://doc.qt.io/qtforpython-6/PySide6/QtCore/Qt.html#PySide6.QtCore.PySide6.QtCore.Qt.Key">PySide6.QtCore.Qt.Key</a></span></dt><dd><p>The Qt key.</p>
 </dd>

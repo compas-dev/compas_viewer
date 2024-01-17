@@ -59,7 +59,7 @@
         </script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Viewer.about" href="compas_viewer.viewer.Viewer.about.html" />
+    <link rel="next" title="Viewer.add" href="compas_viewer.viewer.Viewer.add.html" />
     <link rel="prev" title="compas_viewer.viewer" href="../compas_viewer.viewer.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -496,20 +496,19 @@ document.write(`
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../compas_viewer.configurations.html">compas_viewer.configurations</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.Config.html">Config</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.ViewerConfig.html">ViewerConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.ViewerConfigType.html">ViewerConfigType</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.ControllerConfig.html">ControllerConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.ControllerConfigType.html">ControllerConfigType</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.ActionConfig.html">ActionConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.ActionConfigType.html">ActionConfigType</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.MouseConfig.html">MouseConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.MouseConfigType.html">MouseConfigType</a></li>
 <li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.RenderConfig.html">RenderConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.RenderConfigType.html">RenderConfigType</a></li>
 <li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.CameraConfig.html">CameraConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.CameraConfigType.html">CameraConfigType</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.SelectorConfig.html">SelectorConfig</a></li>
 <li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.SceneConfig.html">SceneConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.SceneConfigType.html">SceneConfigType</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.ControllerConfig.html">ControllerConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.MouseConfig.html">MouseConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.ActionConfig.html">ActionConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.LayoutConfig.html">LayoutConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.StatusbarConfig.html">StatusbarConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.WindowConfig.html">WindowConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.MenubarConfig.html">MenubarConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.ViewportConfig.html">ViewportConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.ToolbarConfig.html">ToolbarConfig</a></li>
 </ul>
 </li>
 </ul>
@@ -526,6 +525,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="compas_viewer.utilities.update_vertex_buffer.html">update_vertex_buffer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="compas_viewer.utilities.update_index_buffer.html">update_index_buffer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="compas_viewer.utilities.key_mapper.html">key_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compas_viewer.utilities.Timer.html">Timer</a></li>
 </ul>
 </li>
 </ul>
@@ -592,7 +592,7 @@ document.write(`
 <h1>Viewer</h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="compas_viewer.viewer.Viewer">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Viewer</span></span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/977669c/src/compas_viewer/viewer.py#L67"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Viewer</span></span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/07b2b94/src/compas_viewer/viewer.py#L39"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.scene.Scene.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Scene</span></code></a></p>
 <p>The Viewer class is the main entry of <cite>compas_viewer</cite>. It organizes the scene and create the GUI application.</p>
 <dl class="field-list simple">
@@ -609,7 +609,7 @@ document.write(`
 <dt><strong>rendermode</strong><span class="classifier">Literal[‘shaded’, ‘ghosted’, ‘wireframe’, ‘lighted’], optional</span></dt><dd><p>The display mode of the OpenGL view. It will override the value in the config file.</p>
 </dd>
 <dt><strong>viewmode</strong><span class="classifier">Literal[‘front’, ‘right’, ‘top’, ‘perspective’], optional</span></dt><dd><p>The view mode of the OpenGL view. It will override the value in the config file.
-In <cite>ghosted</cite> mode, all objects have a default opacity of 0.7.</p>
+In ‘ghosted’ mode, all objects have a default opacity of 0.7.</p>
 </dd>
 <dt><strong>show_grid</strong><span class="classifier">bool, optional</span></dt><dd><p>Show the XY plane. It will override the value in the config file.</p>
 </dd>
@@ -618,6 +618,12 @@ In <cite>ghosted</cite> mode, all objects have a default opacity of 0.7.</p>
 </dl>
 </dd>
 </dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.scene.Scene.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.scene.Scene</span></code></a></dt><dd></dd>
+</dl>
+</div>
 <p class="rubric">Notes</p>
 <p>The viewer has a (main) window with a central OpenGL widget,
 and a menubar, toolbar, and statusbar.
@@ -634,7 +640,11 @@ Currently the viewer uses OpenGL 2.2 and GLSL 120 with a ‘compatibility’ pro
 <dl class="field-list">
 <dt class="field-odd">Attributes<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>config</strong><span class="classifier"><a class="reference internal" href="compas_viewer.configurations.ViewerConfig.html#compas_viewer.configurations.ViewerConfig" title="compas_viewer.configurations.ViewerConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas_viewer.configurations.ViewerConfig</span></code></a></span></dt><dd><p>The configuration for the viewer.</p>
+<dt><strong>render</strong><span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas_viewer.components.render.Render</span></code></span></dt><dd><p>The render component of the viewer.</p>
+</dd>
+<dt><strong>controller</strong><span class="classifier"><a class="reference internal" href="compas_viewer.controller.Controller.html#compas_viewer.controller.Controller" title="compas_viewer.controller.Controller"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas_viewer.controller.Controller</span></code></a></span></dt><dd><p>The controller component of the viewer.</p>
+</dd>
+<dt><strong>layout</strong><span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas_viewer.layout.Layout</span></code></span></dt><dd><p>The layout component of the viewer.</p>
 </dd>
 </dl>
 </dd>
@@ -642,41 +652,17 @@ Currently the viewer uses OpenGL 2.2 and GLSL 120 with a ‘compatibility’ pro
 <p class="rubric">Methods</p>
 <table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.viewer.Viewer.about.html#compas_viewer.viewer.Viewer.about" title="compas_viewer.viewer.Viewer.about"><code class="xref py py-obj docutils literal notranslate"><span class="pre">about</span></code></a></p></td>
-<td><p>Display the about message as defined in the config file.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.viewer.Viewer.add.html#compas_viewer.viewer.Viewer.add" title="compas_viewer.viewer.Viewer.add"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.viewer.Viewer.add.html#compas_viewer.viewer.Viewer.add" title="compas_viewer.viewer.Viewer.add"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add</span></code></a></p></td>
 <td><p>Add an item to the scene.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.viewer.Viewer.add_action.html#compas_viewer.viewer.Viewer.add_action" title="compas_viewer.viewer.Viewer.add_action"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_action</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.viewer.Viewer.add_action.html#compas_viewer.viewer.Viewer.add_action" title="compas_viewer.viewer.Viewer.add_action"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_action</span></code></a></p></td>
 <td><p>Add a custom action to the viewer.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.viewer.Viewer.confirm.html#compas_viewer.viewer.Viewer.confirm" title="compas_viewer.viewer.Viewer.confirm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">confirm</span></code></a></p></td>
-<td><p>Confirm the execution of an action.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.viewer.Viewer.critical.html#compas_viewer.viewer.Viewer.critical" title="compas_viewer.viewer.Viewer.critical"><code class="xref py py-obj docutils literal notranslate"><span class="pre">critical</span></code></a></p></td>
-<td><p>Display a critical warning.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.viewer.Viewer.fps.html#compas_viewer.viewer.Viewer.fps" title="compas_viewer.viewer.Viewer.fps"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fps</span></code></a></p></td>
-<td><p>Update fps info in the status bar.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.viewer.Viewer.info.html#compas_viewer.viewer.Viewer.info" title="compas_viewer.viewer.Viewer.info"><code class="xref py py-obj docutils literal notranslate"><span class="pre">info</span></code></a></p></td>
-<td><p>Display info.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.viewer.Viewer.on.html#compas_viewer.viewer.Viewer.on" title="compas_viewer.viewer.Viewer.on"><code class="xref py py-obj docutils literal notranslate"><span class="pre">on</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.viewer.Viewer.on.html#compas_viewer.viewer.Viewer.on" title="compas_viewer.viewer.Viewer.on"><code class="xref py py-obj docutils literal notranslate"><span class="pre">on</span></code></a></p></td>
 <td><p>Decorator for callbacks of a dynamic drawing process.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.viewer.Viewer.question.html#compas_viewer.viewer.Viewer.question" title="compas_viewer.viewer.Viewer.question"><code class="xref py py-obj docutils literal notranslate"><span class="pre">question</span></code></a></p></td>
-<td><p>Ask a question.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.viewer.Viewer.show.html#compas_viewer.viewer.Viewer.show" title="compas_viewer.viewer.Viewer.show"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show</span></code></a></p></td>
 <td><p>Show the viewer window.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.viewer.Viewer.status.html#compas_viewer.viewer.Viewer.status" title="compas_viewer.viewer.Viewer.status"><code class="xref py py-obj docutils literal notranslate"><span class="pre">status</span></code></a></p></td>
-<td><p>Display a message in the status bar.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.viewer.Viewer.warning.html#compas_viewer.viewer.Viewer.warning" title="compas_viewer.viewer.Viewer.warning"><code class="xref py py-obj docutils literal notranslate"><span class="pre">warning</span></code></a></p></td>
-<td><p>Display a warning.</p></td>
 </tr>
 </tbody>
 </table>

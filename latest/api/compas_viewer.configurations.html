@@ -496,20 +496,19 @@ document.write(`
 </li>
 <li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">compas_viewer.configurations</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.Config.html">Config</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.ViewerConfig.html">ViewerConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.ViewerConfigType.html">ViewerConfigType</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.ControllerConfig.html">ControllerConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.ControllerConfigType.html">ControllerConfigType</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.ActionConfig.html">ActionConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.ActionConfigType.html">ActionConfigType</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.MouseConfig.html">MouseConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.MouseConfigType.html">MouseConfigType</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.RenderConfig.html">RenderConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.RenderConfigType.html">RenderConfigType</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.CameraConfig.html">CameraConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.CameraConfigType.html">CameraConfigType</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.SelectorConfig.html">SelectorConfig</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.SceneConfig.html">SceneConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.SceneConfigType.html">SceneConfigType</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.ControllerConfig.html">ControllerConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.MouseConfig.html">MouseConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.ActionConfig.html">ActionConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.LayoutConfig.html">LayoutConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.StatusbarConfig.html">StatusbarConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.WindowConfig.html">WindowConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.MenubarConfig.html">MenubarConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.ViewportConfig.html">ViewportConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.configurations.ToolbarConfig.html">ToolbarConfig</a></li>
 </ul>
 </li>
 </ul>
@@ -526,6 +525,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.utilities.update_vertex_buffer.html">update_vertex_buffer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.utilities.update_index_buffer.html">update_index_buffer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.utilities.key_mapper.html">key_mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.utilities.Timer.html">Timer</a></li>
 </ul>
 </li>
 </ul>
@@ -587,54 +587,65 @@ document.write(`
                   
   <section id="compas-viewer-configurations">
 <h1>compas_viewer.configurations</h1>
-<section id="classes">
-<h2>Classes</h2>
+<section id="scene">
+<h2>Scene</h2>
 <table class="autosummary longtable table autosummary">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_viewer.configurations.Config.html" title="compas_viewer.configurations.Config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Config</span></code></a></p></td>
 <td><p>The abstract class for different configurations.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_viewer.configurations.ViewerConfig.html" title="compas_viewer.configurations.ViewerConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ViewerConfig</span></code></a></p></td>
-<td><p>The class representation for the <cite>viewer.json</cite> of the class Viewer.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_viewer.configurations.RenderConfig.html" title="compas_viewer.configurations.RenderConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RenderConfig</span></code></a></p></td>
+<td><p>The class representation for the <cite>renderer.json</cite> of the class Renderer.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_viewer.configurations.ViewerConfigType.html" title="compas_viewer.configurations.ViewerConfigType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ViewerConfigType</span></code></a></p></td>
-<td><p>The type template for the <cite>viewer.json</cite>.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_viewer.configurations.CameraConfig.html" title="compas_viewer.configurations.CameraConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CameraConfig</span></code></a></p></td>
+<td><p>The class representation of a camera class Camera.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_viewer.configurations.ControllerConfig.html" title="compas_viewer.configurations.ControllerConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ControllerConfig</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_viewer.configurations.SelectorConfig.html" title="compas_viewer.configurations.SelectorConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SelectorConfig</span></code></a></p></td>
+<td><p>The class representation of a selector class Selector.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_viewer.configurations.SceneConfig.html" title="compas_viewer.configurations.SceneConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SceneConfig</span></code></a></p></td>
+<td><p>The class representation for the <cite>scene.json</cite> of the class ViewerSceneObject.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="keyboard-and-mouse">
+<h2>Keyboard and Mouse</h2>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_viewer.configurations.ControllerConfig.html" title="compas_viewer.configurations.ControllerConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ControllerConfig</span></code></a></p></td>
 <td><p>The class representation for the <cite>controller.json</cite> of the class Controller.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_viewer.configurations.ControllerConfigType.html" title="compas_viewer.configurations.ControllerConfigType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ControllerConfigType</span></code></a></p></td>
-<td><p>The type template for the <cite>controller.json</cite> which contains mouse-based movement and key-based actions.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_viewer.configurations.ActionConfig.html" title="compas_viewer.configurations.ActionConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ActionConfig</span></code></a></p></td>
-<td><p>The class representation  of the key-based action configuration.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_viewer.configurations.ActionConfigType.html" title="compas_viewer.configurations.ActionConfigType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ActionConfigType</span></code></a></p></td>
-<td><p>The type template for the key-based actions only.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/compas_viewer.configurations.MouseConfig.html" title="compas_viewer.configurations.MouseConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MouseConfig</span></code></a></p></td>
 <td><p>The class representation of the mouse-based movement configuration.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_viewer.configurations.MouseConfigType.html" title="compas_viewer.configurations.MouseConfigType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MouseConfigType</span></code></a></p></td>
-<td><p>The type template for the mouse-based movement only.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_viewer.configurations.ActionConfig.html" title="compas_viewer.configurations.ActionConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ActionConfig</span></code></a></p></td>
+<td><p>The class representation  of the key-based action configuration.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_viewer.configurations.RenderConfig.html" title="compas_viewer.configurations.RenderConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RenderConfig</span></code></a></p></td>
-<td><p>The class representation for the <cite>renderer.json</cite> of the class Renderer.</p></td>
+</tbody>
+</table>
+</section>
+<section id="ui">
+<h2>UI</h2>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_viewer.configurations.LayoutConfig.html" title="compas_viewer.configurations.LayoutConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LayoutConfig</span></code></a></p></td>
+<td><p>The class representation for the <cite>layout.json</cite> of the Layout class.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_viewer.configurations.RenderConfigType.html" title="compas_viewer.configurations.RenderConfigType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RenderConfigType</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_viewer.configurations.StatusbarConfig.html" title="compas_viewer.configurations.StatusbarConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StatusbarConfig</span></code></a></p></td>
+<td><p>The class representation for the status bar configuration of the Layout class.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_viewer.configurations.CameraConfig.html" title="compas_viewer.configurations.CameraConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CameraConfig</span></code></a></p></td>
-<td><p>The class representation of a camera class Camera.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_viewer.configurations.WindowConfig.html" title="compas_viewer.configurations.WindowConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WindowConfig</span></code></a></p></td>
+<td><p>The class representation for the window configuration of the Layout class.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_viewer.configurations.CameraConfigType.html" title="compas_viewer.configurations.CameraConfigType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CameraConfigType</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_viewer.configurations.MenubarConfig.html" title="compas_viewer.configurations.MenubarConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MenubarConfig</span></code></a></p></td>
+<td><p>The class representation for the menu bar configuration of the Layout class.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_viewer.configurations.SceneConfig.html" title="compas_viewer.configurations.SceneConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SceneConfig</span></code></a></p></td>
-<td><p>The class representation for the <cite>scene.json</cite> of the class ViewerSceneObject.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_viewer.configurations.ViewportConfig.html" title="compas_viewer.configurations.ViewportConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ViewportConfig</span></code></a></p></td>
+<td><p>The class representation for the viewport configuration of the Layout class.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_viewer.configurations.SceneConfigType.html" title="compas_viewer.configurations.SceneConfigType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SceneConfigType</span></code></a></p></td>
-<td><p>The type template for the <cite>scene.json</cite>.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_viewer.configurations.ToolbarConfig.html" title="compas_viewer.configurations.ToolbarConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ToolbarConfig</span></code></a></p></td>
+<td><p>The class representation for the toolbar configuration of the Layout class.</p></td>
 </tr>
 </tbody>
 </table>
@@ -662,7 +673,9 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#classes">Classes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#scene">Scene</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#keyboard-and-mouse">Keyboard and Mouse</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ui">UI</a></li>
 </ul>
   </nav></div>
 
