@@ -68,7 +68,8 @@ class ToolbarConfig(Config):
     @classmethod
     def from_json(cls, filepath) -> "ToolbarConfig":
         toolbar_config = super().from_json(filepath)
-        assert isinstance(toolbar_config, ToolbarConfig)
+        if not isinstance(toolbar_config, ToolbarConfig):
+            raise TypeError(f"The {filepath} is not a valid toolbar configuration file.")
         return toolbar_config
 
 
@@ -89,7 +90,8 @@ class ViewportConfig(Config):
     @classmethod
     def from_json(cls, filepath) -> "ViewportConfig":
         viewport_config = super().from_json(filepath)
-        assert isinstance(viewport_config, ViewportConfig)
+        if not isinstance(viewport_config, ViewportConfig):
+            raise TypeError(f"The {filepath} is not a valid viewport configuration file.")
         return viewport_config
 
 
@@ -110,7 +112,8 @@ class MenubarConfig(Config):
     @classmethod
     def from_json(cls, filepath) -> "MenubarConfig":
         menu_config = super().from_json(filepath)
-        assert isinstance(menu_config, MenubarConfig)
+        if not isinstance(menu_config, MenubarConfig):
+            raise TypeError(f"The {filepath} is not a valid menu configuration file.")
         return menu_config
 
 
@@ -133,7 +136,8 @@ class StatusbarConfig(Config):
     @classmethod
     def from_json(cls, filepath) -> "StatusbarConfig":
         statusbar_config = super().from_json(filepath)
-        assert isinstance(statusbar_config, StatusbarConfig)
+        if not isinstance(statusbar_config, StatusbarConfig):
+            raise TypeError(f"The {filepath} is not a valid statusbar configuration file.")
         return statusbar_config
 
 
@@ -159,7 +163,8 @@ class WindowConfig(Config):
     @classmethod
     def from_json(cls, filepath) -> "WindowConfig":
         window_config = super().from_json(filepath)
-        assert isinstance(window_config, WindowConfig)
+        if not isinstance(window_config, WindowConfig):
+            raise TypeError(f"The {filepath} is not a valid window configuration file.")
         return window_config
 
 
@@ -200,11 +205,13 @@ class LayoutConfig(Config):
         Load the default configuration.
         """
         layout_config = LayoutConfig.from_json(Path(DATA, "default_config", "layout.json"))
-        assert isinstance(layout_config, LayoutConfig)
+        if not isinstance(layout_config, LayoutConfig):
+            raise TypeError(f"The default layout.json is not a valid layout configuration file.")
         return layout_config
 
     @classmethod
     def from_json(cls, filepath) -> "LayoutConfig":
         layout_config = super().from_json(filepath)
-        assert isinstance(layout_config, LayoutConfig)
+        if not isinstance(layout_config, LayoutConfig):
+            raise TypeError(f"The {filepath} is not a valid layout configuration file.")
         return layout_config

@@ -37,7 +37,8 @@ class SelectorConfig(Config):
     @classmethod
     def from_json(cls, filepath) -> "SelectorConfig":
         selector_config = super().from_json(filepath)
-        assert isinstance(selector_config, SelectorConfig)
+        if not isinstance(selector_config, SelectorConfig):
+            raise TypeError(f"The {filepath} is not a valid selector configuration file.")
         return selector_config
 
 
@@ -84,7 +85,8 @@ class CameraConfig(Config):
     @classmethod
     def from_json(cls, filepath) -> "CameraConfig":
         camera_config = super().from_json(filepath)
-        assert isinstance(camera_config, CameraConfig)
+        if not isinstance(camera_config, CameraConfig):
+            raise TypeError(f"The {filepath} is not a valid camera configuration file.")
         return camera_config
 
 
@@ -134,11 +136,13 @@ class RenderConfig(Config):
         Load the default configuration.
         """
         render_config = RenderConfig.from_json(Path(DATA, "default_config", "renderer.json"))
-        assert isinstance(render_config, RenderConfig)
+        if not isinstance(render_config, RenderConfig):
+            raise TypeError(f"The {render_config} is not a valid renderer configuration file.")
         return render_config
 
     @classmethod
     def from_json(cls, filepath) -> "RenderConfig":
         render_config = super().from_json(filepath)
-        assert isinstance(render_config, RenderConfig)
+        if not isinstance(render_config, RenderConfig):
+            raise TypeError(f"The {filepath} is not a valid renderer configuration file.")
         return render_config

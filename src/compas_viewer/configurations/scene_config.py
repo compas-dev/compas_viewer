@@ -1,5 +1,4 @@
 from pathlib import Path
-
 from typing import TypedDict
 
 from compas.colors import Color
@@ -71,11 +70,13 @@ class SceneConfig(Config):
         Load the default configuration.
         """
         scene_config = SceneConfig.from_json(Path(DATA, "default_config", "scene.json"))
-        assert isinstance(scene_config, SceneConfig)
+        if not isinstance(scene_config, SceneConfig):
+            raise TypeError(f"The {scene_config} is not a valid scene configuration file.")
         return scene_config
 
     @classmethod
     def from_json(cls, filepath) -> "SceneConfig":
         scene_config = super().from_json(filepath)
-        assert isinstance(scene_config, SceneConfig)
+        if not isinstance(scene_config, SceneConfig):
+            raise TypeError(f"The {filepath} is not a valid scene configuration file.")
         return scene_config
