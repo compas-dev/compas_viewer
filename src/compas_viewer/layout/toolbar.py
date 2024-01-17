@@ -11,7 +11,7 @@ from PySide6.QtWidgets import QHBoxLayout
 from PySide6.QtWidgets import QPushButton
 from PySide6.QtWidgets import QSizePolicy
 from PySide6.QtWidgets import QTabWidget
-from PySide6.QtWidgets import QWidget, QSpacerItem
+from PySide6.QtWidgets import QWidget
 
 from compas_viewer import DATA
 from compas_viewer.actions import Action
