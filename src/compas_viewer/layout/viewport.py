@@ -39,14 +39,14 @@ class ViewportLayout:
         self.viewer = self.layout.viewer
         self.config = layout.config.viewport
 
+        self.viewport_layout = QGridLayout()
+        self.viewport_layout.setContentsMargins(1, 1, 1, 1)
+
     def init(self):
         """
         Set up the viewport layout.
         """
-
         #  Viewport layout: this is usually fixed.
-        self.viewport_layout = QGridLayout()
-        self.viewport_layout.setContentsMargins(1, 1, 1, 1)
         self.layout.window.window_layout.addLayout(self.viewport_layout)
 
         for k, i in self.config.data.items():

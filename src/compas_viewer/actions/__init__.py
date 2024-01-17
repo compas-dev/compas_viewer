@@ -21,7 +21,7 @@ def register(name: str, action_class: Callable):
 
 def register_actions():
     register("zoom_selected", ZoomSelected)
-    register("print_gl_info", GLInfo)
+    register("gl_info", GLInfo)
     register("select_all", SelectAll)
     register("view_right", ViewRight)
     register("view_front", ViewFront)

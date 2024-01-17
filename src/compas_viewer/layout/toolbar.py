@@ -7,9 +7,11 @@ if TYPE_CHECKING:
 
 from PySide6.QtCore import QSize
 from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import QHBoxLayout
+from PySide6.QtWidgets import QPushButton
 from PySide6.QtWidgets import QSizePolicy
 from PySide6.QtWidgets import QTabWidget
-from PySide6.QtWidgets import QWidget
+from PySide6.QtWidgets import QWidget, QSpacerItem
 
 from compas_viewer import DATA
 from compas_viewer.actions import Action
@@ -62,21 +64,32 @@ class ToolbarLayout:
         _size_policy.setHeightForWidth(self.toolbar.sizePolicy().hasHeightForWidth())
 
         self.toolbar.setSizePolicy(_size_policy)
-        self.toolbar.setMaximumSize(QSize(16777215, 50))
+        self.toolbar.setMaximumSize(QSize(16777215, 70))
         _ = QIcon(path.join(DATA, "compas_icon_white.png"))
 
+        _button_size_policy = QSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Maximum)
+
         for k, i in self.config.data.items():
-            parent = QWidget()
+            parent = QHBoxLayout()
+
             assert isinstance(i, dict)
+
             for _k, _i in i.items():
                 action_config = ActionConfig({"key": "no"})  # type: ignore
-                parent.addAction(
-                    _k,
+                button = QPushButton(_k)
+                button.clicked.connect(
                     partial(
                         Action(_i["action"], self.viewer, action_config).pressed_action,
                         **_i.get("kwargs", {}),
-                    ),
+                    )
                 )
-            self.toolbar.addTab(parent, k)
+                button.setSizePolicy(_button_size_policy)
+                parent.addWidget(button)
+
+            parent.addStretch()
+            widget = QWidget()
+
+            widget.setLayout(parent)
+            self.toolbar.addTab(widget, k)
 
         self.layout.window.window_layout.addWidget(self.toolbar)

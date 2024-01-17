@@ -9,7 +9,7 @@
         "deselect": { "mouse": "left", "modifier": "control" },
         "actions": {
             "zoom_selected": { "key": "f" },
-            "print_gl_info": { "key": "i" },
+            "gl_info": { "key": "i" },
             "select_all": { "key": "a", "modifier": "control" },
             "view_top": { "key": "f3" },
             "view_perspective": { "key": "f4" },
