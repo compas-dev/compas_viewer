@@ -48,10 +48,10 @@ class Renderer(QOpenGLWidget):
 
         self._viewmode = self.config.viewmode
         self._rendermode = self.config.rendermode
-        self._opacity = 1.0
+        self._opacity = self.config.ghostopacity if self.rendermode == "ghosted" else 1.0
+
         self._frames = 0
         self._now = time.time()
-        self._shader_model = None
 
         self.shader_model: Shader
         self.shader_tag: Shader
@@ -84,10 +84,10 @@ class Renderer(QOpenGLWidget):
             self._opacity = self.config.ghostopacity
         else:
             self._opacity = 1.0
-        if self._shader_model:
-            self._shader_model.bind()
-            self._shader_model.uniform1f("opacity", self._opacity)
-            self._shader_model.release()
+        if self.shader_model:
+            self.shader_model.bind()
+            self.shader_model.uniform1f("opacity", self._opacity)
+            self.shader_model.release()
             self.update()
 
     @property
@@ -107,7 +107,8 @@ class Renderer(QOpenGLWidget):
         self.config.viewmode = viewmode
         self.shader_model.bind()
         self.shader_model.uniform4x4(
-            "projection", self.camera.projection(self.viewer.config.width, self.viewer.config.height)
+            "projection",
+            self.camera.projection(self.viewer.layout.config.window.width, self.viewer.layout.config.window.height),
         )
         self.shader_model.release()
         self.camera.reset_position()
@@ -186,8 +187,8 @@ class Renderer(QOpenGLWidget):
         ----------
         * https://doc.qt.io/qtforpython-6/PySide6/QtOpenGL/QOpenGLWindow.html#PySide6.QtOpenGL.PySide6.QtOpenGL.QOpenGLWindow.resizeGL # noqa: E501
         """
-        self.viewer.config.width = w
-        self.viewer.config.height = h
+        self.viewer.layout.config.window.width = w
+        self.viewer.layout.config.window.height = h
         GL.glViewport(0, 0, w, h)
         self.resize(w, h)
 
@@ -218,7 +219,7 @@ class Renderer(QOpenGLWidget):
         self._frames += 1
         if time.time() - self._now > 1:
             self._now = time.time()
-            self.viewer.fps(self._frames)
+            # self.viewer.layout.fps(self._frames)
             self._frames = 0
 
     # ==========================================================================
@@ -362,7 +363,9 @@ class Renderer(QOpenGLWidget):
         for obj in self.viewer.objects:
             obj.init()
 
-        projection = self.camera.projection(self.viewer.config.width, self.viewer.config.height)
+        projection = self.camera.projection(
+            self.viewer.layout.config.window.width, self.viewer.layout.config.window.height
+        )
         viewworld = self.camera.viewworld()
         transform = list(identity(4, dtype=float32))
         # create the program
@@ -391,7 +394,9 @@ class Renderer(QOpenGLWidget):
         self.shader_arrow.uniform4x4("viewworld", viewworld)
         self.shader_arrow.uniform4x4("transform", transform)
         self.shader_arrow.uniform1f("opacity", self.opacity)
-        self.shader_arrow.uniform1f("aspect", self.viewer.config.width / self.viewer.config.height)
+        self.shader_arrow.uniform1f(
+            "aspect", self.viewer.layout.config.window.width / self.viewer.layout.config.window.height
+        )
         self.shader_arrow.release()
 
         self.shader_instance = Shader(name="instance")
@@ -419,8 +424,8 @@ class Renderer(QOpenGLWidget):
         h : int, optional
             The height of the renderer, by default None.
         """
-        w = w or self.viewer.config.width
-        h = h or self.viewer.config.height
+        w = w or self.viewer.layout.config.window.width
+        h = h or self.viewer.layout.config.window.height
 
         projection = self.camera.projection(w, h)
         self.shader_model.bind()
@@ -579,8 +584,8 @@ class Renderer(QOpenGLWidget):
                     self.viewer.controller.mouse.last_pos.x(),
                     self.viewer.controller.mouse.last_pos.y(),
                 ),
-                self.viewer.config.width,
-                self.viewer.config.height,
+                self.viewer.layout.config.window.width,
+                self.viewer.layout.config.window.height,
             )
 
     def paint_instance(self):

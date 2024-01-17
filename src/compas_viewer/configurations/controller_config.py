@@ -1,5 +1,4 @@
 from pathlib import Path
-
 from typing import Optional
 from typing import TypedDict
 
@@ -66,8 +65,7 @@ class ActionConfig:
     def __init__(self, config: ActionConfigType):
         self.config = config
         self.key = key_mapper(config["key"], 0)
-        _modifier = config.get("modifier", "no")
-        assert _modifier is not None
+        _modifier: str = config.get("modifier", "no")  # type: ignore
         self.modifier = key_mapper(_modifier, 1)
 
 
@@ -94,8 +92,7 @@ class MouseConfig:
     def __init__(self, config: MouseConfigType):
         self.config = config
         self.mouse = key_mapper(config["mouse"], 2)
-        _modifier = config.get("modifier", "no")
-        assert _modifier is not None
+        _modifier: str = config.get("modifier", "no")  # type: ignore
         self.modifier = key_mapper(_modifier, 1)
 
 
@@ -132,11 +129,13 @@ class ControllerConfig(Config):
     @classmethod
     def from_default(cls) -> "ControllerConfig":
         controller_config = ControllerConfig.from_json(Path(DATA, "default_config", "controller.json"))
-        assert isinstance(controller_config, ControllerConfig)
+        if not isinstance(controller_config, ControllerConfig):
+            raise TypeError(f"The {controller_config} is not a valid controller configuration file.")
         return controller_config
 
     @classmethod
     def from_json(cls, filepath) -> "ControllerConfig":
         controller_config = super().from_json(filepath)
-        assert isinstance(controller_config, ControllerConfig)
+        if not isinstance(controller_config, ControllerConfig):
+            raise TypeError(f"The {filepath} is not a valid controller configuration file.")
         return controller_config

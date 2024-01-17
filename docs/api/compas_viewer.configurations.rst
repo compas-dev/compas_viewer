@@ -4,7 +4,7 @@ compas_viewer.configurations
 
 .. currentmodule:: compas_viewer.configurations
 
-Classes
+Scene
 =======
 
 .. autosummary::
@@ -12,17 +12,33 @@ Classes
     :nosignatures:
 
     Config
-    ViewerConfig
-    ViewerConfigType
-    ControllerConfig
-    ControllerConfigType
-    ActionConfig
-    ActionConfigType
-    MouseConfig
-    MouseConfigType
     RenderConfig
-    RenderConfigType
     CameraConfig
-    CameraConfigType
+    SelectorConfig
     SceneConfig
-    SceneConfigType
+
+Keyboard and Mouse
+==================
+
+.. autosummary::
+    :toctree: generated/
+    :nosignatures:
+
+    ControllerConfig
+    MouseConfig
+    ActionConfig
+
+UI
+==
+
+.. autosummary::
+    :toctree: generated/
+    :nosignatures:
+
+    LayoutConfig
+    StatusbarConfig
+    WindowConfig
+    MenubarConfig
+    ViewportConfig
+    ToolbarConfig
+

@@ -7,6 +7,7 @@ This package provides a viewer for COMPAS.
 
 Viewer
 ------
+The Viewer class is the main entry of COMPAS Viewer`. It organizes the scene and create the GUI application.
 
 .. toctree::
     :maxdepth: 1
@@ -18,6 +19,7 @@ Viewer
 
 Scene and Objects
 -----------------
+Classes for all scene objects.
 
 .. toctree::
     :maxdepth: 1
@@ -30,6 +32,8 @@ Scene and Objects
 
 Controller and Actions
 ----------------------
+The Controller class is the main entry of all the key and mouse events.
+Actions are functions that are called when a certain event happens, such as mouse and keyboard click.
 
 .. toctree::
     :maxdepth: 1
@@ -43,6 +47,7 @@ Controller and Actions
 
 Components and Configurations
 -----------------------------
+Components and the corresponding configurations of them.
 
 .. toctree::
     :maxdepth: 1
@@ -55,6 +60,8 @@ Components and Configurations
 
 Layout and UI
 --------------------
+The layout and UI of the viewer.
+
 .. toctree::
     :maxdepth: 1
     :titlesonly:
@@ -65,6 +72,8 @@ Layout and UI
 
 Utilities
 ---------
+Useful functions and other helper classes.
+
 .. toctree::
     :maxdepth: 1
     :titlesonly:

@@ -1,0 +1,83 @@
+{
+    "dtype": "compas_viewer.configurations/LayoutConfig",
+    "data": {
+        "window": {
+            "dtype": "compas_viewer.configurations/WindowConfig",
+            "data": {
+                "about": "compas_viewer is the standalone viewer for COMPAS.",
+                "title": "COMPAS VIEWER",
+                "width": 1600,
+                "height": 900,
+                "fullscreen": false
+            },
+            "guid": "52a481b3-0a86-45df-92b1-dbd59e9cb7a6"
+        },
+
+        "statusbar": {
+            "dtype": "compas_viewer.configurations/StatusbarConfig",
+            "data": {
+                "text": "compas_viewer",
+                "show_fps": true
+            },
+            "guid": "52a481b3-0a86-45df-92b2-dbd59e9cb7a6"
+        },
+
+        "menubar": {
+            "dtype": "compas_viewer.configurations/MenubarConfig",
+
+            "data": {
+                "File": {
+                    "Import": {
+                        "action": "import_file"
+                    },
+                    "Export": {
+                        "action": "export_file"
+                    }
+                },
+
+                "About": {
+                    "COMPAS Framework": {
+                        "action": "url",
+                        "kwargs": { "url": "https://compas.dev/" }
+                    },
+
+                    "COMPAS Viewer": {
+                        "action": "url",
+                        "kwargs": { "url": "https://compas.dev/compas_viewer/latest/" }
+                    },
+
+                    "COMPAS Core": {
+                        "action": "url",
+                        "kwargs": { "url": "https://compas.dev/compas/latest/" }
+                    }
+                }
+            },
+            "guid": "52a481b2-0a86-46df-92b2-dbd59e9cb7a6"
+        },
+        "viewport": {
+            "dtype": "compas_viewer.configurations/ViewportConfig",
+            "data": {
+                "render_1": {
+                    "category": "render",
+                    "config_path": "render.json"
+                }
+            },
+
+            "guid": "52a481b2-0b86-45df-92b2-dbd59e9cb7a6"
+        },
+        "toolbar": {
+            "dtype": "compas_viewer.configurations/ToolbarConfig",
+            "data": {
+                "basic": {
+                    "view_top": { "action": "view_top", "kwargs": {} }
+                },
+                "view": {
+                    "view_top": { "action": "view_top", "kwargs": {} }
+                }
+            },
+
+            "guid": "42a481b2-0b86-45df-92b2-dbd59e9cb7a6"
+        }
+    },
+    "guid": "52a481b3-0a86-45df-92b0-dbd59e9cb7a6"
+}

@@ -1,5 +1,4 @@
 import sys
-from os import path
 from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Any
@@ -13,55 +12,28 @@ from compas.datastructures import Mesh
 from compas.geometry import Frame
 from compas.geometry import Geometry
 from compas.scene import Scene
-from PySide6 import QtCore
-from PySide6 import QtGui
-from PySide6 import QtWidgets
 from PySide6.QtCore import QCoreApplication
-from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QMainWindow
 
-from compas_viewer import DATA
 from compas_viewer.actions import Action
 from compas_viewer.actions import register
 from compas_viewer.components import Renderer
 from compas_viewer.configurations import ActionConfig
 from compas_viewer.configurations import ActionConfigType
 from compas_viewer.configurations import ControllerConfig
+from compas_viewer.configurations import LayoutConfig
 from compas_viewer.configurations import RenderConfig
 from compas_viewer.configurations import SceneConfig
-from compas_viewer.configurations import ViewerConfig
 from compas_viewer.controller import Controller
+from compas_viewer.layout import Layout
 from compas_viewer.scene import FrameObject
 from compas_viewer.scene import ViewerSceneObject
+from compas_viewer.utilities import Timer
 
 if TYPE_CHECKING:
     from compas.datastructures import Network
-    from compas_occ.brep import BRep
-
-
-class Timer:
-    """A simple timer that calls a function at specified intervals.
-
-    Parameters
-    ----------
-    interval : int
-        Interval between subsequent calls to this function, in milliseconds.
-    callback : Callable
-        The function to call.
-    singleshot : bool, optional
-        If True, the timer is a singleshot timer.
-        Default is False.
-
-    """
-
-    def __init__(self, interval: int, callback: Callable, singleshot: bool = False):
-        self.timer = QtCore.QTimer()
-        self.timer.setInterval(interval)
-        self.timer.timeout.connect(callback)
-        self.timer.setSingleShot(singleshot)
-        self.timer.start()
-
-    def stop(self):
-        self.timer.stop()
+    from compas_occ.brep import OCCBrep
 
 
 class Viewer(Scene):
@@ -82,7 +54,7 @@ class Viewer(Scene):
         The display mode of the OpenGL view. It will override the value in the config file.
     viewmode : Literal['front', 'right', 'top', 'perspective'], optional
         The view mode of the OpenGL view. It will override the value in the config file.
-        In `ghosted` mode, all objects have a default opacity of 0.7.
+        In 'ghosted' mode, all objects have a default opacity of 0.7.
     show_grid : bool, optional
         Show the XY plane. It will override the value in the config file.
     configpath : str, optional
@@ -90,8 +62,12 @@ class Viewer(Scene):
 
     Attributes
     ----------
-    config : :class:`compas_viewer.configurations.ViewerConfig`
-        The configuration for the viewer.
+    render : :class:`compas_viewer.components.render.Render`
+        The render component of the viewer.
+    controller : :class:`compas_viewer.controller.Controller`
+        The controller component of the viewer.
+    layout : :class:`compas_viewer.layout.Layout`
+        The layout component of the viewer.
 
     Notes
     -----
@@ -108,6 +84,10 @@ class Viewer(Scene):
     >>> viewer = Viewer() # doctest: +SKIP
     >>> viewer.show() # doctest: +SKIP
 
+    See Also
+    --------
+    :class:`compas.scene.Scene`
+
     """
 
     def __init__(
@@ -122,36 +102,58 @@ class Viewer(Scene):
         configpath: Optional[str] = None,
     ):
         super(Viewer, self).__init__()
+
         # Custom or default config
         if configpath is None:
-            self.config = ViewerConfig.from_default()
-            self.render_config = RenderConfig.from_default()
+            self.renderer_config = RenderConfig.from_default()
             self.scene_config = SceneConfig.from_default()
             self.controller_config = ControllerConfig.from_default()
+            self.layout_config = LayoutConfig.from_default()
         else:
-            self.config = ViewerConfig.from_json(Path(configpath, "viewer.json"))
-            self.render_config = RenderConfig.from_json(Path(configpath, "renderer.json"))
+            self.renderer_config = RenderConfig.from_json(Path(configpath, "renderer.json"))
             self.scene_config = SceneConfig.from_json(Path(configpath, "scene.json"))
             self.controller_config = ControllerConfig.from_json(Path(configpath, "controller.json"))
+            self.layout_config = LayoutConfig.from_json(Path(configpath, "layout.json"))
+
+        #  In-code config
+        if title is not None:
+            self.layout_config.window.title = title
+        if fullscreen is not None:
+            self.layout_config.window.fullscreen = fullscreen
+        if width is not None:
+            self.layout_config.window.width = width
+        if height is not None:
+            self.layout_config.window.height = height
+        if rendermode is not None:
+            self.renderer_config.rendermode = rendermode
+        if viewmode is not None:
+            self.renderer_config.viewmode = viewmode
+        if show_grid is not None:
+            self.renderer_config.show_grid = show_grid
+
+        #  Application
+        self.app = QCoreApplication.instance() or QApplication(sys.argv)
+        self.window = QMainWindow()
 
         # Controller
         self.controller = Controller(self, self.controller_config)
 
-        #  In-code config
-        if title is not None:
-            self.config.title = title
-        if fullscreen is not None:
-            self.config.fullscreen = fullscreen
-        if width is not None:
-            self.config.width = width
-        if height is not None:
-            self.config.height = height
-        if rendermode is not None:
-            self.render_config.rendermode = rendermode
-        if viewmode is not None:
-            self.render_config.viewmode = viewmode
-        if show_grid is not None:
-            self.render_config.show_grid = show_grid
+        # Render
+        self.grid = FrameObject(
+            Frame.worldXY(),
+            framesize=self.renderer_config.gridsize,
+            show_framez=self.renderer_config.show_gridz,
+            viewer=self,
+            is_selected=False,
+            is_locked=True,
+            is_visible=True,
+            config=self.scene_config,
+        )
+        self.renderer = Renderer(self, self.renderer_config)
+
+        # Layout
+        self.layout = Layout(self, self.layout_config)
+        self.layout.init()
 
         # `on` function
         self.timer: Timer
@@ -163,185 +165,10 @@ class Viewer(Scene):
         #  Primitive
         self.objects: list[ViewerSceneObject]
 
-        self._init()
-
     def __new__(cls, *args, **kwargs):
         instance = super(Viewer, cls).__new__(cls)
         Scene.viewerinstance = instance  # type: ignore
         return instance
-
-    # ==========================================================================
-    # Init functions
-    # ==========================================================================
-
-    def _init(self):
-        """Initialize the components of the user interface."""
-        self._glFormat = QtGui.QSurfaceFormat()
-        self._glFormat.setVersion(2, 1)
-        self._glFormat.setProfile(QtGui.QSurfaceFormat.OpenGLContextProfile.CompatibilityProfile)
-        self._glFormat.setDefaultFormat(self._glFormat)
-        QtGui.QSurfaceFormat.setDefaultFormat(self._glFormat)
-        self._app = QCoreApplication.instance() or QtWidgets.QApplication(sys.argv)
-        self._app.references = set()  # type: ignore
-        self._window = QtWidgets.QMainWindow()
-        self._icon = QIcon(path.join(DATA, "compas_icon_white.png"))
-        self._app.setWindowIcon(self._icon)  # type: ignore
-        self._app.setApplicationName(self.config.title)
-        self.grid = FrameObject(
-            Frame.worldXY(),
-            framesize=self.render_config.gridsize,
-            show_framez=self.render_config.show_gridz,
-            viewer=self,
-            is_selected=False,
-            is_locked=True,
-            is_visible=True,
-            config=self.scene_config,
-        )
-        self.renderer = Renderer(self, self.render_config)
-        self._window.setCentralWidget(self.renderer)
-        self._window.setContentsMargins(0, 0, 0, 0)
-        self._app.references.add(self._window)  # type: ignore
-        self._window.resize(self.config.width, self.config.height)
-        if self.config.fullscreen:
-            self._window.setWindowState(self._window.windowState() | QtCore.Qt.WindowState.WindowMaximized)
-        self._init_statusbar()
-
-    def _init_statusbar(self):
-        self.statusbar = self._window.statusBar()
-        self.statusbar.setContentsMargins(0, 0, 0, 0)
-        self.statusText = QtWidgets.QLabel(self.config.statusbar)
-        self.statusbar.addWidget(self.statusText, 1)
-        if self.config.show_fps:
-            self.statusFps = QtWidgets.QLabel("fps: ")
-            self.statusbar.addWidget
-
-    def _resize(self, width: int, height: int):
-        """Resize the main window programmatically.
-
-        Parameters
-        ----------
-        width: int
-            Width of the viewer window.
-        height: int
-            Height of the viewer window.
-
-        """
-        self._window.resize(width, height)
-        desktop = self._app.desktop()  # type: ignore
-        rect = desktop.availableGeometry()
-        x = int(0.5 * (rect.width() - width))
-        y = int(0.5 * (rect.height() - height))
-        self._window.setGeometry(x, y, width, height)
-        self.config.width = width
-        self.config.height = height
-
-    # ==========================================================================
-    # Messages
-    # ==========================================================================
-
-    def about(self):
-        """Display the about message as defined in the config file."""
-        QtWidgets.QMessageBox.about(self._window, "About", self.config.about)
-
-    def info(self, message: str):
-        """Display info.
-
-        Parameters
-        ----------
-        message : str
-            An info message.
-
-        """
-        QtWidgets.QMessageBox.information(self._window, "Info", message)
-
-    def warning(self, message: str):
-        """Display a warning.
-
-        Parameters
-        ----------
-        message : str
-            A warning message.
-
-        """
-        QtWidgets.QMessageBox.warning(self._window, "Warning", message)
-
-    def critical(self, message: str):
-        """Display a critical warning.
-
-        Parameters
-        ----------
-        message : str
-            A critical warning message.
-
-        """
-        QtWidgets.QMessageBox.critical(self._window, "Critical", message)
-
-    def question(self, message: str) -> bool:
-        """Ask a question.
-
-        Parameters
-        ----------
-        message : str
-            A question.
-
-        """
-        flags = QtWidgets.QMessageBox.StandardButton.Yes
-        flags |= QtWidgets.QMessageBox.StandardButton.No
-        response = QtWidgets.QMessageBox.question(self._window, "Question", message, flags)  # type: ignore
-        if response == QtWidgets.QMessageBox.StandardButton.Yes:
-            return True
-        return False
-
-    def confirm(self, message: str) -> bool:
-        """Confirm the execution of an action.
-
-        Parameters
-        ----------
-        message : str
-            Message to inform the user.
-
-        Returns
-        -------
-        bool
-            True if the user confirms.
-            False otherwise.
-
-        Examples
-        --------
-        .. code-block:: python
-
-            if viewer.confirm("Should i continue?"):
-                continue
-
-        """
-        flags = QtWidgets.QMessageBox.StandardButton.Ok
-        flags |= QtWidgets.QMessageBox.StandardButton.Cancel
-        response = QtWidgets.QMessageBox.warning(self._window, "Confirmation", message, flags)
-        if response == QtWidgets.QMessageBox.StandardButton.Ok:
-            return True
-        return False
-
-    def status(self, message: str):
-        """Display a message in the status bar.
-
-        Parameters
-        ----------
-        message : str
-            A status message.
-
-        """
-        self.statusText.setText(message)
-
-    def fps(self, fps: int):
-        """Update fps info in the status bar.
-
-        Parameters
-        ----------
-        fps : int
-            The number of frames per second.
-
-        """
-        self.statusFps.setText("fps: {}".format(fps))
 
     # ==========================================================================
     # Runtime
@@ -351,9 +178,9 @@ class Viewer(Scene):
         """Show the viewer window."""
 
         self.started = True
-        self._window.show()
+        self.window.show()
         # stop point of the main thread:
-        self._app.exec_()
+        self.app.exec_()
 
     def on(self, interval: int, timeout: Optional[int] = None, frames: Optional[int] = None) -> Callable:
         """Decorator for callbacks of a dynamic drawing process.
@@ -418,7 +245,7 @@ class Viewer(Scene):
 
     def add(
         self,
-        item: Union[Mesh, Geometry, "BRep", "Network"],
+        item: Union[Mesh, Geometry, "OCCBrep", "Network"],
         parent: Optional[ViewerSceneObject] = None,
         is_selected: bool = False,
         is_locked: bool = False,
@@ -521,7 +348,7 @@ class Viewer(Scene):
         assert isinstance(sceneobject, ViewerSceneObject)
         if (
             self.instance_colors.get(sceneobject.instance_color.rgb255)
-            or sceneobject.instance_color.rgb255 == self.render_config.backgroundcolor.rgb255
+            or sceneobject.instance_color.rgb255 == self.renderer_config.backgroundcolor.rgb255
         ):
             raise ValueError(
                 "Program error: Instance color is not unique."
@@ -531,6 +358,10 @@ class Viewer(Scene):
             self.instance_colors[sceneobject.instance_color.rgb255] = sceneobject
 
         return sceneobject
+
+    # ==========================================================================
+    # Action
+    # ==========================================================================
 
     def add_action(
         self,

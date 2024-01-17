@@ -1,4 +1,4 @@
-compas @ git+https://github.com/compas-dev/compas@main
+compas >= 2.0.0b2
 freetype-py
 PyOpenGL
 PyOpenGL_accelerate

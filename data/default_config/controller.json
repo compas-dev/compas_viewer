@@ -15,7 +15,9 @@
             "view_perspective": { "key": "f4" },
             "view_front": { "key": "f5" },
             "view_right": { "key": "f6" },
-            "delete_selected": { "key": "delete" }
+            "delete_selected": { "key": "delete" },
+            "camera_info": { "key": "c" },
+            "selection_info": { "key": "s" }
         }
     },
     "guid": "5088a780-910d-4df3-a1b3-d389e0e9c7f2"

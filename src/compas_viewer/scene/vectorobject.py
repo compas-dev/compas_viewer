@@ -1,6 +1,5 @@
 from typing import Any
 
-
 from compas.geometry import Point
 from compas.geometry import Vector
 from compas.scene import GeometryObject
@@ -44,6 +43,7 @@ class VectorObject(ViewerSceneObject, GeometryObject):
         self._anchor = anchor
         super(VectorObject, self).__init__(geometry=vector, **kwargs)
         self.arrow_buffer: dict[str, Any]
+        self._lines_buffer: dict[str, Any]
 
     def _read_lines_data(self) -> DataType:
         arrow_end = self._anchor + self.geometry * (1 - self.config.vectorsize)
@@ -69,7 +69,7 @@ class VectorObject(ViewerSceneObject, GeometryObject):
 
     def draw(self, shader: "Shader"):
         """Draw the object from its buffers"""
-        assert self._lines_buffer is not None
+
         if self.worldtransformation is not None:
             shader.uniform4x4("transform", self.worldtransformation.matrix)
         shader.enable_attribute("position")

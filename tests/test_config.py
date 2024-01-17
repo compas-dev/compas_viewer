@@ -4,21 +4,8 @@ from compas_viewer.configurations import CameraConfig
 from compas_viewer.configurations import ControllerConfig
 from compas_viewer.configurations import RenderConfig
 from compas_viewer.configurations import SceneConfig
-from compas_viewer.configurations import ViewerConfig
+
 from compas_viewer.configurations.controller_config import MouseConfig
-
-
-def test_viewer_config():
-    config = ViewerConfig.from_default()
-    assert isinstance(config, ViewerConfig)
-    assert isinstance(config.about, str)
-    assert isinstance(config.title, str)
-    assert isinstance(config.width, int)
-    assert isinstance(config.height, int)
-    assert isinstance(config.fullscreen, bool)
-    assert isinstance(config.statusbar, str)
-    assert isinstance(config.show_fps, bool)
-    config.validate_data(config.data)
 
 
 def test_controller_config():
