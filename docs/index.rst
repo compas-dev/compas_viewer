@@ -20,7 +20,7 @@ Standalone viewer for COMPAS 2.0 with features:
 * **Data-driven Visualization**: Visualize your assembly data, mesh data, network data, and more with `compas.datastructures <https://compas.dev/compas/latest/api/compas.datastructures.html>`_ ...
 * **Easy-to-use Interaction**: Action-based interaction with mouse and keyboard, and easy-to-use API for your own interaction ...
 
-COMPAS Viewer is the next generation of `compas_view2 <hhttps://compas.dev/compas_view2>`_ which is based on the 1.0 version of compas.
+COMPAS Viewer is the next generation of `compas_view2 <https://compas.dev/compas_view2>`_ which is based on compas <= 1.17.9.
 
 Table of Contents
 =================
