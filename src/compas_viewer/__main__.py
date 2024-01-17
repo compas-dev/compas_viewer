@@ -4,7 +4,6 @@
 
 import argparse
 from os import listdir
-from os import name
 from os import path
 
 from compas import json_load

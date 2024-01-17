@@ -206,7 +206,7 @@ class LayoutConfig(Config):
         """
         layout_config = LayoutConfig.from_json(Path(DATA, "default_config", "layout.json"))
         if not isinstance(layout_config, LayoutConfig):
-            raise TypeError(f"The default layout.json is not a valid layout configuration file.")
+            raise TypeError(f"The {layout_config} is not a valid layout configuration file.")
         return layout_config
 
     @classmethod
