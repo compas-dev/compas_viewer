@@ -1,16 +1,16 @@
 from typing import TYPE_CHECKING
+from typing import Union
 
-from compas.datastructures import Tree
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QDockWidget
 from PySide6.QtWidgets import QScrollArea
 from PySide6.QtWidgets import QVBoxLayout
 from PySide6.QtWidgets import QWidget
 
-from .elements import Treeform
-
 if TYPE_CHECKING:
     from .layout import Layout
+    from .slider import Slider
+    from .treeform import Treeform
 
 
 class SidedockLayout:
@@ -48,30 +48,6 @@ class SidedockLayout:
         self.config = layout.config.toolbar
         self.sidedock = QDockWidget()
         self.sidedock.setMinimumWidth(200)
-
-    def init(self):
-        from compas.datastructures import Tree
-        from compas.datastructures import TreeNode
-        from compas.geometry import Point
-
-        tree = Tree()
-        root = TreeNode(name="root", data= Point(0,0,0))
-        branch = TreeNode(name="branch")
-        branch2 = TreeNode(name="branch2")
-        leaf1 = TreeNode(name="leaf1")
-        leaf2 = TreeNode(name="leaf2")
-        leaf3 = TreeNode(name="leaf3")
-        leaf4 = TreeNode(name="leaf4")
-        tree.add(root)
-        root.add(branch)
-        branch.add(leaf1)
-        branch.add(leaf2)
-        branch2.add(leaf3)
-        root.add(branch2)
-        branch2.add(leaf4)
-
-        # self.sidedock.setWidget(Treeform(self.viewer.tree))
-        self.sidedock.setWidget(Treeform(tree))
         scroll = QScrollArea()
         self.sidedock.setWidget(scroll)
         content = QWidget()
@@ -80,9 +56,9 @@ class SidedockLayout:
         self.sidedock_layout = QVBoxLayout(content)
         self.sidedock_layout.addStretch()
 
+    def init(self):
         self.sidedock.setLayout(self.sidedock_layout)
-
         self.viewer.window.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.sidedock)
 
-    def update(self):
-        print("update sidedock")
+    def add_element(self, element: Union["Slider", "Treeform"]):
+        self.sidedock_layout.insertWidget(self.sidedock_layout.count() - 1, element, element.stretch)
