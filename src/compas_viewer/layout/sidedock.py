@@ -3,6 +3,9 @@ from typing import TYPE_CHECKING
 from compas.datastructures import Tree
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QDockWidget
+from PySide6.QtWidgets import QScrollArea
+from PySide6.QtWidgets import QVBoxLayout
+from PySide6.QtWidgets import QWidget
 
 from .elements import Treeform
 
@@ -69,4 +72,17 @@ class SidedockLayout:
 
         # self.sidedock.setWidget(Treeform(self.viewer.tree))
         self.sidedock.setWidget(Treeform(tree))
+        scroll = QScrollArea()
+        self.sidedock.setWidget(scroll)
+        content = QWidget()
+        scroll.setWidget(content)
+        scroll.setWidgetResizable(True)
+        self.sidedock_layout = QVBoxLayout(content)
+        self.sidedock_layout.addStretch()
+
+        self.sidedock.setLayout(self.sidedock_layout)
+
         self.viewer.window.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.sidedock)
+
+    def update(self):
+        print("update sidedock")

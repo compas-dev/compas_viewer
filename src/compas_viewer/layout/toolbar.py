@@ -65,7 +65,8 @@ class ToolbarLayout:
 
         self.toolbar.setSizePolicy(_size_policy)
         self.toolbar.setMaximumSize(QSize(16777215, 70))
-        _ = QIcon(path.join(DATA, "compas_icon_white.png"))
+        self.toolbar.setContentsMargins(0, 0, 0, 0)
+        _ = QIcon(path.join(DATA, "icons/compas_icon_white.png"))
 
         _button_size_policy = QSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Maximum)
 
@@ -76,7 +77,11 @@ class ToolbarLayout:
 
             for _k, _i in i.items():
                 action_config = ActionConfig({"key": "no"})  # type: ignore
-                button = QPushButton(_k)
+                _path = path.join(DATA, "icons", f"{_k}.svg")
+                _icon = QIcon(_path) if path.exists(_path) else _
+                button = QPushButton()
+                button.setToolTip(_k)
+                button.setIcon(_icon)
                 button.clicked.connect(
                     partial(
                         Action(_i["action"], self.viewer, action_config).pressed_action,
@@ -90,6 +95,7 @@ class ToolbarLayout:
             widget = QWidget()
 
             widget.setLayout(parent)
+
             self.toolbar.addTab(widget, k)
 
         self.layout.window.window_layout.addWidget(self.toolbar)
