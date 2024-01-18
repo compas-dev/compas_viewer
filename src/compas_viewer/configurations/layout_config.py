@@ -5,7 +5,7 @@ from typing import Literal
 from typing import TypedDict
 
 from compas_viewer import DATA
-from compas_viewer.configurations import Config
+from .config import Config
 
 
 class StatusbarConfigType(TypedDict):

@@ -176,7 +176,6 @@ class Viewer(Scene):
 
     def show(self):
         """Show the viewer window."""
-
         self.started = True
         self.window.show()
         # stop point of the main thread:
@@ -428,3 +427,15 @@ class Viewer(Scene):
         self.controller.actions[name] = action
 
         return action
+
+
+
+# TODO
+    # # ==========================================================================
+    # # Add Treeview
+    # # ==========================================================================
+
+    # def add_tree(self, tree, parent=None, is_selected=False, is_locked=False, is_visible=True):
+
+
+
