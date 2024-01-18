@@ -76,7 +76,7 @@ class ToolbarLayout:
 
             for _k, _i in i.items():
                 action_config = ActionConfig({"key": "no"})  # type: ignore
-                button = QPushButton(_k)
+                button = QPushButton(text=_k)
                 button.clicked.connect(
                     partial(
                         Action(_i["action"], self.viewer, action_config).pressed_action,

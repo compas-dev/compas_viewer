@@ -6,7 +6,7 @@ from PySide6.QtWidgets import QWidget
 from compas_viewer.configurations.layout_config import LayoutConfig
 
 from .menubar import MenubarLayout
-from .sidedocks import SidedockLayout
+from .sidedock import SidedockLayout
 from .statusbar import StatusbarLayout
 from .toolbar import ToolbarLayout
 from .viewport import ViewportLayout

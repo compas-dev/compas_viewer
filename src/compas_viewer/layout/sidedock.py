@@ -2,6 +2,9 @@ from typing import TYPE_CHECKING
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QDockWidget
+from PySide6.QtWidgets import QScrollArea
+from PySide6.QtWidgets import QVBoxLayout
+from PySide6.QtWidgets import QWidget
 
 if TYPE_CHECKING:
     from .layout import Layout
@@ -41,6 +44,19 @@ class SidedockLayout:
         self.config = layout.config.window
         self.config = layout.config.toolbar
         self.sidedock = QDockWidget()
+        self.sidedock.setMinimumWidth(200)
+        scroll = QScrollArea()
+        self.sidedock.setWidget(scroll)
+        content = QWidget()
+        scroll.setWidget(content)
+        scroll.setWidgetResizable(True)
+        self.sidedock_layout = QVBoxLayout(content)
+        self.sidedock_layout.addStretch()
 
     def init(self):
+        self.sidedock.setLayout(self.sidedock_layout)
+
         self.viewer.window.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.sidedock)
+
+    def update(self):
+        print("update sidedock")
