@@ -73,9 +73,9 @@
                     "delete_selected": { "action": "delete_selected", "kwargs": {} },
                     "import_file": { "action": "import_file", "kwargs": {} },
                     "export_file": { "action": "export_file", "kwargs": {} },
-                    "gl_info": { "action": "gl_info", "kwargs": {} },
                     "camera_info": { "action": "camera_info", "kwargs": {} },
-                    "selection_info": { "action": "selection_info", "kwargs": {} }
+                    "selection_info": { "action": "selection_info", "kwargs": {} },
+                    "gl_info": { "action": "gl_info", "kwargs": {} }
                 },
 
                 "view": {

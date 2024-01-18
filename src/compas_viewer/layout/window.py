@@ -68,7 +68,7 @@ class WindowLayout:
         self.about_label = QLabel(self.config.about)
 
         #  Window icon: fixed
-        self.viewer.app.setWindowIcon(QIcon(path.join(DATA, "compas_icon_white.png")))  # type: ignore
+        self.viewer.app.setWindowIcon(QIcon(path.join(DATA, "icons/compas_icon_white.png")))  # type: ignore
 
     # ==========================================================================
     # Messages
