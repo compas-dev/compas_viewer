@@ -20,14 +20,11 @@ def gl_info() -> str:
 
     Examples
     --------
-    >>> from compas_viewer import Viewer
-    >>> from compas_viewer.utilities import gl_info
-    >>> viewer = Viewer()
-    >>> gl_info() #doctest: +SKIP
-    Vendor: ...
-    Renderer: ...
-    OpenGL Version: ...
-    Shader Version: ...
+    .. code-block:: python
+        from compas_viewer import Viewer
+        from compas_viewer.utilities import gl_info
+        viewer = Viewer()
+        gl_info()
     """
     info: str = f"""
         Vendor: {GL.glGetString(GL.GL_VENDOR)}
