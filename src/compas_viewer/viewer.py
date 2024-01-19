@@ -81,6 +81,7 @@ class Viewer(Scene):
     Examples
     --------
     .. code-block:: python
+
         from compas_viewer import Viewer
         viewer = Viewer()
         viewer.show()
@@ -397,6 +398,7 @@ class Viewer(Scene):
         Examples
         --------
         .. code-block:: python
+        
             from compas.geometry import Scale
             from compas.geometry import Transformation
             from compas_viewer import Viewer

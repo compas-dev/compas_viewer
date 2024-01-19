@@ -21,6 +21,7 @@ def gl_info() -> str:
     Examples
     --------
     .. code-block:: python
+
         from compas_viewer import Viewer
         from compas_viewer.utilities import gl_info
         viewer = Viewer()

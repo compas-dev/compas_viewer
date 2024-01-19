@@ -44,6 +44,7 @@ class Treeform(QTreeWidget):
     Examples
     --------
     .. code-block:: python
+
         from compas_viewer import Viewer
 
         viewer = Viewer()
@@ -55,6 +56,7 @@ class Treeform(QTreeWidget):
         viewer.layout.sidedock.add_element(Treeform(viewer._tree, {"Name":".object.name", "Object":".object"}))
 
         viewer.show()
+
     """
 
     def __init__(
