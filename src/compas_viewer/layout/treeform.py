@@ -14,9 +14,9 @@ class Treeform(QTreeWidget):
     tree : :class:`compas.datastructures.Tree`
         The tree to be displayed. An typical example is the scene
         object tree: :attr:`compas_viewer.viewer.Viewer._tree`.
-    columns : dict, optional
+    columns : dict
         A dictionary of column names and their corresponding attributes.
-        Defaults to ``{"Name": ["object", "name"], "Object": ["object"]}``.
+        Example: `` {"Name": "object.name", "Object": "object"}``
     column_editable : list, optional
         A list of booleans indicating whether the corresponding column is editable.
         Defaults to ``[False]``.
@@ -35,7 +35,7 @@ class Treeform(QTreeWidget):
     See Also
     --------
     :class:`compas.datastructures.Tree`
-    :class:`compas.datastructures.TreeNode`
+    :class:`compas.datastructures.tree.TreeNode`
     :class:`compas_viewer.layout.SidedockLayout`
 
     References
@@ -46,7 +46,7 @@ class Treeform(QTreeWidget):
     def __init__(
         self,
         tree: Tree,
-        columns: dict[str, list[str]] = {"Name": ["object", "name"], "Object": ["object"]},
+        columns: dict[str, str],
         column_editable: list[bool] = [False],
         show_headers: bool = True,
         stretch: int = 2,
@@ -69,39 +69,15 @@ class Treeform(QTreeWidget):
     @tree.setter
     def tree(self, tree: Tree):
         for node in tree.traverse("breadthfirst"):
-            strings = [self.column_attributes(node, c) for _, c in self.columns.items()]
             if node.is_root:
                 continue
-            elif node.parent.is_root:  # type: ignore
+
+            strings = [str(eval("node" + c, globals(), {"node": node})) for _, c in self.columns.items()]
+
+            if node.parent.is_root:  # type: ignore
                 node.attributes["widget_item"] = QTreeWidgetItem(self, strings)  # type: ignore
             else:
                 node.attributes["widget_item"] = QTreeWidgetItem(
                     node.parent.attributes["widget_item"], strings  # type: ignore
                 )
         self._tree = tree
-
-    def column_attributes(self, node: TreeNode, list_of_strings: list[str]) -> str:
-        """This function finds the attribute names and serializes it to a string by the
-        given ``columns`` template format.
-
-        Parameters
-        ----------
-        node : :class:`compas.datastructures.TreeNode`
-            The node to be serialized.
-        list_of_strings : list of str
-            The list of strings that describes the attribute path.
-
-        Returns
-        -------
-        str
-            The serialized string.
-        """
-        attr = node
-        for string in list_of_strings:
-            if attr is None:
-                break
-            elif isinstance(string, dict):
-                attr = attr[string]  # type: ignore
-            else:
-                attr = getattr(attr, string, None)
-        return str(attr)
