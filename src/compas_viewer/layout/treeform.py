@@ -1,5 +1,4 @@
 from compas.datastructures import Tree
-from compas.datastructures import TreeNode
 from PySide6.QtWidgets import QTreeWidget
 from PySide6.QtWidgets import QTreeWidgetItem
 
