@@ -5,7 +5,7 @@ from typing import TypedDict
 from PySide6.QtCore import Qt
 
 from compas_viewer import DATA
-from compas_viewer.configurations import Config
+from .config import Config
 from compas_viewer.utilities import key_mapper
 
 

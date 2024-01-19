@@ -4,7 +4,7 @@ from typing import TypedDict
 from compas.colors import Color
 
 from compas_viewer import DATA
-from compas_viewer.configurations import Config
+from .config import Config
 
 
 class SceneConfigType(TypedDict):

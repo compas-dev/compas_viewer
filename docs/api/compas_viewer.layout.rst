@@ -4,8 +4,8 @@ compas_viewer.layout
 
 .. currentmodule:: compas_viewer.layout
 
-Classes
-=======
+Major
+=====
 
 .. autosummary::
     :toctree: generated/
@@ -18,3 +18,12 @@ Classes
     ToolbarLayout
     MenubarLayout
     StatusbarLayout
+
+Elements
+========
+.. autosummary::
+    :toctree: generated/
+    :nosignatures:
+
+    Slider
+    Treeform

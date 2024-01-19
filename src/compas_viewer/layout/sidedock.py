@@ -1,4 +1,5 @@
 from typing import TYPE_CHECKING
+from typing import Union
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QDockWidget
@@ -8,6 +9,8 @@ from PySide6.QtWidgets import QWidget
 
 if TYPE_CHECKING:
     from .layout import Layout
+    from .slider import Slider
+    from .treeform import Treeform
 
 
 class SidedockLayout:
@@ -55,8 +58,7 @@ class SidedockLayout:
 
     def init(self):
         self.sidedock.setLayout(self.sidedock_layout)
-
         self.viewer.window.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.sidedock)
 
-    def update(self):
-        print("update sidedock")
+    def add_element(self, element: Union["Slider", "Treeform"]):
+        self.sidedock_layout.insertWidget(self.sidedock_layout.count() - 1, element, element.stretch)

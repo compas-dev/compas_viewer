@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
+* Added `Treeform`.
 * Added basic layout elements: `MenubarLayout`, `ToolbarLayout`, `StatusbarLayout`,`SidedockLayout`.
 * Added Actions: delete_selected, camera_info, selection_info.
 * Added basic buildup of `Layout`'s configurations. The .json template and the configuration classes.

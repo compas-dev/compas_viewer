@@ -2,19 +2,19 @@ from typing import Callable
 from typing import Optional
 
 from compas.colors import Color
-from PySide6 import QtWidgets
 from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QGridLayout
+from PySide6.QtWidgets import QHBoxLayout
+from PySide6.QtWidgets import QLabel
+from PySide6.QtWidgets import QSlider
+from PySide6.QtWidgets import QWidget
 
-from .sidedock import SidedockLayout
 
-
-class Slider:
+class Slider(QWidget):
     """Class representing a horizontal slider wrapped in a grid layout with two rows.
 
     Parameters
     ----------
-    sidedock : :class:compas_viewer.layout.SidedockLayout`
-        The sidedock layout to which the slider is added.
     action : callable
         The callback connected to the slide action.
     value : int, optional
@@ -38,6 +38,9 @@ class Slider:
         Defaults to 1.
     bgcolor : :class:`compas.colors.Color`, optional
         Background color of the box containing the slider.
+    stretch : int, optional
+        Stretch factor of the slider in the grid layout.
+        Defaults to 0.
 
     Attributes
     ----------
@@ -49,6 +52,14 @@ class Slider:
         The current value of the slider.
     STYLE : str
         Stylesheet for the visual appearance of the groove and handle of the slider.
+
+    See Also
+    --------
+    :class:`compas_viewer.layout.SidedockLayout`
+
+    References
+    ----------
+    :PySide6:`PySide6/QtWidgets/QSlider`
 
     """
 
@@ -70,7 +81,6 @@ class Slider:
 
     def __init__(
         self,
-        sidedock: SidedockLayout,
         action: Callable,
         value: int = 0,
         min_value: int = 0,
@@ -80,37 +90,41 @@ class Slider:
         annotation: Optional[str] = None,
         interval: int = 1,
         bgcolor: Optional[Color] = None,
+        stretch: int = 0,
     ):
         if min_value > max_value or interval > max_value - min_value:
             raise ValueError("Slider parameters are invalid. ")
 
-        self.slider = QtWidgets.QSlider()
+        super().__init__()
+
+        self.slider = QSlider()
         self.value = max(min(value, max_value), min_value)
         self.action = action
+        self.stretch = stretch
 
         # Row containing labels with horizontal box layout.
-        row1 = QtWidgets.QWidget()
+        row1 = QWidget()
         if bgcolor:
             row1.setStyleSheet("background-color: {}".format(bgcolor.hex))
-        row1_layout = QtWidgets.QHBoxLayout()
+        row1_layout = QHBoxLayout()
         row1_layout.setContentsMargins(12, 6, 12, 0)
         row1.setLayout(row1_layout)
         # The title label if provided
         if title:
-            row1_layout.addWidget(QtWidgets.QLabel(title))
+            row1_layout.addWidget(QLabel(title))
 
         # The label containing the current value pushed to the right and potentially with an annotation.
-        value_label = QtWidgets.QLabel(str(self.value))
+        value_label = QLabel(str(self.value))
         row1_layout.addStretch(1)
         row1_layout.addWidget(value_label)
         if annotation:
-            row1_layout.addWidget(QtWidgets.QLabel(annotation))
+            row1_layout.addWidget(QLabel(annotation))
 
         # Row containing slider
-        row2 = QtWidgets.QWidget()
+        row2 = QWidget()
         if bgcolor:
             row2.setStyleSheet("background-color: {}".format(bgcolor.hex))
-        row2_layout = QtWidgets.QHBoxLayout()
+        row2_layout = QHBoxLayout()
         row2_layout.setContentsMargins(12, 0, 12, 6)
         row2.setLayout(row2_layout)
 
@@ -125,14 +139,12 @@ class Slider:
         row2_layout.addWidget(self.slider)
 
         # Combine rows in grid
-        grid = QtWidgets.QWidget()
-        grid_layout = QtWidgets.QGridLayout()
+        grid_layout = QGridLayout()
         grid_layout.setSpacing(0)
         grid_layout.addWidget(row1, 0, 0)
         grid_layout.addWidget(row2, 1, 0)
         grid_layout.setContentsMargins(0, 0, 0, 0)
-        grid.setLayout(grid_layout)
-        sidedock.sidedock_layout.insertWidget(sidedock.sidedock_layout.count() - 1, grid)
+        self.setLayout(grid_layout)
 
         # Connect slider to actions
         self.slider.valueChanged.connect(lambda v: value_label.setText(str(v)))

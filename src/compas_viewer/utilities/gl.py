@@ -20,8 +20,12 @@ def gl_info() -> str:
 
     Examples
     --------
-    >>> from compas_viewer.utilities import gl_info
-    >>> print(gl_info()) # doctest: +SKIP
+    .. code-block:: python
+
+        from compas_viewer import Viewer
+        from compas_viewer.utilities import gl_info
+        viewer = Viewer()
+        gl_info()
     """
     info: str = f"""
         Vendor: {GL.glGetString(GL.GL_VENDOR)}
@@ -47,13 +51,6 @@ def make_vertex_buffer(data, dynamic=False):
     -------
     int
         Vertex buffer ID.
-
-    Examples
-    --------
-    >>> from compas.utilities import flatten
-    >>> vertices = [[0, 0, 0], [1, 0, 0], [2, 0, 0], [3, 0, 0]]
-    >>> buffer = make_vertex_buffer(list(flatten(vertices))) # doctest: +SKIP
-
     """
     access = GL.GL_DYNAMIC_DRAW if dynamic else GL.GL_STATIC_DRAW
     n = len(data)
@@ -80,13 +77,6 @@ def make_index_buffer(data, dynamic=False):
     -------
     int
         Element buffer ID.
-
-    Examples
-    --------
-    >>> from compas.utilities import flatten
-    >>> edges = [(0, 1), (1, 2), (2, 3)]
-    >>> buffer = make_index_buffer(list(flatten(edges))) # doctest: +SKIP
-
     """
     access = GL.GL_DYNAMIC_DRAW if dynamic else GL.GL_STATIC_DRAW
     n = len(data)
@@ -108,7 +98,6 @@ def update_vertex_buffer(data, buffer):
         A flat list of floats.
     buffer : int
         The ID of the buffer.
-
     """
     n = len(data)
     size = n * ct.sizeof(ct.c_float)
@@ -127,7 +116,6 @@ def update_index_buffer(data, buffer):
         A flat list of ints.
     buffer : int
         The ID of the buffer.
-
     """
     n = len(data)
     size = n * ct.sizeof(ct.c_uint)
