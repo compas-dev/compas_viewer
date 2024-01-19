@@ -45,6 +45,6 @@ class StatusbarLayout:
 
         if self.config.show_fps:
             # TODO
-            print("Status bar FPS not implemented yet")
+            NotImplementedError("Status bar FPS not implemented yet")
             # self.statusFps = QLabel("fps: ")
             # self.statusbar.addWidget
