@@ -40,6 +40,19 @@ class Treeform(QTreeWidget):
     References
     ----------
     :PySide6:`PySide6/QtWidgets/QTreeWidget`
+
+    Examples
+    --------
+    .. code-block:: python
+        from compas_viewer import Viewer
+
+        for i in range(10):
+            for j in range(10):
+                sp = viewer.add(Sphere(0.1, Frame([i, j, 0], [1, 0, 0], [0, 1, 0])), name=f"Sphere_{i}_{j}")
+
+        viewer.layout.sidedock.add_element(Treeform(viewer._tree, {"Name":".object.name", "Object":".object"}))
+
+        viewer.show()
     """
 
     def __init__(
@@ -71,7 +84,7 @@ class Treeform(QTreeWidget):
             if node.is_root:
                 continue
 
-            strings = [str(eval("node" + c, globals(), {"node": node})) for _, c in self.columns.items()]
+            strings = [eval(f"str(node{c})", globals(), {"node": node}) for _, c in self.columns.items()]
 
             if node.parent.is_root:  # type: ignore
                 node.attributes["widget_item"] = QTreeWidgetItem(self, strings)  # type: ignore
