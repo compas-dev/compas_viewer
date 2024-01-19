@@ -584,7 +584,7 @@ document.write(`
 <h1>gl_info</h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="compas_viewer.utilities.gl_info">
-<span class="sig-name descname"><span class="pre">gl_info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/af0cb25/src/compas_viewer/utilities/gl.py#L6"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<span class="sig-name descname"><span class="pre">gl_info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/3fda8dc/src/compas_viewer/utilities/gl.py#L6"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Return formatted information about the current GL implementation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -600,8 +600,10 @@ implementation.</p>
 The GL error could be diverse depending the driver, OS, and GL versions.
 Please report your error to help us improve the compatibility.</p>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">compas_viewer.utilities</span> <span class="kn">import</span> <span class="n">gl_info</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">gl_info</span><span class="p">())</span> 
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">compas_viewer</span> <span class="kn">import</span> <span class="n">Viewer</span>
+<span class="kn">from</span> <span class="nn">compas_viewer.utilities</span> <span class="kn">import</span> <span class="n">gl_info</span>
+<span class="n">viewer</span> <span class="o">=</span> <span class="n">Viewer</span><span class="p">()</span>
+<span class="n">gl_info</span><span class="p">()</span>
 </pre></div>
 </div>
 </dd></dl>
