@@ -46,6 +46,8 @@ class Treeform(QTreeWidget):
     .. code-block:: python
         from compas_viewer import Viewer
 
+        viewer = Viewer()
+
         for i in range(10):
             for j in range(10):
                 sp = viewer.add(Sphere(0.1, Frame([i, j, 0], [1, 0, 0], [0, 1, 0])), name=f"Sphere_{i}_{j}")

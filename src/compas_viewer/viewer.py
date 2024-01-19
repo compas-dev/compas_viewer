@@ -80,9 +80,10 @@ class Viewer(Scene):
 
     Examples
     --------
-    >>> from compas_viewer import Viewer
-    >>> viewer = Viewer()
-    >>> viewer.show()
+    .. code-block:: python
+        from compas_viewer import Viewer
+        viewer = Viewer()
+        viewer.show()
 
     See Also
     --------
