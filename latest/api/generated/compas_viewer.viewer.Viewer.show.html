@@ -142,7 +142,7 @@
     <div class="me-auto navbar-header-items__center">
       
         <div class="navbar-item"><nav class="navbar-nav">
-  <p class="sidebar-header-items__title"
+  <!-- <p class="sidebar-header-items__title"
      role="heading"
      aria-level="1"
      aria-label="Site Navigation">
@@ -150,6 +150,13 @@
   </p>
   <ul class="bd-navbar-elements navbar-nav">
     
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../index.html">
+                        Introduction
+                      </a>
+                    </li>
+                
+
                     <li class="nav-item">
                       <a class="nav-link nav-internal" href="../../installation.html">
                         Installation
@@ -177,6 +184,25 @@
                       </a>
                     </li>
                 
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../license.html">
+                        License
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../acknowledgements.html">
+                        Acknowledgements
+                      </a>
+                    </li>
+                
 
                 <li class="nav-item">
                   <a class="nav-link nav-external" href="https://compas.dev">
@@ -184,7 +210,10 @@
                   </a>
                 </li>
                 
-  </ul>
+                </div>
+            </div>
+            
+  </ul> -->
 </nav></div>
       
     </div>
@@ -308,7 +337,7 @@ document.write(`
       <div class="sidebar-header-items__center">
         
           <div class="navbar-item"><nav class="navbar-nav">
-  <p class="sidebar-header-items__title"
+  <!-- <p class="sidebar-header-items__title"
      role="heading"
      aria-level="1"
      aria-label="Site Navigation">
@@ -316,6 +345,13 @@ document.write(`
   </p>
   <ul class="bd-navbar-elements navbar-nav">
     
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../index.html">
+                        Introduction
+                      </a>
+                    </li>
+                
+
                     <li class="nav-item">
                       <a class="nav-link nav-internal" href="../../installation.html">
                         Installation
@@ -343,6 +379,25 @@ document.write(`
                       </a>
                     </li>
                 
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../license.html">
+                        License
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../acknowledgements.html">
+                        Acknowledgements
+                      </a>
+                    </li>
+                
 
                 <li class="nav-item">
                   <a class="nav-link nav-external" href="https://compas.dev">
@@ -350,7 +405,10 @@ document.write(`
                   </a>
                 </li>
                 
-  </ul>
+                </div>
+            </div>
+            
+  </ul> -->
 </nav></div>
         
       </div>
@@ -430,107 +488,41 @@ document.write(`
   </div>
   
     <div class="sidebar-primary-items__start sidebar-primary__section">
-        <div class="sidebar-primary-item"><nav class="bd-docs-nav bd-links"
-     aria-label="Section Navigation">
-  <!-- <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p> -->
-  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">viewer</span></p>
-<ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="../compas_viewer.viewer.html">compas_viewer.viewer</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
-<li class="toctree-l2 current active"><a class="reference internal" href="compas_viewer.viewer.Viewer.html">Viewer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.viewer.Viewer.add.html">Viewer.add</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.viewer.Viewer.add_action.html">Viewer.add_action</a></li>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/configurations.html">File Structure</a></li>
 </ul>
 </li>
-</ul>
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Scene and Objects</span></p>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1 has-children"><a class="reference internal" href="../compas_viewer.scene.html">compas_viewer.scene</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.scene.ViewerSceneObject.html">ViewerSceneObject</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.scene.MeshObject.html">MeshObject</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.scene.PointObject.html">PointObject</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.scene.LineObject.html">LineObject</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.scene.VectorObject.html">VectorObject</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.scene.Tag.html">Tag</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.scene.TagObject.html">TagObject</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.scene.FrameObject.html">FrameObject</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.scene.CircleObject.html">CircleObject</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.scene.BoxObject.html">BoxObject</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.scene.TorusObject.html">TorusObject</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.scene.PolylineObject.html">PolylineObject</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.scene.PolygonObject.html">PolygonObject</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.scene.SphereObject.html">SphereObject</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.scene.PlaneObject.html">PlaneObject</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.scene.CylinderObject.html">CylinderObject</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.scene.EllipseObject.html">EllipseObject</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.scene.ConeObject.html">ConeObject</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.scene.CapsuleObject.html">CapsuleObject</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.scene.NurbsSurfaceObject.html">NurbsSurfaceObject</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../examples/index.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/basics.html">Basic Examples</a></li>
 </ul>
 </li>
-</ul>
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Controller and Actions</span></p>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1 has-children"><a class="reference internal" href="../compas_viewer.controller.html">compas_viewer.controller</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.controller.Controller.html">Controller</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.controller.Mouse.html">Mouse</a></li>
-</ul>
-</li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../compas_viewer.actions.html">compas_viewer.actions</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.actions.Action.html">Action</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.actions.ZoomSelected.html">ZoomSelected</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.actions.GLInfo.html">GLInfo</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.actions.SelectAll.html">SelectAll</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.actions.ViewRight.html">ViewRight</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.actions.ViewFront.html">ViewFront</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.actions.ViewTop.html">ViewTop</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.actions.ViewPerspective.html">ViewPerspective</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.actions.DeleteSelected.html">DeleteSelected</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../index.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2 current active"><a class="reference internal" href="../compas_viewer.viewer.html">compas_viewer.viewer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../compas_viewer.scene.html">compas_viewer.scene</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../compas_viewer.controller.html">compas_viewer.controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../compas_viewer.actions.html">compas_viewer.actions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../compas_viewer.components.html">compas_viewer.components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../compas_viewer.configurations.html">compas_viewer.configurations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../compas_viewer.layout.html">compas_viewer.layout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../compas_viewer.utilities.html">compas_viewer.utilities</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../acknowledgements.html">Acknowledgements</a></li>
 </ul>
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Components and Configurations</span></p>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1 has-children"><a class="reference internal" href="../compas_viewer.components.html">compas_viewer.components</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../components/renderer.html">compas_viewer.components.renderer</a></li>
-</ul>
-</li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../compas_viewer.configurations.html">compas_viewer.configurations</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.Config.html">Config</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.RenderConfig.html">RenderConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.CameraConfig.html">CameraConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.SelectorConfig.html">SelectorConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.SceneConfig.html">SceneConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.ControllerConfig.html">ControllerConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.MouseConfig.html">MouseConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.ActionConfig.html">ActionConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.LayoutConfig.html">LayoutConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.StatusbarConfig.html">StatusbarConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.WindowConfig.html">WindowConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.MenubarConfig.html">MenubarConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.ViewportConfig.html">ViewportConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.configurations.ToolbarConfig.html">ToolbarConfig</a></li>
-</ul>
-</li>
-</ul>
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Layout and UI</span></p>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../compas_viewer.layout.html">compas_viewer.layout</a></li>
-</ul>
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Utilities</span></p>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1 has-children"><a class="reference internal" href="../compas_viewer.utilities.html">compas_viewer.utilities</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.utilities.gl_info.html">gl_info</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.utilities.make_vertex_buffer.html">make_vertex_buffer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.utilities.make_index_buffer.html">make_index_buffer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.utilities.update_vertex_buffer.html">update_vertex_buffer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.utilities.update_index_buffer.html">update_index_buffer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.utilities.key_mapper.html">key_mapper</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.utilities.Timer.html">Timer</a></li>
-</ul>
-</li>
-</ul>
-</div>
+
+    </div>
 </nav></div>
+        <div class="sidebar-primary-item"><div class="sidebar-primary-item">
+    <a href="https://compas.dev" target="_blank">
+        COMPAS.dev <i class="fa fa-external-link" aria-hidden="true"></i>
+    </a>
+</div></div>
     </div>
   
   
@@ -597,7 +589,7 @@ document.write(`
 <h1>Viewer.show</h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="compas_viewer.viewer.Viewer.show">
-<span class="sig-prename descclassname"><span class="pre">Viewer.</span></span><span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/07b2b94/src/compas_viewer/viewer.py#L177"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<span class="sig-prename descclassname"><span class="pre">Viewer.</span></span><span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/af0cb25/src/compas_viewer/viewer.py#L177"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Show the viewer window.</p>
 </dd></dl>
 
