@@ -41,6 +41,8 @@ class Slider(QWidget):
     stretch : int, optional
         Stretch factor of the slider in the grid layout.
         Defaults to 0.
+    kwargs : dict, optional
+        Additional keyword arguments for the action.
 
     Attributes
     ----------
@@ -91,6 +93,7 @@ class Slider(QWidget):
         interval: int = 1,
         bgcolor: Optional[Color] = None,
         stretch: int = 0,
+        kwargs={},
     ):
         if min_value > max_value or interval > max_value - min_value:
             raise ValueError("Slider parameters are invalid. ")
@@ -98,9 +101,10 @@ class Slider(QWidget):
         super().__init__()
 
         self.slider = QSlider()
-        self.value = max(min(value, max_value), min_value)
+        self._value = max(min(value, max_value), min_value)
         self.action = action
         self.stretch = stretch
+        self.kwargs = kwargs
 
         # Row containing labels with horizontal box layout.
         row1 = QWidget()
@@ -114,7 +118,7 @@ class Slider(QWidget):
             row1_layout.addWidget(QLabel(title))
 
         # The label containing the current value pushed to the right and potentially with an annotation.
-        value_label = QLabel(str(self.value))
+        value_label = QLabel(str(self._value))
         row1_layout.addStretch(1)
         row1_layout.addWidget(value_label)
         if annotation:
@@ -130,9 +134,9 @@ class Slider(QWidget):
 
         # Slider
         self.slider.setOrientation(Qt.Orientation.Horizontal)
-        self.slider.setValue(self.value)
         self.slider.setMinimum(min_value)
         self.slider.setMaximum(max_value)
+        self.slider.setValue(self._value)
         self.slider.setTickInterval(interval)
         self.slider.setSingleStep(step)
         self.slider.setStyleSheet(Slider.STYLE)
@@ -150,7 +154,7 @@ class Slider(QWidget):
         self.slider.valueChanged.connect(lambda v: value_label.setText(str(v)))
         self.slider.valueChanged.connect(self)
 
-    def __call__(self, *args, **kwargs):
+    def __call__(self, v):
         """Wrapper for the action associated with the slider.
 
         Returns
@@ -158,7 +162,7 @@ class Slider(QWidget):
         None
 
         """
-        return self.action(*args, **kwargs)
+        return self.action(v, **self.kwargs)
 
     @property
     def value(self):

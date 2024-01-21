@@ -434,3 +434,12 @@ class Viewer(Scene):
         self.controller.actions[name] = action
 
         return action
+
+    def clear(self, guids: Optional[Union[list[str], list[ViewerSceneObject]]] = None):
+        """Clear the scene."""
+        if guids is None:
+            guids = self.objects
+
+        for obj in guids:
+            self.remove(obj)
+            del obj
