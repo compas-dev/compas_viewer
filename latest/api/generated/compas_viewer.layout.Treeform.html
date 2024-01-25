@@ -59,7 +59,7 @@
         </script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Treeform.acceptDrops" href="compas_viewer.layout.Treeform.acceptDrops.html" />
+    <link rel="next" title="Treeform.update" href="compas_viewer.layout.Treeform.update.html" />
     <link rel="prev" title="Slider.y" href="compas_viewer.layout.Slider.y.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -584,7 +584,7 @@ document.write(`
 <h1>Treeform</h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="compas_viewer.layout.Treeform">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Treeform</span></span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/066f087/src/compas_viewer/layout/treeform.py#L6"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Treeform</span></span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/5b257fe/src/compas_viewer/layout/treeform.py#L6"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QTreeWidget</span></code></p>
 <p>Class for displaying tree-like data.
 Treeform is an abstract class that could be placed in either the viewport or the sidedock.</p>
@@ -641,6 +641,14 @@ Defaults to <code class="docutils literal notranslate"><span class="pre">2</span
 </dl>
 </dd>
 </dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.update.html#compas_viewer.layout.Treeform.update" title="compas_viewer.layout.Treeform.update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
 <p class="rubric">Inherited Methods</p>
 <table class="autosummary longtable table autosummary">
 <tbody>
@@ -2186,127 +2194,124 @@ Defaults to <code class="docutils literal notranslate"><span class="pre">2</span
 <tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.unsetLocale.html#compas_viewer.layout.Treeform.unsetLocale" title="compas_viewer.layout.Treeform.unsetLocale"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unsetLocale</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.update.html#compas_viewer.layout.Treeform.update" title="compas_viewer.layout.Treeform.update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.updateEditorData.html#compas_viewer.layout.Treeform.updateEditorData" title="compas_viewer.layout.Treeform.updateEditorData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">updateEditorData</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.updateEditorData.html#compas_viewer.layout.Treeform.updateEditorData" title="compas_viewer.layout.Treeform.updateEditorData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">updateEditorData</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.updateEditorGeometries.html#compas_viewer.layout.Treeform.updateEditorGeometries" title="compas_viewer.layout.Treeform.updateEditorGeometries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">updateEditorGeometries</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.updateEditorGeometries.html#compas_viewer.layout.Treeform.updateEditorGeometries" title="compas_viewer.layout.Treeform.updateEditorGeometries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">updateEditorGeometries</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.updateGeometries.html#compas_viewer.layout.Treeform.updateGeometries" title="compas_viewer.layout.Treeform.updateGeometries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">updateGeometries</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.updateGeometries.html#compas_viewer.layout.Treeform.updateGeometries" title="compas_viewer.layout.Treeform.updateGeometries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">updateGeometries</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.updateGeometry.html#compas_viewer.layout.Treeform.updateGeometry" title="compas_viewer.layout.Treeform.updateGeometry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">updateGeometry</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.updateGeometry.html#compas_viewer.layout.Treeform.updateGeometry" title="compas_viewer.layout.Treeform.updateGeometry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">updateGeometry</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.updateMicroFocus.html#compas_viewer.layout.Treeform.updateMicroFocus" title="compas_viewer.layout.Treeform.updateMicroFocus"><code class="xref py py-obj docutils literal notranslate"><span class="pre">updateMicroFocus</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.updateMicroFocus.html#compas_viewer.layout.Treeform.updateMicroFocus" title="compas_viewer.layout.Treeform.updateMicroFocus"><code class="xref py py-obj docutils literal notranslate"><span class="pre">updateMicroFocus</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.updatesEnabled.html#compas_viewer.layout.Treeform.updatesEnabled" title="compas_viewer.layout.Treeform.updatesEnabled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">updatesEnabled</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.updatesEnabled.html#compas_viewer.layout.Treeform.updatesEnabled" title="compas_viewer.layout.Treeform.updatesEnabled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">updatesEnabled</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.verticalOffset.html#compas_viewer.layout.Treeform.verticalOffset" title="compas_viewer.layout.Treeform.verticalOffset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">verticalOffset</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.verticalOffset.html#compas_viewer.layout.Treeform.verticalOffset" title="compas_viewer.layout.Treeform.verticalOffset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">verticalOffset</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.verticalScrollBar.html#compas_viewer.layout.Treeform.verticalScrollBar" title="compas_viewer.layout.Treeform.verticalScrollBar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">verticalScrollBar</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.verticalScrollBar.html#compas_viewer.layout.Treeform.verticalScrollBar" title="compas_viewer.layout.Treeform.verticalScrollBar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">verticalScrollBar</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.verticalScrollBarPolicy.html#compas_viewer.layout.Treeform.verticalScrollBarPolicy" title="compas_viewer.layout.Treeform.verticalScrollBarPolicy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">verticalScrollBarPolicy</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.verticalScrollBarPolicy.html#compas_viewer.layout.Treeform.verticalScrollBarPolicy" title="compas_viewer.layout.Treeform.verticalScrollBarPolicy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">verticalScrollBarPolicy</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.verticalScrollMode.html#compas_viewer.layout.Treeform.verticalScrollMode" title="compas_viewer.layout.Treeform.verticalScrollMode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">verticalScrollMode</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.verticalScrollMode.html#compas_viewer.layout.Treeform.verticalScrollMode" title="compas_viewer.layout.Treeform.verticalScrollMode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">verticalScrollMode</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.verticalScrollbarAction.html#compas_viewer.layout.Treeform.verticalScrollbarAction" title="compas_viewer.layout.Treeform.verticalScrollbarAction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">verticalScrollbarAction</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.verticalScrollbarAction.html#compas_viewer.layout.Treeform.verticalScrollbarAction" title="compas_viewer.layout.Treeform.verticalScrollbarAction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">verticalScrollbarAction</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.verticalScrollbarValueChanged.html#compas_viewer.layout.Treeform.verticalScrollbarValueChanged" title="compas_viewer.layout.Treeform.verticalScrollbarValueChanged"><code class="xref py py-obj docutils literal notranslate"><span class="pre">verticalScrollbarValueChanged</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.verticalScrollbarValueChanged.html#compas_viewer.layout.Treeform.verticalScrollbarValueChanged" title="compas_viewer.layout.Treeform.verticalScrollbarValueChanged"><code class="xref py py-obj docutils literal notranslate"><span class="pre">verticalScrollbarValueChanged</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.viewport.html#compas_viewer.layout.Treeform.viewport" title="compas_viewer.layout.Treeform.viewport"><code class="xref py py-obj docutils literal notranslate"><span class="pre">viewport</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.viewport.html#compas_viewer.layout.Treeform.viewport" title="compas_viewer.layout.Treeform.viewport"><code class="xref py py-obj docutils literal notranslate"><span class="pre">viewport</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.viewportEvent.html#compas_viewer.layout.Treeform.viewportEvent" title="compas_viewer.layout.Treeform.viewportEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">viewportEvent</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.viewportEvent.html#compas_viewer.layout.Treeform.viewportEvent" title="compas_viewer.layout.Treeform.viewportEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">viewportEvent</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.viewportMargins.html#compas_viewer.layout.Treeform.viewportMargins" title="compas_viewer.layout.Treeform.viewportMargins"><code class="xref py py-obj docutils literal notranslate"><span class="pre">viewportMargins</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.viewportMargins.html#compas_viewer.layout.Treeform.viewportMargins" title="compas_viewer.layout.Treeform.viewportMargins"><code class="xref py py-obj docutils literal notranslate"><span class="pre">viewportMargins</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.viewportSizeHint.html#compas_viewer.layout.Treeform.viewportSizeHint" title="compas_viewer.layout.Treeform.viewportSizeHint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">viewportSizeHint</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.viewportSizeHint.html#compas_viewer.layout.Treeform.viewportSizeHint" title="compas_viewer.layout.Treeform.viewportSizeHint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">viewportSizeHint</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.visibleRegion.html#compas_viewer.layout.Treeform.visibleRegion" title="compas_viewer.layout.Treeform.visibleRegion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">visibleRegion</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.visibleRegion.html#compas_viewer.layout.Treeform.visibleRegion" title="compas_viewer.layout.Treeform.visibleRegion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">visibleRegion</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.visualItemRect.html#compas_viewer.layout.Treeform.visualItemRect" title="compas_viewer.layout.Treeform.visualItemRect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">visualItemRect</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.visualItemRect.html#compas_viewer.layout.Treeform.visualItemRect" title="compas_viewer.layout.Treeform.visualItemRect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">visualItemRect</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.visualRect.html#compas_viewer.layout.Treeform.visualRect" title="compas_viewer.layout.Treeform.visualRect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">visualRect</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.visualRect.html#compas_viewer.layout.Treeform.visualRect" title="compas_viewer.layout.Treeform.visualRect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">visualRect</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.visualRegionForSelection.html#compas_viewer.layout.Treeform.visualRegionForSelection" title="compas_viewer.layout.Treeform.visualRegionForSelection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">visualRegionForSelection</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.visualRegionForSelection.html#compas_viewer.layout.Treeform.visualRegionForSelection" title="compas_viewer.layout.Treeform.visualRegionForSelection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">visualRegionForSelection</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.whatsThis.html#compas_viewer.layout.Treeform.whatsThis" title="compas_viewer.layout.Treeform.whatsThis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">whatsThis</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.whatsThis.html#compas_viewer.layout.Treeform.whatsThis" title="compas_viewer.layout.Treeform.whatsThis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">whatsThis</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.wheelEvent.html#compas_viewer.layout.Treeform.wheelEvent" title="compas_viewer.layout.Treeform.wheelEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wheelEvent</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.wheelEvent.html#compas_viewer.layout.Treeform.wheelEvent" title="compas_viewer.layout.Treeform.wheelEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wheelEvent</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.width.html#compas_viewer.layout.Treeform.width" title="compas_viewer.layout.Treeform.width"><code class="xref py py-obj docutils literal notranslate"><span class="pre">width</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.width.html#compas_viewer.layout.Treeform.width" title="compas_viewer.layout.Treeform.width"><code class="xref py py-obj docutils literal notranslate"><span class="pre">width</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.widthMM.html#compas_viewer.layout.Treeform.widthMM" title="compas_viewer.layout.Treeform.widthMM"><code class="xref py py-obj docutils literal notranslate"><span class="pre">widthMM</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.widthMM.html#compas_viewer.layout.Treeform.widthMM" title="compas_viewer.layout.Treeform.widthMM"><code class="xref py py-obj docutils literal notranslate"><span class="pre">widthMM</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.winId.html#compas_viewer.layout.Treeform.winId" title="compas_viewer.layout.Treeform.winId"><code class="xref py py-obj docutils literal notranslate"><span class="pre">winId</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.winId.html#compas_viewer.layout.Treeform.winId" title="compas_viewer.layout.Treeform.winId"><code class="xref py py-obj docutils literal notranslate"><span class="pre">winId</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.window.html#compas_viewer.layout.Treeform.window" title="compas_viewer.layout.Treeform.window"><code class="xref py py-obj docutils literal notranslate"><span class="pre">window</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.window.html#compas_viewer.layout.Treeform.window" title="compas_viewer.layout.Treeform.window"><code class="xref py py-obj docutils literal notranslate"><span class="pre">window</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.windowFilePath.html#compas_viewer.layout.Treeform.windowFilePath" title="compas_viewer.layout.Treeform.windowFilePath"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowFilePath</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.windowFilePath.html#compas_viewer.layout.Treeform.windowFilePath" title="compas_viewer.layout.Treeform.windowFilePath"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowFilePath</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.windowFlags.html#compas_viewer.layout.Treeform.windowFlags" title="compas_viewer.layout.Treeform.windowFlags"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowFlags</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.windowFlags.html#compas_viewer.layout.Treeform.windowFlags" title="compas_viewer.layout.Treeform.windowFlags"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowFlags</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.windowHandle.html#compas_viewer.layout.Treeform.windowHandle" title="compas_viewer.layout.Treeform.windowHandle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowHandle</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.windowHandle.html#compas_viewer.layout.Treeform.windowHandle" title="compas_viewer.layout.Treeform.windowHandle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowHandle</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.windowIcon.html#compas_viewer.layout.Treeform.windowIcon" title="compas_viewer.layout.Treeform.windowIcon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowIcon</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.windowIcon.html#compas_viewer.layout.Treeform.windowIcon" title="compas_viewer.layout.Treeform.windowIcon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowIcon</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.windowIconText.html#compas_viewer.layout.Treeform.windowIconText" title="compas_viewer.layout.Treeform.windowIconText"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowIconText</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.windowIconText.html#compas_viewer.layout.Treeform.windowIconText" title="compas_viewer.layout.Treeform.windowIconText"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowIconText</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.windowModality.html#compas_viewer.layout.Treeform.windowModality" title="compas_viewer.layout.Treeform.windowModality"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowModality</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.windowModality.html#compas_viewer.layout.Treeform.windowModality" title="compas_viewer.layout.Treeform.windowModality"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowModality</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.windowOpacity.html#compas_viewer.layout.Treeform.windowOpacity" title="compas_viewer.layout.Treeform.windowOpacity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowOpacity</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.windowOpacity.html#compas_viewer.layout.Treeform.windowOpacity" title="compas_viewer.layout.Treeform.windowOpacity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowOpacity</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.windowRole.html#compas_viewer.layout.Treeform.windowRole" title="compas_viewer.layout.Treeform.windowRole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowRole</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.windowRole.html#compas_viewer.layout.Treeform.windowRole" title="compas_viewer.layout.Treeform.windowRole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowRole</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.windowState.html#compas_viewer.layout.Treeform.windowState" title="compas_viewer.layout.Treeform.windowState"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowState</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.windowState.html#compas_viewer.layout.Treeform.windowState" title="compas_viewer.layout.Treeform.windowState"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowState</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.windowTitle.html#compas_viewer.layout.Treeform.windowTitle" title="compas_viewer.layout.Treeform.windowTitle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowTitle</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.windowTitle.html#compas_viewer.layout.Treeform.windowTitle" title="compas_viewer.layout.Treeform.windowTitle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowTitle</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.windowType.html#compas_viewer.layout.Treeform.windowType" title="compas_viewer.layout.Treeform.windowType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowType</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.windowType.html#compas_viewer.layout.Treeform.windowType" title="compas_viewer.layout.Treeform.windowType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowType</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.wordWrap.html#compas_viewer.layout.Treeform.wordWrap" title="compas_viewer.layout.Treeform.wordWrap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wordWrap</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.wordWrap.html#compas_viewer.layout.Treeform.wordWrap" title="compas_viewer.layout.Treeform.wordWrap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wordWrap</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.x.html#compas_viewer.layout.Treeform.x" title="compas_viewer.layout.Treeform.x"><code class="xref py py-obj docutils literal notranslate"><span class="pre">x</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.x.html#compas_viewer.layout.Treeform.x" title="compas_viewer.layout.Treeform.x"><code class="xref py py-obj docutils literal notranslate"><span class="pre">x</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.y.html#compas_viewer.layout.Treeform.y" title="compas_viewer.layout.Treeform.y"><code class="xref py py-obj docutils literal notranslate"><span class="pre">y</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Treeform.y.html#compas_viewer.layout.Treeform.y" title="compas_viewer.layout.Treeform.y"><code class="xref py py-obj docutils literal notranslate"><span class="pre">y</span></code></a></p></td>
 <td><p></p></td>
 </tr>
 </tbody>
