@@ -55,6 +55,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added `NetworkObject`.
 
 ### Changed
+* Updated the `Slider`.
 * Documentation improved.
 * `Timer` is moved to utilities.
 * Updated `BRepObject` to connect the latest OCC package, close [#48](https://github.com/compas-dev/compas_viewer/issues/48).
