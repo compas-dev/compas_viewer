@@ -9,3 +9,8 @@ Examples
     :caption: Basic Examples
 
     basics
+    object
+    color
+    layout
+    dynamic
+    other

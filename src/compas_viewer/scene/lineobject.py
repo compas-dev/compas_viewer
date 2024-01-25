@@ -28,8 +28,8 @@ class LineObject(ViewerSceneObject, GeometryObject):
     def _read_lines_data(self) -> DataType:
         positions = [self.geometry.start, self.geometry.end]
         colors = [
-            self.pointscolor.get(0, self.pointscolor["_default"]),  # type: ignore
-            self.pointscolor.get(1, self.pointscolor["_default"]),  # type: ignore
+            self.linescolor.get(0, self.linescolor["_default"]),  # type: ignore
+            self.linescolor.get(1, self.linescolor["_default"]),  # type: ignore
         ]
         elements = [[0, 1]]
         return positions, colors, elements
