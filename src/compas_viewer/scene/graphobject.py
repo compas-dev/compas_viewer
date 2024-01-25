@@ -1,30 +1,30 @@
-from compas.datastructures import Network
-from compas.scene import NetworkObject as BaseNetworkObject
+from compas.datastructures import Graph
+from compas.scene import GraphObject as BaseGraphObject
 
 from .sceneobject import DataType
 from .sceneobject import ViewerSceneObject
 
 
-class NetworkObject(ViewerSceneObject, BaseNetworkObject):
-    """Viewer scene object for displaying COMPAS Network data.
+class GraphObject(ViewerSceneObject, BaseGraphObject):
+    """Viewer scene object for displaying COMPAS Graph data.
 
 
     Parameters
     ----------
-    network : :class:`compas.datastructures.Network`
-        The network data structure.
+    graph : :class:`compas.datastructures.Graph`
+        The graph data structure.
     **kwargs : dict, optional
         Additional options for the :class:`compas_viewer.scene.ViewerSceneObject`.
 
     See Also
     --------
-    :class:`compas.datastructures.Network`
+    :class:`compas.datastructures.Graph`
 
     """
 
-    def __init__(self, network: Network, **kwargs):
-        super(NetworkObject, self).__init__(network=network, **kwargs)
-        self.network: Network
+    def __init__(self, graph: Graph, **kwargs):
+        super(GraphObject, self).__init__(graph=graph, **kwargs)
+        self.graph: Graph
 
     def _read_points_data(self) -> DataType:
         positions = []
@@ -32,8 +32,8 @@ class NetworkObject(ViewerSceneObject, BaseNetworkObject):
         elements = []
         i = 0
 
-        for node in self.network.nodes():
-            positions.append(self.network.node_attribute(node, "xyz"))
+        for node in self.graph.nodes():
+            positions.append(self.graph.node_attribute(node, "xyz"))
             colors.append(self.pointscolor.get(node, self.pointscolor["_default"]))  # type: ignore
             elements.append([i])
             i += 1
@@ -45,10 +45,10 @@ class NetworkObject(ViewerSceneObject, BaseNetworkObject):
         elements = []
         i = 0
 
-        for u, v in self.network.edges():
+        for u, v in self.graph.edges():
             color = self.linescolor.get((u, v), self.linescolor["_default"])  # type: ignore
-            positions.append(self.network.node_attribute(u, "xyz"))
-            positions.append(self.network.node_attribute(v, "xyz"))
+            positions.append(self.graph.node_attribute(u, "xyz"))
+            positions.append(self.graph.node_attribute(v, "xyz"))
             colors.append(color)
             colors.append(color)
             elements.append([i + 0, i + 1])
