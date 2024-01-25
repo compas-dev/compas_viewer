@@ -76,7 +76,7 @@ class Treeform(QTreeWidget):
         self.stretch = stretch
 
         self.tree = tree
-        self._tree: Tree
+        self._tree = tree
 
     @property
     def tree(self) -> Tree:
@@ -84,6 +84,7 @@ class Treeform(QTreeWidget):
 
     @tree.setter
     def tree(self, tree: Tree):
+        self.clear()
         for node in tree.traverse("breadthfirst"):
             if node.is_root:
                 continue
@@ -96,4 +97,6 @@ class Treeform(QTreeWidget):
                 node.attributes["widget_item"] = QTreeWidgetItem(
                     node.parent.attributes["widget_item"], strings  # type: ignore
                 )
-        self._tree = tree
+
+    def update(self):
+        self.tree = self._tree

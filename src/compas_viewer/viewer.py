@@ -32,7 +32,7 @@ from compas_viewer.scene import ViewerSceneObject
 from compas_viewer.utilities import Timer
 
 if TYPE_CHECKING:
-    from compas.datastructures import Network
+    from compas.datastructures import Graph
     from compas_occ.brep import OCCBrep
 
 
@@ -246,7 +246,7 @@ class Viewer(Scene):
 
     def add(
         self,
-        item: Union[Mesh, Geometry, "OCCBrep", "Network"],
+        item: Union[Mesh, Geometry, "OCCBrep", "Graph"],
         parent: Optional[ViewerSceneObject] = None,
         is_selected: bool = False,
         is_locked: bool = False,
@@ -434,3 +434,12 @@ class Viewer(Scene):
         self.controller.actions[name] = action
 
         return action
+
+    def clear(self, guids: Optional[Union[list[str], list[ViewerSceneObject]]] = None):
+        """Clear the scene."""
+        if guids is None:
+            guids = self.objects
+
+        for obj in guids:
+            self.remove(obj)
+            del obj

@@ -31,11 +31,11 @@ class SelectionInfo(Action):
     """
 
     def pressed_action(self):
-        info = "Selected objects: /n"
+        info = "Selected objects: \n"
 
         for i, obj in enumerate(self.viewer.objects):
             if obj.is_selected:
-                info += f"Object {i}: {obj} /n"
+                info += f"Object {i}: {obj} \n"
 
         self.viewer.layout.window.info(info)
 
