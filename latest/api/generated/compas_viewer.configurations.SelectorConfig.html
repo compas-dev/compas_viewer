@@ -59,8 +59,8 @@
         </script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="SelectorConfig.from_json" href="compas_viewer.configurations.SelectorConfig.from_json.html" />
-    <link rel="prev" title="CameraConfig.validate_data" href="compas_viewer.configurations.CameraConfig.validate_data.html" />
+    <link rel="next" title="SceneConfig" href="compas_viewer.configurations.SceneConfig.html" />
+    <link rel="prev" title="CameraConfig" href="compas_viewer.configurations.CameraConfig.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -589,14 +589,16 @@ document.write(`
 <h1>SelectorConfig</h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="compas_viewer.configurations.SelectorConfig">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SelectorConfig</span></span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/9a265cd/src/compas_viewer/configurations/render_config.py#L16"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
-<dd><p>Bases: <a class="reference internal" href="compas_viewer.configurations.Config.html#compas_viewer.configurations.Config" title="compas_viewer.configurations.config.Config"><code class="xref py py-class docutils literal notranslate"><span class="pre">Config</span></code></a></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SelectorConfig</span></span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/918810b/src/compas_viewer/configurations/renderer_config.py#L12"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>The class representation of a selector class Selector.
 It contains all the settings about the selector: enable_selector, selectioncolor, …</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>config</strong><span class="classifier">SelectorConfigType</span></dt><dd><p>A TypedDict with defined keys and types.</p>
+<dt><strong>enable_selector</strong><span class="classifier">bool</span></dt><dd><p>Enable the selector.</p>
+</dd>
+<dt><strong>selectioncolor</strong><span class="classifier">Color</span></dt><dd><p>The color of the selected object.</p>
 </dd>
 </dl>
 </dd>
@@ -605,45 +607,9 @@ It contains all the settings about the selector: enable_selector, selectioncolor
 <p class="admonition-title">See also</p>
 <dl class="simple">
 <dt><a class="reference internal" href="../components/generated/compas_viewer.components.renderer.Selector.html" title="compas_viewer.components.renderer.selector.Selector"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas_viewer.components.renderer.selector.Selector</span></code></a></dt><dd></dd>
+<dt><code class="xref py py-class docutils literal notranslate"><span class="pre">compas_viewer.configurations.render_config.RendererConfig</span></code></dt><dd></dd>
 </dl>
 </div>
-<p class="rubric">Methods</p>
-<table class="autosummary longtable table autosummary">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.configurations.SelectorConfig.from_json.html#compas_viewer.configurations.SelectorConfig.from_json" title="compas_viewer.configurations.SelectorConfig.from_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_json</span></code></a></p></td>
-<td><p>Construct an object of this type from a JSON file.</p></td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Inherited Methods</p>
-<table class="autosummary longtable table autosummary">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.configurations.SelectorConfig.ToString.html#compas_viewer.configurations.SelectorConfig.ToString" title="compas_viewer.configurations.SelectorConfig.ToString"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ToString</span></code></a></p></td>
-<td><p>Converts the instance to a string.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.configurations.SelectorConfig.copy.html#compas_viewer.configurations.SelectorConfig.copy" title="compas_viewer.configurations.SelectorConfig.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a></p></td>
-<td><p>Make an independent copy of the data object.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.configurations.SelectorConfig.from_data.html#compas_viewer.configurations.SelectorConfig.from_data" title="compas_viewer.configurations.SelectorConfig.from_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_data</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.configurations.SelectorConfig.from_jsonstring.html#compas_viewer.configurations.SelectorConfig.from_jsonstring" title="compas_viewer.configurations.SelectorConfig.from_jsonstring"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_jsonstring</span></code></a></p></td>
-<td><p>Construct an object of this type from a JSON string.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.configurations.SelectorConfig.sha256.html#compas_viewer.configurations.SelectorConfig.sha256" title="compas_viewer.configurations.SelectorConfig.sha256"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sha256</span></code></a></p></td>
-<td><p>Compute a hash of the data for comparison during version control using the sha256 algorithm.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.configurations.SelectorConfig.to_json.html#compas_viewer.configurations.SelectorConfig.to_json" title="compas_viewer.configurations.SelectorConfig.to_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_json</span></code></a></p></td>
-<td><p>Convert an object to its native data representation and save it to a JSON file.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.configurations.SelectorConfig.to_jsonstring.html#compas_viewer.configurations.SelectorConfig.to_jsonstring" title="compas_viewer.configurations.SelectorConfig.to_jsonstring"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_jsonstring</span></code></a></p></td>
-<td><p>Convert an object to its native data representation and save it to a JSON string.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.configurations.SelectorConfig.validate_data.html#compas_viewer.configurations.SelectorConfig.validate_data" title="compas_viewer.configurations.SelectorConfig.validate_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_data</span></code></a></p></td>
-<td><p>Validate the data against the object's data schema.</p></td>
-</tr>
-</tbody>
-</table>
 </dd></dl>
 
 </section>
