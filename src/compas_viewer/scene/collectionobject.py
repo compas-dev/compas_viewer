@@ -34,4 +34,4 @@ class CollectionObject:
         pass
 
     def init_collection(self):
-        self.items = [self.viewer.add(node.attributes["mesh"], parent=node.parent, **kwargs) for node in self.tree.nodes]  # type: ignore
+        self.items = [self.viewer.add(node.attributes["mesh"],  **kwargs) for node in self.tree.nodes]  # type: ignore

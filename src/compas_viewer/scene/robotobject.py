@@ -70,7 +70,7 @@ try:
                         root.add(node)
                     else:
                         _node = TreeNode()
-                        node.add(_node)
+                        self.tree.add(_node)
                         node = _node
 
             # if geometry_type[2]:
