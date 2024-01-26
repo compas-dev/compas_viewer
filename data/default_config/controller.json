@@ -1,24 +1,23 @@
 {
     "dtype": "compas_viewer.configurations/ControllerConfig",
     "data": {
-        "pan": { "mouse": "right", "modifier": "shift" },
-        "rotate": { "mouse": "right" },
-        "drag_selection": { "mouse": "left" },
-        "drag_deselection": { "mouse": "left", "modifier": "control" },
-        "multiselect": { "mouse": "left", "modifier": "shift" },
-        "deselect": { "mouse": "left", "modifier": "control" },
+        "pan": ["right", "shift"],
+        "rotate": ["right"],
+        "drag_selection": ["left"],
+        "drag_deselection": ["left", "control"],
+        "multiselect": ["left", "shift"],
+        "deselect": ["left", "control"],
         "actions": {
-            "zoom_selected": { "key": "f" },
-            "gl_info": { "key": "i" },
-            "select_all": { "key": "a", "modifier": "control" },
-            "view_top": { "key": "f3" },
-            "view_perspective": { "key": "f4" },
-            "view_front": { "key": "f5" },
-            "view_right": { "key": "f6" },
-            "delete_selected": { "key": "delete" },
-            "camera_info": { "key": "c" },
-            "selection_info": { "key": "s" }
+            "zoom_selected": ["f"],
+            "gl_info": ["i"],
+            "select_all": ["a", "control"],
+            "view_top": ["f3"],
+            "view_perspective": ["f4"],
+            "view_front": ["f5"],
+            "view_right": ["f6"],
+            "delete_selected": ["delete"],
+            "camera_info": ["c"],
+            "selection_info": ["s"]
         }
-    },
-    "guid": "5088a780-910d-4df3-a1b3-d389e0e9c7f2"
+    }
 }

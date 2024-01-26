@@ -38,15 +38,15 @@ class MenubarLayout:
         self._menubar = self.viewer.window.menuBar()
 
     def init(self):
-        for k, i in self.config.data.items():
+        for k, i in self.config.config.items():
             parent = self._menubar.addMenu(k)
             assert isinstance(i, dict)
             for _k, _i in i.items():
-                action_config = ActionConfig({"key": "no"})  # type: ignore
+                action_config = ActionConfig("no")
                 parent.addAction(
                     _k,
                     partial(
                         Action(_i["action"], self.viewer, action_config).pressed_action,
-                        **_i.get("kwargs", {}),
+                        **_i.get("kwargs", {}),  # type: ignore
                     ),
                 )

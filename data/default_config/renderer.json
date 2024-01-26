@@ -4,46 +4,31 @@
         "show_grid": true,
         "gridsize": [10, 10, 10, 10],
         "show_gridz": true,
-        "gridcolor": {
-            "dtype": "compas.colors/Color",
-            "data": { "red": 1, "green": 1, "blue": 1, "alpha": 1.0 },
-            "guid": "1d181918-3d0d-4882-9d17-a3414ed86a83"
-        },
         "viewmode": "perspective",
         "rendermode": "lighted",
         "backgroundcolor": {
             "dtype": "compas.colors/Color",
-            "data": { "red": 1.0, "green": 1.0, "blue": 1.0, "alpha": 1.0 },
-            "guid": "d2ff2a41-471c-4e95-ac06-70bdd636adf5"
+            "data": { "red": 1.0, "green": 1.0, "blue": 1.0, "alpha": 1.0 }
         },
         "ghostopacity": 0.7,
         "camera": {
-            "dtype": "compas_viewer.configurations/CameraConfig",
-            "data": {
-                "fov": 45.0,
-                "near": 0.1,
-                "far": 1000.0,
-                "position": [10.0, 10.0, 10.0],
-                "target": [0.0, 0.0, 0.0],
-                "scale": 1.0,
-                "zoomdelta": 0.05,
-                "rotationdelta": 0.01,
-                "pan_delta": 0.05
-            },
-            "guid": "3c423548-1706-47f3-a576-81df929a5ac9"
+            "fov": 45.0,
+            "near": 0.1,
+            "far": 1000.0,
+            "position": [10.0, 10.0, 10.0],
+            "target": [0.0, 0.0, 0.0],
+            "scale": 1.0,
+            "zoomdelta": 0.05,
+            "rotationdelta": 0.01,
+            "pan_delta": 0.05
         },
+
         "selector": {
-            "dtype": "compas_viewer.configurations/SelectorConfig",
-            "data": {
-                "enable_selector": true,
-                "selectioncolor": {
-                    "dtype": "compas.colors/Color",
-                    "data": { "red": 1.0, "green": 1.0, "blue": 0, "alpha": 1.0 },
-                    "guid": "eba17ebd-9e88-41b0-b3c7-2904e1d04d02"
-                }
-            },
-            "guid": "3c423547-1706-47f3-a576-81df929a5ac9"
+            "enable_selector": true,
+            "selectioncolor": {
+                "dtype": "compas.colors/Color",
+                "data": { "red": 1.0, "green": 1.0, "blue": 0, "alpha": 1.0 }
+            }
         }
-    },
-    "guid": "4ffff417-3578-4260-aef6-45ea7a400ff9"
+    }
 }

@@ -1,31 +1,11 @@
 from pathlib import Path
-from typing import TypedDict
+
 
 from compas.colors import Color
 
 from compas_viewer import DATA
+
 from .config import Config
-
-
-class SceneConfigType(TypedDict):
-    """
-    The type template for the `scene.json`.
-    """
-
-    pointscolor: Color
-    linescolor: Color
-    facescolor: Color
-    show_points: bool
-    show_lines: bool
-    show_faces: bool
-    lineswidth: float
-    pointssize: float
-    opacity: float
-    hide_coplanaredges: bool
-    use_vertexcolors: bool
-    framesize: tuple[float, int, float, int]
-    show_framez: bool
-    vectorsize: float
 
 
 class SceneConfig(Config):
@@ -35,8 +15,34 @@ class SceneConfig(Config):
 
     Parameters
     ----------
-    config : :class:`SceneConfigType`
-        A TypedDict with defined keys and types.
+    pointscolor : :class:`compas.colors.Color`
+        The default color of the points.
+    linescolor : :class:`compas.colors.Color`
+        The default color of the lines.
+    facescolor : :class:`compas.colors.Color`
+        The default color of the faces.
+    show_points : bool
+        The default setting for showing the points.
+    show_lines : bool
+        The default setting for showing the lines.
+    show_faces : bool
+        The default setting for showing the faces.
+    lineswidth : float
+        The default width of the lines.
+    pointssize : float
+        The default size of the points.
+    opacity : float
+        The default opacity of the objects.
+    hide_coplanaredges : bool
+        The default setting for hiding the coplanar edges.
+    use_vertexcolors : bool
+        The default setting for using the vertex colors.
+    framesize : tuple[float, int, float, int]
+        The default size of the frame.
+    show_framez : bool
+        The default setting for showing the z-axis of the frame.
+    vectorsize : float
+        The default size of the vectors.
 
     See Also
     --------
@@ -44,23 +50,39 @@ class SceneConfig(Config):
 
     """
 
-    def __init__(self, config: SceneConfigType):
-        super().__init__(config)
+    def __init__(
+        self,
+        pointscolor: Color,
+        linescolor: Color,
+        facescolor: Color,
+        show_points: bool,
+        show_lines: bool,
+        show_faces: bool,
+        lineswidth: float,
+        pointssize: float,
+        opacity: float,
+        hide_coplanaredges: bool,
+        use_vertexcolors: bool,
+        framesize: tuple[float, int, float, int],
+        show_framez: bool,
+        vectorsize: float,
+    ):
+        super().__init__()
 
-        self.pointscolor = config["pointscolor"]
-        self.linescolor = config["linescolor"]
-        self.facescolor = config["facescolor"]
-        self.show_points = config["show_points"]
-        self.show_lines = config["show_lines"]
-        self.show_faces = config["show_faces"]
-        self.lineswidth = config["lineswidth"]
-        self.pointssize = config["pointssize"]
-        self.opacity = config["opacity"]
-        self.hide_coplanaredges = config["hide_coplanaredges"]
-        self.use_vertexcolors = config["use_vertexcolors"]
-        self.framesize = config["framesize"]
-        self.show_framez = config["show_framez"]
-        self.vectorsize = config["vectorsize"]
+        self.pointscolor = pointscolor
+        self.linescolor = linescolor
+        self.facescolor = facescolor
+        self.show_points = show_points
+        self.show_lines = show_lines
+        self.show_faces = show_faces
+        self.lineswidth = lineswidth
+        self.pointssize = pointssize
+        self.opacity = opacity
+        self.hide_coplanaredges = hide_coplanaredges
+        self.use_vertexcolors = use_vertexcolors
+        self.framesize = framesize
+        self.show_framez = show_framez
+        self.vectorsize = vectorsize
         if self.vectorsize < 0 or self.vectorsize > 1:
             raise ValueError("The vectorsize must be between 0 and 1.")
 

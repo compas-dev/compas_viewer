@@ -9,3 +9,4 @@ class DeleteSelected(Action):
             if obj.is_selected:
                 self.viewer.remove(obj)
                 del obj
+        self.viewer.renderer.update()

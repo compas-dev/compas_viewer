@@ -20,7 +20,6 @@ from compas_viewer.actions import Action
 from compas_viewer.actions import register
 from compas_viewer.components import Renderer
 from compas_viewer.configurations import ActionConfig
-from compas_viewer.configurations import ActionConfigType
 from compas_viewer.configurations import ControllerConfig
 from compas_viewer.configurations import LayoutConfig
 from compas_viewer.configurations import RenderConfig
@@ -417,7 +416,6 @@ class Viewer(Scene):
             name = pressed_action.__name__
         if modifier is None:
             modifier = "no"
-        config = ActionConfigType({"key": key, "modifier": modifier})
 
         class CustomAction(Action):
             def pressed_action(self):
@@ -429,7 +427,7 @@ class Viewer(Scene):
 
         register(name, CustomAction)
 
-        action = CustomAction(name, self, ActionConfig(config))
+        action = CustomAction(name, self, ActionConfig(key, modifier))
 
         self.controller.actions[name] = action
 

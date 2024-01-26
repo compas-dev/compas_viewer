@@ -49,7 +49,7 @@ class ViewportLayout:
         #  Viewport layout: this is usually fixed.
         self.layout.window.window_layout.addLayout(self.viewport_layout)
 
-        for k, i in self.config.data.items():
+        for k, i in self.config.config.items():
             assert isinstance(i, dict)
             if i["category"] == "render":
                 self.viewport_layout.addWidget(self.layout.viewer.renderer, 1, 1)
