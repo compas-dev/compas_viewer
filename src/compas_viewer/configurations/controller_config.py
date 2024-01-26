@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Optional
 from typing import Union
 
 from PySide6.QtCore import Qt
