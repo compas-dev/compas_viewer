@@ -59,7 +59,7 @@
         </script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="API Reference" href="../../api/index.html" />
+    <link rel="next" title="Object Examples" href="../object.html" />
     <link rel="prev" title="Basic Examples" href="../basics.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -499,6 +499,11 @@ document.write(`
 </li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="../index.html">Examples</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l2 current active"><a class="reference internal" href="../basics.html">Basic Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../object.html">Object Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../color.html">Color Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../layout.html">Layout Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dynamic.html">Dynamic Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../other.html">Other Examples</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../api/index.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -586,61 +591,51 @@ document.write(`
 <tbody>
 </tbody>
 </table>
-<section id="launch-the-viewer">
-<h2>Launch the Viewer</h2>
-<p>Lunching the viewer is as simple as importing it and calling the <code class="docutils literal notranslate"><span class="pre">Viewer</span></code> class:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">compas_viewer</span> <span class="kn">import</span> <span class="n">Viewer</span>
-
-<span class="n">viewer</span> <span class="o">=</span> <span class="n">Viewer</span><span class="p">()</span>
-<span class="n">viewer</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-</div>
 <p>You can add window pop-up messages to your viewer using the following methods.</p>
-</section>
-<section id="about-level-message">
-<h2>“About” Level Message</h2>
+<section id="about-message">
+<h2>“About” Message</h2>
 <p>To display “about” message from the configuration file:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">viewer</span><span class="o">.</span><span class="n">about</span><span class="p">()</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">viewer</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">about</span><span class="p">()</span>
 </pre></div>
 </div>
 <img alt="../../_images/about.jpg" src="../../_images/about.jpg" />
 </section>
-<section id="info-level-message">
-<h2>“Info” Level Message</h2>
+<section id="info-message">
+<h2>“Info” Message</h2>
 <p>To display “info” message:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">viewer</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;This is an info message.&quot;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">viewer</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;This is an info message.&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <img alt="../../_images/info.jpg" src="../../_images/info.jpg" />
 </section>
-<section id="warning-level-message">
-<h2>“Warning” Level Message</h2>
+<section id="warning-message">
+<h2>“Warning” Message</h2>
 <p>To display “warning” message:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">viewer</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;This is a warning message.&quot;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">viewer</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;This is a warning message.&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <img alt="../../_images/warning.jpg" src="../../_images/warning.jpg" />
 </section>
-<section id="critical-level-message">
-<h2>“Critical” Level Message</h2>
+<section id="critical-message">
+<h2>“Critical” Message</h2>
 <p>To display “critical” message:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">viewer</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s2">&quot;This is an error message.&quot;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">viewer</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s2">&quot;This is an error message.&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <img alt="../../_images/critical.jpg" src="../../_images/critical.jpg" />
 </section>
-<section id="question-level-message">
-<h2>“Question” Level Message</h2>
+<section id="question-message">
+<h2>“Question” Message</h2>
 <p>To display “question” message:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">viewer</span><span class="o">.</span><span class="n">question</span><span class="p">(</span><span class="s2">&quot;This is a question message.&quot;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">viewer</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">question</span><span class="p">(</span><span class="s2">&quot;This is a question message.&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <img alt="../../_images/question.jpg" src="../../_images/question.jpg" />
 </section>
-<section id="confirm-level-message">
-<h2>“Confirm” Level Message</h2>
+<section id="confirm-message">
+<h2>“Confirm” Message</h2>
 <p>To display “confirm” message:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">viewer</span><span class="o">.</span><span class="n">confirm</span><span class="p">(</span><span class="s2">&quot;This is a confirmation message.&quot;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">viewer</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">confirm</span><span class="p">(</span><span class="s2">&quot;This is a confirmation message.&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <img alt="../../_images/confirm.jpg" src="../../_images/confirm.jpg" />
@@ -668,13 +663,12 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#launch-the-viewer">Launch the Viewer</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#about-level-message">“About” Level Message</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#info-level-message">“Info” Level Message</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#warning-level-message">“Warning” Level Message</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#critical-level-message">“Critical” Level Message</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#question-level-message">“Question” Level Message</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#confirm-level-message">“Confirm” Level Message</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#about-message">“About” Message</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#info-message">“Info” Message</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#warning-message">“Warning” Message</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#critical-message">“Critical” Message</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#question-message">“Question” Message</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#confirm-message">“Confirm” Message</a></li>
 </ul>
   </nav></div>
 
