@@ -12,7 +12,7 @@ You can add window pop-up messages to your viewer using the following methods.
 
 
 
-"About" Level Message
+"About" Message
 =====================
 To display "about" message from the configuration file:
 
@@ -23,7 +23,7 @@ To display "about" message from the configuration file:
 .. image:: ../../_images/about.jpg
 
 
-"Info" Level Message
+"Info" Message
 ====================
 To display "info" message:
 
@@ -33,7 +33,7 @@ To display "info" message:
 
 .. image:: ../../_images/info.jpg
 
-"Warning" Level Message
+"Warning" Message
 =======================
 To display "warning" message:
 
@@ -43,7 +43,7 @@ To display "warning" message:
 
 .. image:: ../../_images/warning.jpg
 
-"Critical" Level Message
+"Critical" Message
 ========================
 To display "critical" message:
 
@@ -53,7 +53,7 @@ To display "critical" message:
 
 .. image:: ../../_images/critical.jpg
 
-"Question" Level Message
+"Question" Message
 ========================
 To display "question" message:
 
@@ -63,7 +63,7 @@ To display "question" message:
 
 .. image:: ../../_images/question.jpg
 
-"Confirm" Level Message
+"Confirm" Message
 =======================
 To display "confirm" message:
 
