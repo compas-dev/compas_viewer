@@ -44,6 +44,7 @@ class ToolbarLayout:
     References
     ----------
     :PySide6:`PySide6/QtWidgets/QTabWidget`
+
     """
 
     def __init__(self, layout: "Layout"):
@@ -57,37 +58,41 @@ class ToolbarLayout:
         Set up the toolbar layout.
         """
 
-        _size_policy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-        _size_policy.setHorizontalStretch(0)
-        _size_policy.setVerticalStretch(0)
-        _size_policy.setHeightForWidth(self.toolbar.sizePolicy().hasHeightForWidth())
+        size_policy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+        size_policy.setHorizontalStretch(0)
+        size_policy.setVerticalStretch(0)
+        size_policy.setHeightForWidth(self.toolbar.sizePolicy().hasHeightForWidth())
 
-        self.toolbar.setSizePolicy(_size_policy)
-        self.toolbar.setMaximumSize(QSize(16777215, 70))
+        self.toolbar.setSizePolicy(size_policy)
+        self.toolbar.setMaximumSize(QSize(16777215, 64))
         self.toolbar.setContentsMargins(0, 0, 0, 0)
-        _ = QIcon(path.join(DATA, "icons/compas_icon_white.png"))
+        defaulticon = QIcon(path.join(DATA, "icons/compas_icon_white.png"))
 
-        _button_size_policy = QSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Maximum)
+        button_size_policy = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
 
         for k, i in self.config.config.items():
             parent = QHBoxLayout()
 
             assert isinstance(i, dict)
 
-            for _k, _i in i.items():
+            for name, item in i.items():
                 action_config = ActionConfig("no")  # type: ignore
-                _path = path.join(DATA, "icons", f"{_k}.svg")
-                _icon = QIcon(_path) if path.exists(_path) else _
+                iconpath = path.join(DATA, "icons", f"{name}.svg")
+                icon = QIcon(iconpath) if path.exists(iconpath) else defaulticon
                 button = QPushButton()
-                button.setToolTip(_k)
-                button.setIcon(_icon)
+                button.setToolTip(name)
+                button.setIcon(icon)
+                button.setMinimumSize(QSize(32, 32))
+                button.setMaximumSize(QSize(32, 32))
+
+                # button.setFlat(True)
                 button.clicked.connect(
                     partial(
-                        Action(_i["action"], self.viewer, action_config).pressed_action,
-                        **_i.get("kwargs", {}),
+                        Action(item["action"], self.viewer, action_config).pressed_action,
+                        **item.get("kwargs", {}),
                     )
                 )
-                button.setSizePolicy(_button_size_policy)
+                button.setSizePolicy(button_size_policy)
                 parent.addWidget(button)
 
             parent.addStretch()
