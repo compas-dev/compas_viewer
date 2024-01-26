@@ -2,258 +2,106 @@ from typing import Optional
 
 from compas.colors import Color
 from compas.datastructures import Mesh
+from compas.datastructures import Tree
+from compas.datastructures import TreeNode
 from compas.geometry import centroid_points
 from compas.geometry import is_coplanar
 from compas.utilities import pairwise
 
+from .collectionobject import CollectionObject
+from .meshobject import MeshObject
 from .sceneobject import DataType
-from .sceneobject import ViewerSceneObject
 
 try:
+    from compas_robots import RobotModel
     from compas_robots.scene import BaseRobotModelObject
 
-    class RobotModelObject(ViewerSceneObject, BaseRobotModelObject):
+    class RobotModelObject(BaseRobotModelObject, CollectionObject):
         """Viewer scene object for displaying COMPAS Robot geometry.
 
         Parameters
         ----------
-        mesh : :class:`compas.datastructures.Mesh`
-            A COMPAS mesh.
-        hide_coplanaredges : bool, optional
-            True to hide the coplanar edges. It will override the value in the config file.
-        use_vertexcolors : bool, optional
-            True to use vertex color. It will override the value in the config file.
+        model : :class:`compas_robots.RobotModel`
+            Robot model.
+        geometry_type : tuple[bool,bool,bool], optional
+            Geometry types to display (draw_visual, draw_collision, draw_attached_meshes). Defaults to (True, False, True).
         **kwargs : dict, optional
-            Additional options for the :class:`compas_viewer.scene.ViewerSceneObject`.
+            Additional keyword arguments.
+            For more info,
+            see :class:`compas_viewer.scene.MeshObject` and :class:`compas_robots.scene.BaseRobotModelObject`.
 
         Attributes
         ----------
         mesh : :class:`compas.datastructures.Mesh`
             The mesh data structure.
-        vertexcolor : :class:`compas.colors.Colordict`
-            Vertex colors.
-        use_vertexcolors : bool
-            True to use vertex color. Defaults to False.
-        hide_coplanaredges : bool
-            True to hide the coplanar edges.
 
         See Also
         --------
+        :class:`compas_robots.scene.BaseRobotModelObject`
         :class:`compas.datastructures.Mesh`
         """
 
         def __init__(
-            self,
-            mesh: Mesh,
-            hide_coplanaredges: Optional[bool] = None,
-            use_vertexcolors: Optional[bool] = None,
-            **kwargs
+            self, item: RobotModel, viewer, geometry_type: tuple[bool, bool, bool] = (True, False, True), **kwargs
         ):
-            super(MeshObject, self).__init__(mesh=mesh, **kwargs)
-            self.mesh: Mesh
-            self.hide_coplanaredges = (
-                hide_coplanaredges if hide_coplanaredges is not None else self.config.hide_coplanaredges
-            )
-            self.use_vertexcolors = use_vertexcolors if use_vertexcolors is not None else self.config.use_vertexcolors
-            self.vertexcolor = {
-                vertex: self.mesh.vertex_attribute(vertex, "color")
-                or self.facescolor.get(vertex, self.facescolor["_default"])  # type: ignore
-                for vertex in self.mesh.vertices()
-            }
+            super(RobotModelObject, self).__init__(model=item, viewer=viewer, **kwargs)
+            self.viewer = viewer
+            self.tree = Tree()
+            root = TreeNode(name="root")
+            self.tree.add(root)
 
-        def _read_points_data(self) -> DataType:
-            positions = []
-            colors = []
-            elements = []
-            i = 0
-
-            for vertex in self.mesh.vertices():
-                assert isinstance(vertex, int)
-                positions.append(self.mesh.vertex_coordinates(vertex))
-                colors.append(self.pointscolor.get(vertex, self.pointscolor["_default"]))  # type: ignore
-                elements.append([i])
-                i += 1
-            return positions, colors, elements
-
-        def _read_lines_data(self) -> DataType:
-            positions = []
-            colors = []
-            elements = []
-            i = 0
-
-            for u, v in self.mesh.edges():
-                color = self.linescolor.get((u, v), self.linescolor["_default"])  # type: ignore
-                if self.hide_coplanaredges:
-                    # hide the edge if neighbor faces are coplanar
-                    fkeys = self.mesh.edge_faces((u, v))
-                    if not self.mesh.is_edge_on_boundary((u, v)):
-                        ps = [
-                            self.mesh.face_center(fkeys[0]),
-                            self.mesh.face_center(fkeys[1]),
-                            *self.mesh.edge_coordinates((u, v)),
-                        ]
-                        if is_coplanar(ps, tol=1e-5):
-                            continue
-                positions.append(self.mesh.vertex_coordinates(u))
-                positions.append(self.mesh.vertex_coordinates(v))
-                colors.append(color)
-                colors.append(color)
-                elements.append([i + 0, i + 1])
-                i += 2
-            return positions, colors, elements
-
-        def _read_frontfaces_data(self) -> DataType:
-            positions = []
-            colors = []
-            elements = []
-            i = 0
-
-            for face in self.mesh.faces():
-                vertices = self.mesh.face_vertices(face)
-                assert isinstance(face, int)
-                color = self.facescolor.get(face, self.facescolor["_default"])  # type: ignore
-                if len(vertices) == 3:
-                    a, b, c = vertices
-                    positions.append(self.mesh.vertex_coordinates(a))
-                    positions.append(self.mesh.vertex_coordinates(b))
-                    positions.append(self.mesh.vertex_coordinates(c))
-                    if self.use_vertexcolors:
-                        colors.append(self.vertexcolor[a])
-                        colors.append(self.vertexcolor[b])
-                        colors.append(self.vertexcolor[c])
+            if geometry_type[0]:
+                for i, mesh in enumerate(self.draw_visual()):
+                    node = TreeNode()
+                    node.attributes["mesh"] = mesh
+                    if i == 0:
+                        root.add(node)
                     else:
-                        colors.append(color)
-                        colors.append(color)
-                        colors.append(color)
-                    elements.append([i + 0, i + 1, i + 2])
-                    i += 3
-                elif len(vertices) == 4:
-                    a, b, c, d = vertices
-                    positions.append(self.mesh.vertex_coordinates(a))
-                    positions.append(self.mesh.vertex_coordinates(b))
-                    positions.append(self.mesh.vertex_coordinates(c))
-                    positions.append(self.mesh.vertex_coordinates(a))
-                    positions.append(self.mesh.vertex_coordinates(c))
-                    positions.append(self.mesh.vertex_coordinates(d))
-                    if self.use_vertexcolors:
-                        colors.append(self.vertexcolor[a])
-                        colors.append(self.vertexcolor[b])
-                        colors.append(self.vertexcolor[c])
-                        colors.append(self.vertexcolor[a])
-                        colors.append(self.vertexcolor[c])
-                        colors.append(self.vertexcolor[d])
-                    else:
-                        colors.append(color)
-                        colors.append(color)
-                        colors.append(color)
-                        colors.append(color)
-                        colors.append(color)
-                        colors.append(color)
-                    elements.append([i + 0, i + 1, i + 2])
-                    elements.append([i + 3, i + 4, i + 5])
-                    i += 6
-                else:
-                    points = [self.mesh.vertex_coordinates(vertex) for vertex in vertices]
-                    c = centroid_points(points)
-                    for a, b in pairwise(points + points[:1]):
-                        positions.append(a)
-                        positions.append(b)
-                        positions.append(c)
-                        if self.use_vertexcolors:
-                            colors.append(self.vertexcolor[vertices[0]])
-                            colors.append(self.vertexcolor[vertices[1]])
-                            colors.append(self.vertexcolor[vertices[2]])
-                        else:
-                            colors.append(color)
-                            colors.append(color)
-                            colors.append(color)
-                        elements.append([i + 0, i + 1, i + 2])
-                        i += 3
+                        _node = TreeNode()
+                        node.add(_node)
+                        node = _node
 
-            return positions, colors, elements
+            elif geometry_type[1]:
+                for i, mesh in enumerate(self.draw_collision()):
+                    node = TreeNode()
+                    node.attributes["mesh"] = mesh
 
-        def _read_backfaces_data(self) -> DataType:
-            if self.use_vertexcolors:
-                self.vertexcolor = {
-                    vertex: self.mesh.vertex_attribute(vertex, "color") or Color.grey()
-                    for vertex in self.mesh.vertices()
-                }
-            positions = []
-            colors = []
-            elements = []
-            i = 0
-            faces = self.mesh.faces()
-            for face in faces:
-                vertices = self.mesh.face_vertices(face)[::-1]
-                assert isinstance(face, int)
-                color = self.facescolor.get(face, self.facescolor["_default"])  # type: ignore
-                if len(vertices) == 3:
-                    a, b, c = vertices
-                    positions.append(self.mesh.vertex_coordinates(a))
-                    positions.append(self.mesh.vertex_coordinates(b))
-                    positions.append(self.mesh.vertex_coordinates(c))
-                    if self.use_vertexcolors:
-                        colors.append(self.vertexcolor[a])
-                        colors.append(self.vertexcolor[b])
-                        colors.append(self.vertexcolor[c])
+                    if i == 0:
+                        root.add(node)
                     else:
-                        colors.append(color)
-                        colors.append(color)
-                        colors.append(color)
-                    elements.append([i + 0, i + 1, i + 2])
-                    i += 3
-                elif len(vertices) == 4:
-                    a, b, c, d = vertices
-                    positions.append(self.mesh.vertex_coordinates(a))
-                    positions.append(self.mesh.vertex_coordinates(b))
-                    positions.append(self.mesh.vertex_coordinates(c))
-                    positions.append(self.mesh.vertex_coordinates(a))
-                    positions.append(self.mesh.vertex_coordinates(c))
-                    positions.append(self.mesh.vertex_coordinates(d))
-                    if self.use_vertexcolors:
-                        colors.append(self.vertexcolor[a])
-                        colors.append(self.vertexcolor[b])
-                        colors.append(self.vertexcolor[c])
-                        colors.append(self.vertexcolor[a])
-                        colors.append(self.vertexcolor[c])
-                        colors.append(self.vertexcolor[d])
-                    else:
-                        colors.append(color)
-                        colors.append(color)
-                        colors.append(color)
-                        colors.append(color)
-                        colors.append(color)
-                        colors.append(color)
-                    elements.append([i + 0, i + 1, i + 2])
-                    elements.append([i + 3, i + 4, i + 5])
-                    i += 6
-                else:
-                    points = [self.mesh.vertex_coordinates(vertex) for vertex in vertices]
-                    c = centroid_points(points)
-                    for a, b in pairwise(points + points[:1]):
-                        positions.append(a)
-                        positions.append(b)
-                        positions.append(c)
-                        if self.use_vertexcolors:
-                            colors.append(self.vertexcolor[vertices[0]])
-                            colors.append(self.vertexcolor[vertices[1]])
-                            colors.append(self.vertexcolor[vertices[2]])
-                        else:
-                            colors.append(color)
-                            colors.append(color)
-                            colors.append(color)
-                        elements.append([i + 0, i + 1, i + 2])
-                        i += 3
-            return positions, colors, elements
+                        _node = TreeNode()
+                        node.add(_node)
+                        node = _node
 
-        def draw_vertices(self):
+            # if geometry_type[2]:
+            #     list(self.tree.nodes)[-1].add(TreeNode(data=self.draw_attached_meshes()))
+            self.init_collection()
+
+        def transform(self, native_mesh, transformation):
             pass
 
-        def draw_edges(self):
-            pass
+        def create_geometry(self, geometry, name=None, color=None):
+            """Create the scene object representing the robot geometry.
 
-        def draw_faces(self):
-            pass
+            Parameters
+            ----------
+            geometry : :class:`~compas.datastructures.Mesh`
+                Instance of a mesh data structure
+            name : str, optional
+                The name of the mesh to draw.
+            color : :class:`~compas.colors.Color`
+                The color of the object.`
+
+            Returns
+            -------
+            :class:`compas.datastrctures.Mesh`
+            """
+
+            return geometry
+
+        def draw(self):
+            """Draw the visual meshes of the robot model."""
+            return self.draw_visual()
 
 except ImportError:
     pass

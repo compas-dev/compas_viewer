@@ -86,6 +86,14 @@ def register_scene_objects():
     except ImportError:
         pass
 
+    try:
+        from compas_robots import RobotModel
+        from .robotobject import RobotModelObject
+
+        register(RobotModel, RobotModelObject, context="Viewer")
+    except ImportError:
+        pass
+
 
 __all__ = [
     "ViewerSceneObject",
