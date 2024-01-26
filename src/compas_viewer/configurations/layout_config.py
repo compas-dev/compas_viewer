@@ -1,69 +1,45 @@
 from pathlib import Path
-from typing import Dict
-from typing import List
 from typing import Literal
 from typing import TypedDict
 
 from compas_viewer import DATA
+
 from .config import Config
-
-
-class StatusbarConfigType(TypedDict):
-    """
-    The type template for the status bar only.
-    """
-
-    text: str
-    show_fps: bool
-
-
-class WindowConfigType(TypedDict):
-    """
-    The type template for the main window only.
-    """
-
-    about: str
-    title: str
-    width: int
-    height: int
-    fullscreen: bool
-
-
-class MenubarConfigType(TypedDict):
-    """
-    The type template for each single item of the menu.
-    """
-
-    action: Literal["action", "link"]
-    kwargs: List[str]
-
-
-class ViewportConfigType(TypedDict):
-    """
-    The type template for each single item of the viewport.
-    """
-
-    category: Literal["render"]
-    config_path: str
-
-
-class ToolbarConfigType(TypedDict):
-    """
-    The type template for the each toolbar element.
-    """
-
-    action: str
-    kwargs: dict
 
 
 class ToolbarConfig(Config):
     """
     The class representation for the toolbar configuration of the Layout class.
     The toolbar configuration contains all the settings about the toolbar itself.
+
+    Parameters
+    ----------
+    config : dict[str, dict[str, :class:`compas_viewer.configurations.layout_config.ToolbarConfigType`]]
+        A TypedDict with defined keys and types.
+
+    Attributes
+    ----------
+    ToolbarConfigType : :class:`compas_viewer.configurations.layout_config.ToolbarConfigType`
+        The type template for the each toolbar element: {action: str, kwargs: dict}
+
+    See Also
+    --------
+    :class:`compas_viewer.configurations.layout_config.ToolbarConfigType`
+    :class:`compas_viewer.layout.toolbar.ToolbarLayout`
+    :class:`compas_viewer.configurations.layout_config.LayoutConfig`
     """
 
-    def __init__(self, config: Dict[str, Dict[str, ToolbarConfigType]]):
-        super().__init__(config)
+    class ToolbarConfigType(TypedDict):
+        """
+        The type template for the each toolbar element.
+        """
+
+        action: str
+        kwargs: dict
+
+    def __init__(self, config: dict[str, dict[str, ToolbarConfigType]]):
+        super().__init__()
+        self.config = config
 
     @classmethod
     def from_json(cls, filepath) -> "ToolbarConfig":
@@ -80,12 +56,32 @@ class ViewportConfig(Config):
 
     Parameters
     ----------
-    config : :class:`~ViewportConfigType`
+    config : dict[str, dict[str, :class:`compas_viewer.configurations.layout_config.ViewportConfigType`]]
         A TypedDict with defined keys and types.
+
+    Attributes
+    ----------
+    ViewportConfigType : :class:`compas_viewer.configurations.layout_config.ViewportConfigType`
+        The type template for each single item of the viewport: {category: str, config_path: str}
+
+    See Also
+    --------
+    :class:`compas_viewer.configurations.layout_config.ViewportConfigType`
+    :class:`compas_viewer.layout.viewport.ViewportLayout`
+    :class:`compas_viewer.configurations.layout_config.LayoutConfig`
     """
 
-    def __init__(self, config: Dict[str, Dict[str, ViewportConfigType]]):
-        super().__init__(config)
+    class ViewportConfigType(TypedDict):
+        """
+        The type template for each single item of the viewport.
+        """
+
+        category: Literal["render"]
+        config_path: str
+
+    def __init__(self, config: dict[str, dict[str, ViewportConfigType]]):
+        super().__init__()
+        self.config = config
 
     @classmethod
     def from_json(cls, filepath) -> "ViewportConfig":
@@ -102,19 +98,39 @@ class MenubarConfig(Config):
 
     Parameters
     ----------
-    config : :class:`~MenubarConfigType`
+    config : dict[str, dict[str, :class:`compas_viewer.configurations.layout_config.MenubarConfigType`]]
         A TypedDict with defined keys and types.
+
+    Attributes
+    ----------
+    MenubarConfigType : :class:`compas_viewer.configurations.layout_config.MenubarConfigType`
+        The type template for each single item of the menu: {action: str, kwargs: list[str]}
+
+    See Also
+    --------
+    :class:`compas_viewer.configurations.layout_config.MenubarConfigType`
+    :class:`compas_viewer.layout.menubar.MenubarLayout`
+    :class:`compas_viewer.configurations.layout_config.LayoutConfig`
     """
 
-    def __init__(self, config: Dict[str, Dict[str, MenubarConfigType]]):
-        super().__init__(config)
+    class MenubarConfigType(TypedDict):
+        """
+        The type template for each single item of the menu.
+        """
+
+        action: Literal["action", "link"]
+        kwargs: list[str]
+
+    def __init__(self, config: dict[str, dict[str, MenubarConfigType]]):
+        super().__init__()
+        self.config = config
 
     @classmethod
     def from_json(cls, filepath) -> "MenubarConfig":
-        menu_config = super().from_json(filepath)
-        if not isinstance(menu_config, MenubarConfig):
-            raise TypeError(f"The {filepath} is not a valid menu configuration file.")
-        return menu_config
+        menubar_config = super().from_json(filepath)
+        if not isinstance(menubar_config, MenubarConfig):
+            raise TypeError(f"The {filepath} is not a valid menubar configuration file.")
+        return menubar_config
 
 
 class StatusbarConfig(Config):
@@ -124,14 +140,21 @@ class StatusbarConfig(Config):
 
     Parameters
     ----------
-    config : :class:`~StatusbarConfigType`
-        A TypedDict with defined keys and types.
+    text : str
+        The text of the status bar.
+    show_fps : bool
+        Whether to show the fps or not.
+
+    See Also
+    --------
+    :class:`compas_viewer.layout.statusbar.StatusbarLayout`
+    :class:`compas_viewer.configurations.layout_config.LayoutConfig`
     """
 
-    def __init__(self, config: StatusbarConfigType):
-        super().__init__(config)
-        self.text = config["text"]
-        self.show_fps = config["show_fps"]
+    def __init__(self, text: str, show_fps: bool):
+        super().__init__()
+        self.text = text
+        self.show_fps = show_fps
 
     @classmethod
     def from_json(cls, filepath) -> "StatusbarConfig":
@@ -148,17 +171,30 @@ class WindowConfig(Config):
 
     Parameters
     ----------
-    config : :class:`~WindowConfigType`
-        A TypedDict with defined keys and types.
+    about : str
+        The about text of the window.
+    title : str
+        The title of the window.
+    width : int
+        The width of the window.
+    height : int
+        The height of the window.
+    fullscreen : bool
+        Whether to show the window in fullscreen or not.
+
+    See Also
+    --------
+    :class:`compas_viewer.layout.window.WindowLayout`
+    :class:`compas_viewer.configurations.layout_config.LayoutConfig`
     """
 
-    def __init__(self, config: WindowConfigType):
-        super().__init__(config)
-        self.about = config["about"]
-        self.title = config["title"]
-        self.width = config["width"]
-        self.height = config["height"]
-        self.fullscreen = config["fullscreen"]
+    def __init__(self, about: str, title: str, width: int, height: int, fullscreen: bool):
+        super().__init__()
+        self.about = about
+        self.title = title
+        self.width = width
+        self.height = height
+        self.fullscreen = fullscreen
 
     @classmethod
     def from_json(cls, filepath) -> "WindowConfig":
@@ -168,18 +204,6 @@ class WindowConfig(Config):
         return window_config
 
 
-class LayoutConfigType(TypedDict):
-    """
-    The type template for the layout.json file.
-    """
-
-    window: WindowConfig
-    statusbar: StatusbarConfig
-    menubar: MenubarConfig
-    viewport: ViewportConfig
-    toolbar: ToolbarConfig
-
-
 class LayoutConfig(Config):
     """
     The class representation for the `layout.json` of the Layout class.
@@ -187,17 +211,41 @@ class LayoutConfig(Config):
 
     Parameters
     ----------
-    config : :class:`~LayoutConfigType`
-        A TypedDict with defined keys and types.
+    window : :class:`compas_viewer.configurations.layout_config.WindowConfig`
+        The window configuration.
+    statusbar : :class:`compas_viewer.configurations.layout_config.StatusbarConfig`
+        The status bar configuration.
+    menubar : :class:`compas_viewer.configurations.layout_config.MenubarConfig`
+        The menu bar configuration.
+    viewport : :class:`compas_viewer.configurations.layout_config.ViewportConfig`
+        The viewport configuration.
+    toolbar : :class:`compas_viewer.configurations.layout_config.ToolbarConfig`
+        The toolbar configuration.
+
+    See Also
+    --------
+    :class:`compas_viewer.configurations.layout_config.WindowConfig`
+    :class:`compas_viewer.configurations.layout_config.StatusbarConfig`
+    :class:`compas_viewer.configurations.layout_config.MenubarConfig`
+    :class:`compas_viewer.configurations.layout_config.ViewportConfig`
+    :class:`compas_viewer.configurations.layout_config.ToolbarConfig`
+    :class:`compas_viewer.layout.Layout`
     """
 
-    def __init__(self, config: LayoutConfigType):
-        super().__init__(config)
-        self.window = config["window"]
-        self.statusbar = config["statusbar"]
-        self.menubar = config["menubar"]
-        self.viewport = config["viewport"]
-        self.toolbar = config["toolbar"]
+    def __init__(
+        self,
+        window: WindowConfig,
+        statusbar: StatusbarConfig,
+        menubar: MenubarConfig,
+        viewport: ViewportConfig,
+        toolbar: ToolbarConfig,
+    ):
+        super().__init__()
+        self.window = window
+        self.statusbar = statusbar
+        self.menubar = menubar
+        self.viewport = viewport
+        self.toolbar = toolbar
 
     @classmethod
     def from_default(cls) -> "LayoutConfig":

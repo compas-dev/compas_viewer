@@ -12,7 +12,7 @@ Scene
     :nosignatures:
 
     Config
-    RenderConfig
+    RendererConfig
     CameraConfig
     SelectorConfig
     SceneConfig

@@ -49,7 +49,6 @@ class ToolbarLayout:
     def __init__(self, layout: "Layout"):
         self.layout = layout
         self.viewer = self.layout.viewer
-        self.config = layout.config.window
         self.config = layout.config.toolbar
         self.toolbar = QTabWidget(self.viewer.window)
 
@@ -70,13 +69,13 @@ class ToolbarLayout:
 
         _button_size_policy = QSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Maximum)
 
-        for k, i in self.config.data.items():
+        for k, i in self.config.config.items():
             parent = QHBoxLayout()
 
             assert isinstance(i, dict)
 
             for _k, _i in i.items():
-                action_config = ActionConfig({"key": "no"})  # type: ignore
+                action_config = ActionConfig("no")  # type: ignore
                 _path = path.join(DATA, "icons", f"{_k}.svg")
                 _icon = QIcon(_path) if path.exists(_path) else _
                 button = QPushButton()

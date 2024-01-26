@@ -12,7 +12,7 @@ from PySide6.QtGui import QMouseEvent
 from PySide6.QtGui import QWheelEvent
 from PySide6.QtOpenGLWidgets import QOpenGLWidget
 
-from compas_viewer.configurations import RenderConfig
+from compas_viewer.configurations import RendererConfig
 from compas_viewer.scene import TagObject
 from compas_viewer.scene.meshobject import MeshObject
 from compas_viewer.scene.vectorobject import VectorObject
@@ -36,11 +36,11 @@ class Renderer(QOpenGLWidget):
     ----------
     viewer : :class:`compas_viewer.viewer.Viewer`
         The viewer instance.
-    config : :class:`compas_viewer.configurations.RenderConfig`
+    config : :class:`compas_viewer.configurations.RendererConfig`
         The renderer configuration.
     """
 
-    def __init__(self, viewer: "Viewer", config: RenderConfig):
+    def __init__(self, viewer: "Viewer", config: RendererConfig):
         super().__init__()
 
         self.config = config
