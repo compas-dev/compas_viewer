@@ -119,7 +119,7 @@ class RendererConfig(Config):
     Attributes
     ----------
     CameraConfigType : :class:`compas_viewer.configurations.renderer_config.CameraConfigType`
-        The type template for the the camera: {fov: float, near: float, far: float, position: tuple[float, float, float], target: tuple[float, float, float], scale: float, zoomdelta: float, rotationdelta: float, pan_delta: float}
+        The type template for the the camera: {fov: float, near: float, far: float, ..., pan_delta: float}
     SelectorConfigType : :class:`compas_viewer.configurations.renderer_config.SelectorConfigType`
         The type template for the the selector: {enable_selector: bool, selectioncolor: Color}
 
