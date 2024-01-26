@@ -24,7 +24,7 @@ class SelectorConfig:
     See Also
     --------
     :class:`compas_viewer.components.renderer.selector.Selector`
-    :class:`compas_viewer.configurations.render_config.RenderConfig`
+    :class:`compas_viewer.configurations.render_config.RendererConfig`
 
     """
 
@@ -63,7 +63,7 @@ class CameraConfig:
     See Also
     --------
     :class:`compas_viewer.components.renderer.camera.Camera`
-    :class:`compas_viewer.configurations.render_config.RenderConfig`
+    :class:`compas_viewer.configurations.render_config.RendererConfig`
     """
 
     def __init__(
@@ -90,7 +90,7 @@ class CameraConfig:
         self.pan_delta = pan_delta
 
 
-class RenderConfig(Config):
+class RendererConfig(Config):
     """
     The class representation for the `renderer.json` of the class Renderer.
     The renderer.json contains all the settings about the renderer: background color, selection color, ...
@@ -118,8 +118,8 @@ class RenderConfig(Config):
 
     Attributes
     ----------
-    RenderConfigType : :class:`compas_viewer.configurations.renderer_config.RenderConfigType`
-        The type template for the the camera: {show_grid: bool, gridsize: tuple[float, int, float, int], ...}
+    CameraConfigType : :class:`compas_viewer.configurations.renderer_config.CameraConfigType`
+        The type template for the the camera: {fov: float, near: float, far: float, position: tuple[float, float, float], target: tuple[float, float, float], scale: float, zoomdelta: float, rotationdelta: float, pan_delta: float}
     SelectorConfigType : :class:`compas_viewer.configurations.renderer_config.SelectorConfigType`
         The type template for the the selector: {enable_selector: bool, selectioncolor: Color}
 
@@ -167,18 +167,18 @@ class RenderConfig(Config):
         self.selector = SelectorConfig(**selector)
 
     @classmethod
-    def from_default(cls) -> "RenderConfig":
+    def from_default(cls) -> "RendererConfig":
         """
         Load the default configuration.
         """
-        render_config = RenderConfig.from_json(Path(DATA, "default_config", "renderer.json"))
-        if not isinstance(render_config, RenderConfig):
+        render_config = RendererConfig.from_json(Path(DATA, "default_config", "renderer.json"))
+        if not isinstance(render_config, RendererConfig):
             raise TypeError(f"The {render_config} is not a valid renderer configuration file.")
         return render_config
 
     @classmethod
-    def from_json(cls, filepath) -> "RenderConfig":
+    def from_json(cls, filepath) -> "RendererConfig":
         render_config = super().from_json(filepath)
-        if not isinstance(render_config, RenderConfig):
+        if not isinstance(render_config, RendererConfig):
             raise TypeError(f"The {filepath} is not a valid renderer configuration file.")
         return render_config

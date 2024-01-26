@@ -1,6 +1,6 @@
 from .config import Config  # noqa: F401
 from .controller_config import ControllerConfig  # noqa: F401
-from .renderer_config import RenderConfig  # noqa: F401
+from .renderer_config import RendererConfig  # noqa: F401
 from .renderer_config import CameraConfig  # noqa: F401
 from .renderer_config import SelectorConfig  # noqa: F401
 from .controller_config import ActionConfig, MouseConfig  # noqa: F401

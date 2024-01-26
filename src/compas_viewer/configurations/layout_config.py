@@ -14,7 +14,7 @@ class ToolbarConfig(Config):
 
     Parameters
     ----------
-    config : dict[str, dict[str, ToolbarConfigType]]
+    config : dict[str, dict[str, :class:`compas_viewer.configurations.layout_config.ToolbarConfigType`]]
         A TypedDict with defined keys and types.
 
     Attributes
@@ -56,7 +56,7 @@ class ViewportConfig(Config):
 
     Parameters
     ----------
-    config : dict[str, dict[str, ViewportConfigType]]
+    config : dict[str, dict[str, :class:`compas_viewer.configurations.layout_config.ViewportConfigType`]]
         A TypedDict with defined keys and types.
 
     Attributes
@@ -98,7 +98,7 @@ class MenubarConfig(Config):
 
     Parameters
     ----------
-    config : dict[str, dict[str, MenubarConfigType]]
+    config : dict[str, dict[str, :class:`compas_viewer.configurations.layout_config.MenubarConfigType`]]
         A TypedDict with defined keys and types.
 
     Attributes

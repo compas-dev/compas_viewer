@@ -1,5 +1,5 @@
 {
-    "dtype": "compas_viewer.configurations/RenderConfig",
+    "dtype": "compas_viewer.configurations/RendererConfig",
     "data": {
         "show_grid": true,
         "gridsize": [10, 10, 10, 10],
