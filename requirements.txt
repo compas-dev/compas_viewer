@@ -3,4 +3,3 @@ freetype-py
 PyOpenGL
 PyOpenGL_accelerate
 PySide6
-

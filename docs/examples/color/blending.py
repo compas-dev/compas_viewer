@@ -7,7 +7,6 @@ from compas_viewer import Viewer
 
 viewer = Viewer()
 
-
 box = Box(1, 1, 1, Frame((0, 0, 0), [1, 0, 0], [0, 1, 0]))
 obj1 = viewer.add(box, facescolor=Color(1.0, 0.0, 0.0), opacity=0.7)
 

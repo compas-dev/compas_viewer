@@ -11,7 +11,6 @@
                 "fullscreen": false
             }
         },
-
         "statusbar": {
             "dtype": "compas_viewer.configurations/StatusbarConfig",
             "data": {
@@ -19,10 +18,8 @@
                 "show_fps": true
             }
         },
-
         "menubar": {
             "dtype": "compas_viewer.configurations/MenubarConfig",
-
             "data": {
                 "config": {
                     "File": {
@@ -33,21 +30,24 @@
                             "action": "export_file"
                         }
                     },
-
                     "About": {
                         "COMPAS Framework": {
                             "action": "url",
-                            "kwargs": { "url": "https://compas.dev/" }
+                            "kwargs": {
+                                "url": "https://compas.dev/"
+                            }
                         },
-
                         "COMPAS Viewer": {
                             "action": "url",
-                            "kwargs": { "url": "https://compas.dev/compas_viewer/latest/" }
+                            "kwargs": {
+                                "url": "https://compas.dev/compas_viewer/latest/"
+                            }
                         },
-
                         "COMPAS Core": {
                             "action": "url",
-                            "kwargs": { "url": "https://compas.dev/compas/latest/" }
+                            "kwargs": {
+                                "url": "https://compas.dev/compas/latest/"
+                            }
                         }
                     }
                 }
@@ -69,20 +69,52 @@
             "data": {
                 "config": {
                     "basic": {
-                        "import_file": { "action": "import_file", "kwargs": {} },
-                        "export_file": { "action": "export_file", "kwargs": {} },
-                        "zoom_selected": { "action": "zoom_selected", "kwargs": {} },
-                        "delete_selected": { "action": "delete_selected", "kwargs": {} },
-                        "camera_info": { "action": "camera_info", "kwargs": {} },
-                        "selection_info": { "action": "selection_info", "kwargs": {} },
-                        "gl_info": { "action": "gl_info", "kwargs": {} }
+                        "import_file": {
+                            "action": "import_file",
+                            "kwargs": {}
+                        },
+                        "export_file": {
+                            "action": "export_file",
+                            "kwargs": {}
+                        },
+                        "zoom_selected": {
+                            "action": "zoom_selected",
+                            "kwargs": {}
+                        },
+                        "delete_selected": {
+                            "action": "delete_selected",
+                            "kwargs": {}
+                        },
+                        "camera_info": {
+                            "action": "camera_info",
+                            "kwargs": {}
+                        },
+                        "selection_info": {
+                            "action": "selection_info",
+                            "kwargs": {}
+                        },
+                        "gl_info": {
+                            "action": "gl_info",
+                            "kwargs": {}
+                        }
                     },
-
                     "view": {
-                        "view_perspective": { "action": "view_perspective", "kwargs": {} },
-                        "view_right": { "action": "view_right", "kwargs": {} },
-                        "view_front": { "action": "view_front", "kwargs": {} },
-                        "view_top": { "action": "view_top", "kwargs": {} }
+                        "view_perspective": {
+                            "action": "view_perspective",
+                            "kwargs": {}
+                        },
+                        "view_right": {
+                            "action": "view_right",
+                            "kwargs": {}
+                        },
+                        "view_front": {
+                            "action": "view_front",
+                            "kwargs": {}
+                        },
+                        "view_top": {
+                            "action": "view_top",
+                            "kwargs": {}
+                        }
                     }
                 }
             }
