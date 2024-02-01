@@ -45,6 +45,7 @@ from .ellipseobject import EllipseObject
 from .coneobject import ConeObject
 from .capsuleobject import CapsuleObject
 from .nurbssurfaceobject import NurbsSurfaceObject
+from .collectionobject import CollectionObject
 
 
 @plugin(category="drawing-utils", requires=["compas_viewer"])
@@ -77,6 +78,7 @@ def register_scene_objects():
     register(Cone, ConeObject, context="Viewer")
     register(Capsule, CapsuleObject, context="Viewer")
     register(NurbsSurface, NurbsSurfaceObject, context="Viewer")
+    register(list, CollectionObject, context="Viewer")
 
     try:
         from compas_occ.brep import OCCBrep
