@@ -28,7 +28,7 @@ optional_requirements = {}
 
 setup(
     name="compas_viewer",
-    version="1.0.0",
+    version="1.0.1",
     description="Standalone viewer for COMPAS",
     long_description=long_description,
     long_description_content_type="text/markdown",
