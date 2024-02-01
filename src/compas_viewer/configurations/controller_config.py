@@ -124,7 +124,9 @@ class ControllerConfig(Config):
 
     @classmethod
     def from_default(cls) -> "ControllerConfig":
-        controller_config = ControllerConfig.from_json(Path(HERE, "configurations", "default_config", "controller.json"))
+        controller_config = ControllerConfig.from_json(
+            Path(HERE, "configurations", "default_config", "controller.json")
+        )
         if not isinstance(controller_config, ControllerConfig):
             raise TypeError(f"The {controller_config} is not a valid controller configuration file.")
         return controller_config
