@@ -16,11 +16,7 @@ class Collection(Data):
 
 
 class CollectionObject(ViewerSceneObject, GeometryObject):
-    """Viewer scene object for displaying COMPAS Point geometry.
-
-    See Also
-    --------
-    :class:`compas.geometry.Point`
+    """Viewer scene object for displaying a collection of COMPAS geometries.
     """
 
     def __init__(self, items: list, **kwargs):
