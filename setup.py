@@ -55,7 +55,7 @@ setup(
     project_urls={},
     packages=["compas_viewer"],
     package_dir={"": "src"},
-    package_data={},
+    package_data={"": "data/*"},
     data_files=[],
     include_package_data=True,
     zip_safe=False,
