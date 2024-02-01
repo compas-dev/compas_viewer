@@ -43,4 +43,4 @@ jobs:
       - uses: compas-dev/compas-actions.publish@v2
         with:
           pypi_token: ${{ secrets.PYPI }}
-          github_token: ${{ secrets.TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
