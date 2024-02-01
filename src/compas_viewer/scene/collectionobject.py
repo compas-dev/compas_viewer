@@ -16,8 +16,7 @@ class Collection(Data):
 
 
 class CollectionObject(ViewerSceneObject, GeometryObject):
-    """Viewer scene object for displaying a collection of COMPAS geometries.
-    """
+    """Viewer scene object for displaying a collection of COMPAS geometries."""
 
     def __init__(self, items: list, **kwargs):
         collection = Collection(items)
