@@ -10,7 +10,7 @@ from PySide6.QtWidgets import QLabel
 from PySide6.QtWidgets import QMessageBox
 from PySide6.QtWidgets import QVBoxLayout
 
-from compas_viewer import DATA
+from compas_viewer import HERE
 
 
 class WindowLayout:
@@ -68,7 +68,7 @@ class WindowLayout:
         self.about_label = QLabel(self.config.about)
 
         #  Window icon: fixed
-        self.viewer.app.setWindowIcon(QIcon(path.join(DATA, "icons/compas_icon_white.png")))  # type: ignore
+        self.viewer.app.setWindowIcon(QIcon(path.join(HERE, "icons/compas_icon_white.png")))  # type: ignore
 
     # ==========================================================================
     # Messages
