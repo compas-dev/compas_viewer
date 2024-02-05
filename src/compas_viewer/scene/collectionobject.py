@@ -30,7 +30,7 @@ class CollectionObject(ViewerSceneObject, GeometryObject):
         elements = []
         count = 0
         for obj in self.objects:
-            p, c, e = obj._read_points_data()
+            p, c, e = obj._read_points_data() or ([], [], [])
             positions += p
             colors += c
             elements += (np.array(e) + count).tolist()
@@ -43,7 +43,7 @@ class CollectionObject(ViewerSceneObject, GeometryObject):
         elements = []
         count = 0
         for obj in self.objects:
-            p, c, e = obj._read_lines_data()
+            p, c, e = obj._read_lines_data() or ([], [], [])
             positions += p
             colors += c
             elements += (np.array(e) + count).tolist()
@@ -56,7 +56,7 @@ class CollectionObject(ViewerSceneObject, GeometryObject):
         elements = []
         count = 0
         for obj in self.objects:
-            p, c, e = obj._read_frontfaces_data()
+            p, c, e = obj._read_frontfaces_data() or ([], [], [])
             positions += p
             colors += c
             elements += (np.array(e) + count).tolist()
@@ -69,7 +69,7 @@ class CollectionObject(ViewerSceneObject, GeometryObject):
         elements = []
         count = 0
         for obj in self.objects:
-            p, c, e = obj._read_backfaces_data()
+            p, c, e = obj._read_backfaces_data() or ([], [], [])
             positions += p
             colors += c
             elements += (np.array(e) + count).tolist()
