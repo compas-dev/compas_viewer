@@ -19,7 +19,6 @@
         "lineswidth": 1.0,
         "pointssize": 10.0,
         "opacity": 1.0,
-        "hide_coplanaredges": false,
         "use_vertexcolors": true,
         "framesize": [0.1, 10, 0.1, 10],
         "show_framez": true,

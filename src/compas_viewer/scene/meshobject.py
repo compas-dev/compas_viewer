@@ -65,7 +65,7 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
         for vertex in self.mesh.vertices():
             assert isinstance(vertex, int)
             positions.append(self.mesh.vertex_coordinates(vertex))
-            colors.append(self.pointscolor.get(vertex, self.pointscolor["_default"]))  # type: ignore
+            colors.append(self.vertexcolor(vertex))
             elements.append([i])
             i += 1
         return positions, colors, elements
@@ -77,7 +77,7 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
         i = 0
 
         for u, v in self.mesh.edges():
-            color = self.linescolor.get((u, v), self.linescolor["_default"])  # type: ignore
+            color = self.edgecolor((u, v))
             if self.hide_coplanaredges:
                 # hide the edge if neighbor faces are coplanar
                 fkeys = self.mesh.edge_faces((u, v))
@@ -106,7 +106,7 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
         for face in self.mesh.faces():
             vertices = self.mesh.face_vertices(face)
             assert isinstance(face, int)
-            color = self.facescolor.get(face, self.facescolor["_default"])  # type: ignore
+            color = self.facecolor(face)
             if len(vertices) == 3:
                 a, b, c = vertices
                 positions.append(self.mesh.vertex_coordinates(a))
@@ -180,7 +180,7 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
         for face in faces:
             vertices = self.mesh.face_vertices(face)[::-1]
             assert isinstance(face, int)
-            color = self.facescolor.get(face, self.facescolor["_default"])  # type: ignore
+            color = self.facecolor(face)
             if len(vertices) == 3:
                 a, b, c = vertices
                 positions.append(self.mesh.vertex_coordinates(a))

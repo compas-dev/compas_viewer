@@ -3,10 +3,10 @@ from math import pi
 from compas.datastructures import Mesh
 from compas.geometry import Cylinder
 
-from .meshobject import MeshObject
+from .geometryobject import GeometryObject
 
 
-class CylinderObject(MeshObject):
+class CylinderObject(GeometryObject):
     """Viewer scene object for displaying COMPAS Cylinder geometry.
 
     See Also
@@ -14,7 +14,7 @@ class CylinderObject(MeshObject):
     :class:`compas.geometry.Cylinder`
     """
 
-    def __init__(self, cylinder: Cylinder, **kwargs):
-        self.u = kwargs.get("u", int(2 * pi * cylinder.radius / self.LINEARDEFLECTION))
-
-        super(CylinderObject, self).__init__(mesh=Mesh.from_shape(cylinder, u=self.u), **kwargs)
+    def __init__(self, cylinder: Cylinder, u=None, **kwargs):
+        self.u = u or int(2 * pi * cylinder.radius / self.LINEARDEFLECTION)
+        mesh = Mesh.from_shape(cylinder, u=self.u)
+        super().__init__(cylinder, mesh=mesh, **kwargs)

@@ -309,9 +309,6 @@ class Viewer(Scene):
         opacity : float, optional
             The opacity of the object.
             It will override the value in the scene config file.
-        hide_coplanaredges : bool, optional
-            Whether to hide the coplanar edges of the mesh.
-            It will override the value in the scene config file.
         use_vertexcolors : bool, optional
             Whether to use vertex color.
             It will override the value in the scene config file.
@@ -340,7 +337,6 @@ class Viewer(Scene):
             lineswidth=lineswidth,
             pointssize=pointssize,
             opacity=opacity,
-            hide_coplanaredges=hide_coplanaredges,
             use_vertexcolors=use_vertexcolors,
             config=self.scene_config,
             **kwargs

@@ -33,8 +33,6 @@ class SceneConfig(Config):
         The default size of the points.
     opacity : float
         The default opacity of the objects.
-    hide_coplanaredges : bool
-        The default setting for hiding the coplanar edges.
     use_vertexcolors : bool
         The default setting for using the vertex colors.
     framesize : tuple[float, int, float, int]
@@ -61,7 +59,6 @@ class SceneConfig(Config):
         lineswidth: float,
         pointssize: float,
         opacity: float,
-        hide_coplanaredges: bool,
         use_vertexcolors: bool,
         framesize: tuple[float, int, float, int],
         show_framez: bool,
@@ -78,7 +75,6 @@ class SceneConfig(Config):
         self.lineswidth = lineswidth
         self.pointssize = pointssize
         self.opacity = opacity
-        self.hide_coplanaredges = hide_coplanaredges
         self.use_vertexcolors = use_vertexcolors
         self.framesize = framesize
         self.show_framez = show_framez
