@@ -129,6 +129,7 @@ class ViewerSceneObject(SceneObject):
         pointssize: Optional[float] = None,
         opacity: Optional[float] = None,
         config: Optional[SceneConfig] = None,
+        use_rgba: bool = False,
         **kwargs,
     ):
         if config is None:
@@ -180,7 +181,7 @@ class ViewerSceneObject(SceneObject):
         self.pointssize = pointssize or self.config.pointssize
         self.opacity = opacity or self.config.opacity
         self.background: bool = False
-        self.use_rgba = False
+        self.use_rgba = use_rgba
 
         #  Geometric
         self.transformation: Optional[Transformation] = None
