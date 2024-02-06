@@ -46,10 +46,8 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
     ):
         super(MeshObject, self).__init__(mesh=mesh, **kwargs)
         self.mesh: Mesh
-        self.hide_coplanaredges = (
-            hide_coplanaredges if hide_coplanaredges is not None else self.config.hide_coplanaredges
-        )
-        self.use_vertexcolors = use_vertexcolors if use_vertexcolors is not None else self.config.use_vertexcolors
+        self.hide_coplanaredges = hide_coplanaredges
+        self.use_vertexcolors = use_vertexcolors
         self.vertexcolor = {
             vertex: self.mesh.vertex_attribute(vertex, "color")
             or self.facescolor.get(vertex, self.facescolor["_default"])  # type: ignore
@@ -106,7 +104,7 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
         for face in self.mesh.faces():
             vertices = self.mesh.face_vertices(face)
             assert isinstance(face, int)
-            color = self.facecolor(face)
+            color = self.facecolor[face]
             if len(vertices) == 3:
                 a, b, c = vertices
                 positions.append(self.mesh.vertex_coordinates(a))
@@ -180,7 +178,7 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
         for face in faces:
             vertices = self.mesh.face_vertices(face)[::-1]
             assert isinstance(face, int)
-            color = self.facecolor(face)
+            color = self.facecolor[face]
             if len(vertices) == 3:
                 a, b, c = vertices
                 positions.append(self.mesh.vertex_coordinates(a))

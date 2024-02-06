@@ -1,6 +1,7 @@
 #version 120
 
 varying vec3 vertex_color;
+varying float vertex_alpha;
 varying vec3 ec_pos;
 
 uniform float opacity;
@@ -11,6 +12,7 @@ uniform vec3 selection_color;
 uniform int element_type;
 uniform vec3 single_color;
 uniform bool use_single_color;
+uniform bool use_rgba;
 
 
 void main()
@@ -27,6 +29,9 @@ void main()
         else if (element_type == 1) {color = selection_color*0.8;}
         else {color = selection_color;}
         if (alpha < 0.5) alpha = 0.5;
+    }
+    if (use_rgba){
+        alpha *= vertex_alpha;
     }
 
     vec3 light_pos = vec3(0, 0, 0);
