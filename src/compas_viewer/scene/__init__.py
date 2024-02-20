@@ -6,6 +6,7 @@ from compas.scene import register
 from compas.plugins import plugin
 from .sceneobject import ViewerSceneObject
 from compas.datastructures import Mesh
+from compas.datastructures import Graph
 from compas.geometry import (
     Point,
     Line,
@@ -27,6 +28,7 @@ from compas.geometry import (
 
 
 from .meshobject import MeshObject
+from .graphobject import GraphObject
 
 from .pointobject import PointObject
 from .lineobject import LineObject
@@ -61,6 +63,7 @@ def redraw():
 @plugin(category="factories", requires=["compas_viewer"])
 def register_scene_objects():
     register(Mesh, MeshObject, context="Viewer")
+    register(Graph, GraphObject, context="Viewer")
     register(Point, PointObject, context="Viewer")
     register(Line, LineObject, context="Viewer")
     register(Tag, TagObject, context="Viewer")
