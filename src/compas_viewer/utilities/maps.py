@@ -1,7 +1,6 @@
+from random import randint
+from random import seed
 from typing import Generator
-
-from numpy import arange
-from numpy import random
 
 
 def instance_colors(i: int = 0) -> Generator:
@@ -18,14 +17,21 @@ def instance_colors(i: int = 0) -> Generator:
     tuple of int
         A tuple of three integers representing the RGB color of the instance.
     """
-    random.seed(i)
+
     dim = 255
+    seed(i)
+    existed = []
 
-    n = arange(dim**3)
-    random.shuffle(n)
+    while True:
+        n = randint(0, dim**3)
 
-    for i in range(dim**3):
-        r = n[i] // dim**2
-        g = (n[i] - r * dim**2) // dim
-        b = n[i] - r * dim**2 - g * dim
+        if n in existed:
+            continue
+
+        existed.append(n)
+
+        r = n // dim**2
+        g = (n - r * dim**2) // dim
+        b = n - r * dim**2 - g * dim
+
         yield (r, g, b)
