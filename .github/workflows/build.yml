@@ -17,6 +17,8 @@ jobs:
       matrix:
         python: [ '3.9', '3.11']
     steps:
+      - name: update
+        run: sudo apt-get update
       - name: install libegl1
         run: sudo apt-get install libegl1
       - name: install python3-opengl
