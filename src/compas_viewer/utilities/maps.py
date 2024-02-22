@@ -3,7 +3,7 @@ from random import seed
 from typing import Generator
 
 
-def instance_colors(i: int = 0) -> Generator:
+def instance_colors_generator(i: int = 0) -> Generator:
     """
     Generate a set of non-repetitive random colors for instance colors.
 

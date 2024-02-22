@@ -29,7 +29,7 @@ from compas_viewer.layout import Layout
 from compas_viewer.scene import FrameObject
 from compas_viewer.scene import ViewerSceneObject
 from compas_viewer.utilities import Timer
-from compas_viewer.utilities import instance_colors
+from compas_viewer.utilities import instance_colors_generator
 
 if TYPE_CHECKING:
     from compas.datastructures import Graph
@@ -142,7 +142,7 @@ class Viewer(Scene):
 
         #  Selection
         self.instance_colors: dict[tuple[int, int, int], ViewerSceneObject] = {}
-        self._instance_colors_generator = instance_colors()
+        self._instance_colors_generator = instance_colors_generator()
 
         # Render
         self.grid = FrameObject(
