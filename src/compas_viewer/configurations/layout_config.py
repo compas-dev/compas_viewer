@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Literal
 from typing import TypedDict
 
-from compas_viewer import DATA
+from compas_viewer import HERE
 
 from .config import Config
 
@@ -252,7 +252,7 @@ class LayoutConfig(Config):
         """
         Load the default configuration.
         """
-        layout_config = LayoutConfig.from_json(Path(DATA, "default_config", "layout.json"))
+        layout_config = LayoutConfig.from_json(Path(HERE, "configurations", "default_config", "layout.json"))
         if not isinstance(layout_config, LayoutConfig):
             raise TypeError(f"The {layout_config} is not a valid layout configuration file.")
         return layout_config

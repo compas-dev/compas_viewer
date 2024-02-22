@@ -5,7 +5,7 @@
         "gridsize": [10, 10, 10, 10],
         "show_gridz": true,
         "viewmode": "perspective",
-        "rendermode": "lighted",
+        "rendermode": "shaded",
         "backgroundcolor": {
             "dtype": "compas.colors/Color",
             "data": { "red": 1.0, "green": 1.0, "blue": 1.0, "alpha": 1.0 }

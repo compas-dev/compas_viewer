@@ -4,7 +4,7 @@ from typing import TypedDict
 
 from compas.colors import Color
 
-from compas_viewer import DATA
+from compas_viewer import HERE
 
 from .config import Config
 
@@ -119,7 +119,7 @@ class RendererConfig(Config):
     Attributes
     ----------
     CameraConfigType : :class:`compas_viewer.configurations.renderer_config.CameraConfigType`
-        The type template for the the camera: {fov: float, near: float, far: float, position: tuple[float, float, float], target: tuple[float, float, float], scale: float, zoomdelta: float, rotationdelta: float, pan_delta: float}
+        The type template for the the camera: {fov: float, near: float, far: float, ..., pan_delta: float}
     SelectorConfigType : :class:`compas_viewer.configurations.renderer_config.SelectorConfigType`
         The type template for the the selector: {enable_selector: bool, selectioncolor: Color}
 
@@ -171,7 +171,7 @@ class RendererConfig(Config):
         """
         Load the default configuration.
         """
-        render_config = RendererConfig.from_json(Path(DATA, "default_config", "renderer.json"))
+        render_config = RendererConfig.from_json(Path(HERE, "configurations", "default_config", "renderer.json"))
         if not isinstance(render_config, RendererConfig):
             raise TypeError(f"The {render_config} is not a valid renderer configuration file.")
         return render_config

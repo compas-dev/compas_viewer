@@ -7,13 +7,21 @@ If you don't have COMPAS installed
 ===================================
 Check out the COMPAS installation instructions at https://compas.dev/compas/latest/userguide/installation.html
 
-If you have COMPAS installed
+Install from pip
 ============================
 Activate your COMPAS environment and install COMPAS Viewer from `pip`.
 
 .. code-block:: bash
 
     pip install compas_viewer
+
+Install from source
+===================
+Activate your COMPAS environment and install COMPAS Viewer from source.
+
+.. code-block:: bash
+
+    pip install git+https://github.com/compas-dev/compas_viewer
 
 Verify the installation
 =======================

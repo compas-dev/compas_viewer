@@ -521,7 +521,6 @@ class Renderer(QOpenGLWidget):
         mesh_objs = []
 
         def sort(obj):
-            if obj.is_visible:
                 if isinstance(obj, TagObject):
                     tag_objs.append(obj)
                 elif isinstance(obj, VectorObject):
@@ -554,7 +553,9 @@ class Renderer(QOpenGLWidget):
         viewworld = self.camera.viewworld()
         self.update_projection()
         # Object categorization
-        tag_objs, vector_objs, mesh_objs = self.sort_objects_from_category(tuple(self.viewer.objects))
+        tag_objs, vector_objs, mesh_objs = self.sort_objects_from_category(
+            (obj for obj in self.viewer.objects if obj.is_visible)
+        )
 
         # Draw grid
         if self.config.show_grid:

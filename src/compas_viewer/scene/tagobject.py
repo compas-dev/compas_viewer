@@ -15,13 +15,13 @@ from numpy import linalg
 from numpy import zeros
 from OpenGL import GL
 
-from compas_viewer import DATA
+from compas_viewer import HERE
 from compas_viewer.utilities import make_index_buffer
 from compas_viewer.utilities import make_vertex_buffer
 
 from .sceneobject import ViewerSceneObject
 
-FONT = path.join(DATA, "default_config", "FreeSans.ttf")
+FONT = path.join(HERE, "configurations", "default_config", "FreeSans.ttf")
 
 
 class Tag(Geometry):

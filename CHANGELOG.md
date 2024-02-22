@@ -8,6 +8,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
+
+### Changed
+
+### Removed
+
+
+## [1.0.1] 2024-02-01
+
+### Added
+
+### Changed
+
+* Fixed the bug to include `data` folder in the package.
+
+### Removed
+
+
+## [1.0.0] 2024-02-01
+
+### Added
 * Added examples in the doc.
 * Added `Treeform`.
 * Added basic layout elements: `MenubarLayout`, `ToolbarLayout`, `StatusbarLayout`,`SidedockLayout`.
@@ -56,6 +76,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added `NetworkObject`.
 
 ### Changed
+* Patch github actions.
+* Fix [#63](https://github.com/compas-dev/compas_viewer/issues/63). 
 * Updated the configuration architecture.
 * Updated the `delete_selected` action.
 * Renamed `NetworkObject` to `GraphObject`. See commit: https://github.com/compas-dev/compas/commit/7f7098c11a1a4c3c8c0b527c8f610d10adbba1a6#diff-4e906e478c68aaee46648b7323ed68106084e647748b4e0bcb5fd440c3e162fb.

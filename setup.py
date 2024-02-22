@@ -28,13 +28,13 @@ optional_requirements = {}
 
 setup(
     name="compas_viewer",
-    version="0.1.0",
+    version="1.0.1",
     description="Standalone viewer for COMPAS",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/compas.dev/compas_viewer",
-    author="Li Chen",
-    author_email="li.chen@arch.ethz.ch",
+    author="Tom Van Mele, Li Chen, Zac Zhuo Zhang",
+    author_email="van.mele@arch.ethz.ch, li.chen@arch.ethz.ch, zhuo.zhang@arch.ethz.ch",
     license="MIT license",
     classifiers=[
         "Development Status :: 4 - Beta",

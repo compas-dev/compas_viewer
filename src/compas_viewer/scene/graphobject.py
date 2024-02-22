@@ -33,7 +33,7 @@ class GraphObject(ViewerSceneObject, BaseGraphObject):
         i = 0
 
         for node in self.graph.nodes():
-            positions.append(self.graph.node_attribute(node, "xyz"))
+            positions.append(self.graph.node_coordinates(node))
             colors.append(self.pointscolor.get(node, self.pointscolor["_default"]))  # type: ignore
             elements.append([i])
             i += 1
@@ -47,8 +47,8 @@ class GraphObject(ViewerSceneObject, BaseGraphObject):
 
         for u, v in self.graph.edges():
             color = self.linescolor.get((u, v), self.linescolor["_default"])  # type: ignore
-            positions.append(self.graph.node_attribute(u, "xyz"))
-            positions.append(self.graph.node_attribute(v, "xyz"))
+            positions.append(self.graph.node_coordinates(u))
+            positions.append(self.graph.node_coordinates(v))
             colors.append(color)
             colors.append(color)
             elements.append([i + 0, i + 1])

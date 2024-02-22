@@ -3,7 +3,7 @@ from pathlib import Path
 
 from compas.colors import Color
 
-from compas_viewer import DATA
+from compas_viewer import HERE
 
 from .config import Config
 
@@ -91,7 +91,7 @@ class SceneConfig(Config):
         """
         Load the default configuration.
         """
-        scene_config = SceneConfig.from_json(Path(DATA, "default_config", "scene.json"))
+        scene_config = SceneConfig.from_json(Path(HERE, "configurations", "default_config", "scene.json"))
         if not isinstance(scene_config, SceneConfig):
             raise TypeError(f"The {scene_config} is not a valid scene configuration file.")
         return scene_config
