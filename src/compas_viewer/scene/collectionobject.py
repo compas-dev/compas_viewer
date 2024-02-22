@@ -1,9 +1,9 @@
-
-from compas.scene import GeometryObject
+import numpy as np
 from compas.data import Data
+from compas.scene import GeometryObject
+
 from .sceneobject import DataType
 from .sceneobject import ViewerSceneObject
-import numpy as np
 
 
 class Collection(Data):
@@ -76,4 +76,3 @@ class CollectionObject(ViewerSceneObject, GeometryObject):
             elements += (np.array(e) + count).tolist()
             count += len(p)
         return positions, colors, elements
->>>>>>> origin/main
