@@ -49,7 +49,6 @@ try:
             if not self.facecolors:
                 self.facecolors = [[0.5, 0.5, 0.5, 1.0] for _ in range(self.mesh.number_of_faces() * 3)]
 
-
             super().__init__(brep, mesh=self.mesh, doublesided=True, **kwargs)
 
         def _read_lines_data(self) -> DataType:
@@ -74,6 +73,9 @@ try:
             vertices, faces = self.mesh.to_vertices_and_faces()
             vertices = np.array(vertices)
             faces = np.array(faces)
+            if len(faces) == 0:
+                return [], [], []
+
             positions = vertices[faces].reshape(-1, 3).tolist()
             elements = np.arange(len(positions) * 3).reshape(-1, 3).tolist()
             colors = [color[:3] for color in self.facecolors]
@@ -88,6 +90,9 @@ try:
             vertices, faces = self.mesh.to_vertices_and_faces()
             vertices = np.array(vertices)
             faces = np.array(faces)
+            if len(faces) == 0:
+                return [], [], []
+
             faces = faces[:, ::-1]
             positions = vertices[faces].reshape(-1, 3).tolist()
             elements = np.arange(len(positions) * 3).reshape(-1, 3).tolist()
@@ -98,7 +103,6 @@ try:
                 return positions, colors, opacities, elements
             else:
                 return positions, colors, elements
-
 
 except ImportError:
     pass
