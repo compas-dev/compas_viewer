@@ -9,6 +9,8 @@ class ZoomSelected(Action):
 
     def pressed_action(self):
         selected_objs = [obj for obj in self.viewer.objects if obj.is_selected]
+        if len(selected_objs) == 0:
+            selected_objs = self.viewer.objects
         extents = []
 
         for obj in selected_objs:
