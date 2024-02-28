@@ -29,6 +29,7 @@ from compas_viewer.layout import Layout
 from compas_viewer.scene import FrameObject
 from compas_viewer.scene import ViewerSceneObject
 from compas_viewer.utilities import Timer
+from compas_viewer.utilities import instance_colors_generator
 
 if TYPE_CHECKING:
     from compas.datastructures import Graph
@@ -140,6 +141,10 @@ class Viewer(Scene):
         # Controller
         self.controller = Controller(self, self.controller_config)
 
+        #  Selection
+        self.instance_colors: dict[tuple[int, int, int], ViewerSceneObject] = {}
+        self._instance_colors_generator = instance_colors_generator()
+
         # Render
         self.grid = FrameObject(
             Frame.worldXY(),
@@ -160,9 +165,6 @@ class Viewer(Scene):
         # `on` function
         self.timer: Timer
         self.frame_count: int = 0
-
-        #  Selection
-        self.instance_colors: dict[tuple[int, int, int], ViewerSceneObject] = {}
 
         #  Primitive
         self.objects: list[ViewerSceneObject]
@@ -325,7 +327,7 @@ class Viewer(Scene):
             The scene object.
         """
 
-        sceneobject: SceneObject = super(Viewer, self).add(  # type: ignore
+        sceneobject: ViewerSceneObject = super(Viewer, self).add(  # type: ignore
             item=item,
             parent=parent,
             viewer=self,
@@ -346,16 +348,8 @@ class Viewer(Scene):
             config=self.scene_config,
             **kwargs
         )
-        if (
-            self.instance_colors.get(sceneobject.instance_color.rgb255)
-            or sceneobject.instance_color.rgb255 == self.renderer_config.backgroundcolor.rgb255
-        ):
-            raise ValueError(
-                "Program error: Instance color is not unique."
-                + "Scene object might exceed the limit of 16,581,375. Program exists."
-            )
-        else:
-            self.instance_colors[sceneobject.instance_color.rgb255] = sceneobject
+
+        self.instance_colors[sceneobject.instance_color.rgb255] = sceneobject
 
         return sceneobject
 

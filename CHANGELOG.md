@@ -76,6 +76,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added `NetworkObject`.
 
 ### Changed
+
+* Fixed [#64](https://github.com/compas-dev/compas_viewer/issues/64).
 * Patch github actions.
 * Fix [#63](https://github.com/compas-dev/compas_viewer/issues/63). 
 * Updated the configuration architecture.

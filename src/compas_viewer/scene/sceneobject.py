@@ -1,4 +1,3 @@
-from random import randint
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import Optional
@@ -142,8 +141,9 @@ class ViewerSceneObject(SceneObject):
         #  Selection
         self.is_locked = is_locked
         self.is_selected = not is_locked and is_selected
-        self.instance_color = Color.from_rgb255(randint(0, 255), randint(0, 255), randint(0, 255))
-        
+
+        self.instance_color = Color.from_rgb255(*next(self.viewer._instance_colors_generator))
+
 
         #  Visual
         self.show_points = show_points if show_points is not None else self.config.show_points
