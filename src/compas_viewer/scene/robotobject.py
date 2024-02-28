@@ -1,107 +1,154 @@
-from typing import Optional
-
-from compas.colors import Color
-from compas.datastructures import Mesh
-from compas.datastructures import Tree
-from compas.datastructures import TreeNode
-from compas.geometry import centroid_points
-from compas.geometry import is_coplanar
-from compas.utilities import pairwise
-
-from .collectionobject import CollectionObject
-from .meshobject import MeshObject
-from .sceneobject import DataType
-
 try:
+
+    from typing import Optional
+
+    from compas.colors import Color
+    from compas.datastructures import Mesh
+    from compas.geometry import Transformation
+    from compas_robots import Configuration
     from compas_robots import RobotModel
     from compas_robots.scene import BaseRobotModelObject
 
-    class RobotModelObject(BaseRobotModelObject, CollectionObject):
+    from .meshobject import MeshObject
+    from .sceneobject import ViewerSceneObject
+
+    class RobotModelObject(BaseRobotModelObject, ViewerSceneObject):
         """Viewer scene object for displaying COMPAS Robot geometry.
 
         Parameters
         ----------
         model : :class:`compas_robots.RobotModel`
             Robot model.
-        geometry_type : tuple[bool,bool,bool], optional
-            Geometry types to display (draw_visual, draw_collision, draw_attached_meshes). Defaults to (True, False, True).
         **kwargs : dict, optional
             Additional keyword arguments.
-            For more info,
-            see :class:`compas_viewer.scene.MeshObject` and :class:`compas_robots.scene.BaseRobotModelObject`.
-
-        Attributes
-        ----------
-        mesh : :class:`compas.datastructures.Mesh`
-            The mesh data structure.
+            For more info, see :class:`compas_viewer.scene.ViewerSceneObject`.
 
         See Also
         --------
         :class:`compas_robots.scene.BaseRobotModelObject`
-        :class:`compas.datastructures.Mesh`
         """
 
         def __init__(
-            self, item: RobotModel, viewer, geometry_type: tuple[bool, bool, bool] = (True, False, True), **kwargs
+            self,
+            model: RobotModel,
+            configuration: Optional[Configuration],
+            show_visual: Optional[bool] = None,
+            show_collision: Optional[bool] = None,
+            hide_coplanaredges: Optional[bool] = None,
+            use_vertexcolors: Optional[bool] = None,
+            **kwargs
         ):
-            super(RobotModelObject, self).__init__(model=item, viewer=viewer, **kwargs)
-            self.viewer = viewer
-            self.tree = Tree()
-            root = TreeNode(name="root")
-            self.tree.add(root)
+            self.use_vertexcolors = use_vertexcolors
+            self.hide_coplanaredges = hide_coplanaredges
+            self._show_visual = show_visual or True
+            self._show_collision = show_collision or False
+            self.configuration = configuration or model.zero_configuration()
+            super(RobotModelObject, self).__init__(model=model, **kwargs)
 
-            if geometry_type[0]:
-                for i, mesh in enumerate(self.draw_visual()):
-                    node = TreeNode()
-                    node.attributes["mesh"] = mesh
-                    if i == 0:
-                        root.add(node)
-                    else:
-                        _node = TreeNode()
-                        node.add(_node)
-                        node = _node
+        @property
+        def show_visual(self):
+            return self._show_visual
 
-            elif geometry_type[1]:
-                for i, mesh in enumerate(self.draw_collision()):
-                    node = TreeNode()
-                    node.attributes["mesh"] = mesh
+        @show_visual.setter
+        def show_visual(self, value: bool):
+            if value == self._show_visual:
+                return
+            self._show_visual = value
+            for mesh_obj in self.draw_visual():
+                if value:
+                    self.viewer.tree.add_object(mesh_obj, self)
+                    self.viewer.instance_colors[mesh_obj] = mesh_obj.instance_color
+                else:
+                    self.viewer.tree.remove_object(mesh_obj)
 
-                    if i == 0:
-                        root.add(node)
-                    else:
-                        _node = TreeNode()
-                        self.tree.add(_node)
-                        node = _node
+        @property
+        def show_collision(self):
+            return self._show_collision
 
-            # if geometry_type[2]:
-            #     list(self.tree.nodes)[-1].add(TreeNode(data=self.draw_attached_meshes()))
-            self.init_collection()
+        @show_collision.setter
+        def show_collision(self, value: bool):
+            if value == self._show_collision:
+                return
+            self._show_collision = value
+            for mesh_obj in self.draw_collision():
+                if value:
+                    self.viewer.tree.add_object(mesh_obj, self)
+                    self.viewer.instance_colors[mesh_obj] = mesh_obj.instance_color
+                else:
+                    self.viewer.tree.remove_object(mesh_obj)
 
-        def transform(self, native_mesh, transformation):
-            pass
+        def init(self):
+            """Initialize the viewer object."""
 
-        def create_geometry(self, geometry, name=None, color=None):
-            """Create the scene object representing the robot geometry.
+            for mesh_obj in self.draw_visual():
+                mesh_obj.init()
+                if self.show_visual:
+                    print("RobotModelObject.init()")
+                    self.viewer.tree.add_object(mesh_obj, self)
+                    self.viewer.instance_colors[mesh_obj] = mesh_obj.instance_color
 
-            Parameters
-            ----------
-            geometry : :class:`~compas.datastructures.Mesh`
-                Instance of a mesh data structure
-            name : str, optional
-                The name of the mesh to draw.
-            color : :class:`~compas.colors.Color`
-                The color of the object.`
+            for mesh_obj in self.draw_collision():
+                mesh_obj.init()
+                if self.show_collision:
+                    self.viewer.tree.add_object(mesh_obj, self)
+                    self.viewer.instance_colors[mesh_obj] = mesh_obj.instance_color
 
-            Returns
-            -------
-            :class:`compas.datastrctures.Mesh`
-            """
+        def transform(self, geometry, transformation: Transformation):
+            geometry.transformation = transformation
 
-            return geometry
+        def create_geometry(
+            self, geometry: Mesh, name: Optional[str] = None, color: Optional[Color] = None
+        ) -> MeshObject:
+            """Draw geometry."""
 
-        def draw(self):
-            """Draw the visual meshes of the robot model."""
-            return self.draw_visual()
+            mesh_object = MeshObject(  # type: ignore
+                geometry,
+                viewer=self.viewer,
+                parent=None,
+                is_selected=self.is_selected,
+                is_locked=self.is_locked,
+                is_visible=self.is_visible,
+                show_points=self.show_points,
+                show_lines=self.show_lines,
+                show_faces=self.show_faces,
+                pointscolor=self.pointscolor,
+                linescolor=self.linescolor,
+                facescolor=color or self.facescolor,
+                lineswidth=self.lineswidth,
+                pointssize=self.pointssize,
+                opacity=self.opacity,
+                config=self.viewer.scene_config,
+                hide_coplanaredges=self.hide_coplanaredges,
+                use_vertexcolors=self.use_vertexcolors,
+                name=name,
+            )
+
+            return mesh_object
+
+        def update(self, joint_state: Optional[Configuration] = None):
+            """Update the viewer."""
+
+            if joint_state:
+
+                self.configuration = joint_state
+
+                if self.show_visual:
+                    for obj, transformation in zip(
+                        self.draw_visual(), self.model.compute_transformations(joint_state).values()
+                    ):
+                        if obj.transformation != transformation:
+                            obj.transformation = transformation
+                            obj._update_matrix()
+
+                if self.show_collision:
+                    for obj, transformation in zip(
+                        self.draw_collision(), self.model.compute_transformations(joint_state).values()
+                    ):
+                        if obj.transformation != transformation:
+                            obj.transformation = transformation
+                            obj._update_matrix()
+
+            self.viewer.renderer.update()
 
 except ImportError:
     pass

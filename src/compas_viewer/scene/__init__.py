@@ -2,6 +2,7 @@
 This package provides scene object plugins for visualizing COMPAS objects in `compas_viewer`.
 """
 
+from typing import Union
 from compas.scene import register
 from compas.plugins import plugin
 from .sceneobject import ViewerSceneObject
@@ -24,6 +25,7 @@ from compas.geometry import (
     Capsule,
     Frame,
     NurbsSurface,
+    Geometry,
 )
 
 
@@ -81,7 +83,7 @@ def register_scene_objects():
     register(Cone, ConeObject, context="Viewer")
     register(Capsule, CapsuleObject, context="Viewer")
     register(NurbsSurface, NurbsSurfaceObject, context="Viewer")
-    register(list, CollectionObject, context="Viewer")
+    register(list[Union[Geometry, Mesh]], CollectionObject, context="Viewer")
 
     try:
         from compas_occ.brep import OCCBrep

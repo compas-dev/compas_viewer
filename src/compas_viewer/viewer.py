@@ -33,6 +33,7 @@ from compas_viewer.utilities import Timer
 if TYPE_CHECKING:
     from compas.datastructures import Graph
     from compas_occ.brep import OCCBrep
+    from compas_robots import RobotModel
 
 
 class Viewer(Scene):
@@ -245,7 +246,7 @@ class Viewer(Scene):
 
     def add(
         self,
-        item: Union[Mesh, Geometry, "OCCBrep", "Graph"],
+        item: Union[Mesh, Geometry, "OCCBrep", "Graph", "RobotModel"],
         parent: Optional[ViewerSceneObject] = None,
         is_selected: bool = False,
         is_locked: bool = False,
@@ -253,9 +254,9 @@ class Viewer(Scene):
         show_points: Optional[bool] = None,
         show_lines: Optional[bool] = None,
         show_faces: Optional[bool] = None,
-        pointscolor: Optional[Union[Color, dict[Any, list[float]]]] = None,
-        linescolor: Optional[Union[Color, dict[Any, list[float]]]] = None,
-        facescolor: Optional[Union[Color, dict[Any, list[float]]]] = None,
+        pointscolor: Optional[Union[Color, dict[Any, Color]]] = None,
+        linescolor: Optional[Union[Color, dict[Any, Color]]] = None,
+        facescolor: Optional[Union[Color, dict[Any, Color]]] = None,
         lineswidth: Optional[float] = None,
         pointssize: Optional[float] = None,
         opacity: Optional[float] = None,
@@ -324,7 +325,7 @@ class Viewer(Scene):
             The scene object.
         """
 
-        sceneobject = super(Viewer, self).add(
+        sceneobject: SceneObject = super(Viewer, self).add(  # type: ignore
             item=item,
             parent=parent,
             viewer=self,
@@ -345,14 +346,13 @@ class Viewer(Scene):
             config=self.scene_config,
             **kwargs
         )
-        assert isinstance(sceneobject, ViewerSceneObject)
         if (
             self.instance_colors.get(sceneobject.instance_color.rgb255)
             or sceneobject.instance_color.rgb255 == self.renderer_config.backgroundcolor.rgb255
         ):
             raise ValueError(
                 "Program error: Instance color is not unique."
-                + "Scene object might exceed the limit of 16,581,375 or rerun the program."
+                + "Scene object might exceed the limit of 16,581,375. Program exists."
             )
         else:
             self.instance_colors[sceneobject.instance_color.rgb255] = sceneobject
