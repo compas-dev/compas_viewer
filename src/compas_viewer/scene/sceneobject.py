@@ -144,7 +144,6 @@ class ViewerSceneObject(SceneObject):
 
         self.instance_color = Color.from_rgb255(*next(self.viewer._instance_colors_generator))
 
-
         #  Visual
         self.show_points = show_points if show_points is not None else self.config.show_points
         self.show_lines = show_lines if show_lines is not None else self.config.show_lines

@@ -11,6 +11,7 @@ from .sceneobject import ViewerSceneObject
 
 
 class Collection(Data):
+    """Viewer scene object for displaying a collection of COMPAS geometries."""
 
     def __init__(self, items: list[Union[Geometry, Mesh]], **kwargs):
         super(Collection, self).__init__(**kwargs)

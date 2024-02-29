@@ -521,12 +521,12 @@ class Renderer(QOpenGLWidget):
         mesh_objs = []
 
         def sort(obj):
-                if isinstance(obj, TagObject):
-                    tag_objs.append(obj)
-                elif isinstance(obj, VectorObject):
-                    vector_objs.append(obj)
-                else:
-                    mesh_objs.append(obj)
+            if isinstance(obj, TagObject):
+                tag_objs.append(obj)
+            elif isinstance(obj, VectorObject):
+                vector_objs.append(obj)
+            else:
+                mesh_objs.append(obj)
 
         for obj in objs:
             if isinstance(obj, CollectionObject):
