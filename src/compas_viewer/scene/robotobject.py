@@ -18,7 +18,17 @@ try:
         Parameters
         ----------
         model : :class:`compas_robots.RobotModel`
-            Robot model.
+            The robot model.
+        configuration : :class:`compas_robots.Configuration`, optional
+            The initial configuration of the robot. Defaults to the zero configuration.
+        show_visual : bool, optional
+            Toggle the visibility of the visual geometry. Defaults to True.
+        show_collision : bool, optional
+            Toggle the visibility of the collision geometry. Defaults to False.
+        hide_coplanaredges : bool, optional
+            True to hide the coplanar edges. It will override the value in the config file.
+        use_vertexcolors : bool, optional
+            True to use vertex color. It will override the value in the config file.
         **kwargs : dict, optional
             Additional keyword arguments.
             For more info, see :class:`compas_viewer.scene.ViewerSceneObject`.
@@ -31,7 +41,7 @@ try:
         def __init__(
             self,
             model: RobotModel,
-            configuration: Optional[Configuration],
+            configuration: Optional[Configuration] = None,
             show_visual: Optional[bool] = None,
             show_collision: Optional[bool] = None,
             hide_coplanaredges: Optional[bool] = None,
@@ -42,7 +52,7 @@ try:
             self.hide_coplanaredges = hide_coplanaredges
             self._show_visual = show_visual or True
             self._show_collision = show_collision or False
-            self.configuration = configuration or model.zero_configuration()
+            self.configuration: Configuration = configuration or model.zero_configuration()
             super(RobotModelObject, self).__init__(model=model, **kwargs)
 
             self.visual_objects: list[MeshObject] = self.draw_visual()
@@ -81,8 +91,7 @@ try:
                     self.viewer.tree.remove_object(collision_object)
 
         def init(self):
-            """Initialize the viewer object."""
-
+            """Initialize the robot object with creating the visual and collision objects."""
             for i, visual_object in enumerate(self.visual_objects):
                 visual_object.init()
                 if self.show_visual:
@@ -96,13 +105,23 @@ try:
                     self.viewer.instance_colors[collision_object.instance_color.rgb255] = collision_object
 
         def transform(self, geometry, transformation: Transformation):
-            geometry.transformation = geometry.transformation * transformation
+            """Transform the geometry by a given transformation.
+
+            See Also
+            --------
+            :class:`compas_robots.scene.AbstractRobotModelObject`
+            """
+            geometry.transformation = transformation * geometry.transformation
 
         def create_geometry(
             self, geometry: Mesh, name: Optional[str] = None, color: Optional[Color] = None
         ) -> MeshObject:
-            """Draw geometry."""
+            """Create a mesh object from a given geometry.
 
+            See Also
+            --------
+            :class:`compas_robots.scene.AbstractRobotModelObject`
+            """
             mesh_object = MeshObject(  # type: ignore
                 geometry,
                 viewer=self.viewer,
@@ -128,18 +147,23 @@ try:
 
             return mesh_object
 
-        def update(self, joint_state: Optional[Configuration] = None):
+        def update(self, joint_state: Optional[Configuration] = None, update_buffers: bool = False):
             """Update the viewer."""
+            if not self.viewer.started or joint_state is not None:
+                self.configuration = joint_state or self.configuration
+                super().update(self.configuration, self.show_visual, self.show_collision)
 
-            super().update(joint_state, self.show_visual, self.show_collision)
+                if self.show_visual:
+                    for obj in self.visual_objects:
+                        obj._update_matrix()
+                        if update_buffers:
+                            obj.update_buffers()
 
-            if self.show_visual:
-                for obj in self.draw_visual():
-                    obj._update_matrix()
-
-            if self.show_collision:
-                for obj in self.draw_collision():
-                    obj._update_matrix()
+                if self.show_collision:
+                    for obj in self.collision_objects:
+                        obj._update_matrix()
+                        if update_buffers:
+                            obj.update_buffers()
 
             self.viewer.renderer.update()
 

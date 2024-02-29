@@ -105,6 +105,7 @@ class Viewer(Scene):
         configpath: Optional[str] = None,
     ):
         super(Viewer, self).__init__()
+        self.started = False
 
         # Custom or default config
         if configpath is None:
@@ -180,8 +181,9 @@ class Viewer(Scene):
 
     def show(self):
         """Show the viewer window."""
-        self.started = True
+        # opengel being initialized:
         self.window.show()
+        self.started = True
         # stop point of the main thread:
         self.app.exec_()
 
