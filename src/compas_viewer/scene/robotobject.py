@@ -45,6 +45,9 @@ try:
             self.configuration = configuration or model.zero_configuration()
             super(RobotModelObject, self).__init__(model=model, **kwargs)
 
+            self.visual_objects: list[MeshObject] = self.draw_visual()
+            self.collision_objects: list[MeshObject] = self.draw_collision()
+
         @property
         def show_visual(self):
             return self._show_visual
@@ -54,12 +57,12 @@ try:
             if value == self._show_visual:
                 return
             self._show_visual = value
-            for mesh_obj in self.draw_visual():
+            for i, visual_object in enumerate(self.visual_objects):
                 if value:
-                    self.viewer.tree.add_object(mesh_obj, self)
-                    self.viewer.instance_colors[mesh_obj] = mesh_obj.instance_color
+                    self.viewer.tree.add_object(visual_object, self.visual_objects[i - 1] if i > 0 else self)
+                    self.viewer.instance_colors[visual_object.instance_color.rgb255] = visual_object
                 else:
-                    self.viewer.tree.remove_object(mesh_obj)
+                    self.viewer.tree.remove_object(visual_object)
 
         @property
         def show_collision(self):
@@ -70,31 +73,30 @@ try:
             if value == self._show_collision:
                 return
             self._show_collision = value
-            for mesh_obj in self.draw_collision():
+            for i, collision_object in enumerate(self.collision_objects):
                 if value:
-                    self.viewer.tree.add_object(mesh_obj, self)
-                    self.viewer.instance_colors[mesh_obj] = mesh_obj.instance_color
+                    self.viewer.tree.add_object(collision_object, self.visual_objects[i - 1] if i > 0 else self)
+                    self.viewer.instance_colors[collision_object.instance_color.rgb255] = collision_object
                 else:
-                    self.viewer.tree.remove_object(mesh_obj)
+                    self.viewer.tree.remove_object(collision_object)
 
         def init(self):
             """Initialize the viewer object."""
 
-            for mesh_obj in self.draw_visual():
-                mesh_obj.init()
+            for i, visual_object in enumerate(self.visual_objects):
+                visual_object.init()
                 if self.show_visual:
-                    print("RobotModelObject.init()")
-                    self.viewer.tree.add_object(mesh_obj, self)
-                    self.viewer.instance_colors[mesh_obj] = mesh_obj.instance_color
+                    self.viewer.tree.add_object(visual_object, self.visual_objects[i - 1] if i > 0 else self)
+                    self.viewer.instance_colors[visual_object.instance_color.rgb255] = visual_object
 
-            for mesh_obj in self.draw_collision():
-                mesh_obj.init()
+            for i, collision_object in enumerate(self.collision_objects):
+                collision_object.init()
                 if self.show_collision:
-                    self.viewer.tree.add_object(mesh_obj, self)
-                    self.viewer.instance_colors[mesh_obj] = mesh_obj.instance_color
+                    self.viewer.tree.add_object(collision_object, self.visual_objects[i - 1] if i > 0 else self)
+                    self.viewer.instance_colors[collision_object.instance_color.rgb255] = collision_object
 
         def transform(self, geometry, transformation: Transformation):
-            geometry.transformation = transformation
+            geometry.transformation = geometry.transformation * transformation
 
         def create_geometry(
             self, geometry: Mesh, name: Optional[str] = None, color: Optional[Color] = None
@@ -121,6 +123,7 @@ try:
                 hide_coplanaredges=self.hide_coplanaredges,
                 use_vertexcolors=self.use_vertexcolors,
                 name=name,
+                transformation=Transformation(),
             )
 
             return mesh_object
@@ -128,25 +131,15 @@ try:
         def update(self, joint_state: Optional[Configuration] = None):
             """Update the viewer."""
 
-            if joint_state:
+            super().update(joint_state, self.show_visual, self.show_collision)
 
-                self.configuration = joint_state
+            if self.show_visual:
+                for obj in self.draw_visual():
+                    obj._update_matrix()
 
-                if self.show_visual:
-                    for obj, transformation in zip(
-                        self.draw_visual(), self.model.compute_transformations(joint_state).values()
-                    ):
-                        if obj.transformation != transformation:
-                            obj.transformation = transformation
-                            obj._update_matrix()
-
-                if self.show_collision:
-                    for obj, transformation in zip(
-                        self.draw_collision(), self.model.compute_transformations(joint_state).values()
-                    ):
-                        if obj.transformation != transformation:
-                            obj.transformation = transformation
-                            obj._update_matrix()
+            if self.show_collision:
+                for obj in self.draw_collision():
+                    obj._update_matrix()
 
             self.viewer.renderer.update()
 
