@@ -14,6 +14,7 @@ from PySide6.QtOpenGLWidgets import QOpenGLWidget
 
 from compas_viewer.configurations import RendererConfig
 from compas_viewer.scene import TagObject
+from compas_viewer.scene.collectionobject import CollectionObject
 from compas_viewer.scene.meshobject import MeshObject
 from compas_viewer.scene.vectorobject import VectorObject
 
@@ -518,13 +519,21 @@ class Renderer(QOpenGLWidget):
         tag_objs = []
         vector_objs = []
         mesh_objs = []
-        for obj in objs:
+
+        def sort(obj):
             if isinstance(obj, TagObject):
                 tag_objs.append(obj)
             elif isinstance(obj, VectorObject):
                 vector_objs.append(obj)
             else:
                 mesh_objs.append(obj)
+
+        for obj in objs:
+            if isinstance(obj, CollectionObject):
+                [sort(item) for item in obj.objects]
+            else:
+                sort(obj)
+
         return tag_objs, vector_objs, mesh_objs
 
     def paint(self):
