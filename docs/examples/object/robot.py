@@ -20,7 +20,7 @@ robot_object: RobotModelObject = viewer.add(model, show_lines=False, configurati
 def rotate(value, robot_object: RobotModelObject, index: int):
     config = robot_object.configuration
     config.joint_values[index] = value / 360 * 2 * 3.14159
-    robot_object.update(config)
+    robot_object.update_joints(config)
 
 
 for i, joint in enumerate(robot_object.configuration.joint_names):
@@ -40,6 +40,6 @@ treeform = Treeform(viewer.tree, {"Name": ".name", "Object": ""})
 
 viewer.layout.sidedock.add_element(treeform)
 
-robot_object.update()
+robot_object.update_joints(robot_object.configuration)
 
 viewer.show()

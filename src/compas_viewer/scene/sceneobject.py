@@ -179,7 +179,7 @@ class ViewerSceneObject(SceneObject):
         self.background: bool = False
 
         #  Geometric
-        self.transformation: Optional[Transformation] = kwargs.get("transformation", None)
+        self.transformation: Optional[Transformation] = None
         self._matrix_buffer: Optional[list[list[float]]] = None
         self._bounding_box: Optional[list[float]] = None
         self._bounding_box_center: Optional[Point] = None

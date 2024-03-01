@@ -142,28 +142,24 @@ try:
                 hide_coplanaredges=self.hide_coplanaredges,
                 use_vertexcolors=self.use_vertexcolors,
                 name=name,
-                transformation=Transformation(),
             )
+            mesh_object.transformation = Transformation()
 
             return mesh_object
 
-        def update(self, joint_state: Optional[Configuration] = None, update_buffers: bool = False):
-            """Update the viewer."""
-            if not self.viewer.started or joint_state is not None:
-                self.configuration = joint_state or self.configuration
-                super().update(self.configuration, self.show_visual, self.show_collision)
+        def update_joints(self, joint_state: Configuration):
+            """Update the robot joints."""
 
-                if self.show_visual:
-                    for obj in self.visual_objects:
-                        obj._update_matrix()
-                        if update_buffers:
-                            obj.update_buffers()
+            self.configuration = joint_state or self.configuration
+            super().update(self.configuration, self.show_visual, self.show_collision)
 
-                if self.show_collision:
-                    for obj in self.collision_objects:
-                        obj._update_matrix()
-                        if update_buffers:
-                            obj.update_buffers()
+            if self.show_visual:
+                for obj in self.visual_objects:
+                    obj._update_matrix()
+
+            if self.show_collision:
+                for obj in self.collision_objects:
+                    obj._update_matrix()
 
             self.viewer.renderer.update()
 

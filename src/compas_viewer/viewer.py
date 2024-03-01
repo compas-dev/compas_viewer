@@ -1,6 +1,5 @@
 import sys
 from pathlib import Path
-from typing import TYPE_CHECKING
 from typing import Any
 from typing import Callable
 from typing import Literal
@@ -8,9 +7,8 @@ from typing import Optional
 from typing import Union
 
 from compas.colors import Color
-from compas.datastructures import Mesh
+from compas.data import Data
 from compas.geometry import Frame
-from compas.geometry import Geometry
 from compas.scene import Scene
 from PySide6.QtCore import QCoreApplication
 from PySide6.QtWidgets import QApplication
@@ -30,11 +28,6 @@ from compas_viewer.scene import FrameObject
 from compas_viewer.scene import ViewerSceneObject
 from compas_viewer.utilities import Timer
 from compas_viewer.utilities import instance_colors_generator
-
-if TYPE_CHECKING:
-    from compas.datastructures import Graph
-    from compas_occ.brep import OCCBrep
-    from compas_robots import RobotModel
 
 
 class Viewer(Scene):
@@ -250,7 +243,7 @@ class Viewer(Scene):
 
     def add(
         self,
-        item: Union[Mesh, Geometry, "OCCBrep", "Graph", "RobotModel"],
+        item: Data,
         parent: Optional[ViewerSceneObject] = None,
         is_selected: bool = False,
         is_locked: bool = False,
