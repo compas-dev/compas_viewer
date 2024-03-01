@@ -14,6 +14,8 @@ class LineObject(ViewerSceneObject, GeometryObject):
     """
 
     def __init__(self, line: Line, **kwargs):
+        if kwargs["show_lines"] is None:
+            kwargs["show_lines"] = True
         super(LineObject, self).__init__(geometry=line, **kwargs)
 
     def _read_points_data(self) -> DataType:
