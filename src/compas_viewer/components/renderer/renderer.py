@@ -530,7 +530,7 @@ class Renderer(QOpenGLWidget):
 
         for obj in objs:
             if isinstance(obj, CollectionObject):
-                [sort(item) for item in obj.items]
+                [sort(item) for item in obj.objects]
             else:
                 sort(obj)
 

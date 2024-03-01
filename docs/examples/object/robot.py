@@ -1,10 +1,10 @@
 from compas_robots import RobotModel
 from compas_robots.resources import GithubPackageMeshLoader
+from compas_robots.viewer.scene.robotmodelobject import RobotModelObject
 
 from compas_viewer import Viewer
 from compas_viewer.layout import Slider
 from compas_viewer.layout import Treeform
-from compas_viewer.scene.robotobject import RobotModelObject
 
 viewer = Viewer(rendermode="lighted")
 
