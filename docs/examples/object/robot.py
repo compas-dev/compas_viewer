@@ -24,15 +24,7 @@ def rotate(value, robot_object: RobotModelObject, index: int):
 
 
 for i, joint in enumerate(robot_object.configuration.joint_names):
-    slider = Slider(
-        rotate,
-        0,
-        -180,
-        180,
-        1,
-        joint,
-        kwargs={"robot_object": robot_object, "index": i},
-    )
+    slider = Slider(rotate, 0, -180, 180, 1, joint, robot_object=robot_object, index=i)
     slider = viewer.layout.sidedock.add_element(slider)
 
 

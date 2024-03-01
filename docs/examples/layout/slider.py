@@ -16,8 +16,9 @@ pointobj: PointObject = viewer.scene.add(Point(*curve.point_at(0)), pointssize=2
 curveobj = viewer.scene.add(Polyline(curve.to_polyline()), lineswidth=2, linescolor=Color.blue())
 
 
-def slide(value):
+def slide(value, additional_var):
     value = value / 100
+    print(additional_var + str(value))
     pointobj.geometry = curve.point_at(value)
     pointobj.init()
     pointobj.update()
@@ -25,14 +26,7 @@ def slide(value):
 
 
 viewer.layout.sidedock.add_element(
-    Slider(
-        slide,
-        0,
-        0,
-        100,
-        1,
-        "Slide Point",
-    )
+    Slider(slide, 0, 0, 100, 1, "Slide Point", additional_var="Slide the point along the curve at ")
 )
 
 
