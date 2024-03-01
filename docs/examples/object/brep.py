@@ -7,5 +7,5 @@ box = Box(1, 1, 1, Frame.worldXY())
 brep = OCCBrep.from_box(box)
 
 viewer = Viewer()
-viewer.add(brep)
+viewer.scene.add(brep)
 viewer.show()

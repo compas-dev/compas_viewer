@@ -14,7 +14,7 @@ model = RobotModel.from_urdf_file(github.load_urdf("irb6640.urdf"))
 model.load_geometry(github)
 
 
-robot_object: RobotModelObject = viewer.add(model, show_lines=False, configuration=model.random_configuration())  # type: ignore
+robot_object: RobotModelObject = viewer.scene.add(model, show_lines=False, configuration=model.random_configuration())  # type: ignore
 
 
 def rotate(value, robot_object: RobotModelObject, index: int):
@@ -36,7 +36,7 @@ for i, joint in enumerate(robot_object.configuration.joint_names):
     slider = viewer.layout.sidedock.add_element(slider)
 
 
-treeform = Treeform(viewer.tree, {"Name": ".name", "Object": ""})
+treeform = Treeform(viewer.scene.tree, {"Name": ".name", "Object": ""})
 
 viewer.layout.sidedock.add_element(treeform)
 

@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added `RobotModelObject` and its example in the documentation.
 
 ### Changed
+* Added `ViewerScene` as an attribute of the `Viewer` class. resolve [#28](https://github.com/compas-dev/compas_viewer/issues/28).
 * Documentation images and code correction.
 * Improved typing hints of `CollectionObject`.
 

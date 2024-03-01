@@ -130,18 +130,20 @@ class ViewerSceneObject(SceneObject):
         if config is None:
             raise ValueError(
                 "No SceneConfig specified for the ViewerSceneObject. "
-                + "Check if the object is added by the function `Viewer.add`."
+                + "Check if the object is added by the function `scene.add`."
             )
         #  Basic
         self.config = config
         super(ViewerSceneObject, self).__init__(config=self.config, **kwargs)
         self.viewer = viewer
+        self.scene = viewer.scene
+        self.renderer = viewer.renderer
         self.is_visible = is_visible
 
         #  Selection
-        self.is_locked = is_locked
+        self._is_locked = is_locked
         self.is_selected = not is_locked and is_selected
-        self.instance_color = Color.from_rgb255(*next(self.viewer._instance_colors_generator))
+        self.instance_color = Color.from_rgb255(*next(self.scene._instance_colors_generator))
 
         #  Visual
         self.show_points = show_points if show_points is not None else self.config.show_points
@@ -193,6 +195,19 @@ class ViewerSceneObject(SceneObject):
         self._lines_buffer: Optional[dict[str, Any]] = None
         self._frontfaces_buffer: Optional[dict[str, Any]] = None
         self._backfaces_buffer: Optional[dict[str, Any]] = None
+
+    @property
+    def is_locked(self):
+        return self._is_locked
+
+    @is_locked.setter
+    def is_locked(self, value: bool):
+        self._is_locked = value
+        if value:
+            self.is_selected = False
+            self.scene.instance_colors.pop(self.instance_color.rgb255)
+        else:
+            self.scene.instance_colors[self.instance_color.rgb255] = self
 
     @property
     def bounding_box(self):
@@ -345,7 +360,7 @@ class ViewerSceneObject(SceneObject):
         """Update the object"""
         self._update_matrix()
         self.update_buffers()
-        self.viewer.renderer.update()
+        self.renderer.update()
 
     def _update_bounding_box(self, positions: Optional[list[Point]] = None):
         """Update the bounding box of the object"""
@@ -446,7 +461,7 @@ class ViewerSceneObject(SceneObject):
         if self._lines_buffer is not None and (self.show_lines or wireframe):
             shader.bind_attribute("position", self._lines_buffer["positions"])
             shader.draw_lines(
-                width=self.lineswidth + self.viewer.renderer.selector.PIXEL_SELECTION_INCREMENTAL,
+                width=self.lineswidth + self.renderer.selector.PIXEL_SELECTION_INCREMENTAL,
                 elements=self._lines_buffer["elements"],
                 n=self._lines_buffer["n"],
             )
