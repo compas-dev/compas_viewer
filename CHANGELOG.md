@@ -8,8 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
+* Added `RobotModelObject` and its example in the documentation.
 
 ### Changed
+* Documentation images and code correction.
+* Improved typing hints of `CollectionObject`.
 
 ### Removed
 

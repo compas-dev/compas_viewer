@@ -1,6 +1,5 @@
 import sys
 from pathlib import Path
-from typing import TYPE_CHECKING
 from typing import Any
 from typing import Callable
 from typing import Literal
@@ -8,9 +7,8 @@ from typing import Optional
 from typing import Union
 
 from compas.colors import Color
-from compas.datastructures import Mesh
+from compas.data import Data
 from compas.geometry import Frame
-from compas.geometry import Geometry
 from compas.scene import Scene
 from PySide6.QtCore import QCoreApplication
 from PySide6.QtWidgets import QApplication
@@ -30,10 +28,6 @@ from compas_viewer.scene import FrameObject
 from compas_viewer.scene import ViewerSceneObject
 from compas_viewer.utilities import Timer
 from compas_viewer.utilities import instance_colors_generator
-
-if TYPE_CHECKING:
-    from compas.datastructures import Graph
-    from compas_occ.brep import OCCBrep
 
 
 class Viewer(Scene):
@@ -104,6 +98,7 @@ class Viewer(Scene):
         configpath: Optional[str] = None,
     ):
         super(Viewer, self).__init__()
+        self.started = False
 
         # Custom or default config
         if configpath is None:
@@ -179,8 +174,9 @@ class Viewer(Scene):
 
     def show(self):
         """Show the viewer window."""
-        self.started = True
+        # opengel being initialized:
         self.window.show()
+        self.started = True
         # stop point of the main thread:
         self.app.exec_()
 
@@ -247,7 +243,7 @@ class Viewer(Scene):
 
     def add(
         self,
-        item: Union[Mesh, Geometry, "OCCBrep", "Graph"],
+        item: Data,
         parent: Optional[ViewerSceneObject] = None,
         is_selected: bool = False,
         is_locked: bool = False,
@@ -255,9 +251,9 @@ class Viewer(Scene):
         show_points: Optional[bool] = None,
         show_lines: Optional[bool] = None,
         show_faces: Optional[bool] = None,
-        pointscolor: Optional[Union[Color, dict[Any, list[float]]]] = None,
-        linescolor: Optional[Union[Color, dict[Any, list[float]]]] = None,
-        facescolor: Optional[Union[Color, dict[Any, list[float]]]] = None,
+        pointscolor: Optional[Union[Color, dict[Any, Color]]] = None,
+        linescolor: Optional[Union[Color, dict[Any, Color]]] = None,
+        facescolor: Optional[Union[Color, dict[Any, Color]]] = None,
         lineswidth: Optional[float] = None,
         pointssize: Optional[float] = None,
         opacity: Optional[float] = None,
