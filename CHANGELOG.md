@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added `RobotModelObject` and its example in the documentation.
 
 ### Changed
+* Improved argument passing mechanism in the `Slider` class. Close [#76](https://github.com/compas-dev/compas_viewer/issues/76).
 * Documentation images and code correction.
 * Improved typing hints of `CollectionObject`.
 
