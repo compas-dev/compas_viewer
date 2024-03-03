@@ -54,7 +54,6 @@ class Action(QObject):
         super(Action, self).__init__()
         self.name = name
         self.viewer = viewer
-        self.scene = viewer.scene
         self.config = config
         self.key = self.config.key
         self.modifier = self.config.modifier

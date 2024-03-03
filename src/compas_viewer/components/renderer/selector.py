@@ -61,7 +61,6 @@ class Selector(QObject):
         super().__init__()
         self.renderer = renderer
         self.viewer = renderer.viewer
-        self.scene = renderer.scene
         self.controller = renderer.viewer.controller
         self.selectioncolor = renderer.config.selector.selectioncolor
 
@@ -80,7 +79,7 @@ class Selector(QObject):
         """Select the object under the mouse cursor."""
 
         # Deselect all objects first
-        for _, obj in self.renderer.scene.instance_colors.items():
+        for _, obj in self.renderer.viewer.instance_colors.items():
             obj.is_selected = False
 
         x = self.controller.mouse.last_pos.x()
@@ -88,7 +87,7 @@ class Selector(QObject):
         instance_color = self.read_instance_color((x, y, x, y))
         unique_color = unique(instance_color, axis=0, return_counts=False)
 
-        selected_obj = self.renderer.scene.instance_colors.get(tuple(unique_color[0]))  # type: ignore
+        selected_obj = self.renderer.viewer.instance_colors.get(tuple(unique_color[0]))  # type: ignore
         if selected_obj:
             selected_obj.is_selected = True
 
@@ -100,7 +99,7 @@ class Selector(QObject):
         instance_color = self.read_instance_color((x, y, x, y))
         unique_color = unique(instance_color, axis=0, return_counts=False)
 
-        selected_obj = self.renderer.scene.instance_colors.get(tuple(unique_color[0]))  # type: ignore
+        selected_obj = self.renderer.viewer.instance_colors.get(tuple(unique_color[0]))  # type: ignore
         if selected_obj:
             selected_obj.is_selected = False
 
@@ -116,7 +115,7 @@ class Selector(QObject):
         instance_color = self.read_instance_color((x, y, x, y))
         unique_color = unique(instance_color, axis=0, return_counts=False)
 
-        selected_obj = self.renderer.scene.instance_colors.get(tuple(unique_color[0]))  # type: ignore
+        selected_obj = self.renderer.viewer.instance_colors.get(tuple(unique_color[0]))  # type: ignore
         if selected_obj:
             selected_obj.is_selected = True
 
@@ -124,7 +123,7 @@ class Selector(QObject):
         """Drag select the objects in the rectangle area."""
 
         # Deselect all objects first
-        for _, obj in self.renderer.scene.instance_colors.items():
+        for _, obj in self.renderer.viewer.instance_colors.items():
             obj.is_selected = False
 
         instance_color = self.read_instance_color(
@@ -138,7 +137,7 @@ class Selector(QObject):
         if len(unique_colors) == 0:
             return
 
-        for color, obj in self.renderer.scene.instance_colors.items():
+        for color, obj in self.renderer.viewer.instance_colors.items():
             if any(all(color == unique_colors, axis=1)):
                 obj.is_selected = True
                 continue
@@ -162,7 +161,7 @@ class Selector(QObject):
         if len(unique_colors) == 0:
             return
 
-        for color, obj in self.renderer.scene.instance_colors.items():
+        for color, obj in self.renderer.viewer.instance_colors.items():
             if any(all(color == unique_colors, axis=1)):
                 obj.is_selected = False
                 continue

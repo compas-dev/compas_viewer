@@ -14,7 +14,7 @@ mesh.transform(T * S)
 
 mesh2 = mesh.transformed(Translation.from_vector([-6, 0, 0]))
 
-viewer.scene.add(mesh, hide_coplanaredges=False)
-viewer.scene.add(mesh2, hide_coplanaredges=True)
+viewer.add(mesh, hide_coplanaredges=False)
+viewer.add(mesh2, hide_coplanaredges=True)
 
 viewer.show()

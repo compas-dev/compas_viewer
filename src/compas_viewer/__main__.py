@@ -100,6 +100,6 @@ print("Check out our page for more tutorials, documentations and api references:
 
 
 for name, geometry in geometries.items():
-    viewer.scene.add(item=geometry, name=name)
+    viewer.add(item=geometry, name=name)
 
 viewer.show()

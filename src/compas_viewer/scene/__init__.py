@@ -5,6 +5,7 @@ This package provides scene object plugins for visualizing COMPAS objects in `co
 from typing import Union
 from compas.scene import register
 from compas.plugins import plugin
+from .sceneobject import ViewerSceneObject
 from compas.datastructures import Mesh
 from compas.datastructures import Graph
 from compas.geometry import (
@@ -27,10 +28,10 @@ from compas.geometry import (
     Geometry,
 )
 
-from .scene import ViewerScene  # noqa: F401
-from .sceneobject import ViewerSceneObject
+
 from .meshobject import MeshObject
 from .graphobject import GraphObject
+
 from .pointobject import PointObject
 from .lineobject import LineObject
 from .vectorobject import VectorObject

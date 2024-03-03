@@ -13,6 +13,6 @@ mesh = Mesh.from_obj(compas.get("faces.obj"))
 for vertex in mesh.vertices():
     mesh.vertex_attribute(vertex, "color", Color.from_i(random()))
 
-viewer.scene.add(mesh, use_vertexcolors=True)
+viewer.add(mesh, use_vertexcolors=True)
 
 viewer.show()
