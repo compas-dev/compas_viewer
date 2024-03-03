@@ -93,7 +93,7 @@ class Slider(QWidget):
         interval: int = 1,
         bgcolor: Optional[Color] = None,
         stretch: int = 0,
-        kwargs={},
+        **kwargs,
     ):
         if min_value > max_value or interval > max_value - min_value:
             raise ValueError("Slider parameters are invalid. ")
