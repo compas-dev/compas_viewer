@@ -12,7 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+
 * Added `ViewerScene` as an attribute of the `Viewer` class. resolve [#28](https://github.com/compas-dev/compas_viewer/issues/28).
+* Bug fix of [#73](https://github.com/compas-dev/compas_viewer/issues/73).
 * Improved argument passing mechanism in the `Slider` class. Close [#76](https://github.com/compas-dev/compas_viewer/issues/76).
 * Documentation images and code correction.
 * Improved typing hints of `CollectionObject`.
