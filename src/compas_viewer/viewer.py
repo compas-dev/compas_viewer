@@ -140,6 +140,24 @@ class Viewer:
         self.frame_count: int = 0
 
     # ==========================================================================
+    # Scene
+    # ==========================================================================
+
+    def add(self, item, **kwargs):
+        """
+        Add an item to the scene.
+        This is a compatibility function for the old version of the viewer.
+        While :func:`compas_viewer.scene.ViewerScene.add` is the recommended way to add an item to the scene.
+
+        Returns
+        -------
+        :class:`compas_viewer.scene.sceneobject.ViewerSceneObject`
+            The scene object.
+        """
+
+        return self.scene.add(item, **kwargs)
+
+    # ==========================================================================
     # Runtime
     # ==========================================================================
 
