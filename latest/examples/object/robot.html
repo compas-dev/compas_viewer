@@ -606,7 +606,7 @@ document.write(`
 <span class="n">model</span><span class="o">.</span><span class="n">load_geometry</span><span class="p">(</span><span class="n">github</span><span class="p">)</span>
 
 
-<span class="n">robot_object</span><span class="p">:</span> <span class="n">RobotModelObject</span> <span class="o">=</span> <span class="n">viewer</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">show_lines</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">configuration</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">random_configuration</span><span class="p">())</span>  <span class="c1"># type: ignore</span>
+<span class="n">robot_object</span><span class="p">:</span> <span class="n">RobotModelObject</span> <span class="o">=</span> <span class="n">viewer</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">show_lines</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">configuration</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">random_configuration</span><span class="p">())</span>  <span class="c1"># type: ignore</span>
 
 
 <span class="k">def</span> <span class="nf">rotate</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">robot_object</span><span class="p">:</span> <span class="n">RobotModelObject</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
@@ -620,7 +620,7 @@ document.write(`
     <span class="n">slider</span> <span class="o">=</span> <span class="n">viewer</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">sidedock</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">slider</span><span class="p">)</span>
 
 
-<span class="n">treeform</span> <span class="o">=</span> <span class="n">Treeform</span><span class="p">(</span><span class="n">viewer</span><span class="o">.</span><span class="n">tree</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;.name&quot;</span><span class="p">,</span> <span class="s2">&quot;Object&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">})</span>
+<span class="n">treeform</span> <span class="o">=</span> <span class="n">Treeform</span><span class="p">(</span><span class="n">viewer</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">tree</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;.name&quot;</span><span class="p">,</span> <span class="s2">&quot;Object&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">})</span>
 
 <span class="n">viewer</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">sidedock</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">treeform</span><span class="p">)</span>
 

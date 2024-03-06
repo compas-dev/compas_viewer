@@ -59,8 +59,8 @@
         </script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Viewer.clear" href="compas_viewer.viewer.Viewer.clear.html" />
-    <link rel="prev" title="Viewer.add" href="compas_viewer.viewer.Viewer.add.html" />
+    <link rel="next" title="Viewer.on" href="compas_viewer.viewer.Viewer.on.html" />
+    <link rel="prev" title="Viewer" href="compas_viewer.viewer.Viewer.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -594,7 +594,7 @@ document.write(`
 <h1>Viewer.add_action</h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="compas_viewer.viewer.Viewer.add_action">
-<span class="sig-prename descclassname"><span class="pre">Viewer.</span></span><span class="sig-name descname"><span class="pre">add_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pressed_action</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">released_action</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modifier</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/bafcb6c/src/compas_viewer/viewer.py#L355"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<span class="sig-prename descclassname"><span class="pre">Viewer.</span></span><span class="sig-name descname"><span class="pre">add_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pressed_action</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">released_action</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modifier</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/405c75d/src/compas_viewer/viewer.py#L215"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Add a custom action to the viewer.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -626,7 +626,7 @@ Default to the name of the pressed_action function.</p>
 <span class="kn">from</span> <span class="nn">compas.geometry</span> <span class="kn">import</span> <span class="n">Transformation</span>
 <span class="kn">from</span> <span class="nn">compas_viewer</span> <span class="kn">import</span> <span class="n">Viewer</span>
 <span class="n">viewer</span> <span class="o">=</span> <span class="n">Viewer</span><span class="p">()</span>
-<span class="n">faces</span> <span class="o">=</span> <span class="n">viewer</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Mesh</span><span class="o">.</span><span class="n">from_obj</span><span class="p">(</span><span class="n">compas</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;faces.obj&quot;</span><span class="p">)))</span>
+<span class="n">faces</span> <span class="o">=</span> <span class="n">viewer</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Mesh</span><span class="o">.</span><span class="n">from_obj</span><span class="p">(</span><span class="n">compas</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;faces.obj&quot;</span><span class="p">)))</span>
 <span class="n">faces</span><span class="o">.</span><span class="n">transformation</span> <span class="o">=</span> <span class="n">Transformation</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">pressed_action</span><span class="p">():</span>
     <span class="n">faces</span><span class="o">.</span><span class="n">transformation</span> <span class="o">*=</span> <span class="n">Scale</span><span class="o">.</span><span class="n">from_factors</span><span class="p">([</span><span class="mf">1.1</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">],</span> <span class="n">Frame</span><span class="o">.</span><span class="n">worldXY</span><span class="p">())</span>

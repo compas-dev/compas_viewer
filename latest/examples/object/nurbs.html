@@ -590,10 +590,11 @@ document.write(`
 <figure class="figure align-default">
 <img alt="../../_images/nurbs.jpg" class="figure-img img-fluid" src="../../_images/nurbs.jpg" />
 </figure>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">compas.geometry</span> <span class="kn">import</span> <span class="n">Point</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">compas.colors</span> <span class="kn">import</span> <span class="n">Color</span>
 <span class="kn">from</span> <span class="nn">compas.geometry</span> <span class="kn">import</span> <span class="n">NurbsSurface</span>
+<span class="kn">from</span> <span class="nn">compas.geometry</span> <span class="kn">import</span> <span class="n">Point</span>
+
 <span class="kn">from</span> <span class="nn">compas_viewer</span> <span class="kn">import</span> <span class="n">Viewer</span>
-<span class="kn">from</span> <span class="nn">compas.colors</span> <span class="kn">import</span> <span class="n">Color</span>
 
 <span class="n">points</span> <span class="o">=</span> <span class="p">[</span>
     <span class="p">[</span><span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">Point</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">Point</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">Point</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)],</span>
@@ -604,9 +605,11 @@ document.write(`
 
 <span class="n">surface</span> <span class="o">=</span> <span class="n">NurbsSurface</span><span class="o">.</span><span class="n">from_points</span><span class="p">(</span><span class="n">points</span><span class="o">=</span><span class="n">points</span><span class="p">)</span>
 
-<span class="n">view</span> <span class="o">=</span> <span class="n">Viewer</span><span class="p">(</span><span class="n">rendermode</span><span class="o">=</span><span class="s2">&quot;lighted&quot;</span><span class="p">)</span>
-<span class="n">view</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">surface</span><span class="p">,</span> <span class="n">show_points</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">show_lines</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">pointscolor</span><span class="o">=</span><span class="n">Color</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span> <span class="n">linescolor</span><span class="o">=</span><span class="n">Color</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))</span>
-<span class="n">view</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">viewer</span> <span class="o">=</span> <span class="n">Viewer</span><span class="p">(</span><span class="n">rendermode</span><span class="o">=</span><span class="s2">&quot;lighted&quot;</span><span class="p">)</span>
+<span class="n">viewer</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">surface</span><span class="p">,</span> <span class="n">show_points</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">show_lines</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">pointscolor</span><span class="o">=</span><span class="n">Color</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span> <span class="n">linescolor</span><span class="o">=</span><span class="n">Color</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">viewer</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </section>

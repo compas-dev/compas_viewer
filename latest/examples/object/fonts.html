@@ -609,15 +609,15 @@ document.write(`
 
 <span class="c1"># By default, the text is rendered using the FreeSans font from the library.</span>
 <span class="n">t</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="s2">&quot;EN&quot;</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">height</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
-<span class="n">viewer</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+<span class="n">viewer</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
 
 <span class="c1"># Font specified is possible.</span>
 <span class="n">t</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="s2">&quot;EN&quot;</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">height</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="n">find_sys_font</span><span class="p">(</span><span class="s2">&quot;Times New Roman&quot;</span><span class="p">))</span>
-<span class="n">viewer</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+<span class="n">viewer</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
 
 <span class="c1"># Multi-language text is possible if the machine has the font installed.</span>
 <span class="n">t</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="s2">&quot;中文 CN&quot;</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">height</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="n">find_sys_font</span><span class="p">(</span><span class="s2">&quot;DengXian&quot;</span><span class="p">))</span>
-<span class="n">viewer</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+<span class="n">viewer</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
 
 <span class="n">viewer</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
