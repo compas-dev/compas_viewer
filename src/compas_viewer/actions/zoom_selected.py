@@ -8,7 +8,7 @@ class ZoomSelected(Action):
     """Look at action."""
 
     def pressed_action(self):
-        selected_objs = [obj for obj in self.viewer.objects if obj.is_selected]
+        selected_objs = [obj for obj in self.scene.objects if obj.is_selected]
         extents = []
 
         for obj in selected_objs:

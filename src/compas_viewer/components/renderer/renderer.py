@@ -2,6 +2,7 @@ import time
 from functools import lru_cache
 from typing import TYPE_CHECKING
 
+from compas.geometry import Frame
 from compas.geometry import transform_points_numpy
 from numpy import float32
 from numpy import identity
@@ -15,7 +16,6 @@ from PySide6.QtOpenGLWidgets import QOpenGLWidget
 from compas_viewer.configurations import RendererConfig
 from compas_viewer.scene import TagObject
 from compas_viewer.scene.collectionobject import CollectionObject
-from compas_viewer.scene.meshobject import MeshObject
 from compas_viewer.scene.vectorobject import VectorObject
 
 from .camera import Camera
@@ -25,6 +25,8 @@ from .shaders import Shader
 if TYPE_CHECKING:
     # https://peps.python.org/pep-0484/#runtime-or-type-checking
     from compas_viewer import Viewer
+    from compas_viewer.scene.frameobject import FrameObject
+    from compas_viewer.scene.meshobject import MeshObject
 
 
 class Renderer(QOpenGLWidget):
@@ -46,6 +48,7 @@ class Renderer(QOpenGLWidget):
 
         self.config = config
         self.viewer = viewer
+        self.scene = viewer.scene
 
         self._viewmode = self.config.viewmode
         self._rendermode = self.config.rendermode
@@ -61,8 +64,8 @@ class Renderer(QOpenGLWidget):
         self.shader_grid: Shader
 
         self.camera = Camera(self)
-        self.grid = self.viewer.grid
         self.selector = Selector(self)
+        self.grid: "FrameObject"
 
         self.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
 
@@ -357,11 +360,20 @@ class Renderer(QOpenGLWidget):
 
     def init(self):
         """Initialize the renderer."""
+
         # Init the grid
+        self.grid = self.scene.add(  # type: ignore
+            Frame.worldXY(),
+            framesize=self.config.gridsize,
+            show_framez=self.config.show_gridz,
+            is_selected=False,
+            is_locked=True,
+            is_visible=self.config.show_grid,
+        )
         self.grid.init()
 
         # Init the buffers
-        for obj in self.viewer.objects:
+        for obj in self.scene.objects:
             obj.init()
 
         projection = self.camera.projection(
@@ -463,7 +475,7 @@ class Renderer(QOpenGLWidget):
         """
         self.update_projection(w, h)
 
-    def sort_objects_from_viewworld(self, objects: list[MeshObject], viewworld: list[list[float]]):
+    def sort_objects_from_viewworld(self, objects: list["MeshObject"], viewworld: list[list[float]]):
         """Sort objects by the distances from their bounding box centers to camera location
 
         Parameters
@@ -496,8 +508,8 @@ class Renderer(QOpenGLWidget):
 
     @lru_cache(maxsize=3)
     def sort_objects_from_category(
-        self, objs: tuple[MeshObject]
-    ) -> tuple[list[TagObject], list[VectorObject], list[MeshObject]]:
+        self, objs: tuple["MeshObject"]
+    ) -> tuple[list["TagObject"], list["VectorObject"], list["MeshObject"]]:
         """Sort objects by their categories
 
         Returns
@@ -554,15 +566,8 @@ class Renderer(QOpenGLWidget):
         self.update_projection()
         # Object categorization
         tag_objs, vector_objs, mesh_objs = self.sort_objects_from_category(
-            (obj for obj in self.viewer.objects if obj.is_visible)
+            (obj for obj in self.scene.objects if obj.is_visible)
         )
-
-        # Draw grid
-        if self.config.show_grid:
-            self.shader_grid.bind()
-            self.shader_grid.uniform4x4("viewworld", viewworld)
-            self.grid.draw(self.shader_grid, self.config.rendermode == "wireframe", self.config.rendermode == "lighted")
-            self.shader_grid.release()
 
         # Draw model objects in the scene
         self.shader_model.bind()
@@ -614,7 +619,7 @@ class Renderer(QOpenGLWidget):
         viewworld = self.camera.viewworld()
         self.update_projection()
         # Object categorization
-        _, _, mesh_objs = self.sort_objects_from_category(tuple(self.viewer.objects))
+        _, _, mesh_objs = self.sort_objects_from_category(tuple(self.scene.objects))
         # Draw instance maps
         GL.glDisable(GL.GL_POINT_SMOOTH)
         GL.glDisable(GL.GL_LINE_SMOOTH)

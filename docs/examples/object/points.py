@@ -8,6 +8,7 @@ from compas_viewer import Viewer
 viewer = Viewer()
 for i in range(10):
     point = Point(random() * 10, random() * 10, random() * 10)
-    viewer.add(point, pointscolor=Color(random(), random(), random()), pointssize=30)
+    viewer.scene.add(point, pointscolor=Color(random(), random(), random()), pointssize=30)
+
 
 viewer.show()

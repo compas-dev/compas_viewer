@@ -9,6 +9,6 @@ viewer = Viewer()
 
 for i in range(10):
     line = Line([random() * 20, random() * 20, random() * 20], [random() * 20, random() * 20, random() * 20])
-    viewer.add(line, linescolor=Color(random(), random(), random()))
+    viewer.scene.add(line, linescolor=Color(random(), random(), random()))
 
 viewer.show()
