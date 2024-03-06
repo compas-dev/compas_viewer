@@ -594,65 +594,14 @@ document.write(`
 <h1>Viewer.add</h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="compas_viewer.viewer.Viewer.add">
-<span class="sig-prename descclassname"><span class="pre">Viewer.</span></span><span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">item</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_selected</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_locked</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_visible</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_lines</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_faces</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pointscolor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linescolor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">facescolor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lineswidth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pointssize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opacity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hide_coplanaredges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_vertexcolors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/bafcb6c/src/compas_viewer/viewer.py#L244"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<span class="sig-prename descclassname"><span class="pre">Viewer.</span></span><span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">item</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/1f00315/src/compas_viewer/viewer.py#L146"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Add an item to the scene.
-This function is inherent from <a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.scene.Scene.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.scene.Scene</span></code></a> with additional functionalities.</p>
-<dl class="field-list">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl>
-<dt><strong>item</strong><span class="classifier">Union[<a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.geometry.Geometry.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.geometry.Geometry</span></code></a>, <a class="reference external" href="https://compas.dev/compas/latest/api/compas.datastructures.Mesh.html#compas.datastructures.Mesh" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.datastructures.Mesh</span></code></a>]</span></dt><dd><p>The geometry to add to the scene.</p>
-</dd>
-<dt><strong>parent</strong><span class="classifier"><a class="reference internal" href="compas_viewer.scene.ViewerSceneObject.html#compas_viewer.scene.ViewerSceneObject" title="compas_viewer.scene.ViewerSceneObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas_viewer.scene.ViewerSceneObject</span></code></a>, optional</span></dt><dd><p>The parent of the item.</p>
-</dd>
-<dt><strong>is_selected</strong><span class="classifier">bool, optional</span></dt><dd><p>Whether the object is selected.
-Default to False.</p>
-</dd>
-<dt><strong>is_locked</strong><span class="classifier">bool, optional</span></dt><dd><p>Whether the object is locked (not selectable).
-Default to False.</p>
-</dd>
-<dt><strong>is_visible</strong><span class="classifier">bool, optional</span></dt><dd><p>Whether to show object.
-Default to True.</p>
-</dd>
-<dt><strong>show_points</strong><span class="classifier">bool, optional</span></dt><dd><p>Whether to show points/vertices of the object.
-It will override the value in the scene config file.</p>
-</dd>
-<dt><strong>show_lines</strong><span class="classifier">bool, optional</span></dt><dd><p>Whether to show lines/edges of the object.
-It will override the value in the scene config file.</p>
-</dd>
-<dt><strong>show_faces</strong><span class="classifier">bool, optional</span></dt><dd><p>Whether to show faces of the object.
-It will override the value in the scene config file.</p>
-</dd>
-<dt><strong>pointscolor</strong><span class="classifier">Union[<a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.colors.Color.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.colors.Color</span></code></a>, dict[Any, <a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.colors.Color.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.colors.Color</span></code></a>], optional</span></dt><dd><p>The color or the dict of colors of the points.
-It will override the value in the scene config file.</p>
-</dd>
-<dt><strong>linescolor</strong><span class="classifier">Union[<a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.colors.Color.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.colors.Color</span></code></a>, dict[Any, <a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.colors.Color.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.colors.Color</span></code></a>], optional</span></dt><dd><p>The color or the dict of colors of the lines.
-It will override the value in the scene config file.</p>
-</dd>
-<dt><strong>facescolor</strong><span class="classifier">Union[<a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.colors.Color.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.colors.Color</span></code></a>, dict[Any, <a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.colors.Color.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.colors.Color</span></code></a>], optional</span></dt><dd><p>The color or the dict of colors the faces.
-It will override the value in the scene config file.</p>
-</dd>
-<dt><strong>lineswidth</strong><span class="classifier">float, optional</span></dt><dd><p>The line width to be drawn on screen
-It will override the value in the scene config file.</p>
-</dd>
-<dt><strong>pointssize</strong><span class="classifier">float, optional</span></dt><dd><p>The point size to be drawn on screen
-It will override the value in the scene config file.</p>
-</dd>
-<dt><strong>opacity</strong><span class="classifier">float, optional</span></dt><dd><p>The opacity of the object.
-It will override the value in the scene config file.</p>
-</dd>
-<dt><strong>hide_coplanaredges</strong><span class="classifier">bool, optional</span></dt><dd><p>Whether to hide the coplanar edges of the mesh.
-It will override the value in the scene config file.</p>
-</dd>
-<dt><strong>use_vertexcolors</strong><span class="classifier">bool, optional</span></dt><dd><p>Whether to use vertex color.
-It will override the value in the scene config file.</p>
-</dd>
-<dt><strong>**kwargs</strong><span class="classifier">dict, optional</span></dt><dd><p>The other possible parameters to be passed to the object.</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt><a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.scene.SceneObject.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.scene.SceneObject</span></code></a></dt><dd><p>The scene object.</p>
+This is a compatibility function for the old version of the viewer.
+While <code class="xref py py-func docutils literal notranslate"><span class="pre">compas_viewer.scene.ViewerScene.add()</span></code> is the recommended way to add an item to the scene.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><a class="reference internal" href="compas_viewer.scene.ViewerSceneObject.html#compas_viewer.scene.ViewerSceneObject" title="compas_viewer.scene.sceneobject.ViewerSceneObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas_viewer.scene.sceneobject.ViewerSceneObject</span></code></a></dt><dd><p>The scene object.</p>
 </dd>
 </dl>
 </dd>
