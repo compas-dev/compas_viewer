@@ -97,7 +97,7 @@ class Viewer(Scene):
         show_grid: Optional[bool] = None,
         configpath: Optional[str] = None,
     ):
-        super(Viewer, self).__init__()
+        super().__init__()
         self.started = False
 
         # Custom or default config
@@ -164,7 +164,7 @@ class Viewer(Scene):
         self.objects: list[ViewerSceneObject]
 
     def __new__(cls, *args, **kwargs):
-        instance = super(Viewer, cls).__new__(cls)
+        instance = super().__new__(cls)
         Scene.viewerinstance = instance  # type: ignore
         return instance
 
@@ -322,7 +322,7 @@ class Viewer(Scene):
             The scene object.
         """
 
-        sceneobject: ViewerSceneObject = super(Viewer, self).add(  # type: ignore
+        sceneobject: ViewerSceneObject = super().add(  # type: ignore
             item=item,
             parent=parent,
             viewer=self,

@@ -41,7 +41,7 @@ class VectorObject(ViewerSceneObject, GeometryObject):
 
     def __init__(self, vector: Vector, anchor: Point = Point(0, 0, 0), **kwargs):
         self._anchor = anchor
-        super(VectorObject, self).__init__(geometry=vector, **kwargs)
+        super().__init__(geometry=vector, **kwargs)
         self.arrow_buffer: dict[str, Any]
         self._lines_buffer: dict[str, Any]
 

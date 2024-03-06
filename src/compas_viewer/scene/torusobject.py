@@ -18,4 +18,4 @@ class TorusObject(MeshObject):
         self.u = kwargs.get("u", int(2 * pi * torus.radius_axis / self.LINEARDEFLECTION))
         self.v = kwargs.get("v", int(2 * pi * torus.radius_pipe / self.LINEARDEFLECTION))
 
-        super(TorusObject, self).__init__(mesh=Mesh.from_shape(torus, u=self.u, v=self.v), **kwargs)
+        super().__init__(mesh=Mesh.from_shape(torus, u=self.u, v=self.v), **kwargs)

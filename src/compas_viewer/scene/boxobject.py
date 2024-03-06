@@ -13,4 +13,4 @@ class BoxObject(MeshObject):
     """
 
     def __init__(self, box: Box, **kwargs):
-        super(BoxObject, self).__init__(mesh=Mesh.from_shape(box), **kwargs)
+        super().__init__(mesh=Mesh.from_shape(box), **kwargs)

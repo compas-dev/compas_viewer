@@ -25,7 +25,7 @@ class PlaneObject(ViewerSceneObject, GeometryObject):
     """
 
     def __init__(self, plane: Plane, planesize: float = 1, **kwargs):
-        super(PlaneObject, self).__init__(geometry=plane, **kwargs)
+        super().__init__(geometry=plane, **kwargs)
         self.frame = Frame.from_plane(plane)
         self.planesize = planesize
 

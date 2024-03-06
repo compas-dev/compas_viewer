@@ -109,7 +109,7 @@ class ControllerConfig(Config):
         deselect: Union[tuple[str, str], tuple[str]],
         actions: dict[str, Union[tuple[str, str], tuple[str]]],
     ):
-        super(ControllerConfig, self).__init__()
+        super().__init__()
         # Zoom function fixed.
         self.zoom = None
         # Select function fixed.
