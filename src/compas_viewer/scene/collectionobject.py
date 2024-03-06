@@ -14,7 +14,7 @@ class Collection(Data):
     """Viewer scene object for displaying a collection of COMPAS geometries."""
 
     def __init__(self, items: list[Union[Geometry, Mesh]], **kwargs):
-        super(Collection, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.items = items
 
     @property
@@ -27,7 +27,7 @@ class CollectionObject(ViewerSceneObject, GeometryObject):
 
     def __init__(self, items: list[Union[Geometry, Mesh]], **kwargs):
         self.collection = Collection(items)
-        super(CollectionObject, self).__init__(geometry=self.collection, **kwargs)
+        super().__init__(geometry=self.collection, **kwargs)
         self.objects = [ViewerSceneObject(item=item, **kwargs) for item in self.collection.items]
 
     def _read_points_data(self) -> DataType:

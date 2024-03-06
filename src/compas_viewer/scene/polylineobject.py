@@ -15,7 +15,7 @@ class PolylineObject(ViewerSceneObject, GeometryObject):
     """
 
     def __init__(self, polyline: Polyline, **kwargs):
-        super(PolylineObject, self).__init__(geometry=polyline, **kwargs)
+        super().__init__(geometry=polyline, **kwargs)
         self.geometry: Polyline
 
     def _read_points_data(self) -> DataType:

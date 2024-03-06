@@ -134,7 +134,7 @@ class ViewerSceneObject(SceneObject):
             )
         #  Basic
         self.config = config
-        super(ViewerSceneObject, self).__init__(config=self.config, **kwargs)
+        super().__init__(config=self.config, **kwargs)
         self.viewer = viewer
         self.is_visible = is_visible
 

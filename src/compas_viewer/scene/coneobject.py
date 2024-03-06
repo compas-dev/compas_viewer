@@ -17,4 +17,4 @@ class ConeObject(MeshObject):
     def __init__(self, cone: Cone, **kwargs):
         self.u = kwargs.get("u", int(2 * pi * cone.radius / self.LINEARDEFLECTION))
 
-        super(ConeObject, self).__init__(mesh=Mesh.from_shape(shape=cone, u=self.u), **kwargs)
+        super().__init__(mesh=Mesh.from_shape(shape=cone, u=self.u), **kwargs)

@@ -44,7 +44,7 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
     def __init__(
         self, mesh: Mesh, hide_coplanaredges: Optional[bool] = None, use_vertexcolors: Optional[bool] = None, **kwargs
     ):
-        super(MeshObject, self).__init__(mesh=mesh, **kwargs)
+        super().__init__(mesh=mesh, **kwargs)
         self.mesh: Mesh
         self.hide_coplanaredges = (
             hide_coplanaredges if hide_coplanaredges is not None else self.config.hide_coplanaredges

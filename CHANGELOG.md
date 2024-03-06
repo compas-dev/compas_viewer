@@ -13,7 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 * Documentation images and code correction.
 * Improved typing hints of `CollectionObject`.
-* Bug fix of [#73](https://github.com/compas-dev/compas_viewer/issues/73).
+* Changed to the point object is `show_points = True` by default. Refer to [#73](https://github.com/compas-dev/compas_viewer/issues/73).
+* Changed from `super(__t, __obj)` to `super()` as the new version.
 
 ### Removed
 

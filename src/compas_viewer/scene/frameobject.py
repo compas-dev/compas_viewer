@@ -57,7 +57,7 @@ class FrameObject(ViewerSceneObject, GeometryObject):
         show_framez: Optional[bool] = None,
         **kwargs
     ):
-        super(FrameObject, self).__init__(geometry=frame, **kwargs)
+        super().__init__(geometry=frame, **kwargs)
 
         self.dx = framesize[0] if framesize else self.config.framesize[0]
         self.nx = framesize[1] if framesize else self.config.framesize[1]

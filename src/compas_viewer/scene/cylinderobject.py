@@ -17,4 +17,4 @@ class CylinderObject(MeshObject):
     def __init__(self, cylinder: Cylinder, **kwargs):
         self.u = kwargs.get("u", int(2 * pi * cylinder.radius / self.LINEARDEFLECTION))
 
-        super(CylinderObject, self).__init__(mesh=Mesh.from_shape(cylinder, u=self.u), **kwargs)
+        super().__init__(mesh=Mesh.from_shape(cylinder, u=self.u), **kwargs)

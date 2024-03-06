@@ -23,7 +23,7 @@ class GraphObject(ViewerSceneObject, BaseGraphObject):
     """
 
     def __init__(self, graph: Graph, **kwargs):
-        super(GraphObject, self).__init__(graph=graph, **kwargs)
+        super().__init__(graph=graph, **kwargs)
         self.graph: Graph
 
     def _read_points_data(self) -> DataType:

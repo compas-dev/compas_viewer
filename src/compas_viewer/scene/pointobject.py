@@ -23,7 +23,7 @@ class PointObject(ViewerSceneObject, GeometryObject):
     def __init__(self, point: Point, **kwargs):
         if kwargs["show_points"] is None:
             kwargs["show_points"] = True
-        super(PointObject, self).__init__(geometry=point, **kwargs)
+        super().__init__(geometry=point, **kwargs)
         self.geometry: Point
 
     def _read_points_data(self) -> DataType:

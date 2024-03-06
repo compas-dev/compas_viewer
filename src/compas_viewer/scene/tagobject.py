@@ -120,7 +120,7 @@ class TagObject(ViewerSceneObject, GeometryObject):
     """
 
     def __init__(self, tag: Tag, **kwargs):
-        super(TagObject, self).__init__(geometry=tag, **kwargs)
+        super().__init__(geometry=tag, **kwargs)
 
     def make_buffers(self):
         self._text_buffer = {
