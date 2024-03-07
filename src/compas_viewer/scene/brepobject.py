@@ -1,13 +1,17 @@
-from compas.geometry import Polyline
+from typing import Optional
+from typing import Tuple
+
+from compas.geometry import Line
+from compas.geometry import Point
+from compas.scene import GeometryObject
 from compas.utilities import pairwise
 
-from .meshobject import MeshObject
-from .sceneobject import DataType
+from .geometryobject import GeometryObject as ViewerGeometryObject
 
 try:
     from compas_occ.brep import OCCBrep
 
-    class BRepObject(MeshObject):
+    class BRepObject(ViewerGeometryObject, GeometryObject):
         """Viewer scene object for displaying COMPAS OCCBrep geometry.
 
         Attributes
@@ -15,7 +19,7 @@ try:
         brep : :class:`compas_occ.brep.OCCBrep`
             The compas_occ Brep object.
         mesh : :class:`compas.datastructures.Mesh`
-            The tesselation mesh representation of the Brep.
+            The mesh representation of the Brep.
 
         See Also
         --------
@@ -23,38 +27,34 @@ try:
         """
 
         def __init__(self, brep: OCCBrep, **kwargs):
-            self.brep = brep
-            mesh, boundaries = self.brep.to_tesselation(kwargs.get("linear_deflection ", self.LINEARDEFLECTION))
-            super().__init__(mesh=mesh, **kwargs)
-            self.boundaries = boundaries
+            super().__init__(geometry=brep, **kwargs)
+            self.geometry: OCCBrep
+            self.mesh, self.boundaries = self.geometry.to_tesselation(self.LINEARDEFLECTION)
 
-        def _read_lines_data(self) -> DataType:
-            positions = []
-            colors = []
-            elements = []
+        @property
+        def points(self) -> Optional[list[Point]]:
+            """The points to be shown in the viewer."""
+            return self.geometry.points
+
+        @property
+        def lines(self) -> Optional[list[Line]]:
+            """The lines to be shown in the viewer."""
             lines = []
             for polyline in self.boundaries:
-                lines += pairwise(polyline.points)
-            count = 0
-            for i, (pt1, pt2) in enumerate(lines):
-                positions.append(pt1)
-                positions.append(pt2)
-                color = self.linescolor.get(i, self.linescolor["_default"])  # type: ignore
-                colors.append(color)
-                colors.append(color)
-                elements.append([count, count + 1])
-                count += 2
-            return positions, colors, elements
+                for pair in pairwise(polyline.points):
+                    lines.append(Line(*pair))
 
-        def to_viewmesh(self, linear_deflection=1):
-            """
-            Convert the OCCBrep to a view mesh.
-            """
-            lines = []
-            for edge in self.brep.edges:
-                if edge.is_line:
-                    lines.append(Polyline([edge.vertices[0].point, edge.vertices[-1].point]))
-            return self.brep.to_tesselation(linear_deflection=linear_deflection), lines
+            return lines
+
+        @property
+        def surfaces(self) -> Optional[list[Tuple[Point, Point, Point]]]:
+            """The surface to be shown in the viewer. Currently only triangles are supported."""
+            surface_points = []
+            vertices, faces = self.mesh.to_vertices_and_faces()
+            for face in faces:
+                face_points = [vertices[i] for i in face]
+                surface_points.append(face_points)
+            return surface_points
 
 except ImportError:
     pass

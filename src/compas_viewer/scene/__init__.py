@@ -27,7 +27,6 @@ from compas.geometry import (
     Geometry,
 )
 
-from .scene import ViewerScene  # noqa: F401
 from .sceneobject import ViewerSceneObject
 from .meshobject import MeshObject
 from .graphobject import GraphObject
@@ -52,8 +51,9 @@ from .collectionobject import CollectionObject
 
 
 @plugin(category="drawing-utils", requires=["compas_viewer"])
-def clear(guids=None):
-    pass
+def clear(guids: list[str]):
+    for obj in guids:
+        del obj
 
 
 @plugin(category="drawing-utils", requires=["compas_viewer"])

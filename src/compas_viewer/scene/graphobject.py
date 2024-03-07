@@ -1,11 +1,15 @@
+from typing import Optional
+from typing import Tuple
+
 from compas.datastructures import Graph
+from compas.geometry import Line
+from compas.geometry import Point
 from compas.scene import GraphObject as BaseGraphObject
 
-from .sceneobject import DataType
-from .sceneobject import ViewerSceneObject
+from .geometryobject import GeometryObject as ViewerGeometryObject
 
 
-class GraphObject(ViewerSceneObject, BaseGraphObject):
+class GraphObject(ViewerGeometryObject, BaseGraphObject):
     """Viewer scene object for displaying COMPAS Graph data.
 
 
@@ -26,31 +30,17 @@ class GraphObject(ViewerSceneObject, BaseGraphObject):
         super().__init__(graph=graph, **kwargs)
         self.graph: Graph
 
-    def _read_points_data(self) -> DataType:
-        positions = []
-        colors = []
-        elements = []
-        i = 0
+    @property
+    def points(self) -> Optional[list[Point]]:
+        """The points to be shown in the viewer."""
+        return [Point(*self.graph.node_coordinates(node)) for node in self.graph.nodes()]
 
-        for node in self.graph.nodes():
-            positions.append(self.graph.node_coordinates(node))
-            colors.append(self.pointscolor.get(node, self.pointscolor["_default"]))  # type: ignore
-            elements.append([i])
-            i += 1
-        return positions, colors, elements
+    @property
+    def lines(self) -> Optional[list[Line]]:
+        """The lines to be shown in the viewer."""
+        return [Line(self.graph.node_coordinates(u), self.graph.node_coordinates(v)) for u, v in self.graph.edges()]
 
-    def _read_lines_data(self) -> DataType:
-        positions = []
-        colors = []
-        elements = []
-        i = 0
-
-        for u, v in self.graph.edges():
-            color = self.linescolor.get((u, v), self.linescolor["_default"])  # type: ignore
-            positions.append(self.graph.node_coordinates(u))
-            positions.append(self.graph.node_coordinates(v))
-            colors.append(color)
-            colors.append(color)
-            elements.append([i + 0, i + 1])
-            i += 2
-        return positions, colors, elements
+    @property
+    def surfaces(self) -> Optional[list[Tuple[Point, Point, Point]]]:
+        """The surface to be shown in the viewer. Currently only triangles are supported."""
+        pass

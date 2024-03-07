@@ -1,20 +1,18 @@
 from typing import Optional
 
-
 from compas.colors import Color
 from compas.geometry import Frame
 from compas.geometry import Point
 from compas.geometry import Transformation
-from compas.scene import GeometryObject
 
-from .sceneobject import DataType
+from .sceneobject import ShaderDataType
 from .sceneobject import ViewerSceneObject
 
 
-class FrameObject(ViewerSceneObject, GeometryObject):
+class FrameObject(ViewerSceneObject):
     """
-    The scene object of the COMPAS Frame geometry.
-    With its modifiable cell size and dimension, the world grid is also created from this class.
+    The scene object of the COMPAS Frame.
+    With its modifiable cell size and dimension.
 
     Parameters
     ----------
@@ -54,21 +52,24 @@ class FrameObject(ViewerSceneObject, GeometryObject):
         self,
         frame: Frame,
         framesize: Optional[tuple[float, int, float, int]] = None,
+        linecolor: Optional[Color] = None,
         show_framez: Optional[bool] = None,
         **kwargs
     ):
-        super().__init__(geometry=frame, **kwargs)
-
-        self.dx = framesize[0] if framesize else self.config.framesize[0]
-        self.nx = framesize[1] if framesize else self.config.framesize[1]
-        self.dy = framesize[2] if framesize else self.config.framesize[2]
-        self.ny = framesize[3] if framesize else self.config.framesize[3]
-        self.show_framez = show_framez or self.config.show_framez
+        super().__init__(item=frame, **kwargs)
+        self.frame = frame
+        self.linecolor = linecolor or self.viewer.config.linescolor
+        self.dx = framesize[0] if framesize else self.viewer.config.framesize[0]
+        self.nx = framesize[1] if framesize else self.viewer.config.framesize[1]
+        self.dy = framesize[2] if framesize else self.viewer.config.framesize[2]
+        self.ny = framesize[3] if framesize else self.viewer.config.framesize[3]
+        self.show_framez = show_framez or self.viewer.config.show_framez
         if self.nx % 2 != 0 or self.ny % 2 != 0:
             raise ValueError("The number of grid cells in the X and Y directions must be even numbers.")
+        self.show_lines = True
 
-    def _read_lines_data(self) -> DataType:
-        trans = Transformation.from_frame_to_frame(Frame.worldXY(), self.geometry)
+    def _read_lines_data(self) -> ShaderDataType:
+        trans = Transformation.from_frame_to_frame(Frame.worldXY(), self.frame)
 
         positions = []
         colors = []
@@ -80,9 +81,9 @@ class FrameObject(ViewerSceneObject, GeometryObject):
             x = -self.dx / 2 + self.dx / self.nx * i
             # Color Y axis positive green.
             if x == 0:
-                colors.extend([self.config.linescolor, self.config.linescolor, Color.green(), Color.green()])
+                colors.extend([self.linecolor, self.linecolor, Color.green(), Color.green()])
             else:
-                colors.extend([self.config.linescolor] * 4)
+                colors.extend([self.linecolor] * 4)
             positions.extend(
                 [
                     Point(x, -self.dy / 2, 0).transformed(trans),
@@ -98,9 +99,9 @@ class FrameObject(ViewerSceneObject, GeometryObject):
             y = -self.dy / 2 + self.dy / self.ny * i
             # Color X axis positive red.
             if y == 0:
-                colors.extend([self.config.linescolor, self.config.linescolor, Color.red(), Color.red()])
+                colors.extend([self.linecolor, self.linecolor, Color.red(), Color.red()])
             else:
-                colors.extend([self.config.linescolor] * 4)
+                colors.extend([self.linecolor] * 4)
             positions.extend(
                 [
                     Point(-self.dx / 2, y, 0).transformed(trans),
@@ -128,11 +129,14 @@ class FrameObject(ViewerSceneObject, GeometryObject):
 
         return positions, colors, elements
 
-    def draw_vertices(self):
+    def _read_points_data(self) -> Optional[ShaderDataType]:
+        """Read points data from the object."""
         pass
 
-    def draw_edges(self):
+    def _read_frontfaces_data(self) -> Optional[ShaderDataType]:
+        """Read frontfaces data from the object."""
         pass
 
-    def draw_faces(self):
+    def _read_backfaces_data(self) -> Optional[ShaderDataType]:
+        """Read backfaces data from the object."""
         pass

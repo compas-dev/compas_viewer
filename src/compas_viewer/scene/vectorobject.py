@@ -6,7 +6,7 @@ from compas.scene import GeometryObject
 
 from compas_viewer.components.renderer.shaders.shader import Shader
 
-from .sceneobject import DataType
+from .sceneobject import ShaderDataType
 from .sceneobject import ViewerSceneObject
 
 
@@ -45,9 +45,9 @@ class VectorObject(ViewerSceneObject, GeometryObject):
         self.arrow_buffer: dict[str, Any]
         self._lines_buffer: dict[str, Any]
 
-    def _read_lines_data(self) -> DataType:
-        arrow_end = self._anchor + self.geometry * (1 - self.config.vectorsize)
-        arrow_width = self.config.vectorsize * self.config.vectorsize * self.geometry.length
+    def _read_lines_data(self) -> ShaderDataType:
+        arrow_end = self._anchor + self.geometry * (1 - self.viewer.config.vectorsize)
+        arrow_width = self.viewer.config.vectorsize * self.viewer.config.vectorsize * self.geometry.length
         positions = [
             self._anchor,  # Arrow start
             arrow_end,  # Arrow body end
@@ -58,7 +58,7 @@ class VectorObject(ViewerSceneObject, GeometryObject):
             self._anchor + self.geometry,  # Arrow end
         ]
 
-        colors = [self.linescolor["_default"]] * len(positions)
+        colors = [self.linecolor or self.viewer.config.linescolor] * len(positions)
         elements = [[0, 1]]
         return positions, colors, elements
 

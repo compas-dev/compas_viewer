@@ -1,14 +1,17 @@
 import math
+from typing import Optional
+from typing import Tuple
 
 from compas.geometry import Circle
+from compas.geometry import Line
+from compas.geometry import Point
 from compas.scene import GeometryObject
 from compas.utilities import pairwise
 
-from .sceneobject import DataType
-from .sceneobject import ViewerSceneObject
+from .geometryobject import GeometryObject as ViewerGeometryObject
 
 
-class CircleObject(ViewerSceneObject, GeometryObject):
+class CircleObject(ViewerGeometryObject, GeometryObject):
     """Viewer scene object for displaying COMPAS Circle geometry.
 
     See Also
@@ -17,10 +20,10 @@ class CircleObject(ViewerSceneObject, GeometryObject):
     """
 
     def __init__(self, circle: Circle, **kwargs):
-        self.geometry: Circle
-        self.u = kwargs.get("u", int(circle.circumference / self.LINEARDEFLECTION))
-        self.u_points = self._calculate_circle_points(circle)
         super().__init__(geometry=circle, **kwargs)
+        self.geometry: Circle
+        self.u = int(circle.circumference / self.LINEARDEFLECTION)
+        self.show_lines = True
 
     def _calculate_circle_points(self, circle):
         return [
@@ -34,33 +37,22 @@ class CircleObject(ViewerSceneObject, GeometryObject):
             for i in range(self.u)
         ]
 
-    def _read_points_data(self) -> DataType:
-        positions = []
-        colors = []
-        elements = []
-        i = 0
+    @property
+    def points(self) -> Optional[list[Point]]:
+        """The points to be shown in the viewer."""
+        return [self.geometry.center]
 
-        for i, u_point in enumerate(self.u_points):
-            positions.append(u_point)
-            colors.append(self.pointscolor.get(i, self.pointscolor["_default"]))  # type: ignore
-            elements.append([i])
-            i += 1
+    @property
+    def lines(self) -> Optional[list[Line]]:
+        """The lines to be shown in the viewer."""
+        return [
+            Line(*pair)
+            for pair in pairwise(
+                self._calculate_circle_points(self.geometry) + [self._calculate_circle_points(self.geometry)[0]]
+            )
+        ]
 
-        return positions, colors, elements
-
-    def _read_lines_data(self) -> DataType:
-        positions = []
-        colors = []
-        elements = []
-        i = 0
-        count = 0
-        lines = pairwise(self.u_points + [self.u_points[0]])
-        count = 0
-        for i, (pt1, pt2) in enumerate(lines):
-            positions.append(pt1)
-            positions.append(pt2)
-            colors.append(self.pointscolor.get(i, self.pointscolor["_default"]))  # type: ignore
-            colors.append(self.pointscolor.get(i, self.pointscolor["_default"]))  # type: ignore
-            elements.append([count, count + 1])
-            count += 2
-        return positions, colors, elements
+    @property
+    def surfaces(self) -> Optional[list[Tuple[Point, Point, Point]]]:
+        """The surface to be shown in the viewer. Currently only triangles are supported."""
+        pass

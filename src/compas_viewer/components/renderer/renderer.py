@@ -362,15 +362,15 @@ class Renderer(QOpenGLWidget):
         """Initialize the renderer."""
 
         # Init the grid
-        self.grid = self.scene.add(  # type: ignore
-            Frame.worldXY(),
+        self.grid: FrameObject = self.scene.add(  # type: ignore
+            item=Frame.worldXY(),
             framesize=self.config.gridsize,
             show_framez=self.config.show_gridz,
             is_selected=False,
             is_locked=True,
             is_visible=self.config.show_grid,
         )
-        self.grid.init()
+        self.grid.init()  # type: ignore
 
         # Init the buffers
         for obj in self.scene.objects:

@@ -18,9 +18,9 @@ from compas_viewer.configurations import RendererConfig
 from compas_viewer.configurations import SceneConfig
 from compas_viewer.controller import Controller
 from compas_viewer.layout import Layout
+from compas_viewer.scene.scene import ViewerScene
+from compas_viewer.scene.sceneobject import ViewerSceneObject
 from compas_viewer.utilities import Timer
-
-from .scene import ViewerScene as Scene
 
 
 class Viewer:
@@ -87,9 +87,6 @@ class Viewer:
         show_grid: Optional[bool] = None,
         configpath: Optional[str] = None,
     ):
-
-        self.started = False
-
         # Custom or default config
         if configpath is None:
             self.renderer_config = RendererConfig.from_default()
@@ -119,11 +116,15 @@ class Viewer:
             self.renderer_config.show_grid = show_grid
 
         #  Application
+        self.started = False
         self.app = QCoreApplication.instance() or QApplication(sys.argv)
         self.window = QMainWindow()
 
+        # Viewer
+        self.config = self.scene_config
+
         # Scene
-        self.scene = Scene(self, config=self.scene_config)
+        self.scene = ViewerScene(self, name=self.layout_config.window.title, context="Viewer")
 
         # Controller
         self.controller = Controller(self, self.controller_config)
@@ -139,15 +140,18 @@ class Viewer:
         self.timer: Timer
         self.frame_count: int = 0
 
+        #  Primitive
+        self.objects: list[ViewerSceneObject]
+
     # ==========================================================================
     # Scene
     # ==========================================================================
 
-    def add(self, item, **kwargs):
+    def add(self, **kwargs):
         """
         Add an item to the scene.
         This is a compatibility function for the old version of the viewer.
-        While :func:`compas_viewer.scene.ViewerScene.add` is the recommended way to add an item to the scene.
+        While :func:`compas.scene.Scene.add` is the recommended way to add an item to the scene.
 
         Returns
         -------
@@ -155,7 +159,7 @@ class Viewer:
             The scene object.
         """
 
-        return self.scene.add(item, **kwargs)
+        return self.scene.add(**kwargs)
 
     # ==========================================================================
     # Runtime

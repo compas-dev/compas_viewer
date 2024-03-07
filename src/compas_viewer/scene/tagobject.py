@@ -1,7 +1,6 @@
 from os import PathLike
 from os import path
 from typing import Optional
-
 from typing import Union
 
 from compas.colors import Color
@@ -200,3 +199,15 @@ class TagObject(ViewerSceneObject, GeometryObject):
         shader.uniform1i("is_text", 0)
         shader.uniform1f("object_opacity", 1)
         shader.disable_attribute("position")
+
+    def _read_points_data(self):
+        pass
+
+    def _read_lines_data(self):
+        pass
+
+    def _read_frontfaces_data(self):
+        pass
+
+    def _read_backfaces_data(self):
+        pass
