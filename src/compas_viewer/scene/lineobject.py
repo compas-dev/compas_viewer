@@ -1,11 +1,13 @@
+from typing import Optional
+
 from compas.geometry import Line
+from compas.geometry import Point
 from compas.scene import GeometryObject
 
-from .sceneobject import DataType
-from .sceneobject import ViewerSceneObject
+from .geometryobject import GeometryObject as ViewerGeometryObject
 
 
-class LineObject(ViewerSceneObject, GeometryObject):
+class LineObject(ViewerGeometryObject, GeometryObject):
     """Viewer scene object for displaying COMPAS Line geometry.
 
     See Also
@@ -14,24 +16,21 @@ class LineObject(ViewerSceneObject, GeometryObject):
     """
 
     def __init__(self, line: Line, **kwargs):
-        if kwargs["show_lines"] is None:
-            kwargs["show_lines"] = True
         super().__init__(geometry=line, **kwargs)
+        self.geometry: Line
+        self.show_lines = True
 
-    def _read_points_data(self) -> DataType:
-        positions = [self.geometry.start, self.geometry.end]
-        colors = [
-            self.pointscolor.get(0, self.pointscolor["_default"]),  # type: ignore
-            self.pointscolor.get(1, self.pointscolor["_default"]),  # type: ignore
-        ]
-        elements = [[0], [1]]
-        return positions, colors, elements
+    @property
+    def points(self) -> Optional[list[Point]]:
+        """The points to be shown in the viewer."""
+        return [self.geometry.start, self.geometry.end]
 
-    def _read_lines_data(self) -> DataType:
-        positions = [self.geometry.start, self.geometry.end]
-        colors = [
-            self.linescolor.get(0, self.linescolor["_default"]),  # type: ignore
-            self.linescolor.get(1, self.linescolor["_default"]),  # type: ignore
-        ]
-        elements = [[0, 1]]
-        return positions, colors, elements
+    @property
+    def lines(self) -> Optional[list[Line]]:
+        """The lines to be shown in the viewer."""
+        return [self.geometry]
+
+    @property
+    def viewmesh(self):
+        """The mesh volume to be shown in the viewer."""
+        return None

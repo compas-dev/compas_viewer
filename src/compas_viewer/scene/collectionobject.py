@@ -6,7 +6,7 @@ from compas.geometry import Geometry
 from compas.scene import GeometryObject
 from numpy import array
 
-from .sceneobject import DataType
+from .sceneobject import ShaderDataType
 from .sceneobject import ViewerSceneObject
 
 
@@ -30,7 +30,7 @@ class CollectionObject(ViewerSceneObject, GeometryObject):
         super().__init__(geometry=self.collection, **kwargs)
         self.objects = [ViewerSceneObject(item=item, **kwargs) for item in self.collection.items]
 
-    def _read_points_data(self) -> DataType:
+    def _read_points_data(self) -> ShaderDataType:
         positions = []
         colors = []
         elements = []
@@ -43,7 +43,7 @@ class CollectionObject(ViewerSceneObject, GeometryObject):
             count += len(p)
         return positions, colors, elements
 
-    def _read_lines_data(self) -> DataType:
+    def _read_lines_data(self) -> ShaderDataType:
         positions = []
         colors = []
         elements = []
@@ -56,7 +56,7 @@ class CollectionObject(ViewerSceneObject, GeometryObject):
             count += len(p)
         return positions, colors, elements
 
-    def _read_frontfaces_data(self) -> DataType:
+    def _read_frontfaces_data(self) -> ShaderDataType:
         positions = []
         colors = []
         elements = []
@@ -69,7 +69,7 @@ class CollectionObject(ViewerSceneObject, GeometryObject):
             count += len(p)
         return positions, colors, elements
 
-    def _read_backfaces_data(self) -> DataType:
+    def _read_backfaces_data(self) -> ShaderDataType:
         positions = []
         colors = []
         elements = []

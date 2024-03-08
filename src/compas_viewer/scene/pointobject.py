@@ -1,11 +1,13 @@
+from typing import Optional
+
+from compas.geometry import Line
 from compas.geometry import Point
 from compas.scene import GeometryObject
 
-from .sceneobject import DataType
-from .sceneobject import ViewerSceneObject
+from .geometryobject import GeometryObject as ViewerGeometryObject
 
 
-class PointObject(ViewerSceneObject, GeometryObject):
+class PointObject(ViewerGeometryObject, GeometryObject):
     """Viewer scene object for displaying COMPAS Point geometry.
 
     Parameters
@@ -21,17 +23,21 @@ class PointObject(ViewerSceneObject, GeometryObject):
     """
 
     def __init__(self, point: Point, **kwargs):
-        if kwargs["show_points"] is None:
-            kwargs["show_points"] = True
         super().__init__(geometry=point, **kwargs)
+        self.show_points = True
         self.geometry: Point
 
-    def _read_points_data(self) -> DataType:
-        positions = [self.geometry]
-        colors = [self.pointscolor["_default"]]
-        elements = [[0]]
-        return positions, colors, elements
+    @property
+    def points(self) -> Optional[list[Point]]:
+        """The points to be shown in the viewer."""
+        return [self.geometry]
 
-    def _read_lines_data(self):
-        """No line data exist for this geometry, Return None."""
+    @property
+    def lines(self) -> Optional[list[Line]]:
+        """The lines to be shown in the viewer."""
+        return None
+
+    @property
+    def viewmesh(self):
+        """The mesh volume to be shown in the viewer."""
         return None

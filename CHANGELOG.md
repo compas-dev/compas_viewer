@@ -11,8 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added `RobotModelObject` and its example in the documentation.
 
 ### Changed
-
-
+* Renamed `surfaces` into `viewmesh` in every `ViewerGeometryObject`.
+* Renamed `scene.json` to `viewer.json` and `scene_config` to `viewer_config`.
+* Unify color naming. variables that control the colors of geometries are `surfacecolor`, `linecolor`,`pointcolor`, yet variables that control the colors of meshes are `facecolor`, `edgecolor`, `vertexcolor`.
+* Added `ViewerGeometryObject` as the abstract class for all the geometry objects. Other specific geometry objects are inherited from this class.
+* Changed `DataType` into `ShaderDataType`. Resolve to [#46](https://github.com/compas-dev/compas_viewer/issues/46).
 * Added `ViewerScene` as an attribute of the `Viewer` class. resolve [#28](https://github.com/compas-dev/compas_viewer/issues/28).
 * Bug fix of [#73](https://github.com/compas-dev/compas_viewer/issues/73).
 * Improved argument passing mechanism in the `Slider` class. Close [#76](https://github.com/compas-dev/compas_viewer/issues/76).
@@ -50,7 +53,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added `installation` documentation.
 * Added documentations: index, api, etc. Mockups style is improved.
 * Added `DeleteSelected` action class.
-* Added `DataType` as the data type template for generating the buffer.
+* Added `ShaderDataType` as the data type template for generating the buffer.
 * Added `NetworkObject` for the scene objects.
 * Added `compas_viewer.scene.ViewerSceneObject.LINEWIDTH_SELECTION_INCREMENTAL` to enhance line width for selection only.
 * Added `BRepObject`, `CapsuleObject`, `ConeObject`, `CylinderObject`, `PlaneObject`, `SphereObject`, `EllipseObject`, `TorusObject`, `PolygonObject`, `PolylineObject`, `BoxObject`. The geometric resolution is handled by the `compas_viewer.scene.ViewerSceneObject.LINEARDEFLECTION`.
