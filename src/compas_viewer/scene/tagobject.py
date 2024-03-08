@@ -201,13 +201,13 @@ class TagObject(ViewerSceneObject, GeometryObject):
         shader.disable_attribute("position")
 
     def _read_points_data(self):
-        pass
+        return None
 
     def _read_lines_data(self):
-        pass
+        return None
 
     def _read_frontfaces_data(self):
-        pass
+        return None
 
     def _read_backfaces_data(self):
-        pass
+        return None

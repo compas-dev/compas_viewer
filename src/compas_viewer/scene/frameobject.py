@@ -129,12 +129,12 @@ class FrameObject(ViewerSceneObject):
 
     def _read_points_data(self) -> Optional[ShaderDataType]:
         """Read points data from the object."""
-        pass
+        return None
 
     def _read_frontfaces_data(self) -> Optional[ShaderDataType]:
         """Read frontfaces data from the object."""
-        pass
+        return None
 
     def _read_backfaces_data(self) -> Optional[ShaderDataType]:
         """Read backfaces data from the object."""
-        pass
+        return None

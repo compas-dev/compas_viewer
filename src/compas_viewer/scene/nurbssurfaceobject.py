@@ -1,5 +1,4 @@
 from typing import Optional
-from typing import Tuple
 
 from compas.datastructures import Mesh
 from compas.geometry import Line
@@ -23,8 +22,8 @@ class NurbsSurfaceObject(ViewerGeometryObject, GeometryObject):
         self.geometry: NurbsSurface
 
         # LINEARDEFLECTION not implemented in NurbsSurface.
-        self.u = int(16 + (0 * self.LINEARDEFLECTION))
-        self.v = int(16 + (0 * self.LINEARDEFLECTION))
+        self.nu = int(16 + (0 * self.LINEARDEFLECTION))
+        self.nv = int(16 + (0 * self.LINEARDEFLECTION))
 
     @property
     def points(self) -> Optional[list[Point]]:
@@ -49,4 +48,9 @@ class NurbsSurfaceObject(ViewerGeometryObject, GeometryObject):
     @property
     def viewmesh(self) -> Mesh:
         """The mesh volume to be shown in the viewer."""
-        return Mesh.from_shape(self.geometry, u=self.u, v=self.v)
+        vertices = []
+        faces = []
+        for n, triangle in enumerate(self.geometry.to_triangles(nu=self.nu, nv=self.nv)):
+            vertices.extend([point for point in triangle])
+            faces.append([3 * n, 3 * n + 1, 3 * n + 2])
+        return Mesh.from_vertices_and_faces(vertices, faces)

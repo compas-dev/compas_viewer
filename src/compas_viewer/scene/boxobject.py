@@ -50,4 +50,4 @@ class BoxObject(ViewerGeometryObject, GeometryObject):
     @property
     def viewmesh(self):
         """The mesh volume to be shown in the viewer."""
-        return Mesh.from_shape(self.geometry)
+        return Mesh.from_shape(self.geometry, triangulated=True)

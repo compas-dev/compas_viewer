@@ -3,7 +3,6 @@ from math import pi
 from math import sin
 from math import sqrt
 from typing import Optional
-from typing import Tuple
 
 from compas.geometry import Ellipse
 from compas.geometry import Frame
