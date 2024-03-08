@@ -59,7 +59,7 @@
         </script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="ViewerSceneObject.clear" href="compas_viewer.scene.ViewerSceneObject.clear.html" />
+    <link rel="next" title="ViewerSceneObject.draw" href="compas_viewer.scene.ViewerSceneObject.draw.html" />
     <link rel="prev" title="compas_viewer.scene" href="../compas_viewer.scene.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -589,7 +589,7 @@ document.write(`
 <h1>ViewerSceneObject</h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="compas_viewer.scene.ViewerSceneObject">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ViewerSceneObject</span></span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/1f00315/src/compas_viewer/scene/sceneobject.py#L30"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ViewerSceneObject</span></span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/cbb73a1/src/compas_viewer/scene/sceneobject.py#L29"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.scene.SceneObject.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SceneObject</span></code></a></p>
 <p>Base class for all Viewer scene objects
 which also includes the  GL buffer creation and drawing methods.</p>
@@ -598,35 +598,25 @@ which also includes the  GL buffer creation and drawing methods.</p>
 <dd class="field-odd"><dl>
 <dt><strong>viewer</strong><span class="classifier"><a class="reference internal" href="compas_viewer.viewer.Viewer.html#compas_viewer.viewer.Viewer" title="compas_viewer.viewer.Viewer"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas_viewer.viewer.Viewer</span></code></a></span></dt><dd><p>The viewer object.</p>
 </dd>
-<dt><strong>is_selected</strong><span class="classifier">bool</span></dt><dd><p>Whether the object is selected.</p>
+<dt><strong>is_selected</strong><span class="classifier">bool, optional</span></dt><dd><p>Whether the object is selected. Default is False.</p>
 </dd>
-<dt><strong>is_locked</strong><span class="classifier">bool</span></dt><dd><p>Whether the object is locked.</p>
+<dt><strong>is_locked</strong><span class="classifier">bool, optional</span></dt><dd><p>Whether the object is locked. Default is False.</p>
 </dd>
-<dt><strong>is_visible</strong><span class="classifier">bool</span></dt><dd><p>Whether to show object.</p>
+<dt><strong>is_visible</strong><span class="classifier">bool, optional</span></dt><dd><p>Whether to show object. Default is True.</p>
 </dd>
-<dt><strong>show_points</strong><span class="classifier">bool, optional</span></dt><dd><p>Whether to show points/vertices of the object. It will override the value in the config file.</p>
+<dt><strong>show_points</strong><span class="classifier">bool, optional</span></dt><dd><p>Whether to show points/vertices of the object. Default is the value of <cite>show_points</cite> in <cite>viewer.config</cite>.</p>
 </dd>
-<dt><strong>show_lines</strong><span class="classifier">bool, optional</span></dt><dd><p>Whether to show lines/edges of the object. It will override the value in the config file.</p>
+<dt><strong>show_lines</strong><span class="classifier">bool, optional</span></dt><dd><p>Whether to show lines/edges of the object. Default is the value of <cite>show_lines</cite> in <cite>viewer.config</cite>.</p>
 </dd>
-<dt><strong>show_faces</strong><span class="classifier">bool, optional</span></dt><dd><p>Whether to show faces of the object. It will override the value in the config file.</p>
+<dt><strong>show_faces</strong><span class="classifier">bool, optional</span></dt><dd><p>Whether to show faces of the object. Default is the value of <cite>show_faces</cite> in <cite>viewer.config</cite>.</p>
 </dd>
-<dt><strong>pointscolor</strong><span class="classifier">Union[<a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.colors.Color.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.colors.Color</span></code></a>, dict[Any, <a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.colors.Color.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.colors.Color</span></code></a>]], optional</span></dt><dd><p>The color or the dict of colors of the points. It will override the value in the config file.</p>
+<dt><strong>lineswidth</strong><span class="classifier">float, optional</span></dt><dd><p>The line width to be drawn on screen. Default is the value of <cite>lineswidth</cite> in <cite>viewer.config</cite>.</p>
 </dd>
-<dt><strong>linescolor</strong><span class="classifier">Union[<a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.colors.Color.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.colors.Color</span></code></a>, dict[Any, <a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.colors.Color.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.colors.Color</span></code></a>]], optional</span></dt><dd><p>The color or the dict of colors of the lines. It will override the value in the config file.</p>
+<dt><strong>pointssize</strong><span class="classifier">float, optional</span></dt><dd><p>The point size to be drawn on screen. Default is the value of <cite>pointssize</cite> in <cite>viewer.config</cite>.</p>
 </dd>
-<dt><strong>facescolor</strong><span class="classifier">Union[<a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.colors.Color.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.colors.Color</span></code></a>, dict[Any, <a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.colors.Color.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.colors.Color</span></code></a>]], optional</span></dt><dd><p>The color or the dict of colors the faces. It will override the value in the config file.</p>
+<dt><strong>opacity</strong><span class="classifier">float, optional</span></dt><dd><p>The opacity of the object. Default is the value of <cite>opacity</cite> in <cite>viewer.config</cite>.</p>
 </dd>
-<dt><strong>lineswidth</strong><span class="classifier">float, optional</span></dt><dd><p>The line width to be drawn on screen. It will override the value in the config file.</p>
-</dd>
-<dt><strong>pointssize</strong><span class="classifier">float, optional</span></dt><dd><p>The point size to be drawn on screen. It will override the value in the config file.</p>
-</dd>
-<dt><strong>opacity</strong><span class="classifier">float, optional</span></dt><dd><p>The opacity of the object. It will override the value in the config file.</p>
-</dd>
-<dt><strong>config: :class:`compas_viewer.configurations.scene_config.SceneConfig`.</strong></dt><dd><p>The configuration of the scene object. Defaults to None.
-It should be assigned though the <a class="reference internal" href="compas_viewer.viewer.Viewer.add.html#compas_viewer.viewer.Viewer.add" title="compas_viewer.viewer.Viewer.add"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas_viewer.viewer.Viewer.add</span></code></a> method.
-Otherwise a exception will be raised.</p>
-</dd>
-<dt><strong>**kwargs</strong><span class="classifier">dict, optional</span></dt><dd><p>Additional visualization options for specific objects.</p>
+<dt><strong>**kwargs</strong><span class="classifier">dict, optional</span></dt><dd><p>Additional visualization options for <a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.scene.SceneObject.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.scene.SceneObject</span></code></a>.</p>
 </dd>
 </dl>
 </dd>
@@ -640,7 +630,7 @@ Otherwise a exception will be raised.</p>
 <dl class="field-list">
 <dt class="field-odd">Attributes<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>is_selected</strong><span class="classifier">bool</span></dt><dd><p>Whether the object is selected.</p>
+<dt><strong>is_selected</strong><span class="classifier">boolA</span></dt><dd><p>Whether the object is selected.</p>
 </dd>
 <dt><strong>is_locked</strong><span class="classifier">bool</span></dt><dd><p>Whether the object is locked (selectable).
 The global grid is a typical object that is not selectable.</p>
@@ -652,12 +642,6 @@ The global grid is a typical object that is not selectable.</p>
 <dt><strong>show_lines</strong><span class="classifier">bool</span></dt><dd><p>Whether to show lines/edges of the object.</p>
 </dd>
 <dt><strong>show_faces</strong><span class="classifier">bool</span></dt><dd><p>Whether to show faces of the object.</p>
-</dd>
-<dt><strong>pointscolor</strong><span class="classifier">dict[Any, <a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.colors.Color.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.colors.Color</span></code></a>]</span></dt><dd><p>The color of the points.</p>
-</dd>
-<dt><strong>linescolor</strong><span class="classifier">dict[Any, <a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.colors.Color.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.colors.Color</span></code></a>]</span></dt><dd><p>The color of the lines.</p>
-</dd>
-<dt><strong>facescolor</strong><span class="classifier">dict[Any, <a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.colors.Color.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.colors.Color</span></code></a>]</span></dt><dd><p>The color of the faces.</p>
 </dd>
 <dt><strong>lineswidth</strong><span class="classifier">float</span></dt><dd><p>The line width to be drawn on screen</p>
 </dd>
@@ -677,31 +661,28 @@ The global grid is a typical object that is not selectable.</p>
 <p class="rubric">Methods</p>
 <table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.ViewerSceneObject.clear.html#compas_viewer.scene.ViewerSceneObject.clear" title="compas_viewer.scene.ViewerSceneObject.clear"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear</span></code></a></p></td>
-<td><p>Clear the object</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.ViewerSceneObject.draw.html#compas_viewer.scene.ViewerSceneObject.draw" title="compas_viewer.scene.ViewerSceneObject.draw"><code class="xref py py-obj docutils literal notranslate"><span class="pre">draw</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.ViewerSceneObject.draw.html#compas_viewer.scene.ViewerSceneObject.draw" title="compas_viewer.scene.ViewerSceneObject.draw"><code class="xref py py-obj docutils literal notranslate"><span class="pre">draw</span></code></a></p></td>
 <td><p>Draw the object from its buffers</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.ViewerSceneObject.draw_instance.html#compas_viewer.scene.ViewerSceneObject.draw_instance" title="compas_viewer.scene.ViewerSceneObject.draw_instance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">draw_instance</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.ViewerSceneObject.draw_instance.html#compas_viewer.scene.ViewerSceneObject.draw_instance" title="compas_viewer.scene.ViewerSceneObject.draw_instance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">draw_instance</span></code></a></p></td>
 <td><p>Draw the object instance for picking</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.ViewerSceneObject.init.html#compas_viewer.scene.ViewerSceneObject.init" title="compas_viewer.scene.ViewerSceneObject.init"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.ViewerSceneObject.init.html#compas_viewer.scene.ViewerSceneObject.init" title="compas_viewer.scene.ViewerSceneObject.init"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init</span></code></a></p></td>
 <td><p>Initialize the object</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.ViewerSceneObject.make_buffer_from_data.html#compas_viewer.scene.ViewerSceneObject.make_buffer_from_data" title="compas_viewer.scene.ViewerSceneObject.make_buffer_from_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_buffer_from_data</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.ViewerSceneObject.make_buffer_from_data.html#compas_viewer.scene.ViewerSceneObject.make_buffer_from_data" title="compas_viewer.scene.ViewerSceneObject.make_buffer_from_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_buffer_from_data</span></code></a></p></td>
 <td><p>Create buffers from point/line/face data.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.ViewerSceneObject.make_buffers.html#compas_viewer.scene.ViewerSceneObject.make_buffers" title="compas_viewer.scene.ViewerSceneObject.make_buffers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_buffers</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.ViewerSceneObject.make_buffers.html#compas_viewer.scene.ViewerSceneObject.make_buffers" title="compas_viewer.scene.ViewerSceneObject.make_buffers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_buffers</span></code></a></p></td>
 <td><p>Create all buffers from object's data</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.ViewerSceneObject.update.html#compas_viewer.scene.ViewerSceneObject.update" title="compas_viewer.scene.ViewerSceneObject.update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.ViewerSceneObject.update.html#compas_viewer.scene.ViewerSceneObject.update" title="compas_viewer.scene.ViewerSceneObject.update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code></a></p></td>
 <td><p>Update the object</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.ViewerSceneObject.update_buffer_from_data.html#compas_viewer.scene.ViewerSceneObject.update_buffer_from_data" title="compas_viewer.scene.ViewerSceneObject.update_buffer_from_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_buffer_from_data</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.ViewerSceneObject.update_buffer_from_data.html#compas_viewer.scene.ViewerSceneObject.update_buffer_from_data" title="compas_viewer.scene.ViewerSceneObject.update_buffer_from_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_buffer_from_data</span></code></a></p></td>
 <td><p>Update existing buffers from point/line/face data.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.ViewerSceneObject.update_buffers.html#compas_viewer.scene.ViewerSceneObject.update_buffers" title="compas_viewer.scene.ViewerSceneObject.update_buffers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_buffers</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.ViewerSceneObject.update_buffers.html#compas_viewer.scene.ViewerSceneObject.update_buffers" title="compas_viewer.scene.ViewerSceneObject.update_buffers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_buffers</span></code></a></p></td>
 <td><p>Update all buffers from object's data</p></td>
 </tr>
 </tbody>
@@ -711,6 +692,9 @@ The global grid is a typical object that is not selectable.</p>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.ViewerSceneObject.add.html#compas_viewer.scene.ViewerSceneObject.add" title="compas_viewer.scene.ViewerSceneObject.add"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add</span></code></a></p></td>
 <td><p>Add a child item to the scene object.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.ViewerSceneObject.clear.html#compas_viewer.scene.ViewerSceneObject.clear" title="compas_viewer.scene.ViewerSceneObject.clear"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear</span></code></a></p></td>
+<td><p>The main clearing method.</p></td>
 </tr>
 </tbody>
 </table>

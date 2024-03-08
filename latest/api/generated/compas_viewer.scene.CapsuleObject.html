@@ -589,8 +589,8 @@ document.write(`
 <h1>CapsuleObject</h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="compas_viewer.scene.CapsuleObject">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">CapsuleObject</span></span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/1f00315/src/compas_viewer/scene/capsuleobject.py#L9"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
-<dd><p>Bases: <a class="reference internal" href="compas_viewer.scene.MeshObject.html#compas_viewer.scene.MeshObject" title="compas_viewer.scene.meshobject.MeshObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">MeshObject</span></code></a></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">CapsuleObject</span></span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/cbb73a1/src/compas_viewer/scene/capsuleobject.py#L12"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">GeometryObject</span></code>, <a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.scene.GeometryObject.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">GeometryObject</span></code></a></p>
 <p>Viewer scene object for displaying COMPAS Capsule geometry.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -605,51 +605,30 @@ document.write(`
 <td><p>Add a child item to the scene object.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.CapsuleObject.clear.html#compas_viewer.scene.CapsuleObject.clear" title="compas_viewer.scene.CapsuleObject.clear"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear</span></code></a></p></td>
-<td><p>Clear the object</p></td>
+<td><p>The main clearing method.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.CapsuleObject.clear_edges.html#compas_viewer.scene.CapsuleObject.clear_edges" title="compas_viewer.scene.CapsuleObject.clear_edges"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear_edges</span></code></a></p></td>
-<td><p>Clear the edges of the mesh.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.CapsuleObject.clear_faces.html#compas_viewer.scene.CapsuleObject.clear_faces" title="compas_viewer.scene.CapsuleObject.clear_faces"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear_faces</span></code></a></p></td>
-<td><p>Clear the faces of the mesh.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.CapsuleObject.clear_vertices.html#compas_viewer.scene.CapsuleObject.clear_vertices" title="compas_viewer.scene.CapsuleObject.clear_vertices"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear_vertices</span></code></a></p></td>
-<td><p>Clear the vertices of the mesh.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.CapsuleObject.draw.html#compas_viewer.scene.CapsuleObject.draw" title="compas_viewer.scene.CapsuleObject.draw"><code class="xref py py-obj docutils literal notranslate"><span class="pre">draw</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.CapsuleObject.draw.html#compas_viewer.scene.CapsuleObject.draw" title="compas_viewer.scene.CapsuleObject.draw"><code class="xref py py-obj docutils literal notranslate"><span class="pre">draw</span></code></a></p></td>
 <td><p>Draw the object from its buffers</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.CapsuleObject.draw_edges.html#compas_viewer.scene.CapsuleObject.draw_edges" title="compas_viewer.scene.CapsuleObject.draw_edges"><code class="xref py py-obj docutils literal notranslate"><span class="pre">draw_edges</span></code></a></p></td>
-<td><p>Draw the edges of the mesh.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.CapsuleObject.draw_faces.html#compas_viewer.scene.CapsuleObject.draw_faces" title="compas_viewer.scene.CapsuleObject.draw_faces"><code class="xref py py-obj docutils literal notranslate"><span class="pre">draw_faces</span></code></a></p></td>
-<td><p>Draw the faces of the mesh.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.CapsuleObject.draw_instance.html#compas_viewer.scene.CapsuleObject.draw_instance" title="compas_viewer.scene.CapsuleObject.draw_instance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">draw_instance</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.CapsuleObject.draw_instance.html#compas_viewer.scene.CapsuleObject.draw_instance" title="compas_viewer.scene.CapsuleObject.draw_instance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">draw_instance</span></code></a></p></td>
 <td><p>Draw the object instance for picking</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.CapsuleObject.draw_mesh.html#compas_viewer.scene.CapsuleObject.draw_mesh" title="compas_viewer.scene.CapsuleObject.draw_mesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">draw_mesh</span></code></a></p></td>
-<td><p>Draw the mesh of the mesh.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.CapsuleObject.draw_vertices.html#compas_viewer.scene.CapsuleObject.draw_vertices" title="compas_viewer.scene.CapsuleObject.draw_vertices"><code class="xref py py-obj docutils literal notranslate"><span class="pre">draw_vertices</span></code></a></p></td>
-<td><p>Draw the vertices of the mesh.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.CapsuleObject.init.html#compas_viewer.scene.CapsuleObject.init" title="compas_viewer.scene.CapsuleObject.init"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.CapsuleObject.init.html#compas_viewer.scene.CapsuleObject.init" title="compas_viewer.scene.CapsuleObject.init"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init</span></code></a></p></td>
 <td><p>Initialize the object</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.CapsuleObject.make_buffer_from_data.html#compas_viewer.scene.CapsuleObject.make_buffer_from_data" title="compas_viewer.scene.CapsuleObject.make_buffer_from_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_buffer_from_data</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.CapsuleObject.make_buffer_from_data.html#compas_viewer.scene.CapsuleObject.make_buffer_from_data" title="compas_viewer.scene.CapsuleObject.make_buffer_from_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_buffer_from_data</span></code></a></p></td>
 <td><p>Create buffers from point/line/face data.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.CapsuleObject.make_buffers.html#compas_viewer.scene.CapsuleObject.make_buffers" title="compas_viewer.scene.CapsuleObject.make_buffers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_buffers</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.CapsuleObject.make_buffers.html#compas_viewer.scene.CapsuleObject.make_buffers" title="compas_viewer.scene.CapsuleObject.make_buffers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_buffers</span></code></a></p></td>
 <td><p>Create all buffers from object's data</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.CapsuleObject.update.html#compas_viewer.scene.CapsuleObject.update" title="compas_viewer.scene.CapsuleObject.update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.CapsuleObject.update.html#compas_viewer.scene.CapsuleObject.update" title="compas_viewer.scene.CapsuleObject.update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code></a></p></td>
 <td><p>Update the object</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.CapsuleObject.update_buffer_from_data.html#compas_viewer.scene.CapsuleObject.update_buffer_from_data" title="compas_viewer.scene.CapsuleObject.update_buffer_from_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_buffer_from_data</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.CapsuleObject.update_buffer_from_data.html#compas_viewer.scene.CapsuleObject.update_buffer_from_data" title="compas_viewer.scene.CapsuleObject.update_buffer_from_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_buffer_from_data</span></code></a></p></td>
 <td><p>Update existing buffers from point/line/face data.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.CapsuleObject.update_buffers.html#compas_viewer.scene.CapsuleObject.update_buffers" title="compas_viewer.scene.CapsuleObject.update_buffers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_buffers</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.CapsuleObject.update_buffers.html#compas_viewer.scene.CapsuleObject.update_buffers" title="compas_viewer.scene.CapsuleObject.update_buffers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_buffers</span></code></a></p></td>
 <td><p>Update all buffers from object's data</p></td>
 </tr>
 </tbody>

@@ -59,7 +59,7 @@
         </script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="FrameObject.draw_edges" href="compas_viewer.scene.FrameObject.draw_edges.html" />
+    <link rel="next" title="FrameObject.add" href="compas_viewer.scene.FrameObject.add.html" />
     <link rel="prev" title="TagObject.update_buffers" href="compas_viewer.scene.TagObject.update_buffers.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -589,10 +589,10 @@ document.write(`
 <h1>FrameObject</h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="compas_viewer.scene.FrameObject">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">FrameObject</span></span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/1f00315/src/compas_viewer/scene/frameobject.py#L14"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
-<dd><p>Bases: <a class="reference internal" href="compas_viewer.scene.ViewerSceneObject.html#compas_viewer.scene.ViewerSceneObject" title="compas_viewer.scene.sceneobject.ViewerSceneObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">ViewerSceneObject</span></code></a>, <a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.scene.GeometryObject.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">GeometryObject</span></code></a></p>
-<p>The scene object of the COMPAS Frame geometry.
-With its modifiable cell size and dimension, the world grid is also created from this class.</p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">FrameObject</span></span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/cbb73a1/src/compas_viewer/scene/frameobject.py#L12"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <a class="reference internal" href="compas_viewer.scene.ViewerSceneObject.html#compas_viewer.scene.ViewerSceneObject" title="compas_viewer.scene.sceneobject.ViewerSceneObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">ViewerSceneObject</span></code></a></p>
+<p>The scene object of the COMPAS Frame.
+With its modifiable cell size and dimension.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
@@ -600,6 +600,8 @@ With its modifiable cell size and dimension, the world grid is also created from
 </dd>
 <dt><strong>framesize</strong><span class="classifier">tuple[float, int, float, int]</span></dt><dd><p>The size of the grid in [dx, nx, dy, ny] format.
 Notice that the <cite>nx</cite> and <cite>ny</cite> must be even numbers.</p>
+</dd>
+<dt><strong>linecolor</strong><span class="classifier"><a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.colors.Color.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.colors.Color</span></code></a></span></dt><dd><p>The color of the grid lines.</p>
 </dd>
 <dt><strong>show_framez</strong><span class="classifier">bool</span></dt><dd><p>If True, the Z axis of the grid will be shown.</p>
 </dd>
@@ -612,8 +614,6 @@ Notice that the <cite>nx</cite> and <cite>ny</cite> must be even numbers.</p>
 <dt><a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.geometry.Frame.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.geometry.Frame</span></code></a></dt><dd></dd>
 </dl>
 </div>
-<p class="rubric">Notes</p>
-<p>The frame object is always unselectable.</p>
 <dl class="field-list">
 <dt class="field-odd">Attributes<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
@@ -632,20 +632,6 @@ Notice that the <cite>nx</cite> and <cite>ny</cite> must be even numbers.</p>
 </dl>
 </dd>
 </dl>
-<p class="rubric">Methods</p>
-<table class="autosummary longtable table autosummary">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.FrameObject.draw_edges.html#compas_viewer.scene.FrameObject.draw_edges" title="compas_viewer.scene.FrameObject.draw_edges"><code class="xref py py-obj docutils literal notranslate"><span class="pre">draw_edges</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.FrameObject.draw_faces.html#compas_viewer.scene.FrameObject.draw_faces" title="compas_viewer.scene.FrameObject.draw_faces"><code class="xref py py-obj docutils literal notranslate"><span class="pre">draw_faces</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.FrameObject.draw_vertices.html#compas_viewer.scene.FrameObject.draw_vertices" title="compas_viewer.scene.FrameObject.draw_vertices"><code class="xref py py-obj docutils literal notranslate"><span class="pre">draw_vertices</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-</tbody>
-</table>
 <p class="rubric">Inherited Methods</p>
 <table class="autosummary longtable table autosummary">
 <tbody>
@@ -653,7 +639,7 @@ Notice that the <cite>nx</cite> and <cite>ny</cite> must be even numbers.</p>
 <td><p>Add a child item to the scene object.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.FrameObject.clear.html#compas_viewer.scene.FrameObject.clear" title="compas_viewer.scene.FrameObject.clear"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear</span></code></a></p></td>
-<td><p>Clear the object</p></td>
+<td><p>The main clearing method.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.FrameObject.draw.html#compas_viewer.scene.FrameObject.draw" title="compas_viewer.scene.FrameObject.draw"><code class="xref py py-obj docutils literal notranslate"><span class="pre">draw</span></code></a></p></td>
 <td><p>Draw the object from its buffers</p></td>

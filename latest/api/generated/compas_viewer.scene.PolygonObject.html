@@ -589,8 +589,8 @@ document.write(`
 <h1>PolygonObject</h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="compas_viewer.scene.PolygonObject">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">PolygonObject</span></span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/1f00315/src/compas_viewer/scene/polygonobject.py#L7"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
-<dd><p>Bases: <a class="reference internal" href="compas_viewer.scene.MeshObject.html#compas_viewer.scene.MeshObject" title="compas_viewer.scene.meshobject.MeshObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">MeshObject</span></code></a></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">PolygonObject</span></span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/cbb73a1/src/compas_viewer/scene/polygonobject.py#L11"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">GeometryObject</span></code>, <a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.scene.GeometryObject.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">GeometryObject</span></code></a></p>
 <p>Viewer scene object for displaying COMPAS Polygon geometry.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -605,51 +605,30 @@ document.write(`
 <td><p>Add a child item to the scene object.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.PolygonObject.clear.html#compas_viewer.scene.PolygonObject.clear" title="compas_viewer.scene.PolygonObject.clear"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear</span></code></a></p></td>
-<td><p>Clear the object</p></td>
+<td><p>The main clearing method.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.PolygonObject.clear_edges.html#compas_viewer.scene.PolygonObject.clear_edges" title="compas_viewer.scene.PolygonObject.clear_edges"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear_edges</span></code></a></p></td>
-<td><p>Clear the edges of the mesh.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.PolygonObject.clear_faces.html#compas_viewer.scene.PolygonObject.clear_faces" title="compas_viewer.scene.PolygonObject.clear_faces"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear_faces</span></code></a></p></td>
-<td><p>Clear the faces of the mesh.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.PolygonObject.clear_vertices.html#compas_viewer.scene.PolygonObject.clear_vertices" title="compas_viewer.scene.PolygonObject.clear_vertices"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear_vertices</span></code></a></p></td>
-<td><p>Clear the vertices of the mesh.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.PolygonObject.draw.html#compas_viewer.scene.PolygonObject.draw" title="compas_viewer.scene.PolygonObject.draw"><code class="xref py py-obj docutils literal notranslate"><span class="pre">draw</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.PolygonObject.draw.html#compas_viewer.scene.PolygonObject.draw" title="compas_viewer.scene.PolygonObject.draw"><code class="xref py py-obj docutils literal notranslate"><span class="pre">draw</span></code></a></p></td>
 <td><p>Draw the object from its buffers</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.PolygonObject.draw_edges.html#compas_viewer.scene.PolygonObject.draw_edges" title="compas_viewer.scene.PolygonObject.draw_edges"><code class="xref py py-obj docutils literal notranslate"><span class="pre">draw_edges</span></code></a></p></td>
-<td><p>Draw the edges of the mesh.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.PolygonObject.draw_faces.html#compas_viewer.scene.PolygonObject.draw_faces" title="compas_viewer.scene.PolygonObject.draw_faces"><code class="xref py py-obj docutils literal notranslate"><span class="pre">draw_faces</span></code></a></p></td>
-<td><p>Draw the faces of the mesh.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.PolygonObject.draw_instance.html#compas_viewer.scene.PolygonObject.draw_instance" title="compas_viewer.scene.PolygonObject.draw_instance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">draw_instance</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.PolygonObject.draw_instance.html#compas_viewer.scene.PolygonObject.draw_instance" title="compas_viewer.scene.PolygonObject.draw_instance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">draw_instance</span></code></a></p></td>
 <td><p>Draw the object instance for picking</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.PolygonObject.draw_mesh.html#compas_viewer.scene.PolygonObject.draw_mesh" title="compas_viewer.scene.PolygonObject.draw_mesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">draw_mesh</span></code></a></p></td>
-<td><p>Draw the mesh of the mesh.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.PolygonObject.draw_vertices.html#compas_viewer.scene.PolygonObject.draw_vertices" title="compas_viewer.scene.PolygonObject.draw_vertices"><code class="xref py py-obj docutils literal notranslate"><span class="pre">draw_vertices</span></code></a></p></td>
-<td><p>Draw the vertices of the mesh.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.PolygonObject.init.html#compas_viewer.scene.PolygonObject.init" title="compas_viewer.scene.PolygonObject.init"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.PolygonObject.init.html#compas_viewer.scene.PolygonObject.init" title="compas_viewer.scene.PolygonObject.init"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init</span></code></a></p></td>
 <td><p>Initialize the object</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.PolygonObject.make_buffer_from_data.html#compas_viewer.scene.PolygonObject.make_buffer_from_data" title="compas_viewer.scene.PolygonObject.make_buffer_from_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_buffer_from_data</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.PolygonObject.make_buffer_from_data.html#compas_viewer.scene.PolygonObject.make_buffer_from_data" title="compas_viewer.scene.PolygonObject.make_buffer_from_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_buffer_from_data</span></code></a></p></td>
 <td><p>Create buffers from point/line/face data.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.PolygonObject.make_buffers.html#compas_viewer.scene.PolygonObject.make_buffers" title="compas_viewer.scene.PolygonObject.make_buffers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_buffers</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.PolygonObject.make_buffers.html#compas_viewer.scene.PolygonObject.make_buffers" title="compas_viewer.scene.PolygonObject.make_buffers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_buffers</span></code></a></p></td>
 <td><p>Create all buffers from object's data</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.PolygonObject.update.html#compas_viewer.scene.PolygonObject.update" title="compas_viewer.scene.PolygonObject.update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.PolygonObject.update.html#compas_viewer.scene.PolygonObject.update" title="compas_viewer.scene.PolygonObject.update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code></a></p></td>
 <td><p>Update the object</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.PolygonObject.update_buffer_from_data.html#compas_viewer.scene.PolygonObject.update_buffer_from_data" title="compas_viewer.scene.PolygonObject.update_buffer_from_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_buffer_from_data</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.PolygonObject.update_buffer_from_data.html#compas_viewer.scene.PolygonObject.update_buffer_from_data" title="compas_viewer.scene.PolygonObject.update_buffer_from_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_buffer_from_data</span></code></a></p></td>
 <td><p>Update existing buffers from point/line/face data.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.PolygonObject.update_buffers.html#compas_viewer.scene.PolygonObject.update_buffers" title="compas_viewer.scene.PolygonObject.update_buffers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_buffers</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.PolygonObject.update_buffers.html#compas_viewer.scene.PolygonObject.update_buffers" title="compas_viewer.scene.PolygonObject.update_buffers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_buffers</span></code></a></p></td>
 <td><p>Update all buffers from object's data</p></td>
 </tr>
 </tbody>

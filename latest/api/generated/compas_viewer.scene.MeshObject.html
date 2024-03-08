@@ -60,7 +60,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="MeshObject.draw_edges" href="compas_viewer.scene.MeshObject.draw_edges.html" />
-    <link rel="prev" title="ViewerSceneObject.add" href="compas_viewer.scene.ViewerSceneObject.add.html" />
+    <link rel="prev" title="ViewerSceneObject.clear" href="compas_viewer.scene.ViewerSceneObject.clear.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -589,7 +589,7 @@ document.write(`
 <h1>MeshObject</h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="compas_viewer.scene.MeshObject">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MeshObject</span></span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/1f00315/src/compas_viewer/scene/meshobject.py#L14"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MeshObject</span></span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/cbb73a1/src/compas_viewer/scene/meshobject.py#L19"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <a class="reference internal" href="compas_viewer.scene.ViewerSceneObject.html#compas_viewer.scene.ViewerSceneObject" title="compas_viewer.scene.sceneobject.ViewerSceneObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">ViewerSceneObject</span></code></a>, <a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.scene.MeshObject.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">MeshObject</span></code></a></p>
 <p>Viewer scene object for displaying COMPAS Mesh geometry.</p>
 <dl class="field-list">
@@ -597,11 +597,17 @@ document.write(`
 <dd class="field-odd"><dl>
 <dt><strong>mesh</strong><span class="classifier"><a class="reference external" href="https://compas.dev/compas/latest/api/compas.datastructures.Mesh.html#compas.datastructures.Mesh" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.datastructures.Mesh</span></code></a></span></dt><dd><p>A COMPAS mesh.</p>
 </dd>
-<dt><strong>hide_coplanaredges</strong><span class="classifier">bool, optional</span></dt><dd><p>True to hide the coplanar edges. It will override the value in the config file.</p>
+<dt><strong>vertexcolor</strong><span class="classifier">Union[Dict[Any, <a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.colors.Color.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.colors.Color</span></code></a>], <a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.colors.Color.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.colors.Color</span></code></a>]], optional</span></dt><dd><p>The vertex color. Defaults to the value of <cite>pointcolor</cite> in <cite>viewer.config</cite>.</p>
 </dd>
-<dt><strong>use_vertexcolors</strong><span class="classifier">bool, optional</span></dt><dd><p>True to use vertex color. It will override the value in the config file.</p>
+<dt><strong>edgecolor</strong><span class="classifier">Union[Dict[Any, <a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.colors.Color.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.colors.Color</span></code></a>], <a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.colors.Color.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.colors.Color</span></code></a>]], optional</span></dt><dd><p>The edge color. Defaults to the value of <cite>linecolor</cite> in <cite>viewer.config</cite>.</p>
 </dd>
-<dt><strong>**kwargs</strong><span class="classifier">dict, optional</span></dt><dd><p>Additional options for the <a class="reference internal" href="compas_viewer.scene.ViewerSceneObject.html#compas_viewer.scene.ViewerSceneObject" title="compas_viewer.scene.ViewerSceneObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas_viewer.scene.ViewerSceneObject</span></code></a>.</p>
+<dt><strong>facecolor</strong><span class="classifier">Union[Dict[Any, <a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.colors.Color.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.colors.Color</span></code></a>], <a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.colors.Color.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.colors.Color</span></code></a>]], optional</span></dt><dd><p>The face color. Defaults to the value of <cite>surfacecolor</cite> in <cite>viewer.config</cite>.</p>
+</dd>
+<dt><strong>hide_coplanaredges</strong><span class="classifier">bool, optional</span></dt><dd><p>True to hide the coplanar edges. Defaults to the value of <cite>hide_coplanaredges</cite> in <cite>viewer.config</cite>.</p>
+</dd>
+<dt><strong>use_vertexcolors</strong><span class="classifier">bool, optional</span></dt><dd><p>True to use vertex color. Defaults to the value of <cite>use_vertexcolors</cite> in <cite>viewer.config</cite>.</p>
+</dd>
+<dt><strong>**kwargs</strong><span class="classifier">dict, optional</span></dt><dd><p>Additional options for the <a class="reference internal" href="compas_viewer.scene.ViewerSceneObject.html#compas_viewer.scene.ViewerSceneObject" title="compas_viewer.scene.ViewerSceneObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas_viewer.scene.ViewerSceneObject</span></code></a> and <a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.scene.MeshObject.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.scene.MeshObject</span></code></a>.</p>
 </dd>
 </dl>
 </dd>
@@ -616,8 +622,6 @@ document.write(`
 <dt class="field-odd">Attributes<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
 <dt><strong>mesh</strong><span class="classifier"><a class="reference external" href="https://compas.dev/compas/latest/api/compas.datastructures.Mesh.html#compas.datastructures.Mesh" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.datastructures.Mesh</span></code></a></span></dt><dd><p>The mesh data structure.</p>
-</dd>
-<dt><strong>vertexcolor</strong><span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.colors.Colordict</span></code></span></dt><dd><p>Vertex colors.</p>
 </dd>
 <dt><strong>use_vertexcolors</strong><span class="classifier">bool</span></dt><dd><p>True to use vertex color. Defaults to False.</p>
 </dd>
@@ -647,7 +651,7 @@ document.write(`
 <td><p>Add a child item to the scene object.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.MeshObject.clear.html#compas_viewer.scene.MeshObject.clear" title="compas_viewer.scene.MeshObject.clear"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear</span></code></a></p></td>
-<td><p>Clear the object</p></td>
+<td><p>Clear all components of the mesh.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.MeshObject.clear_edges.html#compas_viewer.scene.MeshObject.clear_edges" title="compas_viewer.scene.MeshObject.clear_edges"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear_edges</span></code></a></p></td>
 <td><p>Clear the edges of the mesh.</p></td>
