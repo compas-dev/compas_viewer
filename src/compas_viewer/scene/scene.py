@@ -65,6 +65,8 @@ class ViewerScene(Scene):
         opacity: Optional[float] = None,
         hide_coplanaredges: Optional[bool] = None,
         use_vertexcolors: Optional[bool] = None,
+        v: int = 16,
+        u: int = 16,
         **kwargs
     ) -> ViewerSceneObject:
         """
@@ -114,6 +116,10 @@ class ViewerScene(Scene):
             Whether to hide the coplanar edges of the mesh.
         use_vertexcolors : bool, optional
             Whether to use vertex color.
+        v : int, optional
+            The number of vertices in the u-direction of non-OCC geometries. Default is 16.
+        u : int, optional
+            The number of vertices in the v-direction of non-OCC geometries. Default is 16.
         **kwargs : dict, optional
             The other possible parameters to be passed to the object.
 
@@ -144,7 +150,9 @@ class ViewerScene(Scene):
             opacity=opacity,
             hide_coplanaredges=hide_coplanaredges,
             use_vertexcolors=use_vertexcolors,
-            **kwargs
+            v=v,
+            u=u,
+            **kwargs,
         )
 
         return sceneobject

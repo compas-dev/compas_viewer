@@ -18,6 +18,10 @@ class GeometryObject(ViewerSceneObject, BaseGeometryObject):
     ----------
     geometry : :class:`compas.geometry.Geometry`
         A COMPAS geometry.
+    v : int, optional
+        The number of vertices in the u-direction of non-OCC geometries.
+    u : int, optional
+        The number of vertices in the v-direction of non-OCC geometries.
     pointcolor : :class:`compas.colors.Color`, optional
         The color of the points. Default is the value of `pointcolor` in `viewer.config`.
     linecolor : :class:`compas.colors.Color`, optional
@@ -48,11 +52,11 @@ class GeometryObject(ViewerSceneObject, BaseGeometryObject):
     :class:`compas.geometry.Geometry`
     """
 
-    LINEARDEFLECTION = 0.2
-
     def __init__(
         self,
         geometry: Geometry,
+        u: int,
+        v: int,
         pointcolor: Optional[Color] = None,
         linecolor: Optional[Color] = None,
         surfacecolor: Optional[Color] = None,
@@ -62,6 +66,8 @@ class GeometryObject(ViewerSceneObject, BaseGeometryObject):
         super().__init__(geometry=geometry, **kwargs)
         self.geometry: Geometry
 
+        self.u = u
+        self.v = v
         self.pointcolor = pointcolor or self.viewer.config.pointcolor
         self.linecolor = linecolor or self.viewer.config.linecolor
         self.surfacecolor = surfacecolor or self.viewer.config.surfacecolor

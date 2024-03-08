@@ -1,4 +1,3 @@
-from math import pi
 from typing import Optional
 
 from compas.datastructures import Mesh
@@ -21,8 +20,6 @@ class CapsuleObject(ViewerGeometryObject, GeometryObject):
     def __init__(self, capsule: Capsule, **kwargs):
         super().__init__(geometry=capsule, **kwargs)
         self.geometry: Capsule
-        self.u = int(2 * pi * capsule.radius / self.LINEARDEFLECTION)
-        self.v = self.u
 
     @property
     def points(self) -> Optional[list[Point]]:

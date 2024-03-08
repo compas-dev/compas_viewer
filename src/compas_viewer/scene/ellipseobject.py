@@ -32,7 +32,6 @@ class EllipseObject(ViewerGeometryObject, GeometryObject):
     def __init__(self, ellipse: Ellipse, **kwargs):
         super().__init__(geometry=ellipse, **kwargs)
         self.geometry: Ellipse
-        self.u = int(self._proximate_circumference() / self.LINEARDEFLECTION)
         self.show_lines = True
 
     @property

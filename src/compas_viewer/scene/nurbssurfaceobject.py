@@ -21,10 +21,6 @@ class NurbsSurfaceObject(ViewerGeometryObject, GeometryObject):
         super().__init__(geometry=surface, **kwargs)
         self.geometry: NurbsSurface
 
-        # LINEARDEFLECTION not implemented in NurbsSurface.
-        self.nu = int(16 + (0 * self.LINEARDEFLECTION))
-        self.nv = int(16 + (0 * self.LINEARDEFLECTION))
-
     @property
     def points(self) -> Optional[list[Point]]:
         """The points to be shown in the viewer."""
@@ -48,9 +44,4 @@ class NurbsSurfaceObject(ViewerGeometryObject, GeometryObject):
     @property
     def viewmesh(self) -> Mesh:
         """The mesh volume to be shown in the viewer."""
-        vertices = []
-        faces = []
-        for n, triangle in enumerate(self.geometry.to_triangles(nu=self.nu, nv=self.nv)):
-            vertices.extend([point for point in triangle])
-            faces.append([3 * n, 3 * n + 1, 3 * n + 2])
-        return Mesh.from_vertices_and_faces(vertices, faces)
+        return self.geometry.to_tesselation()

@@ -1,4 +1,3 @@
-from math import pi
 from typing import Optional
 
 from compas.datastructures import Mesh
@@ -21,8 +20,6 @@ class TorusObject(ViewerGeometryObject, GeometryObject):
     def __init__(self, torus: Torus, **kwargs):
         super().__init__(geometry=torus, **kwargs)
         self.geometry: Torus
-        self.u = int(2 * pi * torus.radius_axis / self.LINEARDEFLECTION)
-        self.v = int(2 * pi * torus.radius_pipe / self.LINEARDEFLECTION)
 
     @property
     def points(self) -> Optional[list[Point]]:
