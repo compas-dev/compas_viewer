@@ -1,7 +1,7 @@
 from typing import Optional
-from typing import Tuple
 
 from compas.colors import Color
+from compas.datastructures import Mesh
 from compas.geometry import Geometry
 from compas.geometry import Line
 from compas.geometry import Point
@@ -19,11 +19,11 @@ class GeometryObject(ViewerSceneObject, BaseGeometryObject):
     geometry : :class:`compas.geometry.Geometry`
         A COMPAS geometry.
     pointcolor : :class:`compas.colors.Color`, optional
-        The color of the points. Global settings in the viewer will be used if not specified.
+        The color of the points. Default is the value of `pointcolor` in `viewer.config`.
     linecolor : :class:`compas.colors.Color`, optional
-        The color of the lines. Global settings in the viewer will be used if not specified.
+        The color of the lines. Default is the value of `linecolor` in `viewer.config`.
     surfacecolor : :class:`compas.colors.Color`, optional
-        The color of the surfaces. Global settings in the viewer will be used if not specified.
+        The color of the surfaces. Default is the value of `surfacecolor` in `viewer.config`.
     **kwargs : dict, optional
         Additional options for the :class:`compas_viewer.scene.ViewerSceneObject`
         and :class:`compas.scene.GeometryObject`.
@@ -62,9 +62,9 @@ class GeometryObject(ViewerSceneObject, BaseGeometryObject):
         super().__init__(geometry=geometry, **kwargs)
         self.geometry: Geometry
 
-        self.pointcolor = pointcolor or self.viewer.config.pointscolor
-        self.linecolor = linecolor or self.viewer.config.linescolor
-        self.surfacecolor = surfacecolor or self.viewer.config.facescolor
+        self.pointcolor = pointcolor or self.viewer.config.pointcolor
+        self.linecolor = linecolor or self.viewer.config.linecolor
+        self.surfacecolor = surfacecolor or self.viewer.config.surfacecolor
 
     @property
     def points(self) -> Optional[list[Point]]:
@@ -77,8 +77,8 @@ class GeometryObject(ViewerSceneObject, BaseGeometryObject):
         raise NotImplementedError
 
     @property
-    def surfaces(self) -> Optional[list[Tuple[Point, Point, Point]]]:
-        """The surface to be shown in the viewer. Currently only triangles are supported."""
+    def viewmesh(self) -> Mesh:
+        """The mesh volume to be shown in the viewer."""
         raise NotImplementedError
 
     def _read_points_data(self) -> ShaderDataType:
@@ -102,23 +102,17 @@ class GeometryObject(ViewerSceneObject, BaseGeometryObject):
         return positions, colors, elements
 
     def _read_frontfaces_data(self) -> ShaderDataType:
-        if self.surfaces is None:
+        if self.viewmesh is None:
             return [], [], []
-        positions = []
-        for surface in self.surfaces:
-            positions.extend(surface)
+        positions, elements = self.viewmesh.to_vertices_and_faces()
         colors = [self.surfacecolor] * 3 * len(positions)
-        elements = [[3 * i, 3 * i + 1, 3 * i + 2] for i in range(len(positions))]
-
-        return positions, colors, elements
+        return positions, colors, elements  # type: ignore
 
     def _read_backfaces_data(self) -> ShaderDataType:
-        if self.surfaces is None:
+        if self.viewmesh is None:
             return [], [], []
-        positions = []
-        for surface in self.surfaces:
-            positions.extend(surface[::-1])
+        positions, elements = self.viewmesh.to_vertices_and_faces()
+        for element in elements:
+            element.reverse()
         colors = [self.surfacecolor] * 3 * len(positions)
-        elements = [[3 * i, 3 * i + 1, 3 * i + 2] for i in range(len(positions))]
-
-        return positions, colors, elements
+        return positions, colors, elements  # type: ignore

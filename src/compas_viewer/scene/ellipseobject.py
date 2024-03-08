@@ -58,9 +58,9 @@ class EllipseObject(ViewerGeometryObject, GeometryObject):
         return [Line(line_points[i - 1], line_points[i]) for i in range(0, self.u)]
 
     @property
-    def surfaces(self) -> Optional[list[Tuple[Point, Point, Point]]]:
-        """The surface to be shown in the viewer. Currently only triangles are supported."""
-        return []
+    def viewmesh(self):
+        """The mesh volume to be shown in the viewer."""
+        return None
 
     def _proximate_circumference(self):
         return 2 * pi * sqrt((self.geometry.major**2 + self.geometry.minor**2) / 2)

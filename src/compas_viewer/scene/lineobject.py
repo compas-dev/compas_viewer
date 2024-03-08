@@ -32,6 +32,6 @@ class LineObject(ViewerGeometryObject, GeometryObject):
         return [self.geometry]
 
     @property
-    def surfaces(self) -> Optional[list[Tuple[Point, Point, Point]]]:
-        """The surface to be shown in the viewer. Currently only triangles are supported."""
-        pass
+    def viewmesh(self):
+        """The mesh volume to be shown in the viewer."""
+        return None

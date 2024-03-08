@@ -1,6 +1,6 @@
 from typing import Optional
-from typing import Tuple
 
+from compas.datastructures import Mesh
 from compas.geometry import Line
 from compas.geometry import Point
 from compas.scene import GeometryObject
@@ -29,7 +29,7 @@ try:
         def __init__(self, brep: OCCBrep, **kwargs):
             super().__init__(geometry=brep, **kwargs)
             self.geometry: OCCBrep
-            self.mesh, self.boundaries = self.geometry.to_tesselation(self.LINEARDEFLECTION)
+            self._viewmesh, self._boundaries = self.geometry.to_tesselation(self.LINEARDEFLECTION)
 
         @property
         def points(self) -> Optional[list[Point]]:
@@ -40,21 +40,16 @@ try:
         def lines(self) -> Optional[list[Line]]:
             """The lines to be shown in the viewer."""
             lines = []
-            for polyline in self.boundaries:
+            for polyline in self._boundaries:
                 for pair in pairwise(polyline.points):
                     lines.append(Line(*pair))
 
             return lines
 
         @property
-        def surfaces(self) -> Optional[list[Tuple[Point, Point, Point]]]:
-            """The surface to be shown in the viewer. Currently only triangles are supported."""
-            surface_points = []
-            vertices, faces = self.mesh.to_vertices_and_faces()
-            for face in faces:
-                face_points = [vertices[i] for i in face]
-                surface_points.append(face_points)
-            return surface_points
+        def viewmesh(self) -> Mesh:
+            """The mesh volume to be shown in the viewer."""
+            return self._viewmesh
 
 except ImportError:
     pass

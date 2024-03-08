@@ -11,7 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added `RobotModelObject` and its example in the documentation.
 
 ### Changed
+
 * Update examples in the documentation.
+* Renamed `surfaces` into `viewmesh` in every `ViewerGeometryObject`.
+* Renamed `scene.json` to `viewer.json` and `scene_config` to `viewer_config`.
 * Unify color naming. variables that control the colors of geometries are `surfacecolor`, `linecolor`,`pointcolor`, yet variables that control the colors of meshes are `facecolor`, `edgecolor`, `vertexcolor`.
 * Added `ViewerGeometryObject` as the abstract class for all the geometry objects. Other specific geometry objects are inherited from this class.
 * Changed `DataType` into `ShaderDataType`. Resolve to [#46](https://github.com/compas-dev/compas_viewer/issues/46).

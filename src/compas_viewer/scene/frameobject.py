@@ -21,6 +21,8 @@ class FrameObject(ViewerSceneObject):
     framesize : tuple[float, int, float, int]
         The size of the grid in [dx, nx, dy, ny] format.
         Notice that the `nx` and `ny` must be even numbers.
+    linecolor : :class:`compas.colors.Color`
+        The color of the grid lines.
     show_framez : bool
         If True, the Z axis of the grid will be shown.
 
@@ -39,10 +41,6 @@ class FrameObject(ViewerSceneObject):
     show_framez : bool
         If the Z axis of the grid is shown.
 
-    Notes
-    -----
-    The frame object is always unselectable.
-
     See Also
     --------
     :class:`compas.geometry.Frame`
@@ -58,7 +56,7 @@ class FrameObject(ViewerSceneObject):
     ):
         super().__init__(item=frame, **kwargs)
         self.frame = frame
-        self.linecolor = linecolor or self.viewer.config.linescolor
+        self.linecolor = linecolor or self.viewer.config.linecolor
         self.dx = framesize[0] if framesize else self.viewer.config.framesize[0]
         self.nx = framesize[1] if framesize else self.viewer.config.framesize[1]
         self.dy = framesize[2] if framesize else self.viewer.config.framesize[2]

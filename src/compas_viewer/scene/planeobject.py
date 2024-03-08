@@ -1,6 +1,6 @@
 from typing import Optional
-from typing import Tuple
 
+from compas.datastructures import Mesh
 from compas.geometry import Frame
 from compas.geometry import Line
 from compas.geometry import Plane
@@ -54,9 +54,6 @@ class PlaneObject(ViewerGeometryObject, GeometryObject):
         ]
 
     @property
-    def surfaces(self) -> Optional[list[Tuple[Point, Point, Point]]]:
-        """The surface to be shown in the viewer. Currently only triangles are supported."""
-        return [
-            (self.vertices[0], self.vertices[1], self.vertices[2]),
-            (self.vertices[0], self.vertices[2], self.vertices[3]),
-        ]
+    def viewmesh(self) -> Mesh:
+        """The mesh volume to be shown in the viewer."""
+        return Mesh.from_vertices_and_faces(self.vertices, [[0, 1, 2, 3]])

@@ -1,6 +1,7 @@
 from typing import Optional
 from typing import Tuple
 
+from compas.datastructures import Mesh
 from compas.geometry import Line
 from compas.geometry import NurbsSurface
 from compas.geometry import Point
@@ -46,9 +47,6 @@ class NurbsSurfaceObject(ViewerGeometryObject, GeometryObject):
         return lines
 
     @property
-    def surfaces(self) -> Optional[list[Tuple[Point, Point, Point]]]:
-        """The surface to be shown in the viewer. Currently only triangles are supported."""
-        surface_points = []
-        for triangle in self.geometry.to_triangles(nu=self.u, nv=self.v):
-            surface_points.append(triangle)
-        return surface_points
+    def viewmesh(self) -> Mesh:
+        """The mesh volume to be shown in the viewer."""
+        return Mesh.from_shape(self.geometry, u=self.u, v=self.v)

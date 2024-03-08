@@ -24,15 +24,15 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
     mesh : :class:`compas.datastructures.Mesh`
         A COMPAS mesh.
     vertexcolor : Union[Dict[Any, :class:`compas.colors.Color`], :class:`compas.colors.Color`]], optional
-        The vertex color. Global settings in the viewer will be used if not specified.
+        The vertex color. Defaults to the value of `pointcolor` in `viewer.config`.
     edgecolor : Union[Dict[Any, :class:`compas.colors.Color`], :class:`compas.colors.Color`]], optional
-        The edge color. Global settings in the viewer will be used if not specified.
+        The edge color. Defaults to the value of `linecolor` in `viewer.config`.
     facecolor : Union[Dict[Any, :class:`compas.colors.Color`], :class:`compas.colors.Color`]], optional
-        The face color. Global settings in the viewer will be used if not specified.
+        The face color. Defaults to the value of `surfacecolor` in `viewer.config`.
     hide_coplanaredges : bool, optional
-        True to hide the coplanar edges. Global settings in the viewer will be used if not specified.
+        True to hide the coplanar edges. Defaults to the value of `hide_coplanaredges` in `viewer.config`.
     use_vertexcolors : bool, optional
-        True to use vertex color. Global settings in the viewer will be used if not specified.
+        True to use vertex color. Defaults to the value of `use_vertexcolors` in `viewer.config`.
     **kwargs : dict, optional
         Additional options for the :class:`compas_viewer.scene.ViewerSceneObject` and :class:`compas.scene.MeshObject`.
 
@@ -72,21 +72,21 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
         )
 
         if not vertexcolor:
-            self.vertexcolor = self.viewer.config.pointscolor
+            self.vertexcolor = self.viewer.config.pointcolor
             for vertex in self.mesh.vertices():
                 self.vertexcolor[vertex] = self.mesh.vertex_attribute(vertex, "color")  # type: ignore
         else:
             self.vertexcolor = vertexcolor
 
         if not edgecolor:
-            self.edgecolor = self.viewer.config.linescolor
+            self.edgecolor = self.viewer.config.linecolor
             for u, v in self.mesh.edges():
                 self.edgecolor[(u, v)] = self.mesh.edge_attribute((u, v), "color")  # type: ignore
         else:
             self.edgecolor = edgecolor
 
         if not facecolor:
-            self.facecolor = self.viewer.config.facescolor
+            self.facecolor = self.viewer.config.surfacecolor
             for face in self.mesh.faces():
                 self.facecolor[face] = self.mesh.face_attribute(face, "color")  # type: ignore
         else:
