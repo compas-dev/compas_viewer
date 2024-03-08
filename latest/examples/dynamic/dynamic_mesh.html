@@ -601,7 +601,7 @@ document.write(`
 <span class="n">viewer</span> <span class="o">=</span> <span class="n">Viewer</span><span class="p">()</span>
 
 <span class="n">mesh</span> <span class="o">=</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">from_off</span><span class="p">(</span><span class="n">compas</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;tubemesh.off&quot;</span><span class="p">))</span>
-<span class="n">obj</span> <span class="o">=</span> <span class="n">viewer</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">surfacecolor</span><span class="o">=</span><span class="n">Color</span><span class="o">.</span><span class="n">cyan</span><span class="p">(),</span> <span class="n">use_vertexcolors</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">obj</span> <span class="o">=</span> <span class="n">viewer</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">facescolor</span><span class="o">=</span><span class="n">Color</span><span class="o">.</span><span class="n">cyan</span><span class="p">(),</span> <span class="n">use_vertexcolors</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 
 <span class="nd">@viewer</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="n">interval</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
