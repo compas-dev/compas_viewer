@@ -9,7 +9,7 @@ from compas_viewer import Viewer
 viewer = Viewer()
 
 mesh = Mesh.from_off(compas.get("tubemesh.off"))
-obj = viewer.scene.add(mesh, facescolor=Color.cyan(), use_vertexcolors=False)
+obj = viewer.scene.add(mesh, surfacecolor=Color.cyan(), use_vertexcolors=False)
 
 
 @viewer.on(interval=1000)

@@ -11,9 +11,9 @@ viewer = Viewer()
 box1 = Box(1, 1, 1, Frame([0, 0, 0], [1, 0, 0], [0, 1, 0]))
 box2 = Box(1, 1, 1, Frame([0, 0, 0], [1, 0, 0], [0, 1, 0]))
 box3 = Box(1, 1, 1, Frame([0, 0, 0], [1, 0, 0], [0, 1, 0]))
-obj1 = viewer.scene.add(box1, facescolor=Color.red())
-obj2 = viewer.scene.add(box2, facescolor=Color.blue())
-obj3 = viewer.scene.add(box3, facescolor=Color.green())
+obj1 = viewer.scene.add(box1, surfacecolor=Color.red())
+obj2 = viewer.scene.add(box2, surfacecolor=Color.blue())
+obj3 = viewer.scene.add(box3, surfacecolor=Color.green())
 
 s = 1
 
