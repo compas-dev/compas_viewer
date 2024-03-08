@@ -13,8 +13,8 @@ github = GithubPackageMeshLoader("ros-industrial/abb", "abb_irb6600_support", "k
 model = RobotModel.from_urdf_file(github.load_urdf("irb6640.urdf"))
 model.load_geometry(github)
 
-
-robot_object: RobotModelObject = viewer.scene.add(model, show_lines=False, configuration=model.random_configuration())  # type: ignore
+configuration = model.random_configuration()
+robot_object: RobotModelObject = viewer.scene.add(model, show_lines=False, show_points=False, configuration=configuration)  # type: ignore
 
 
 def rotate(value, robot_object: RobotModelObject, index: int):
@@ -24,7 +24,16 @@ def rotate(value, robot_object: RobotModelObject, index: int):
 
 
 for i, joint in enumerate(robot_object.configuration.joint_names):
-    slider = Slider(rotate, 0, -180, 180, 1, joint, robot_object=robot_object, index=i)
+    slider = Slider(
+        rotate,
+        configuration.joint_values[i] / 360 * 2 * 3.14159,
+        -180,
+        180,
+        1,
+        joint,
+        robot_object=robot_object,
+        index=i,
+    )
     slider = viewer.layout.sidedock.add_element(slider)
 
 

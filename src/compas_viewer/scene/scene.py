@@ -129,7 +129,7 @@ class ViewerScene(Scene):
             The scene object.
         """
 
-        sceneobject: ViewerSceneObject = super(ViewerScene, self).add(  # type: ignore
+        sceneobject: ViewerSceneObject = super().add(  # type: ignore
             item=item,
             parent=parent,
             viewer=self.viewer,

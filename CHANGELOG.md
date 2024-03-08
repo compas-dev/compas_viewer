@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added `RobotModelObject` and its example in the documentation.
 
 ### Changed
-
+* Updated the `RobotModelObject` example.
 * Update examples in the documentation.
 * Renamed `surfaces` into `viewmesh` in every `ViewerGeometryObject`.
 * Renamed `scene.json` to `viewer.json` and `scene_config` to `viewer_config`.

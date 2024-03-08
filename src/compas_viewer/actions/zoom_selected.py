@@ -13,6 +13,7 @@ class ZoomSelected(Action):
 
         for obj in selected_objs:
             if obj.bounding_box is not None:
+                obj._update_bounding_box()
                 extents.append(obj.bounding_box)
 
         extents = array([obj.bounding_box for obj in selected_objs if obj.bounding_box is not None])
