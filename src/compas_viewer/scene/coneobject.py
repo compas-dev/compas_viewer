@@ -1,4 +1,3 @@
-from math import pi
 from typing import Optional
 
 from compas.datastructures import Mesh
@@ -21,8 +20,6 @@ class ConeObject(ViewerGeometryObject, GeometryObject):
     def __init__(self, cone: Cone, **kwargs):
         super().__init__(geometry=cone, **kwargs)
         self.geometry: Cone
-        self.u = int(2 * pi * cone.radius / self.LINEARDEFLECTION)
-        self.v = self.u
 
     @property
     def points(self) -> Optional[list[Point]]:

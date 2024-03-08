@@ -1,4 +1,3 @@
-from math import pi
 from typing import Optional
 
 from compas.datastructures import Mesh
@@ -21,8 +20,6 @@ class SphereObject(ViewerGeometryObject, GeometryObject):
     def __init__(self, sphere: Sphere, **kwargs):
         super().__init__(geometry=sphere, **kwargs)
         self.geometry: Sphere
-        self.u = int(2 * pi * sphere.radius / self.LINEARDEFLECTION)
-        self.v = self.u
 
     @property
     def points(self) -> Optional[list[Point]]:

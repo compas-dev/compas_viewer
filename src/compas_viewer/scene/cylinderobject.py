@@ -1,4 +1,3 @@
-from math import pi
 from typing import Optional
 
 from compas.datastructures import Mesh
@@ -21,8 +20,6 @@ class CylinderObject(ViewerGeometryObject, GeometryObject):
     def __init__(self, cylinder: Cylinder, **kwargs):
         super().__init__(geometry=cylinder, **kwargs)
         self.geometry: Cylinder
-        self.u = int(2 * pi * cylinder.radius / self.LINEARDEFLECTION)
-        self.v = self.u
 
     @property
     def points(self) -> Optional[list[Point]]:

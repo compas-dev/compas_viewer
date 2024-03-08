@@ -21,7 +21,6 @@ class CircleObject(ViewerGeometryObject, GeometryObject):
     def __init__(self, circle: Circle, **kwargs):
         super().__init__(geometry=circle, **kwargs)
         self.geometry: Circle
-        self.u = int(circle.circumference / self.LINEARDEFLECTION)
         self.show_lines = True
 
     def _calculate_circle_points(self, circle):

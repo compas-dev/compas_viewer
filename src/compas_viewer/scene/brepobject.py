@@ -4,6 +4,7 @@ from compas.datastructures import Mesh
 from compas.geometry import Line
 from compas.geometry import Point
 from compas.scene import GeometryObject
+from compas.tolerance import TOL
 from compas.utilities import pairwise
 
 from .geometryobject import GeometryObject as ViewerGeometryObject
@@ -29,7 +30,7 @@ try:
         def __init__(self, brep: OCCBrep, **kwargs):
             super().__init__(geometry=brep, **kwargs)
             self.geometry: OCCBrep
-            self._viewmesh, self._boundaries = self.geometry.to_tesselation(self.LINEARDEFLECTION)
+            self._viewmesh, self._boundaries = self.geometry.to_tesselation(TOL.lineardeflection)
 
         @property
         def points(self) -> Optional[list[Point]]:
