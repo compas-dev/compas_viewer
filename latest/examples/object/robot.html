@@ -605,8 +605,8 @@ document.write(`
 <span class="n">model</span> <span class="o">=</span> <span class="n">RobotModel</span><span class="o">.</span><span class="n">from_urdf_file</span><span class="p">(</span><span class="n">github</span><span class="o">.</span><span class="n">load_urdf</span><span class="p">(</span><span class="s2">&quot;irb6640.urdf&quot;</span><span class="p">))</span>
 <span class="n">model</span><span class="o">.</span><span class="n">load_geometry</span><span class="p">(</span><span class="n">github</span><span class="p">)</span>
 
-
-<span class="n">robot_object</span><span class="p">:</span> <span class="n">RobotModelObject</span> <span class="o">=</span> <span class="n">viewer</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">show_lines</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">configuration</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">random_configuration</span><span class="p">())</span>  <span class="c1"># type: ignore</span>
+<span class="n">configuration</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">random_configuration</span><span class="p">()</span>
+<span class="n">robot_object</span><span class="p">:</span> <span class="n">RobotModelObject</span> <span class="o">=</span> <span class="n">viewer</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">show_lines</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">show_points</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">configuration</span><span class="o">=</span><span class="n">configuration</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
 
 
 <span class="k">def</span> <span class="nf">rotate</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">robot_object</span><span class="p">:</span> <span class="n">RobotModelObject</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
@@ -616,7 +616,16 @@ document.write(`
 
 
 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">joint</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">robot_object</span><span class="o">.</span><span class="n">configuration</span><span class="o">.</span><span class="n">joint_names</span><span class="p">):</span>
-    <span class="n">slider</span> <span class="o">=</span> <span class="n">Slider</span><span class="p">(</span><span class="n">rotate</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="mi">180</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">joint</span><span class="p">,</span> <span class="n">robot_object</span><span class="o">=</span><span class="n">robot_object</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">i</span><span class="p">)</span>
+    <span class="n">slider</span> <span class="o">=</span> <span class="n">Slider</span><span class="p">(</span>
+        <span class="n">rotate</span><span class="p">,</span>
+        <span class="n">configuration</span><span class="o">.</span><span class="n">joint_values</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">/</span> <span class="mi">360</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="mf">3.14159</span><span class="p">,</span>
+        <span class="o">-</span><span class="mi">180</span><span class="p">,</span>
+        <span class="mi">180</span><span class="p">,</span>
+        <span class="mi">1</span><span class="p">,</span>
+        <span class="n">joint</span><span class="p">,</span>
+        <span class="n">robot_object</span><span class="o">=</span><span class="n">robot_object</span><span class="p">,</span>
+        <span class="n">index</span><span class="o">=</span><span class="n">i</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="n">slider</span> <span class="o">=</span> <span class="n">viewer</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">sidedock</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">slider</span><span class="p">)</span>
 
 
