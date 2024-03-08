@@ -270,10 +270,10 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
         return positions, colors, elements
 
     def draw_vertices(self):
-        pass
+        return None
 
     def draw_edges(self):
-        pass
+        return None
 
     def draw_faces(self):
-        pass
+        return None

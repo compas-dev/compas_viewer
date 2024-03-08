@@ -90,7 +90,7 @@ class ViewerConfig(Config):
         """
         Load the default configuration.
         """
-        viewer_config = ViewerConfig.from_json(Path(HERE, "configurations", "default_config", "scene.json"))
+        viewer_config = ViewerConfig.from_json(Path(HERE, "configurations", "default_config", "viewer.json"))
         if not isinstance(viewer_config, ViewerConfig):
             raise TypeError(f"The {viewer_config} is not a valid scene configuration file.")
         return viewer_config

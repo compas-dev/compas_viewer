@@ -1,6 +1,5 @@
 import math
 from typing import Optional
-from typing import Tuple
 
 from compas.geometry import Circle
 from compas.geometry import Line

@@ -36,4 +36,4 @@ class ConeObject(ViewerGeometryObject, GeometryObject):
     @property
     def viewmesh(self) -> Mesh:
         """The mesh volume to be shown in the viewer."""
-        return Mesh.from_shape(self.geometry, u=self.u, v=self.v)
+        return Mesh.from_shape(self.geometry, u=self.u, triangulated=True)

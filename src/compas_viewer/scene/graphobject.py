@@ -1,5 +1,4 @@
 from typing import Optional
-from typing import Tuple
 
 from compas.datastructures import Graph
 from compas.geometry import Line

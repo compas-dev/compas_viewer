@@ -32,9 +32,9 @@ class TorusObject(ViewerGeometryObject, GeometryObject):
     @property
     def lines(self) -> Optional[list[Line]]:
         """The lines to be shown in the viewer."""
-        pass
+        return None
 
     @property
     def viewmesh(self):
         """The mesh volume to be shown in the viewer."""
-        return Mesh.from_shape(self.geometry, u=self.u, v=self.v)
+        return Mesh.from_shape(self.geometry, u=self.u, v=self.v, triangulated=True)
