@@ -42,17 +42,17 @@ class ViewerSceneObject(SceneObject):
     is_visible : bool, optional
         Whether to show object. Default is True.
     show_points : bool, optional
-        Whether to show points/vertices of the object. Global settings in the viewer will be used if not specified.
+        Whether to show points/vertices of the object. Default is the value of `show_points` in `viewer.config`.
     show_lines : bool, optional
-        Whether to show lines/edges of the object. Global settings in the viewer will be used if not specified.
+        Whether to show lines/edges of the object. Default is the value of `show_lines` in `viewer.config`.
     show_faces : bool, optional
-        Whether to show faces of the object. Global settings in the viewer will be used if not specified.
+        Whether to show faces of the object. Default is the value of `show_faces` in `viewer.config`.
     lineswidth : float, optional
-        The line width to be drawn on screen. Global settings in the viewer will be used if not specified.
+        The line width to be drawn on screen. Default is the value of `lineswidth` in `viewer.config`.
     pointssize : float, optional
-        The point size to be drawn on screen. Global settings in the viewer will be used if not specified.
+        The point size to be drawn on screen. Default is the value of `pointssize` in `viewer.config`.
     opacity : float, optional
-        The opacity of the object. Global settings in the viewer will be used if not specified.
+        The opacity of the object. Default is the value of `opacity` in `viewer.config`.
     **kwargs : dict, optional
         Additional visualization options for :class:`compas.scene.SceneObject`.
 

@@ -1,5 +1,4 @@
 from typing import Optional
-from typing import Tuple
 
 from compas.geometry import Line
 from compas.geometry import Point
@@ -33,6 +32,6 @@ class PolylineObject(ViewerGeometryObject, GeometryObject):
         return self.geometry.lines
 
     @property
-    def surfaces(self) -> Optional[list[Tuple[Point, Point, Point]]]:
-        """The surface to be shown in the viewer. Currently only triangles are supported."""
-        pass
+    def viewmesh(self):
+        """The mesh volume to be shown in the viewer."""
+        return None

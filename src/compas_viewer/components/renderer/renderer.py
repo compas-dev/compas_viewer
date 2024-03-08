@@ -25,7 +25,7 @@ from .shaders import Shader
 if TYPE_CHECKING:
     # https://peps.python.org/pep-0484/#runtime-or-type-checking
     from compas_viewer import Viewer
-    from compas_viewer.scene.frameobject import FrameObject
+    from compas_viewer.scene.gridobject import GridObject
     from compas_viewer.scene.meshobject import MeshObject
 
 
@@ -65,7 +65,7 @@ class Renderer(QOpenGLWidget):
 
         self.camera = Camera(self)
         self.selector = Selector(self)
-        self.grid: "FrameObject"
+        self.grid: "GridObject"
 
         self.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
 
@@ -362,8 +362,8 @@ class Renderer(QOpenGLWidget):
         """Initialize the renderer."""
 
         # Init the grid
-        self.grid: FrameObject = self.scene.add(  # type: ignore
-            item=Frame.worldXY(),
+        self.grid: GridObject = self.scene.add(  # type: ignore
+            Frame.worldXY(),
             framesize=self.config.gridsize,
             show_framez=self.config.show_gridz,
             is_selected=False,

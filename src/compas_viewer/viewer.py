@@ -15,7 +15,7 @@ from compas_viewer.configurations import ActionConfig
 from compas_viewer.configurations import ControllerConfig
 from compas_viewer.configurations import LayoutConfig
 from compas_viewer.configurations import RendererConfig
-from compas_viewer.configurations import SceneConfig
+from compas_viewer.configurations import ViewerConfig
 from compas_viewer.controller import Controller
 from compas_viewer.layout import Layout
 from compas_viewer.scene.scene import ViewerScene
@@ -90,12 +90,12 @@ class Viewer:
         # Custom or default config
         if configpath is None:
             self.renderer_config = RendererConfig.from_default()
-            self.scene_config = SceneConfig.from_default()
+            self.viewer_config = ViewerConfig.from_default()
             self.controller_config = ControllerConfig.from_default()
             self.layout_config = LayoutConfig.from_default()
         else:
             self.renderer_config = RendererConfig.from_json(Path(configpath, "renderer.json"))
-            self.scene_config = SceneConfig.from_json(Path(configpath, "scene.json"))
+            self.viewer_config = ViewerConfig.from_json(Path(configpath, "scene.json"))
             self.controller_config = ControllerConfig.from_json(Path(configpath, "controller.json"))
             self.layout_config = LayoutConfig.from_json(Path(configpath, "layout.json"))
 
@@ -115,13 +115,13 @@ class Viewer:
         if show_grid is not None:
             self.renderer_config.show_grid = show_grid
 
+        # Viewer
+        self.config = self.viewer_config
+
         #  Application
         self.started = False
         self.app = QCoreApplication.instance() or QApplication(sys.argv)
         self.window = QMainWindow()
-
-        # Viewer
-        self.config = self.scene_config
 
         # Scene
         self.scene = ViewerScene(self, name=self.layout_config.window.title, context="Viewer")
