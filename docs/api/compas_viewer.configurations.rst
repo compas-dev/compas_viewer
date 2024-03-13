@@ -15,7 +15,7 @@ Scene
     RendererConfig
     CameraConfig
     SelectorConfig
-    SceneConfig
+    ViewerConfig
 
 Keyboard and Mouse
 ==================
