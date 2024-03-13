@@ -192,7 +192,7 @@ class TagObject(ViewerSceneObject, GeometryObject):
         shader.uniform1f("object_opacity", self.opacity)
         shader.uniform1i("text_height", self._calculate_text_height(camera_position))
         shader.uniform1i("text_num", len(self.geometry.text))
-        shader.uniform3f("text_color", self.color)
+        shader.uniform3f("text_color", self.geometry.color)
         shader.uniformText("text_texture", self._text_buffer["text_texture"])
         shader.bind_attribute("position", self._text_buffer["positions"])
         shader.draw_texts(elements=self._text_buffer["elements"], n=self._text_buffer["n"])
