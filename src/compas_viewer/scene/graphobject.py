@@ -1,14 +1,13 @@
 from typing import Optional
 
 from compas.datastructures import Graph
-from compas.geometry import Line
-from compas.geometry import Point
 from compas.scene import GraphObject as BaseGraphObject
 
-from .geometryobject import GeometryObject as ViewerGeometryObject
+from .sceneobject import ViewerSceneObject
+from .sceneobject import ShaderDataType
 
 
-class GraphObject(ViewerGeometryObject, BaseGraphObject):
+class GraphObject(ViewerSceneObject, BaseGraphObject):
     """Viewer scene object for displaying COMPAS Graph data.
 
 
@@ -29,17 +28,39 @@ class GraphObject(ViewerGeometryObject, BaseGraphObject):
         super().__init__(graph=graph, **kwargs)
         self.graph: Graph
 
-    @property
-    def points(self) -> Optional[list[Point]]:
-        """The points to be shown in the viewer."""
-        return [Point(*self.graph.node_coordinates(node)) for node in self.graph.nodes()]
+    def _read_points_data(self) -> ShaderDataType:
+        positions = []
+        colors = []
+        elements = []
+        i = 0
 
-    @property
-    def lines(self) -> Optional[list[Line]]:
-        """The lines to be shown in the viewer."""
-        return [Line(self.graph.node_coordinates(u), self.graph.node_coordinates(v)) for u, v in self.graph.edges()]
+        for node in self.graph.nodes():
+            positions.append(self.graph.node_coordinates(node))
+            colors.append(self.nodecolor[node] or self.nodecolor.default)  # type: ignore
+            elements.append([i])
+            i += 1
+        return positions, colors, elements
 
-    @property
-    def viewmesh(self):
-        """The mesh volume to be shown in the viewer."""
-        return None
+    def _read_lines_data(self) -> ShaderDataType:
+        positions = []
+        colors = []
+        elements = []
+        i = 0
+
+        for u, v in self.graph.edges():
+            color = self.edgecolor[(u, v)] or self.edgecolor.default  # type: ignore
+            positions.append(self.graph.node_coordinates(u))
+            positions.append(self.graph.node_coordinates(v))
+            colors.append(color)
+            colors.append(color)
+            elements.append([i + 0, i + 1])
+            i += 2
+        return positions, colors, elements
+    
+    def _read_frontfaces_data(self) -> Optional[ShaderDataType]:
+        """Read frontfaces data from the object."""
+        pass
+
+    def _read_backfaces_data(self) -> Optional[ShaderDataType]:
+        """Read backfaces data from the object."""
+        pass
