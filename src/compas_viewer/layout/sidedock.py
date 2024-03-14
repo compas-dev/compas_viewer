@@ -7,10 +7,12 @@ from PySide6.QtWidgets import QScrollArea
 from PySide6.QtWidgets import QVBoxLayout
 from PySide6.QtWidgets import QWidget
 
+from .propertyform import Propertyform
+from .slider import Slider
+from .treeform import Treeform
+
 if TYPE_CHECKING:
     from .layout import Layout
-    from .slider import Slider
-    from .treeform import Treeform
 
 
 class SidedockLayout:
@@ -60,5 +62,8 @@ class SidedockLayout:
         self.sidedock.setLayout(self.sidedock_layout)
         self.viewer.window.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.sidedock)
 
-    def add_element(self, element: Union["Slider", "Treeform"]):
-        self.sidedock_layout.insertWidget(self.sidedock_layout.count() - 1, element, element.stretch)
+    def add_element(self, element: Union[Slider, Treeform, Propertyform]):
+        if isinstance(element, Propertyform):
+            self.sidedock_layout.insertLayout(self.sidedock_layout.count() - 1, element, element._stretch)
+        else:
+            self.sidedock_layout.insertWidget(self.sidedock_layout.count() - 1, element, element.stretch)

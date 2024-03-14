@@ -7,3 +7,4 @@ from .sidedock import SidedockLayout  # noqa: F401
 from .viewport import ViewportLayout  # noqa: F401
 from .slider import Slider  # noqa: F401
 from .treeform import Treeform  # noqa: F401
+from .propertyform import Propertyform  # noqa: F401
