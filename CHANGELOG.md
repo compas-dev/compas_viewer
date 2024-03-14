@@ -10,9 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 * Added example `layout/tree_view`.
 * Added functionality of multiple widgets in main viewport.
+* Added example `object/scale.py`.
 * Added `RobotModelObject` and its example in the documentation.
 
 ### Changed
+* Auto set the camera scale when `zoom_extend` is called.
 * Updated the `Tag` example.
 * Updated the `RobotModelObject` example.
 * Update examples in the documentation.
