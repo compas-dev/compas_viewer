@@ -147,7 +147,7 @@ class Viewer:
     # Scene
     # ==========================================================================
 
-    def add(self, **kwargs):
+    def add(self, *args, **kwargs):
         """
         Add an item to the scene.
         This is a compatibility function for the old version of the viewer.
@@ -159,7 +159,7 @@ class Viewer:
             The scene object.
         """
 
-        return self.scene.add(**kwargs)
+        return self.scene.add(*args, **kwargs)
 
     # ==========================================================================
     # Runtime

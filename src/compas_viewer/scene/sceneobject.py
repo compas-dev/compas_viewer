@@ -277,32 +277,56 @@ class ViewerSceneObject(SceneObject):
             if len(data[0]) and self._bounding_box_center is None:
                 self._update_bounding_box(data[0])
 
-    def update_buffers(self):
-        """Update all buffers from object's data"""
-
-        if self._points_data is not None:
-            # boolean values are keys for improving the performance, true for now to update all, will flag them later.
-            self.update_buffer_from_data(self._points_data, self._points_buffer, True, True, True)
-        if self._lines_data is not None:
-            self.update_buffer_from_data(self._lines_data, self._lines_buffer, True, True, True)
-        if self._frontfaces_data is not None:
-            self.update_buffer_from_data(self._frontfaces_data, self._frontfaces_buffer, True, True, True)
-        if self._backfaces_data is not None:
-            self.update_buffer_from_data(self._backfaces_data, self._backfaces_buffer, True, True, True)
-
     def init(self):
         """Initialize the object"""
-        self._points_data = self._read_points_data() if self.show_points else None
-        self._lines_data = self._read_lines_data() if self.show_lines else None
-        self._frontfaces_data = self._read_frontfaces_data() if self.show_faces else None
-        self._backfaces_data = self._read_backfaces_data() if self.show_faces else None
+        self._points_data = self._read_points_data()
+        self._lines_data = self._read_lines_data()
+        self._frontfaces_data = self._read_frontfaces_data()
+        self._backfaces_data = self._read_backfaces_data()
         self.make_buffers()
         self._update_matrix()
 
-    def update(self):
+    def update(self, update_positions: bool = True, update_colors: bool = True, update_elements: bool = True):
         """Update the object"""
+
+        # Update the matrix from object's translation, rotation and scale.
         self._update_matrix()
-        self.update_buffers()
+
+        # Update all buffers from object's data.
+        if self._points_data is not None:
+            self.update_buffer_from_data(
+                self._points_data,
+                self._points_buffer,
+                update_positions,
+                update_colors,
+                update_elements,
+            )
+        if self._lines_data is not None:
+            self.update_buffer_from_data(
+                self._lines_data,
+                self._lines_buffer,
+                update_positions,
+                update_colors,
+                update_elements,
+            )
+        if self._frontfaces_data is not None:
+            self.update_buffer_from_data(
+                self._frontfaces_data,
+                self._frontfaces_buffer,
+                update_positions,
+                update_colors,
+                update_elements,
+            )
+        if self._backfaces_data is not None:
+            self.update_buffer_from_data(
+                self._backfaces_data,
+                self._backfaces_buffer,
+                update_positions,
+                update_colors,
+                update_elements,
+            )
+
+        #  Update the canvas.
         self.renderer.update()
 
     def _update_bounding_box(self, positions: Optional[list[Point]] = None):
@@ -336,14 +360,14 @@ class ViewerSceneObject(SceneObject):
         shader.uniform1f("object_opacity", self.opacity)
         shader.uniform1i("element_type", 2)
         # Frontfaces
-        if self._frontfaces_buffer is not None and not wireframe:
+        if self._frontfaces_buffer is not None and not wireframe and self.show_faces:
             shader.bind_attribute("position", self._frontfaces_buffer["positions"])
             shader.bind_attribute("color", self._frontfaces_buffer["colors"])
             shader.draw_triangles(
                 elements=self._frontfaces_buffer["elements"], n=self._frontfaces_buffer["n"], background=self.background
             )
         # Backfaces
-        if self._backfaces_buffer is not None and not wireframe:
+        if self._backfaces_buffer is not None and not wireframe and self.show_faces:
             shader.bind_attribute("position", self._backfaces_buffer["positions"])
             shader.bind_attribute("color", self._backfaces_buffer["colors"])
             shader.draw_triangles(
@@ -352,7 +376,7 @@ class ViewerSceneObject(SceneObject):
         shader.uniform1i("is_lighted", False)
         shader.uniform1i("element_type", 1)
         # Lines
-        if self._lines_buffer is not None:
+        if self._lines_buffer is not None and self.show_lines:
             shader.bind_attribute("position", self._lines_buffer["positions"])
             shader.bind_attribute("color", self._lines_buffer["colors"])
             shader.draw_lines(
@@ -363,7 +387,7 @@ class ViewerSceneObject(SceneObject):
             )
         shader.uniform1i("element_type", 0)
         # Points
-        if self._points_buffer is not None:
+        if self._points_buffer is not None and self.show_points:
             shader.bind_attribute("position", self._points_buffer["positions"])
             shader.bind_attribute("color", self._points_buffer["colors"])
             shader.draw_points(
@@ -402,11 +426,11 @@ class ViewerSceneObject(SceneObject):
                 n=self._lines_buffer["n"],
             )
         # Frontfaces
-        if self._frontfaces_buffer is not None and not wireframe:
+        if self._frontfaces_buffer is not None and not wireframe and self.show_faces:
             shader.bind_attribute("position", self._frontfaces_buffer["positions"])
             shader.draw_triangles(elements=self._frontfaces_buffer["elements"], n=self._frontfaces_buffer["n"])
         # Backfaces
-        if self._backfaces_buffer is not None and not wireframe:
+        if self._backfaces_buffer is not None and not wireframe and self.show_faces:
             shader.bind_attribute("position", self._backfaces_buffer["positions"])
             shader.draw_triangles(elements=self._backfaces_buffer["elements"], n=self._backfaces_buffer["n"])
         # Reset

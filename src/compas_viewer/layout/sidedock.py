@@ -56,14 +56,19 @@ class SidedockLayout:
         scroll.setWidget(content)
         scroll.setWidgetResizable(True)
         self.sidedock_layout = QVBoxLayout(content)
-        self.sidedock_layout.addStretch()
+        self.sidedock_layout.addStretch(2)
+
+        self.elements: list[Union[Slider, Treeform, Propertyform]] = []
 
     def init(self):
         self.sidedock.setLayout(self.sidedock_layout)
         self.viewer.window.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.sidedock)
 
     def add_element(self, element: Union[Slider, Treeform, Propertyform]):
-        if isinstance(element, Propertyform):
-            self.sidedock_layout.insertLayout(self.sidedock_layout.count() - 1, element, element._stretch)
-        else:
-            self.sidedock_layout.insertWidget(self.sidedock_layout.count() - 1, element, element.stretch)
+        self.sidedock_layout.insertWidget(self.sidedock_layout.count() - 1, element, element.stretch)
+        self.elements.append(element)
+        element.viewer = self.viewer
+
+    def update(self):
+        for element in self.elements:
+            element.update()

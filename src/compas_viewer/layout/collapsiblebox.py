@@ -3,19 +3,38 @@ from typing import Optional
 from PySide6.QtCore import QSize
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QScrollArea
-from PySide6.QtWidgets import QSizePolicy
 from PySide6.QtWidgets import QToolButton
 from PySide6.QtWidgets import QVBoxLayout
 from PySide6.QtWidgets import QWidget
 
 
 class CollapsibleBox(QWidget):
+    """Collapsible box widget.
 
-    def __init__(self, parent: Optional[QWidget] = None, expend: bool = False):
-        super().__init__(parent=parent)
-        self._parent = parent
+    Parameters
+    ----------
+    name : str, optional
+        Name of the collapsible box.
+    expend : bool, optional
+        Whether the box is expanded or not.
+
+    See Also
+    --------
+    :class:`compas_viewer.layout.Slider`
+
+    References
+    ----------
+    :PySide6:`PySide6/QWidgets/QWidget`
+    """
+
+    def __init__(self, name: Optional[str] = None, expend: bool = True):
+        super().__init__()
+        self.name = name
         self._expanded = expend
-        self.toggle_button = QToolButton(parent=self._parent)
+
+        self.toggle_button = QToolButton()
+        self.toggle_button.setText(self.name or "")
+        self.toggle_button.setCheckable(True)
         self.toggle_button.setStyleSheet("QToolButton { border: none; }")
         self.toggle_button.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
         self.toggle_button.setIconSize(QSize(8, 8))
@@ -23,35 +42,41 @@ class CollapsibleBox(QWidget):
         self.toggle_button.pressed.connect(self.on_pressed)
 
         self.content_area = QScrollArea()
-        self.content_area.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        self.content_area.setLayout(QVBoxLayout())
+        _layout = QVBoxLayout(self)
+        _layout.setSpacing(0)
+        _layout.setContentsMargins(0, 0, 0, 0)
+        _layout.addWidget(self.toggle_button)
+        _layout.addWidget(self.content_area)
 
-        lay = QVBoxLayout(self)
-        lay.setSpacing(0)
-        lay.setContentsMargins(0, 0, 0, 0)
-        lay.addWidget(self.toggle_button)
-        lay.addWidget(self.content_area)
+        if self._expanded:
+            self.expand()
 
     def on_pressed(self):
-        self._expanded = not self.toggle_button.isChecked()
+        """Toggle the box."""
+        self._expanded = not self._expanded
         if self._expanded:
             self.expand()
         else:
             self.collapse()
 
-    def get_content_height(self):
-        return self._layout.sizeHint().height()
-
-    def setContentLayout(self, layout):
-        self._layout = layout
-        self.content_area.setLayout(layout)
-        self._collapsed_height = self.sizeHint().height()
-
     def expand(self):
+        """Expand the box."""
         self.toggle_button.setArrowType(Qt.ArrowType.DownArrow)
-        self.setFixedHeight(self._collapsed_height + self.get_content_height())
-        self.content_area.setMaximumHeight(self.get_content_height())
+        self.content_area.show()
+        self.content_area.setMinimumHeight(self.content_area.layout().sizeHint().height())
 
     def collapse(self):
+        """Collapse the box."""
         self.toggle_button.setArrowType(Qt.ArrowType.RightArrow)
-        self.setFixedHeight(self._collapsed_height)
-        self.content_area.setMaximumHeight(0)
+        self.content_area.hide()
+
+    def update(self):
+        """Update the layout."""
+
+        if self._expanded:
+            self.expand()
+        else:
+            self.collapse()
+
+        super().update()
