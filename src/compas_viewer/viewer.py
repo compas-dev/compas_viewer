@@ -20,7 +20,7 @@ from compas_viewer.controller import Controller
 from compas_viewer.layout import Layout
 from compas_viewer.scene.scene import ViewerScene
 from compas_viewer.scene.sceneobject import ViewerSceneObject
-from compas_viewer.utilities import Timer
+from compas_viewer.qt import Timer
 
 
 class Viewer:
