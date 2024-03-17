@@ -1,7 +1,5 @@
-from compas.datastructures import Mesh
 from compas.geometry import Box
 from compas.geometry import Frame
-from compas.geometry import Sphere
 
 from compas_viewer import Viewer
 from compas_viewer.layout import Propertyform
