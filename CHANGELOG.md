@@ -33,7 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Changed from `super(__t, __obj)` to `super()` as the new version.
 
 ### Removed
-
+* Removed `utilities` folder.
 
 ## [1.0.1] 2024-02-01
 
