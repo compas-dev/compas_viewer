@@ -1,5 +1,8 @@
+from random import randint
+from random import seed
 from typing import TYPE_CHECKING
 from typing import Any
+from typing import Generator
 from typing import Optional
 from typing import Union
 
@@ -11,10 +14,6 @@ from .sceneobject import ViewerSceneObject
 
 if TYPE_CHECKING:
     from compas_viewer import Viewer
-
-from random import randint
-from random import seed
-from typing import Generator
 
 
 def instance_colors_generator(i: int = 0) -> Generator:
