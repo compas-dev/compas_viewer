@@ -2,7 +2,6 @@ from functools import partial
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import Optional
-from typing import Union
 
 from compas.colors import Color
 from compas.geometry import Rotation
