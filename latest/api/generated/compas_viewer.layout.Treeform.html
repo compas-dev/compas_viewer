@@ -589,7 +589,7 @@ document.write(`
 <h1>Treeform</h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="compas_viewer.layout.Treeform">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Treeform</span></span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/b1d9ce5/src/compas_viewer/layout/treeform.py#L6"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Treeform</span></span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/158f29f/src/compas_viewer/layout/treeform.py#L10"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QTreeWidget</span></code></p>
 <p>Class for displaying tree-like data.
 Treeform is an abstract class that could be placed in either the viewport or the sidedock.</p>
@@ -599,8 +599,8 @@ Treeform is an abstract class that could be placed in either the viewport or the
 <dt><strong>tree</strong><span class="classifier"><a class="reference external" href="https://compas.dev/compas/latest/api/compas.datastructures.Tree.html#compas.datastructures.Tree" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.datastructures.Tree</span></code></a></span></dt><dd><p>The tree to be displayed. An typical example is the scene
 object tree: <code class="xref py py-attr docutils literal notranslate"><span class="pre">compas_viewer.viewer.Viewer._tree</span></code>.</p>
 </dd>
-<dt><strong>columns</strong><span class="classifier">dict</span></dt><dd><p>A dictionary of column names and their corresponding attributes.
-Example: `` {“Name”: “object.name”, “Object”: “object”}``</p>
+<dt><strong>columns</strong><span class="classifier">dict[str, callable]</span></dt><dd><p>A dictionary of column names and their corresponding attributes.
+Example: <code class="docutils literal notranslate"><span class="pre">{&quot;Name&quot;:</span> <span class="pre">(lambda</span> <span class="pre">o:</span> <span class="pre">o.name),</span> <span class="pre">&quot;Object&quot;:</span> <span class="pre">(lambda</span> <span class="pre">o:</span> <span class="pre">o)}</span></code></p>
 </dd>
 <dt><strong>column_editable</strong><span class="classifier">list, optional</span></dt><dd><p>A list of booleans indicating whether the corresponding column is editable.
 Defaults to <code class="docutils literal notranslate"><span class="pre">[False]</span></code>.</p>
@@ -610,6 +610,9 @@ Defaults to <code class="docutils literal notranslate"><span class="pre">True</s
 </dd>
 <dt><strong>stretch</strong><span class="classifier">int, optional</span></dt><dd><p>Stretch factor of the tree in the grid layout.
 Defaults to <code class="docutils literal notranslate"><span class="pre">2</span></code>.</p>
+</dd>
+<dt><strong>backgrounds</strong><span class="classifier">dict[str, callable], optional</span></dt><dd><p>A dictionary of column names and their corresponding color.
+Example: <code class="docutils literal notranslate"><span class="pre">{&quot;Object-Color&quot;:</span> <span class="pre">(lambda</span> <span class="pre">o:</span> <span class="pre">o.surfacecolor)}</span></code></p>
 </dd>
 </dl>
 </dd>
@@ -633,7 +636,9 @@ Defaults to <code class="docutils literal notranslate"><span class="pre">2</span
     <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
         <span class="n">sp</span> <span class="o">=</span> <span class="n">viewer</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Sphere</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">Frame</span><span class="p">([</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])),</span> <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Sphere_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-<span class="n">viewer</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">sidedock</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">Treeform</span><span class="p">(</span><span class="n">viewer</span><span class="o">.</span><span class="n">_tree</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span><span class="s2">&quot;.object.name&quot;</span><span class="p">,</span> <span class="s2">&quot;Object&quot;</span><span class="p">:</span><span class="s2">&quot;.object&quot;</span><span class="p">}))</span>
+<span class="n">viewer</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">sidedock</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span>
+    <span class="n">Treeform</span><span class="p">(</span><span class="n">viewer</span><span class="o">.</span><span class="n">_tree</span><span class="p">,{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">o</span><span class="p">:</span> <span class="n">o</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">name</span><span class="p">),</span> <span class="s2">&quot;Object&quot;</span><span class="p">:</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">o</span><span class="p">:</span> <span class="n">o</span><span class="o">.</span><span class="n">object</span><span class="p">)})</span>
+    <span class="p">)</span>
 
 <span class="n">viewer</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
