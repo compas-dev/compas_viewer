@@ -1,6 +1,9 @@
 from typing import TYPE_CHECKING
+from typing import Callable
+from typing import Optional
 
 from compas.datastructures import Tree
+from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QTreeWidget
 from PySide6.QtWidgets import QTreeWidgetItem
 
@@ -18,9 +21,9 @@ class Treeform(QTreeWidget):
     tree : :class:`compas.datastructures.Tree`
         The tree to be displayed. An typical example is the scene
         object tree: :attr:`compas_viewer.viewer.Viewer._tree`.
-    columns : dict
+    columns : dict[str, callable]
         A dictionary of column names and their corresponding attributes.
-        Example: `` {"Name": "object.name", "Object": "object"}``
+        Example: ``{"Name": (lambda o: o.name), "Object": (lambda o: o)}``
     column_editable : list, optional
         A list of booleans indicating whether the corresponding column is editable.
         Defaults to ``[False]``.
@@ -30,6 +33,9 @@ class Treeform(QTreeWidget):
     stretch : int, optional
         Stretch factor of the tree in the grid layout.
         Defaults to ``2``.
+    backgrounds : dict[str, callable], optional
+        A dictionary of column names and their corresponding color.
+        Example: ``{"Object-Color": (lambda o: o.surfacecolor)}``
 
     Attributes
     ----------
@@ -58,7 +64,9 @@ class Treeform(QTreeWidget):
             for j in range(10):
                 sp = viewer.scene.add(Sphere(0.1, Frame([i, j, 0], [1, 0, 0], [0, 1, 0])), name=f"Sphere_{i}_{j}")
 
-        viewer.layout.sidedock.add_element(Treeform(viewer._tree, {"Name":".object.name", "Object":".object"}))
+        viewer.layout.sidedock.add_element(
+            Treeform(viewer._tree,{"Name": (lambda o: o.object.name), "Object": (lambda o: o.object)})
+            )
 
         viewer.show()
 
@@ -67,10 +75,11 @@ class Treeform(QTreeWidget):
     def __init__(
         self,
         tree: Tree,
-        columns: dict[str, str],
+        columns: dict[str, Callable],
         column_editable: list[bool] = [False],
         show_headers: bool = True,
         stretch: int = 2,
+        backgrounds: Optional[dict[str, Callable]] = None,
     ):
         super().__init__()
         self.viewer: "Viewer"
@@ -80,6 +89,7 @@ class Treeform(QTreeWidget):
         self.setHeaderLabels(list(self.columns.keys()))
         self.setHeaderHidden(not show_headers)
         self.stretch = stretch
+        self._backgrounds = backgrounds
 
         self.tree = tree
         self._tree = tree
@@ -95,7 +105,7 @@ class Treeform(QTreeWidget):
             if node.is_root:
                 continue
 
-            strings = [eval(f"str(node{c})", globals(), {"node": node}) for _, c in self.columns.items()]
+            strings = [str(c(node)) for _, c in self.columns.items()]
 
             if node.parent.is_root:  # type: ignore
                 node.attributes["widget_item"] = QTreeWidgetItem(self, strings)  # type: ignore
@@ -103,6 +113,12 @@ class Treeform(QTreeWidget):
                 node.attributes["widget_item"] = QTreeWidgetItem(
                     node.parent.attributes["widget_item"], strings  # type: ignore
                 )
+
+            if self._backgrounds:
+                for col, background in self._backgrounds.items():
+                    node.attributes["widget_item"].setBackground(
+                        list(self.columns.keys()).index(col), QColor(*background(node).rgb255)
+                    )
 
     def update(self):
         self.tree = self._tree
