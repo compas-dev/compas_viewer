@@ -58,7 +58,7 @@ class ViewportLayout:
             if i["category"] == "render":
                 self.add_element(self.layout.viewer.renderer)
             else:
-                raise NotImplementedError(f"Ttype {i['render']} not implemented.")
+                raise NotImplementedError(f"Type {i['render']} not implemented.")
 
     def add_element(self, element: Union["Renderer", "Treeform"], is_horizontal: bool = True):
         """

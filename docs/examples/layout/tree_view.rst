@@ -1,9 +1,7 @@
 *******************************************************************************
 Tree View
 *******************************************************************************
-.. autosummary::
-    :toctree:
-    :nosignatures:
+
 .. figure:: /_images/tree_view.jpg
     :figclass: figure
     :class: figure-img img-fluid

@@ -17,12 +17,12 @@ for i in range(10):
             name=f"Box_{i}_{j}",
         )
 
-form_ids = Treeform(viewer.scene.tree, {"Name": ".object.name", "Object": ".object"})
+form_ids = Treeform(viewer.scene.tree, {"Name": (lambda o: o.object.name), "Object": (lambda o: o.object)})
 viewer.layout.viewport.add_element(form_ids)
 form_colors = Treeform(
     viewer.scene.tree,
-    {"Name": ".object.name", "Object-Color": ".object.surfacecolor"},
-    backgrounds={"Object-Color": ".object.surfacecolor"},
+    {"Name": (lambda o: o.object.name), "Object-Color": (lambda o: o.object.surfacecolor)},
+    backgrounds={"Object-Color": (lambda o: o.object.surfacecolor)},
 )
 viewer.layout.viewport.add_element(form_colors, False)
 
