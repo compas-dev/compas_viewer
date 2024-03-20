@@ -13,7 +13,7 @@ viewer = Viewer(rendermode="shaded", width=1600, height=900)
 
 
 pointobj: PointObject = viewer.scene.add(Point(*curve.point_at(0)), pointssize=20, pointcolor=Color.red(), show_points=True)  # type: ignore
-curveobj = viewer.scene.add(Polyline(curve.to_polyline()), lineswidth=2, linecolor=Color.blue())
+curveobj = viewer.scene.add(Polyline(curve.to_polyline()), lineswidth=2, linecolor=Color.blue(), show_points=False)
 
 
 def slide(value, additional_var):
