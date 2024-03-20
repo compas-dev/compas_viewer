@@ -13,10 +13,10 @@ from numpy import average
 from numpy import identity
 
 from compas_viewer.components.renderer.shaders import Shader
-from compas_viewer.utilities.gl import make_index_buffer
-from compas_viewer.utilities.gl import make_vertex_buffer
-from compas_viewer.utilities.gl import update_index_buffer
-from compas_viewer.utilities.gl import update_vertex_buffer
+from compas_viewer.gl import make_index_buffer
+from compas_viewer.gl import make_vertex_buffer
+from compas_viewer.gl import update_index_buffer
+from compas_viewer.gl import update_vertex_buffer
 
 if TYPE_CHECKING:
     from compas_viewer import Viewer

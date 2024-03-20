@@ -1,5 +1,8 @@
+from random import randint
+from random import seed
 from typing import TYPE_CHECKING
 from typing import Any
+from typing import Generator
 from typing import Optional
 from typing import Union
 
@@ -7,12 +10,44 @@ from compas.colors import Color
 from compas.data import Data
 from compas.scene import Scene
 
-from compas_viewer.utilities import instance_colors_generator
-
 from .sceneobject import ViewerSceneObject
 
 if TYPE_CHECKING:
     from compas_viewer import Viewer
+
+
+def instance_colors_generator(i: int = 0) -> Generator:
+    """
+    Generate a set of non-repetitive random colors for instance colors.
+
+    Parameters
+    ----------
+    i : int, optional
+        Seed for the random number generator. Default is ``0``.
+
+    Yields
+    ------
+    tuple of int
+        A tuple of three integers representing the RGB color of the instance.
+    """
+
+    dim = 255
+    seed(i)
+    existed = []
+
+    while True:
+        n = randint(0, dim**3)
+
+        if n in existed:
+            continue
+
+        existed.append(n)
+
+        r = n // dim**2
+        g = (n - r * dim**2) // dim
+        b = n - r * dim**2 - g * dim
+
+        yield (r, g, b)
 
 
 class ViewerScene(Scene):
