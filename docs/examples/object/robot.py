@@ -37,7 +37,7 @@ for i, joint in enumerate(robot_object.configuration.joint_names):
     slider = viewer.layout.sidedock.add_element(slider)
 
 
-treeform = Treeform(viewer.scene.tree, {"Name": ".name", "Object": ""})
+treeform = Treeform(viewer.scene.tree, {"Name": (lambda o: o.name), "Object": (lambda o: o)})
 
 viewer.layout.sidedock.add_element(treeform)
 

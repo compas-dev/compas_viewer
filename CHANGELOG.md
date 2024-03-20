@@ -8,9 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
+
 * Added `*args` in the `Viewer.add` method, resolve [#85](https://github.com/compas-dev/compas_viewer/issues/85).
 * Added `Transformation` and `Visualization` sections for the `Propertyform`.
 * Added `Propertyform` and its example in the documentation.
+* Added example `layout/tree_view`.
+* Added functionality of multiple widgets in main viewport.
 * Added example `object/scale.py`.
 * Added `RobotModelObject` and its example in the documentation.
 
