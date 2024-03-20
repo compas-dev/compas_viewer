@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
+* Added example `layout/tree_view`.
+* Added functionality of multiple widgets in main viewport.
 * Added example `object/scale.py`.
 * Added `RobotModelObject` and its example in the documentation.
 
