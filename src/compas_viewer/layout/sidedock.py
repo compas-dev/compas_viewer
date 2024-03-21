@@ -65,10 +65,20 @@ class SidedockLayout:
         self.viewer.window.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.sidedock)
 
     def add_element(self, element: Union[Slider, Treeform, Propertyform]):
+        """
+        Add an element to the sidedock.
+
+        Parameters
+        ----------
+        element
+            The element to be added to the sidedock.
+
+        """
         self.sidedock_layout.insertWidget(self.sidedock_layout.count() - 1, element, element.stretch)
         self.elements.append(element)
         element.viewer = self.viewer
 
     def update(self):
+        """Update the elements in the sidedock."""
         for element in self.elements:
             element.update()

@@ -38,7 +38,6 @@ class Propertyform(QWidget):
         The object to be displayed initially.
     on_select : bool, optional
         If ``True``, the form will be updated when the object is selected.
-        Defaults to ``True``.
     title : str, optional
         The title of the form.
     stretch : int, optional
@@ -76,7 +75,13 @@ class Propertyform(QWidget):
     # ==========================================================================
 
     def set_object(self, obj: "ViewerSceneObject"):
-        """Set the object to be displayed in the form."""
+        """Set the object to be displayed in the form.
+
+        Parameters
+        ----------
+        obj : :class:`compas_viewer.scene.ViewerSceneObject`
+            The object to be displayed in the form.
+        """
 
         self.clearLayout(self.layout())
 
@@ -134,7 +139,7 @@ class Propertyform(QWidget):
 
         Returns
         -------
-        cb : :class:`compas_viewer.layout.CollapsibleBox`
+        :class:`compas_viewer.layout.CollapsibleBox`
             The collapsible box added to the layout.
         """
         cb = CollapsibleBox(name=name)
@@ -153,7 +158,7 @@ class Propertyform(QWidget):
 
         Returns
         -------
-        collapsibleBox : :class:`compas_viewer.layout.CollapsibleBox`
+        :class:`compas_viewer.layout.CollapsibleBox`
             The collapsible box added to the layout.
         """
 

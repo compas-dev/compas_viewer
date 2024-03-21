@@ -287,7 +287,17 @@ class ViewerSceneObject(SceneObject):
         self._update_matrix()
 
     def update(self, update_positions: bool = True, update_colors: bool = True, update_elements: bool = True):
-        """Update the object"""
+        """Update the object.
+
+        Parameters
+        ----------
+        update_positions : bool, optional
+            Whether to update positions of the object.
+        update_colors : bool, optional
+            Whether to update colors of the object.
+        update_elements : bool, optional
+            Whether to update elements of the object.
+        """
 
         # Update the matrix from object's translation, rotation and scale.
         self._update_matrix()

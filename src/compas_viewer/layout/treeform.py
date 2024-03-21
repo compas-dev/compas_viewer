@@ -2,8 +2,6 @@ from typing import TYPE_CHECKING
 from typing import Callable
 from typing import Optional
 
-
-
 from compas.datastructures import Tree
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QTreeWidget

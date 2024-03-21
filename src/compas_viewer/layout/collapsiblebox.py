@@ -43,11 +43,11 @@ class CollapsibleBox(QWidget):
 
         self.content_area = QScrollArea()
         self.content_area.setLayout(QVBoxLayout())
-        _layout = QVBoxLayout(self)
-        _layout.setSpacing(0)
-        _layout.setContentsMargins(0, 0, 0, 0)
-        _layout.addWidget(self.toggle_button)
-        _layout.addWidget(self.content_area)
+        layout = QVBoxLayout(self)
+        layout.setSpacing(0)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(self.toggle_button)
+        layout.addWidget(self.content_area)
 
         if self._expanded:
             self.expand()

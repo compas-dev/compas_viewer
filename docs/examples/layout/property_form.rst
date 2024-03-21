@@ -1,9 +1,7 @@
 *******************************************************************************
 Property Form
 *******************************************************************************
-.. autosummary::
-    :toctree:
-    :nosignatures:
+
 .. figure:: /_images/property_form.gif
     :figclass: figure
     :class: figure-img img-fluid

@@ -92,6 +92,9 @@ class Selector(QObject):
         if selected_obj:
             selected_obj.is_selected = True
 
+        # Update the layout.
+        self.viewer.layout.update()
+
     def deselect_action(self):
         """Deselect the object under the mouse cursor."""
 
@@ -119,6 +122,9 @@ class Selector(QObject):
         selected_obj = self.renderer.scene.instance_colors.get(tuple(unique_color[0]))  # type: ignore
         if selected_obj:
             selected_obj.is_selected = True
+
+        # Update the layout.
+        self.viewer.layout.update()
 
     def drag_selection_action(self):
         """Drag select the objects in the rectangle area."""

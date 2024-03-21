@@ -139,9 +139,6 @@ class Controller:
         elif event.buttons() == self.config.rotate.mouse and event.modifiers() == self.config.rotate.modifier:
             QApplication.setOverrideCursor(Qt.CursorShape.SizeAllCursor)
 
-        # Update the UI every time a mouse button is pressed.
-        self.viewer.layout.update()
-
     def mouse_release_action(self, renderer: "Renderer", event: QMouseEvent):
         """
         The mouse release action of the renderer object.
