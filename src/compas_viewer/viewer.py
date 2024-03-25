@@ -21,6 +21,7 @@ from compas_viewer.layout import Layout
 from compas_viewer.scene.scene import ViewerScene
 from compas_viewer.scene.sceneobject import ViewerSceneObject
 from compas_viewer.utilities import Timer
+from compas.data import Data
 
 
 class Viewer:
@@ -147,11 +148,18 @@ class Viewer:
     # Scene
     # ==========================================================================
 
-    def add(self, **kwargs):
+    def add(self, item: Data, **kwargs):
         """
         Add an item to the scene.
         This is a compatibility function for the old version of the viewer.
         While :func:`compas.scene.Scene.add` is the recommended way to add an item to the scene.
+
+        Parameters
+        ----------
+        item : :class:`compas.data.Data`
+            The item to be added to the scene.
+        **kwargs : dict
+            Additional options for the :class:`compas_viewer.scene.ViewerSceneObject`.
 
         Returns
         -------
@@ -159,7 +167,7 @@ class Viewer:
             The scene object.
         """
 
-        return self.scene.add(**kwargs)
+        return self.scene.add(item, **kwargs)
 
     # ==========================================================================
     # Runtime
