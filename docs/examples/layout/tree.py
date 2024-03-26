@@ -13,7 +13,7 @@ for i in range(10):
 
 
 viewer.layout.sidedock.add_element(
-    Treeform(viewer.scene.tree, {"Name": (lambda o: o.object.name), "Object": (lambda o: o.object)})
+    Treeform(viewer.scene, {"Name": (lambda o: o.name), "Object": (lambda o: o)})
 )
 
 
