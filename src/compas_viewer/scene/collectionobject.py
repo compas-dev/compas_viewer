@@ -9,6 +9,8 @@ from numpy import array
 from .sceneobject import ShaderDataType
 from .sceneobject import ViewerSceneObject
 
+import numpy as np
+
 
 class Collection(Data):
     """Viewer scene object for displaying a collection of COMPAS geometries."""

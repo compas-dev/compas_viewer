@@ -9,8 +9,6 @@ from compas.utilities import pairwise
 
 from .geometryobject import GeometryObject as ViewerGeometryObject
 
-import numpy as np
-
 try:
     from compas_occ.brep import OCCBrep
 

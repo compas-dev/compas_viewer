@@ -132,4 +132,5 @@ __all__ = [
     "CapsuleObject",
     "NurbsSurface",
     "NurbsSurfaceObject",
+    "GeometryObject",
 ]
