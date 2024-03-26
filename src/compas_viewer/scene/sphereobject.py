@@ -8,7 +8,6 @@ from compas.scene import GeometryObject
 
 from .geometryobject import GeometryObject as ViewerGeometryObject
 
-from .geometryobject import GeometryObject
 
 class SphereObject(ViewerGeometryObject, GeometryObject):
     """Viewer scene object for displaying COMPAS Sphere geometry.
