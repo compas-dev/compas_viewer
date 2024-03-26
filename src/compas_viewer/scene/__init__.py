@@ -2,10 +2,11 @@
 This package provides scene object plugins for visualizing COMPAS objects in `compas_viewer`.
 """
 
+from typing import Union
 from compas.scene import register
 from compas.plugins import plugin
-from .sceneobject import ViewerSceneObject
 from compas.datastructures import Mesh
+from compas.datastructures import Graph
 from compas.geometry import (
     Point,
     Line,
@@ -23,11 +24,12 @@ from compas.geometry import (
     Capsule,
     Frame,
     NurbsSurface,
+    Geometry,
 )
 
-
+from .sceneobject import ViewerSceneObject
 from .meshobject import MeshObject
-
+from .graphobject import GraphObject
 from .pointobject import PointObject
 from .lineobject import LineObject
 from .vectorobject import VectorObject
@@ -50,8 +52,9 @@ from .geometryobject import GeometryObject
 
 
 @plugin(category="drawing-utils", requires=["compas_viewer"])
-def clear(guids=None):
-    pass
+def clear(guids: list[str]):
+    for obj in guids:
+        del obj
 
 
 @plugin(category="drawing-utils", requires=["compas_viewer"])
@@ -62,6 +65,7 @@ def redraw():
 @plugin(category="factories", requires=["compas_viewer"])
 def register_scene_objects():
     register(Mesh, MeshObject, context="Viewer")
+    register(Graph, GraphObject, context="Viewer")
     register(Point, PointObject, context="Viewer")
     register(Line, LineObject, context="Viewer")
     register(Tag, TagObject, context="Viewer")
@@ -79,7 +83,7 @@ def register_scene_objects():
     register(Cone, ConeObject, context="Viewer")
     register(Capsule, CapsuleObject, context="Viewer")
     register(NurbsSurface, NurbsSurfaceObject, context="Viewer")
-    register(list, CollectionObject, context="Viewer")
+    register(list[Union[Geometry, Mesh]], CollectionObject, context="Viewer")
 
     try:
         from compas_occ.brep import OCCBrep

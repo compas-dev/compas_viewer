@@ -1,180 +1,124 @@
-from compas.colors import Color
-from compas.geometry import Geometry
-from compas.geometry import centroid_points
-from compas.geometry import is_coplanar
-from compas.scene import GeometryObject as BaseGeometryObject
-from compas.utilities import pairwise
-from compas.datastructures import Mesh
+from typing import Optional
 
-from .sceneobject import DataType
+from compas.colors import Color
+from compas.datastructures import Mesh
+from compas.geometry import Geometry
+from compas.geometry import Line
+from compas.geometry import Point
+from compas.scene import GeometryObject as BaseGeometryObject
+
+from .sceneobject import ShaderDataType
 from .sceneobject import ViewerSceneObject
 
 
 class GeometryObject(ViewerSceneObject, BaseGeometryObject):
-    """Viewer scene object for displaying COMPAS geometry shapes."""
+    """Viewer scene object for displaying COMPAS Geometry.
+
+    Parameters
+    ----------
+    geometry : :class:`compas.geometry.Geometry`
+        A COMPAS geometry.
+    v : int, optional
+        The number of vertices in the u-direction of non-OCC geometries.
+    u : int, optional
+        The number of vertices in the v-direction of non-OCC geometries.
+    pointcolor : :class:`compas.colors.Color`, optional
+        The color of the points. Default is the value of `pointcolor` in `viewer.config`.
+    linecolor : :class:`compas.colors.Color`, optional
+        The color of the lines. Default is the value of `linecolor` in `viewer.config`.
+    surfacecolor : :class:`compas.colors.Color`, optional
+        The color of the surfaces. Default is the value of `surfacecolor` in `viewer.config`.
+    **kwargs : dict, optional
+        Additional options for the :class:`compas_viewer.scene.ViewerSceneObject`
+        and :class:`compas.scene.GeometryObject`.
+
+    Attributes
+    ----------
+    geometry : :class:`compas.geometry.Geometry`
+        The COMPAS geometry.
+    pointcolor : :class:`compas.colors.Color`
+        The color of the points.
+    linecolor : :class:`compas.colors.Color`
+        The color of the lines.
+    surfacecolor : :class:`compas.colors.Color`
+        The color of the surfaces.
+    mesh : :class:`compas.datastructures.Mesh`
+        The triangulated mesh representation of the geometry.
+    LINEARDEFLECTION : float
+        The default linear deflection for the geometry.
+
+    See Also
+    --------
+    :class:`compas.geometry.Geometry`
+    """
 
     def __init__(
         self,
         geometry: Geometry,
-        mesh=None,
-        hide_coplanaredges=True,
-        pointcolor=None,
-        linecolor=None,
-        surfacecolor=None,
-        doublesided=False,
+        u: int,
+        v: int,
+        pointcolor: Optional[Color] = None,
+        linecolor: Optional[Color] = None,
+        surfacecolor: Optional[Color] = None,
         **kwargs
     ):
-        super(GeometryObject, self).__init__(geometry=geometry, **kwargs)
-        # TODO: use Polyhedron instead of Mesh
-        self.mesh = mesh or Mesh.from_shape(geometry)
-        self.hide_coplanaredges = hide_coplanaredges
-        self.pointcolor = pointcolor or Color(0.2, 0.2, 0.2)
-        self.linecolor = linecolor or Color(0.4, 0.4, 0.4)
-        self.surfacecolor = surfacecolor or Color(0.8, 0.8, 0.8)
-        self.doublesided = doublesided
 
-    def _read_points_data(self) -> DataType:
-        positions = []
-        colors = []
-        elements = []
-        i = 0
+        super().__init__(geometry=geometry, **kwargs)
+        self.geometry: Geometry
 
-        for vertex in self.mesh.vertices():
-            positions.append(self.mesh.vertex_coordinates(vertex))
-            colors.append(self.pointcolor)
-            elements.append([i])
-            i += 1
+        self.u = u
+        self.v = v
+        self.pointcolor = pointcolor or self.viewer.config.pointcolor
+        self.linecolor = linecolor or self.viewer.config.linecolor
+        self.surfacecolor = surfacecolor or self.viewer.config.surfacecolor
+
+    @property
+    def points(self) -> Optional[list[Point]]:
+        """The points to be shown in the viewer."""
+        raise NotImplementedError
+
+    @property
+    def lines(self) -> Optional[list[Line]]:
+        """The lines to be shown in the viewer."""
+        raise NotImplementedError
+
+    @property
+    def viewmesh(self) -> Mesh:
+        """The mesh volume to be shown in the viewer."""
+        raise NotImplementedError
+
+    def _read_points_data(self) -> ShaderDataType:
+        if self.points is None:
+            return [], [], []
+        positions = self.points
+        colors = [self.pointcolor] * len(positions)
+        elements = [[i] for i in range(len(positions))]
         return positions, colors, elements
 
-    def _read_lines_data(self) -> DataType:
+    def _read_lines_data(self) -> ShaderDataType:
+        if self.lines is None:
+            return [], [], []
         positions = []
-        colors = []
-        elements = []
-        i = 0
-
-        for u, v in self.mesh.edges():
-            color = self.linecolor
-            if self.hide_coplanaredges:
-                # hide the edge if neighbor faces are coplanar
-                fkeys = self.mesh.edge_faces((u, v))
-                if not self.mesh.is_edge_on_boundary((u, v)):
-                    ps = [
-                        self.mesh.face_center(fkeys[0]),
-                        self.mesh.face_center(fkeys[1]),
-                        *self.mesh.edge_coordinates((u, v)),
-                    ]
-                    if is_coplanar(ps, tol=1e-5):
-                        continue
-            positions.append(self.mesh.vertex_coordinates(u))
-            positions.append(self.mesh.vertex_coordinates(v))
-            colors.append(color)
-            colors.append(color)
-            elements.append([i + 0, i + 1])
-            i += 2
-        return positions, colors, elements
-
-    def _read_frontfaces_data(self) -> DataType:
-        positions = []
-        colors = []
-        elements = []
-        i = 0
-
-        for face in self.mesh.faces():
-            vertices = self.mesh.face_vertices(face)
-            color = self.surfacecolor
-            if len(vertices) == 3:
-                a, b, c = vertices
-                positions.append(self.mesh.vertex_coordinates(a))
-                positions.append(self.mesh.vertex_coordinates(b))
-                positions.append(self.mesh.vertex_coordinates(c))
-                colors.append(color)
-                colors.append(color)
-                colors.append(color)
-                elements.append([i + 0, i + 1, i + 2])
-                i += 3
-            elif len(vertices) == 4:
-                a, b, c, d = vertices
-                positions.append(self.mesh.vertex_coordinates(a))
-                positions.append(self.mesh.vertex_coordinates(b))
-                positions.append(self.mesh.vertex_coordinates(c))
-                positions.append(self.mesh.vertex_coordinates(a))
-                positions.append(self.mesh.vertex_coordinates(c))
-                positions.append(self.mesh.vertex_coordinates(d))
-                colors.append(color)
-                colors.append(color)
-                colors.append(color)
-                colors.append(color)
-                colors.append(color)
-                colors.append(color)
-                elements.append([i + 0, i + 1, i + 2])
-                elements.append([i + 3, i + 4, i + 5])
-                i += 6
-            else:
-                points = [self.mesh.vertex_coordinates(vertex) for vertex in vertices]
-                c = centroid_points(points)
-                for a, b in pairwise(points + points[:1]):
-                    positions.append(a)
-                    positions.append(b)
-                    positions.append(c)
-                    colors.append(color)
-                    colors.append(color)
-                    colors.append(color)
-                    elements.append([i + 0, i + 1, i + 2])
-                    i += 3
+        for line in self.lines:
+            positions.append(line.start)
+            positions.append(line.end)
+        colors = [self.linecolor] * 2 * len(positions)
+        elements = [[2 * i, 2 * i + 1] for i in range(len(positions))]
 
         return positions, colors, elements
 
-    def _read_backfaces_data(self) -> DataType:
-        positions = []
-        colors = []
-        elements = []
+    def _read_frontfaces_data(self) -> ShaderDataType:
+        if self.viewmesh is None:
+            return [], [], []
+        positions, elements = self.viewmesh.to_vertices_and_faces()
+        colors = [self.surfacecolor] * 3 * len(positions)
+        return positions, colors, elements  # type: ignore
 
-        if not self.doublesided:
-            return positions, colors, elements
-
-        i = 0
-        faces = self.mesh.faces()
-        for face in faces:
-            vertices = self.mesh.face_vertices(face)[::-1]
-            color = self.surfacecolor
-            if len(vertices) == 3:
-                a, b, c = vertices
-                positions.append(self.mesh.vertex_coordinates(a))
-                positions.append(self.mesh.vertex_coordinates(b))
-                positions.append(self.mesh.vertex_coordinates(c))
-                colors.append(color)
-                colors.append(color)
-                colors.append(color)
-                elements.append([i + 0, i + 1, i + 2])
-                i += 3
-            elif len(vertices) == 4:
-                a, b, c, d = vertices
-                positions.append(self.mesh.vertex_coordinates(a))
-                positions.append(self.mesh.vertex_coordinates(b))
-                positions.append(self.mesh.vertex_coordinates(c))
-                positions.append(self.mesh.vertex_coordinates(a))
-                positions.append(self.mesh.vertex_coordinates(c))
-                positions.append(self.mesh.vertex_coordinates(d))
-                colors.append(color)
-                colors.append(color)
-                colors.append(color)
-                colors.append(color)
-                colors.append(color)
-                colors.append(color)
-                elements.append([i + 0, i + 1, i + 2])
-                elements.append([i + 3, i + 4, i + 5])
-                i += 6
-            else:
-                points = [self.mesh.vertex_coordinates(vertex) for vertex in vertices]
-                c = centroid_points(points)
-                for a, b in pairwise(points + points[:1]):
-                    positions.append(a)
-                    positions.append(b)
-                    positions.append(c)
-                    colors.append(color)
-                    colors.append(color)
-                    colors.append(color)
-                    elements.append([i + 0, i + 1, i + 2])
-                    i += 3
-
-        return positions, colors, elements
+    def _read_backfaces_data(self) -> ShaderDataType:
+        if self.viewmesh is None:
+            return [], [], []
+        positions, elements = self.viewmesh.to_vertices_and_faces()
+        for element in elements:
+            element.reverse()
+        colors = [self.surfacecolor] * 3 * len(positions)
+        return positions, colors, elements  # type: ignore

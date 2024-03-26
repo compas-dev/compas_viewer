@@ -5,7 +5,7 @@ on:
     branches:
       - main
     tags:
-      - 'v*'
+      - "v*"
   pull_request:
     branches:
       - main
@@ -14,6 +14,8 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     steps:
+      - name: update
+        run: sudo apt-get update
       - name: install libegl1
         run: sudo apt-get install libegl1
       - name: install python3-opengl

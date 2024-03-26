@@ -5,18 +5,20 @@ from compas.geometry import Polyline
 
 from compas_viewer import Viewer
 from compas_viewer.layout import Slider
+from compas_viewer.scene import PointObject
 
 curve = Bezier([[0, 0, 0], [3, 6, 0], [5, -3, 0], [10, 0, 0]])
 
 viewer = Viewer(rendermode="shaded", width=1600, height=900)
 
 
-pointobj = viewer.add(Point(*curve.point_at(0)), pointssize=20, pointscolor=Color.red(), show_points=True)
-curveobj = viewer.add(Polyline(curve.to_polyline()), lineswidth=2, linescolor=Color.blue())
+pointobj: PointObject = viewer.scene.add(Point(*curve.point_at(0)), pointssize=20, pointcolor=Color.red(), show_points=True)  # type: ignore
+curveobj = viewer.scene.add(Polyline(curve.to_polyline()), lineswidth=2, linecolor=Color.blue())
 
 
-def slide(value):
+def slide(value, additional_var):
     value = value / 100
+    print(additional_var + str(value))
     pointobj.geometry = curve.point_at(value)
     pointobj.init()
     pointobj.update()
@@ -24,14 +26,7 @@ def slide(value):
 
 
 viewer.layout.sidedock.add_element(
-    Slider(
-        slide,
-        0,
-        0,
-        100,
-        1,
-        "Slide Point",
-    )
+    Slider(slide, 0, 0, 100, 1, "Slide Point", additional_var="Slide the point along the curve at ")
 )
 
 

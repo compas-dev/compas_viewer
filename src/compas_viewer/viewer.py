@@ -1,17 +1,9 @@
 import sys
 from pathlib import Path
-from typing import TYPE_CHECKING
-from typing import Any
 from typing import Callable
 from typing import Literal
 from typing import Optional
-from typing import Union
 
-from compas.colors import Color
-from compas.datastructures import Mesh
-from compas.geometry import Frame
-from compas.geometry import Geometry
-from compas.scene import Scene
 from PySide6.QtCore import QCoreApplication
 from PySide6.QtWidgets import QApplication
 from PySide6.QtWidgets import QMainWindow
@@ -23,21 +15,18 @@ from compas_viewer.configurations import ActionConfig
 from compas_viewer.configurations import ControllerConfig
 from compas_viewer.configurations import LayoutConfig
 from compas_viewer.configurations import RendererConfig
-from compas_viewer.configurations import SceneConfig
+from compas_viewer.configurations import ViewerConfig
 from compas_viewer.controller import Controller
 from compas_viewer.layout import Layout
-from compas_viewer.scene import FrameObject
-from compas_viewer.scene import ViewerSceneObject
+from compas_viewer.scene.scene import ViewerScene
+from compas_viewer.scene.sceneobject import ViewerSceneObject
 from compas_viewer.utilities import Timer
-
-if TYPE_CHECKING:
-    from compas.datastructures import Graph
-    from compas_occ.brep import OCCBrep
+from compas.data import Data
 
 
-class Viewer(Scene):
+class Viewer:
     """
-    The Viewer class is the main entry of `compas_viewer`. It organizes the scene and create the GUI application.
+    The Viewer class is the main entry of the viewer. It contains the scene and create the GUI application.
 
     Parameters
     ----------
@@ -61,6 +50,8 @@ class Viewer(Scene):
 
     Attributes
     ----------
+    scene : :class:`compas_viewer.scene.ViewerScene`
+        The scene of the viewer.
     render : :class:`compas_viewer.components.render.Render`
         The render component of the viewer.
     controller : :class:`compas_viewer.controller.Controller`
@@ -84,11 +75,6 @@ class Viewer(Scene):
         from compas_viewer import Viewer
         viewer = Viewer()
         viewer.show()
-
-    See Also
-    --------
-    :class:`compas.scene.Scene`
-
     """
 
     def __init__(
@@ -102,17 +88,15 @@ class Viewer(Scene):
         show_grid: Optional[bool] = None,
         configpath: Optional[str] = None,
     ):
-        super(Viewer, self).__init__()
-
         # Custom or default config
         if configpath is None:
             self.renderer_config = RendererConfig.from_default()
-            self.scene_config = SceneConfig.from_default()
+            self.viewer_config = ViewerConfig.from_default()
             self.controller_config = ControllerConfig.from_default()
             self.layout_config = LayoutConfig.from_default()
         else:
             self.renderer_config = RendererConfig.from_json(Path(configpath, "renderer.json"))
-            self.scene_config = SceneConfig.from_json(Path(configpath, "scene.json"))
+            self.viewer_config = ViewerConfig.from_json(Path(configpath, "scene.json"))
             self.controller_config = ControllerConfig.from_json(Path(configpath, "controller.json"))
             self.layout_config = LayoutConfig.from_json(Path(configpath, "layout.json"))
 
@@ -132,24 +116,21 @@ class Viewer(Scene):
         if show_grid is not None:
             self.renderer_config.show_grid = show_grid
 
+        # Viewer
+        self.config = self.viewer_config
+
         #  Application
+        self.started = False
         self.app = QCoreApplication.instance() or QApplication(sys.argv)
         self.window = QMainWindow()
+
+        # Scene
+        self.scene = ViewerScene(self, name=self.layout_config.window.title, context="Viewer")
 
         # Controller
         self.controller = Controller(self, self.controller_config)
 
         # Render
-        self.grid = FrameObject(
-            Frame.worldXY(),
-            framesize=self.renderer_config.gridsize,
-            show_framez=self.renderer_config.show_gridz,
-            viewer=self,
-            is_selected=False,
-            is_locked=True,
-            is_visible=True,
-            config=self.scene_config,
-        )
         self.renderer = Renderer(self, self.renderer_config)
 
         # Layout
@@ -160,16 +141,33 @@ class Viewer(Scene):
         self.timer: Timer
         self.frame_count: int = 0
 
-        #  Selection
-        self.instance_colors: dict[tuple[int, int, int], ViewerSceneObject] = {}
-
         #  Primitive
         self.objects: list[ViewerSceneObject]
 
-    def __new__(cls, *args, **kwargs):
-        instance = super(Viewer, cls).__new__(cls)
-        Scene.viewerinstance = instance  # type: ignore
-        return instance
+    # ==========================================================================
+    # Scene
+    # ==========================================================================
+
+    def add(self, item: Data, **kwargs):
+        """
+        Add an item to the scene.
+        This is a compatibility function for the old version of the viewer.
+        While :func:`compas.scene.Scene.add` is the recommended way to add an item to the scene.
+
+        Parameters
+        ----------
+        item : :class:`compas.data.Data`
+            The item to be added to the scene.
+        **kwargs : dict
+            Additional options for the :class:`compas_viewer.scene.ViewerSceneObject`.
+
+        Returns
+        -------
+        :class:`compas_viewer.scene.sceneobject.ViewerSceneObject`
+            The scene object.
+        """
+
+        return self.scene.add(item, **kwargs)
 
     # ==========================================================================
     # Runtime
@@ -177,8 +175,9 @@ class Viewer(Scene):
 
     def show(self):
         """Show the viewer window."""
-        self.started = True
+        # opengel being initialized:
         self.window.show()
+        self.started = True
         # stop point of the main thread:
         self.app.exec_()
 
@@ -240,122 +239,6 @@ class Viewer(Scene):
         return outer
 
     # ==========================================================================
-    # Scene
-    # ==========================================================================
-
-    def add(
-        self,
-        item: Union[Mesh, Geometry, "OCCBrep", "Graph"],
-        parent: Optional[ViewerSceneObject] = None,
-        is_selected: bool = False,
-        is_locked: bool = False,
-        is_visible: bool = True,
-        show_points: Optional[bool] = None,
-        show_lines: Optional[bool] = None,
-        show_faces: Optional[bool] = None,
-        pointscolor: Optional[Union[Color, dict[Any, list[float]]]] = None,
-        linescolor: Optional[Union[Color, dict[Any, list[float]]]] = None,
-        facescolor: Optional[Union[Color, dict[Any, list[float]]]] = None,
-        lineswidth: Optional[float] = None,
-        pointssize: Optional[float] = None,
-        opacity: Optional[float] = None,
-        hide_coplanaredges: Optional[bool] = None,
-        use_vertexcolors: Optional[bool] = None,
-        **kwargs
-    ) -> ViewerSceneObject:
-        """
-        Add an item to the scene.
-        This function is inherent from :class:`compas.scene.Scene` with additional functionalities.
-
-        Parameters
-        ----------
-        item : Union[:class:`compas.geometry.Geometry`, :class:`compas.datastructures.Mesh`]
-            The geometry to add to the scene.
-        parent : :class:`compas_viewer.scene.ViewerSceneObject`, optional
-            The parent of the item.
-        is_selected : bool, optional
-            Whether the object is selected.
-            Default to False.
-        is_locked : bool, optional
-            Whether the object is locked (not selectable).
-            Default to False.
-        is_visible : bool, optional
-            Whether to show object.
-            Default to True.
-        show_points : bool, optional
-            Whether to show points/vertices of the object.
-            It will override the value in the scene config file.
-        show_lines : bool, optional
-            Whether to show lines/edges of the object.
-            It will override the value in the scene config file.
-        show_faces : bool, optional
-            Whether to show faces of the object.
-            It will override the value in the scene config file.
-        pointscolor : Union[:class:`compas.colors.Color`, dict[Any, :class:`compas.colors.Color`], optional
-            The color or the dict of colors of the points.
-            It will override the value in the scene config file.
-        linescolor : Union[:class:`compas.colors.Color`, dict[Any, :class:`compas.colors.Color`], optional
-            The color or the dict of colors of the lines.
-            It will override the value in the scene config file.
-        facescolor : Union[:class:`compas.colors.Color`, dict[Any, :class:`compas.colors.Color`], optional
-            The color or the dict of colors the faces.
-            It will override the value in the scene config file.
-        lineswidth : float, optional
-            The line width to be drawn on screen
-            It will override the value in the scene config file.
-        pointssize : float, optional
-            The point size to be drawn on screen
-            It will override the value in the scene config file.
-        opacity : float, optional
-            The opacity of the object.
-            It will override the value in the scene config file.
-        use_vertexcolors : bool, optional
-            Whether to use vertex color.
-            It will override the value in the scene config file.
-        **kwargs : dict, optional
-            The other possible parameters to be passed to the object.
-
-        Returns
-        -------
-        :class:`compas.scene.SceneObject`
-            The scene object.
-        """
-
-        sceneobject = super(Viewer, self).add(
-            item=item,
-            parent=parent,
-            viewer=self,
-            is_selected=is_selected,
-            is_visible=is_visible,
-            is_locked=is_locked,
-            show_points=show_points,
-            show_lines=show_lines,
-            show_faces=show_faces,
-            pointscolor=pointscolor,
-            linescolor=linescolor,
-            facescolor=facescolor,
-            lineswidth=lineswidth,
-            pointssize=pointssize,
-            opacity=opacity,
-            use_vertexcolors=use_vertexcolors,
-            config=self.scene_config,
-            **kwargs
-        )
-        assert isinstance(sceneobject, ViewerSceneObject)
-        if (
-            self.instance_colors.get(sceneobject.instance_color.rgb255)
-            or sceneobject.instance_color.rgb255 == self.renderer_config.backgroundcolor.rgb255
-        ):
-            raise ValueError(
-                "Program error: Instance color is not unique."
-                + "Scene object might exceed the limit of 16,581,375 or rerun the program."
-            )
-        else:
-            self.instance_colors[sceneobject.instance_color.rgb255] = sceneobject
-
-        return sceneobject
-
-    # ==========================================================================
     # Action
     # ==========================================================================
 
@@ -398,7 +281,7 @@ class Viewer(Scene):
             from compas.geometry import Transformation
             from compas_viewer import Viewer
             viewer = Viewer()
-            faces = viewer.add(Mesh.from_obj(compas.get("faces.obj")))
+            faces = viewer.scene.add(Mesh.from_obj(compas.get("faces.obj")))
             faces.transformation = Transformation()
             def pressed_action():
                 faces.transformation *= Scale.from_factors([1.1, 1.1, 1.1], Frame.worldXY())
@@ -428,12 +311,3 @@ class Viewer(Scene):
         self.controller.actions[name] = action
 
         return action
-
-    def clear(self, guids: Optional[Union[list[str], list[ViewerSceneObject]]] = None):
-        """Clear the scene."""
-        if guids is None:
-            guids = self.objects
-
-        for obj in guids:
-            self.remove(obj)
-            del obj

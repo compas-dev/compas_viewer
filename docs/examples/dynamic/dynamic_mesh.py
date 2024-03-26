@@ -9,13 +9,13 @@ from compas_viewer import Viewer
 viewer = Viewer()
 
 mesh = Mesh.from_off(compas.get("tubemesh.off"))
-obj = viewer.add(mesh, facescolor=Color.cyan(), use_vertexcolors=False)
+obj = viewer.scene.add(mesh, surfacecolor=Color.cyan(), use_vertexcolors=False)
 
 
 @viewer.on(interval=1000)
 def deform_mesh(frame):
     for v in mesh.vertices():
-        vertex = mesh.vertex_attributes(v, "xyz")
+        vertex: list = mesh.vertex_attributes(v, "xyz")  # type: ignore
         vertex[0] += random() - 0.5
         vertex[1] += random() - 0.5
         vertex[2] += random() - 0.5

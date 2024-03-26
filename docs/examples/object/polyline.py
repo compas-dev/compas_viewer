@@ -12,13 +12,13 @@ for i in range(10):
     pts.append([random.uniform(0, 10), random.uniform(0, 10), random.uniform(0, 10)])
 
 polyline = Polyline(pts)
-viewer.add(polyline, show_points=True, pointscolor=Color(1.0, 0.0, 1.0), linescolor=Color(1.0, 0.0, 1.0), lineswidth=1)
+viewer.scene.add(polyline, show_points=True, pointcolor=Color(1.0, 0.0, 1.0), linecolor=Color(1.0, 0.5, 1.0), lineswidth=1)
 
 pts = []
 for i in range(5):
     pts.append([random.uniform(0, 10), random.uniform(0, 10), random.uniform(0, 10)])
 
 polyline = Polyline(pts)
-viewer.add(polyline, show_points=True, pointscolor=Color(0.0, 0.0, 1.0), linescolor=Color(1.0, 0.0, 0.0), lineswidth=5)
+viewer.scene.add(polyline, show_points=True, pointcolor=Color(0.0, 0.0, 1.0), linecolor=Color(1.0, 0.0, 0.0), lineswidth=5)
 
 viewer.show()

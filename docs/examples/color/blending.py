@@ -1,23 +1,32 @@
-from compas.colors import Color
-from compas.geometry import Box
-from compas.geometry import Frame
-from compas.geometry import Translation
+from random import random
 
+import compas
+from compas.colors import Color
+from compas.datastructures import Mesh
+from compas.geometry import Scale, Translation
 from compas_viewer import Viewer
 
 viewer = Viewer()
 
-box = Box(1, 1, 1, Frame((0, 0, 0), [1, 0, 0], [0, 1, 0]))
-obj1 = viewer.add(box, facescolor=Color(1.0, 0.0, 0.0), opacity=0.7)
+mesh = Mesh.from_obj(compas.get("faces.obj"))
+T = Translation.from_vector([0, 0, 1])
+S = Scale.from_factors([0.5, 0.5, 0.5])
+mesh.transform(T * S)
 
-box = Box(1, 1, 1, Frame((0, 0, 0), [1, 0, 0], [0, 1, 0]))
-obj2 = viewer.add(box, facescolor=Color(0.0, 1.0, 0.0), opacity=0.7)
+mesh2 = mesh.transformed(Translation.from_vector([-6, 0, 0]))
 
-box = Box(1, 1, 1, Frame((0, 0, 0), [1, 0, 0], [0, 1, 0]))
-obj3 = viewer.add(box, facescolor=Color(0.0, 0.0, 1.0), opacity=0.7)
+facecolor = {k: Color(random(), random(), random()) for k in mesh.faces()}
+edgecolor = {k: Color(random(), random(), random()) for k in mesh.edges()}
+vertexcolor = {k: Color(random(), random(), random()) for k in mesh.vertices()}
 
-
-obj2.transformation = Translation.from_vector([2, 0, 0])
-obj3.transformation = Translation.from_vector([4, 0, 0])
+viewer.scene.add(mesh, name="mesh1", show_points=True, facecolor=facecolor, edgecolor=edgecolor, vertexcolor=vertexcolor, use_vertexcolors=True)  # type: ignore
+viewer.scene.add(
+    mesh2,
+    name="mesh2",
+    show_points=True,
+    facecolor=Color.red(),
+    edgecolor=Color.green(),
+    vertexcolor=Color.blue(),
+)
 
 viewer.show()

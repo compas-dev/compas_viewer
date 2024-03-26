@@ -1,12 +1,15 @@
-from math import pi
+from typing import Optional
 
 from compas.datastructures import Mesh
 from compas.geometry import Capsule
+from compas.geometry import Line
+from compas.geometry import Point
+from compas.scene import GeometryObject
 
-from .meshobject import MeshObject
+from .geometryobject import GeometryObject as ViewerGeometryObject
 
 
-class CapsuleObject(MeshObject):
+class CapsuleObject(ViewerGeometryObject, GeometryObject):
     """Viewer scene object for displaying COMPAS Capsule geometry.
 
     See Also
@@ -15,6 +18,19 @@ class CapsuleObject(MeshObject):
     """
 
     def __init__(self, capsule: Capsule, **kwargs):
-        self.u = kwargs.get("u", int(2 * pi * capsule.radius / self.LINEARDEFLECTION))
+        super().__init__(geometry=capsule, **kwargs)
+        self.geometry: Capsule
 
-        super(CapsuleObject, self).__init__(mesh=Mesh.from_shape(capsule, u=self.u), **kwargs)
+    @property
+    def points(self) -> Optional[list[Point]]:
+        """The points to be shown in the viewer."""
+        return None
+
+    @property
+    def lines(self) -> Optional[list[Line]]:
+        return None
+
+    @property
+    def viewmesh(self):
+        """The mesh volume to be shown in the viewer."""
+        return Mesh.from_shape(self.geometry, u=self.u, v=self.v, triangulated=True)

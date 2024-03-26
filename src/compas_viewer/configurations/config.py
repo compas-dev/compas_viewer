@@ -7,4 +7,4 @@ class Config(Data):
     """
 
     def __init__(self):
-        super(Config, self).__init__()
+        super().__init__()

@@ -17,14 +17,14 @@ def find_sys_font(font_name: str) -> PathLike:  # type: ignore
 
 # By default, the text is rendered using the FreeSans font from the library.
 t = Tag("EN", (0, 0, 0), height=50)
-viewer.add(t)
+viewer.scene.add(t)
 
 # Font specified is possible.
 t = Tag("EN", (3, 0, 0), height=50, font=find_sys_font("Times New Roman"))
-viewer.add(t)
+viewer.scene.add(t)
 
 # Multi-language text is possible if the machine has the font installed.
 t = Tag("中文 CN", (3, 3, 0), height=50, font=find_sys_font("DengXian"))
-viewer.add(t)
+viewer.scene.add(t)
 
 viewer.show()

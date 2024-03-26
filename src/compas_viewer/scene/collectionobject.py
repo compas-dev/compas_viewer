@@ -1,13 +1,20 @@
-from compas.scene import GeometryObject
+from typing import Union
+
 from compas.data import Data
-from .sceneobject import DataType
+from compas.datastructures import Mesh
+from compas.geometry import Geometry
+from compas.scene import GeometryObject
+from numpy import array
+
+from .sceneobject import ShaderDataType
 from .sceneobject import ViewerSceneObject
-import numpy as np
 
 
 class Collection(Data):
-    def __init__(self, items: list, **kwargs):
-        super(Collection, self).__init__(**kwargs)
+    """Viewer scene object for displaying a collection of COMPAS geometries."""
+
+    def __init__(self, items: list[Union[Geometry, Mesh]], **kwargs):
+        super().__init__(**kwargs)
         self.items = items
 
     @property
@@ -18,13 +25,12 @@ class Collection(Data):
 class CollectionObject(ViewerSceneObject, GeometryObject):
     """Viewer scene object for displaying a collection of COMPAS geometries."""
 
-    def __init__(self, items: list, **kwargs):
-        collection = Collection(items)
-        super(CollectionObject, self).__init__(geometry=collection, **kwargs)
-        self.collection = collection
-        self.objects = [ViewerSceneObject(item, **kwargs) for item in self.collection.items]
+    def __init__(self, items: list[Union[Geometry, Mesh]], **kwargs):
+        self.collection = Collection(items)
+        super().__init__(geometry=self.collection, **kwargs)
+        self.objects = [ViewerSceneObject(item=item, **kwargs) for item in self.collection.items]
 
-    def _read_points_data(self) -> DataType:
+    def _read_points_data(self) -> ShaderDataType:
         positions = []
         colors = []
         elements = []
@@ -33,11 +39,11 @@ class CollectionObject(ViewerSceneObject, GeometryObject):
             p, c, e = obj._read_points_data() or ([], [], [])
             positions += p
             colors += c
-            elements += (np.array(e) + count).tolist()
+            elements += (array(e) + count).tolist()
             count += len(p)
         return positions, colors, elements
 
-    def _read_lines_data(self):
+    def _read_lines_data(self) -> ShaderDataType:
         positions = []
         colors = []
         elements = []
@@ -46,11 +52,11 @@ class CollectionObject(ViewerSceneObject, GeometryObject):
             p, c, e = obj._read_lines_data() or ([], [], [])
             positions += p
             colors += c
-            elements += (np.array(e) + count).tolist()
+            elements += (array(e) + count).tolist()
             count += len(p)
         return positions, colors, elements
 
-    def _read_frontfaces_data(self):
+    def _read_frontfaces_data(self) -> ShaderDataType:
         positions = []
         colors = []
         opacities = []
@@ -76,7 +82,7 @@ class CollectionObject(ViewerSceneObject, GeometryObject):
         else:
             return positions, colors, elements
 
-    def _read_backfaces_data(self):
+    def _read_backfaces_data(self) -> ShaderDataType:
         positions = []
         colors = []
         opacities = []

@@ -10,6 +10,6 @@ viewer = Viewer()
 
 for x in range(5):
     for y in range(5):
-        viewer.add(Vector(0, 0, 1), anchor=Point(x, y, 0), linescolor=Color.from_i(random()))
+        viewer.scene.add(Vector(0, 0, 1), anchor=Point(x, y, 0), linecolor=Color.from_i(random()))
 
 viewer.show()

@@ -1,12 +1,15 @@
-from math import pi
+from typing import Optional
 
 from compas.datastructures import Mesh
 from compas.geometry import Cone
+from compas.geometry import Line
+from compas.geometry import Point
+from compas.scene import GeometryObject
 
-from .meshobject import MeshObject
+from .geometryobject import GeometryObject as ViewerGeometryObject
 
 
-class ConeObject(MeshObject):
+class ConeObject(ViewerGeometryObject, GeometryObject):
     """Viewer scene object for displaying COMPAS Cone geometry.
 
     See Also
@@ -15,6 +18,19 @@ class ConeObject(MeshObject):
     """
 
     def __init__(self, cone: Cone, **kwargs):
-        self.u = kwargs.get("u", int(2 * pi * cone.radius / self.LINEARDEFLECTION))
+        super().__init__(geometry=cone, **kwargs)
+        self.geometry: Cone
 
-        super(ConeObject, self).__init__(mesh=Mesh.from_shape(shape=cone, u=self.u), **kwargs)
+    @property
+    def points(self) -> Optional[list[Point]]:
+        """The points to be shown in the viewer."""
+        return None
+
+    @property
+    def lines(self) -> Optional[list[Line]]:
+        return None
+
+    @property
+    def viewmesh(self) -> Mesh:
+        """The mesh volume to be shown in the viewer."""
+        return Mesh.from_shape(self.geometry, u=self.u, triangulated=True)

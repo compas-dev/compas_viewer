@@ -1,6 +1,5 @@
 from pathlib import Path
 
-
 from compas.colors import Color
 
 from compas_viewer import HERE
@@ -8,19 +7,19 @@ from compas_viewer import HERE
 from .config import Config
 
 
-class SceneConfig(Config):
+class ViewerConfig(Config):
     """
-    The class representation for the `scene.json` of the class ViewerSceneObject.
-    The scene.json contains all the settings about the general (default) appearance of the scene objects.
+    The class representation for the `viewer.json` of the viewer.
+    The viewer.json contains all the settings about the general (default) appearance of the scene objects.
 
     Parameters
     ----------
-    pointscolor : :class:`compas.colors.Color`
+    pointcolor : :class:`compas.colors.Color`
         The default color of the points.
-    linescolor : :class:`compas.colors.Color`
+    linecolor : :class:`compas.colors.Color`
         The default color of the lines.
-    facescolor : :class:`compas.colors.Color`
-        The default color of the faces.
+    surfacecolor : :class:`compas.colors.Color`
+        The default color of the surfaces.
     show_points : bool
         The default setting for showing the points.
     show_lines : bool
@@ -50,9 +49,9 @@ class SceneConfig(Config):
 
     def __init__(
         self,
-        pointscolor: Color,
-        linescolor: Color,
-        facescolor: Color,
+        pointcolor: Color,
+        linecolor: Color,
+        surfacecolor: Color,
         show_points: bool,
         show_lines: bool,
         show_faces: bool,
@@ -66,9 +65,9 @@ class SceneConfig(Config):
     ):
         super().__init__()
 
-        self.pointscolor = pointscolor
-        self.linescolor = linescolor
-        self.facescolor = facescolor
+        self.pointcolor = pointcolor
+        self.linecolor = linecolor
+        self.surfacecolor = surfacecolor
         self.show_points = show_points
         self.show_lines = show_lines
         self.show_faces = show_faces
@@ -83,18 +82,18 @@ class SceneConfig(Config):
             raise ValueError("The vectorsize must be between 0 and 1.")
 
     @classmethod
-    def from_default(cls) -> "SceneConfig":
+    def from_default(cls) -> "ViewerConfig":
         """
         Load the default configuration.
         """
-        scene_config = SceneConfig.from_json(Path(HERE, "configurations", "default_config", "scene.json"))
-        if not isinstance(scene_config, SceneConfig):
-            raise TypeError(f"The {scene_config} is not a valid scene configuration file.")
-        return scene_config
+        viewer_config = ViewerConfig.from_json(Path(HERE, "configurations", "default_config", "viewer.json"))
+        if not isinstance(viewer_config, ViewerConfig):
+            raise TypeError(f"The {viewer_config} is not a valid scene configuration file.")
+        return viewer_config
 
     @classmethod
-    def from_json(cls, filepath) -> "SceneConfig":
-        scene_config = super().from_json(filepath)
-        if not isinstance(scene_config, SceneConfig):
+    def from_json(cls, filepath) -> "ViewerConfig":
+        viewer_config = super().from_json(filepath)
+        if not isinstance(viewer_config, ViewerConfig):
             raise TypeError(f"The {filepath} is not a valid scene configuration file.")
-        return scene_config
+        return viewer_config

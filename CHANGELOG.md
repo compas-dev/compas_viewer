@@ -8,8 +8,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
+* Added example `layout/tree_view`.
+* Added functionality of multiple widgets in main viewport.
+* Added example `object/scale.py`.
+* Added `RobotModelObject` and its example in the documentation.
 
 ### Changed
+* Pin the `PySide6` version to `6.6.1`.
+* Auto set the camera scale when `zoom_extend` is called.
+* Updated the `Tag` example.
+* Updated the `RobotModelObject` example.
+* Update examples in the documentation.
+* Renamed `surfaces` into `viewmesh` in every `ViewerGeometryObject`.
+* Renamed `scene.json` to `viewer.json` and `scene_config` to `viewer_config`.
+* Unify color naming. variables that control the colors of geometries are `surfacecolor`, `linecolor`,`pointcolor`, yet variables that control the colors of meshes are `facecolor`, `edgecolor`, `vertexcolor`.
+* Added `ViewerGeometryObject` as the abstract class for all the geometry objects. Other specific geometry objects are inherited from this class.
+* Changed `DataType` into `ShaderDataType`. Resolve to [#46](https://github.com/compas-dev/compas_viewer/issues/46).
+* Added `ViewerScene` as an attribute of the `Viewer` class. resolve [#28](https://github.com/compas-dev/compas_viewer/issues/28).
+* Bug fix of [#73](https://github.com/compas-dev/compas_viewer/issues/73).
+* Improved argument passing mechanism in the `Slider` class. Close [#76](https://github.com/compas-dev/compas_viewer/issues/76).
+* Documentation images and code correction.
+* Improved typing hints of `CollectionObject`.
+* Changed to the point object is `show_points = True` by default. Refer to [#73](https://github.com/compas-dev/compas_viewer/issues/73).
+* Changed from `super(__t, __obj)` to `super()` as the new version.
 
 ### Removed
 
@@ -40,7 +61,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added `installation` documentation.
 * Added documentations: index, api, etc. Mockups style is improved.
 * Added `DeleteSelected` action class.
-* Added `DataType` as the data type template for generating the buffer.
+* Added `ShaderDataType` as the data type template for generating the buffer.
 * Added `NetworkObject` for the scene objects.
 * Added `compas_viewer.scene.ViewerSceneObject.LINEWIDTH_SELECTION_INCREMENTAL` to enhance line width for selection only.
 * Added `BRepObject`, `CapsuleObject`, `ConeObject`, `CylinderObject`, `PlaneObject`, `SphereObject`, `EllipseObject`, `TorusObject`, `PolygonObject`, `PolylineObject`, `BoxObject`. The geometric resolution is handled by the `compas_viewer.scene.ViewerSceneObject.LINEARDEFLECTION`.
@@ -76,6 +97,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added `NetworkObject`.
 
 ### Changed
+
+* Fixed [#64](https://github.com/compas-dev/compas_viewer/issues/64).
+* Patch github actions.
+* Fix [#63](https://github.com/compas-dev/compas_viewer/issues/63). 
 * Updated the configuration architecture.
 * Updated the `delete_selected` action.
 * Renamed `NetworkObject` to `GraphObject`. See commit: https://github.com/compas-dev/compas/commit/7f7098c11a1a4c3c8c0b527c8f610d10adbba1a6#diff-4e906e478c68aaee46648b7323ed68106084e647748b4e0bcb5fd440c3e162fb.

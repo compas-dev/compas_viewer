@@ -51,9 +51,10 @@ class Action(QObject):
         return super(Action, cls).__new__(action_cls, **kwargs)
 
     def __init__(self, name: str, viewer: "Viewer", config: ActionConfig):
-        super(Action, self).__init__()
+        super().__init__()
         self.name = name
         self.viewer = viewer
+        self.scene = viewer.scene
         self.config = config
         self.key = self.config.key
         self.modifier = self.config.modifier

@@ -1,7 +1,8 @@
-from compas.geometry import Point
-from compas.geometry import NurbsSurface
-from compas_viewer import Viewer
 from compas.colors import Color
+from compas.geometry import NurbsSurface
+from compas.geometry import Point
+
+from compas_viewer import Viewer
 
 points = [
     [Point(0, 0, 0), Point(1, 0, 0), Point(2, 0, 0), Point(3, 0, 0)],
@@ -12,6 +13,8 @@ points = [
 
 surface = NurbsSurface.from_points(points=points)
 
-view = Viewer(rendermode="lighted")
-view.add(surface, show_points=True, show_lines=True, pointscolor=Color(1.0, 0.0, 0.0), linescolor=Color(0.0, 0.0, 1.0))
-view.show()
+viewer = Viewer(rendermode="lighted")
+viewer.scene.add(
+    surface, show_points=True, show_lines=True, pointcolor=Color(1.0, 0.0, 0.0), linecolor=Color(0.0, 0.0, 1.0)
+)
+viewer.show()

@@ -1,7 +1,6 @@
 from os import PathLike
 from os import path
 from typing import Optional
-
 from typing import Union
 
 from compas.colors import Color
@@ -120,7 +119,7 @@ class TagObject(ViewerSceneObject, GeometryObject):
     """
 
     def __init__(self, tag: Tag, **kwargs):
-        super(TagObject, self).__init__(geometry=tag, **kwargs)
+        super().__init__(geometry=tag, **kwargs)
 
     def make_buffers(self):
         self._text_buffer = {
@@ -193,10 +192,22 @@ class TagObject(ViewerSceneObject, GeometryObject):
         shader.uniform1f("object_opacity", self.opacity)
         shader.uniform1i("text_height", self._calculate_text_height(camera_position))
         shader.uniform1i("text_num", len(self.geometry.text))
-        shader.uniform3f("text_color", self.color)
+        shader.uniform3f("text_color", self.geometry.color)
         shader.uniformText("text_texture", self._text_buffer["text_texture"])
         shader.bind_attribute("position", self._text_buffer["positions"])
         shader.draw_texts(elements=self._text_buffer["elements"], n=self._text_buffer["n"])
         shader.uniform1i("is_text", 0)
         shader.uniform1f("object_opacity", 1)
         shader.disable_attribute("position")
+
+    def _read_points_data(self):
+        return None
+
+    def _read_lines_data(self):
+        return None
+
+    def _read_frontfaces_data(self):
+        return None
+
+    def _read_backfaces_data(self):
+        return None
