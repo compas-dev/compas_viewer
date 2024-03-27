@@ -10,7 +10,7 @@ uniform int text_height;
 uniform int text_num;
 
 void main()
-{   
+{
     gl_PointSize = text_height * text_num;
     gl_Position = projection * viewworld * transform * vec4(position, 1.0);
 }

@@ -1,5 +1,6 @@
 from os import PathLike
 from os import path
+from typing import Literal
 from typing import Optional
 from typing import Union
 
@@ -10,7 +11,11 @@ from compas.scene import GeometryObject
 from freetype import FT_LOAD_FLAGS
 from freetype import Face
 from numpy import array
+from numpy import empty
+from numpy import hstack
+from numpy import int32, bool_
 from numpy import linalg
+from numpy import vstack
 from numpy import zeros
 from OpenGL import GL
 
@@ -44,6 +49,10 @@ class Tag(Geometry):
     font : :class:`os.PathLike`, optional
         The font of the tag.
         Default is FreeSans.ttf in the default config folder.
+    alignment : Literal["TopLeft", "TopCenter", "TopRight", "MiddleLeft", "MiddleCenter", "MiddleRight", "BottomLeft", "BottomCenter", "BottomRight"], optional
+        The alignment of the tag.
+    spacing : int, optional
+        The spacing of the tag.
 
     Attributes
     ----------
@@ -59,6 +68,10 @@ class Tag(Geometry):
         If True, the height of the tag is calculated based on the distance between the tag and the camera.
     font : :class:`os.PathLike`
         The font of the tag.
+    alignment : Literal["TopLeft", "TopCenter", "TopRight", "MiddleLeft", "MiddleCenter", "MiddleRight", "BottomLeft", "BottomCenter", "BottomRight"], optional
+        The alignment of the tag.
+    spacing : int, optional
+        The spacing of the tag.
     """
 
     def __eq__(self, other):
@@ -70,6 +83,8 @@ class Tag(Geometry):
             and self.height == other.height
             and self.absolute_height == other.absolute_height
             and self.font == other.font
+            and self.alignment == other.alignment
+            and self.spacing == other.spacing
         )
 
     def __init__(
@@ -80,6 +95,18 @@ class Tag(Geometry):
         height: float = 50,
         absolute_height: bool = False,
         font: Optional[PathLike] = None,
+        alignment: Literal[
+            "TopLeft",
+            "TopCenter",
+            "TopRight",
+            "MiddleLeft",
+            "MiddleCenter",
+            "MiddleRight",
+            "BottomLeft",
+            "BottomCenter",
+            "BottomRight",
+        ] = "BottomLeft",
+        spacing: int = 1,
     ):
         super().__init__()
         self.text = text
@@ -88,6 +115,8 @@ class Tag(Geometry):
         self.height = height
         self.absolute_height = absolute_height
         self.font = font or FONT
+        self.alignment = alignment
+        self.spacing = spacing
 
     def transform(self, transformation):
         """Transform the tag.
@@ -130,29 +159,103 @@ class TagObject(ViewerSceneObject, GeometryObject):
         }
 
     def make_text_texture(self):
+        """Create the texture as an array of the text.
+
+        Returns
+        -------
+        int
+            The texture of the text.
+        """
+
         face = Face(self.geometry.font)
+        # Set basic char size to 64 pixels.
+        face.set_char_size(64 * self.geometry.height)
 
-        char_width = 48
-        char_height = 80
-        # the size is specified in 1/64 pixel
-        face.set_char_size(64 * char_width)
+        strings = self.geometry.text.split("\n")
+        strings_array = zeros((0, 0), dtype=int32)
 
-        text = self.geometry.text
-        string_buffer = zeros(shape=(char_height, char_width * len(text)))
+        for string in strings:
 
-        for i, c in enumerate(text):
-            if c == " ":
-                continue
-            face.load_char(c, FT_LOAD_FLAGS["FT_LOAD_RENDER"])
-            glyph = face.glyph
-            bitmap = glyph.bitmap
-            char = array(bitmap.buffer)
-            char = char.reshape((bitmap.rows, bitmap.width))
-            string_buffer[-char.shape[0] :, i * char_width : i * char_width + char.shape[1]] = char  # noqa: E203
+            # For each line
+            string_array = zeros((0, 0), dtype=int32)
+            for char in string:
+                # Load the character.
+                face.load_char(char, FT_LOAD_FLAGS["FT_LOAD_RENDER"])
+                bitmap = face.glyph.bitmap
+                char = array(bitmap.buffer, dtype=int32)
+                char = char.reshape((bitmap.rows, bitmap.width))
+                char = hstack(
+                    (  
+                        char,
+                        zeros((char.shape[0], self.geometry.spacing * 10), dtype=int32),
+                    )
+                )
+                # Match the height of the characters.
+                if char.shape[0] > string_array.shape[0]:
+                    string_array = vstack(
+                        (
+                            zeros((char.shape[0] - string_array.shape[0], string_array.shape[1]), dtype=int32),
+                            string_array,
+                        )
+                    )
+                elif char.shape[0] < string_array.shape[0]:
+                    char = vstack((zeros((string_array.shape[0] - char.shape[0], char.shape[1]), dtype=int32),char))
+                # Concatenate the characters.
+                string_array = hstack((string_array, char), dtype=int32)
 
-        string_buffer = string_buffer.reshape((string_buffer.shape[0] * string_buffer.shape[1]))
+            # Match the width of the lines.
+            if string_array.shape[1] > strings_array.shape[1]:
+                strings_array = hstack(
+                    (
+                        strings_array,
+                        zeros((strings_array.shape[0], string_array.shape[1] - strings_array.shape[1]), dtype=int32),
+                    )
+                )
+            elif string_array.shape[1] < strings_array.shape[1]:
+                string_array = hstack(
+                    (
+                        string_array,
+                        zeros((string_array.shape[0], strings_array.shape[1] - string_array.shape[1]), dtype=int32),
+                    )
+                )
+            # Concatenate the lines.
+            strings_array = vstack((strings_array, string_array), dtype=int32)
 
-        # create glyph texture
+        # Match the width and height to be the same.
+        if strings_array.shape[0] > strings_array.shape[1]:
+            strings_array = hstack(
+                (
+                    strings_array,
+                    zeros((strings_array.shape[0], strings_array.shape[0] - strings_array.shape[1]), dtype=int32),
+                )
+            )
+        elif strings_array.shape[0] < strings_array.shape[1]:
+            strings_array = vstack(
+                (
+                    strings_array,
+                    zeros((strings_array.shape[1] - strings_array.shape[0], strings_array.shape[1]), dtype=int32),
+                )
+            )
+
+        # The number of characters must be a multiple of 4, as described in the OpenGL documentation.
+        if strings_array.shape[0] % 4 != 0:
+            strings_array = vstack(
+                (
+                    strings_array,
+                    zeros((4 - strings_array.shape[0] % 4, strings_array.shape[1]), dtype=int32),
+                )
+            )
+
+        if strings_array.shape[1] % 4 != 0:
+            strings_array = hstack(
+                (
+                    strings_array,
+                    zeros((strings_array.shape[0], 4 - strings_array.shape[1] % 4), dtype=int32),
+                )
+            )
+
+        # Create the glyph texture.
+        strings_buffer = strings_array.reshape((strings_array.shape[0] * strings_array.shape[1]))
         texture = GL.glGenTextures(1)
         GL.glBindTexture(GL.GL_TEXTURE_2D, texture)
         GL.glTexParameterf(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR)
@@ -161,13 +264,14 @@ class TagObject(ViewerSceneObject, GeometryObject):
             GL.GL_TEXTURE_2D,
             0,
             GL.GL_R8,
-            char_width * len(text),
-            char_height,
+            strings_array.shape[1],
+            strings_array.shape[0],
             0,
             GL.GL_RED,
             GL.GL_UNSIGNED_BYTE,
-            string_buffer,
+            strings_buffer,
         )
+
         return texture
 
     def _calculate_text_height(self, camera_position):
