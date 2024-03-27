@@ -9,6 +9,8 @@ from numpy import array
 from .sceneobject import ShaderDataType
 from .sceneobject import ViewerSceneObject
 
+import numpy as np
+
 
 class Collection(Data):
     """Viewer scene object for displaying a collection of COMPAS geometries."""
@@ -59,25 +61,51 @@ class CollectionObject(ViewerSceneObject, GeometryObject):
     def _read_frontfaces_data(self) -> ShaderDataType:
         positions = []
         colors = []
+        opacities = []
         elements = []
         count = 0
         for obj in self.objects:
-            p, c, e = obj._read_frontfaces_data() or ([], [], [])
-            positions += p
-            colors += c
-            elements += (array(e) + count).tolist()
-            count += len(p)
-        return positions, colors, elements
+            if obj.use_rgba:
+                p, c, o, e = obj._read_frontfaces_data() or ([], [], [])
+                positions += p
+                colors += c
+                opacities += o
+                elements += (np.array(e) + count).tolist()
+                count += len(p)
+            else:
+                p, c, e = obj._read_frontfaces_data() or ([], [], [])
+                positions += p
+                colors += c
+                elements += (np.array(e) + count).tolist()
+                count += len(p)
+
+        if opacities:
+            return positions, colors, opacities, elements
+        else:
+            return positions, colors, elements
 
     def _read_backfaces_data(self) -> ShaderDataType:
         positions = []
         colors = []
+        opacities = []
         elements = []
         count = 0
         for obj in self.objects:
-            p, c, e = obj._read_backfaces_data() or ([], [], [])
-            positions += p
-            colors += c
-            elements += (array(e) + count).tolist()
-            count += len(p)
-        return positions, colors, elements
+            if obj.use_rgba:
+                p, c, o, e = obj._read_backfaces_data() or ([], [], [])
+                positions += p
+                colors += c
+                opacities += o
+                elements += (np.array(e) + count).tolist()
+                count += len(p)
+            else:
+                p, c, e = obj._read_backfaces_data() or ([], [], [])
+                positions += p
+                colors += c
+                elements += (np.array(e) + count).tolist()
+                count += len(p)
+
+        if opacities:
+            return positions, colors, opacities, elements
+        else:
+            return positions, colors, elements

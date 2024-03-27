@@ -153,6 +153,13 @@ class Viewer:
         This is a compatibility function for the old version of the viewer.
         While :func:`compas.scene.Scene.add` is the recommended way to add an item to the scene.
 
+        Parameters
+        ----------
+        item : :class:`compas.data.Data`
+            The item to be added to the scene.
+        **kwargs : dict
+            Additional options for the :class:`compas_viewer.scene.ViewerSceneObject`.
+
         Returns
         -------
         :class:`compas_viewer.scene.sceneobject.ViewerSceneObject`

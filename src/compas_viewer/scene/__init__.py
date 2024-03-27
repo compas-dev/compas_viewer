@@ -48,6 +48,7 @@ from .coneobject import ConeObject
 from .capsuleobject import CapsuleObject
 from .nurbssurfaceobject import NurbsSurfaceObject
 from .collectionobject import CollectionObject
+from .geometryobject import GeometryObject
 
 
 @plugin(category="drawing-utils", requires=["compas_viewer"])
@@ -131,4 +132,5 @@ __all__ = [
     "CapsuleObject",
     "NurbsSurface",
     "NurbsSurfaceObject",
+    "GeometryObject",
 ]
