@@ -4,7 +4,7 @@ from typing import Union
 from PySide6.QtCore import Qt
 
 from compas_viewer import HERE
-from compas_viewer.utilities import key_mapper
+from compas_viewer.qt import key_mapper
 
 from .config import Config
 

@@ -21,9 +21,9 @@ from compas_viewer.configurations import RendererConfig
 from compas_viewer.configurations import ViewerConfig
 from compas_viewer.controller import Controller
 from compas_viewer.layout import Layout
+from compas_viewer.qt import Timer
 from compas_viewer.scene.scene import ViewerScene
 from compas_viewer.scene.sceneobject import ViewerSceneObject
-from compas_viewer.utilities import Timer
 
 
 class Viewer:
@@ -150,7 +150,7 @@ class Viewer:
     # Scene
     # ==========================================================================
 
-    def add(self, item: Union[Geometry, Datastructure, ViewerSceneObject], **kwargs):
+    def add(self, item: Union[Geometry, Datastructure, ViewerSceneObject], *args, **kwargs):
         """
         Add an item to the scene.
         This is a compatibility function for the old version of the viewer.
@@ -161,6 +161,8 @@ class Viewer:
         item : :class:`compas.geometry.Geometry`, :class:`compas.datastructures.Datastructure`,
             :class:`compas_viewer.scene.ViewerSceneObject`
             The item to be added to the scene.
+        *args : list
+            Additional arguments for the :class:`compas_viewer.scene.ViewerSceneObject`.
         **kwargs : dict
             Additional options for the :class:`compas_viewer.scene.ViewerSceneObject`.
 
@@ -170,7 +172,7 @@ class Viewer:
             The scene object.
         """
 
-        return self.scene.add(item, **kwargs)
+        return self.scene.add(*args, **kwargs)
 
     # ==========================================================================
     # Runtime

@@ -7,10 +7,12 @@ from PySide6.QtWidgets import QScrollArea
 from PySide6.QtWidgets import QVBoxLayout
 from PySide6.QtWidgets import QWidget
 
+from .propertyform import Propertyform
+from .slider import Slider
+from .treeform import Treeform
+
 if TYPE_CHECKING:
     from .layout import Layout
-    from .slider import Slider
-    from .treeform import Treeform
 
 
 class SidedockLayout:
@@ -54,11 +56,29 @@ class SidedockLayout:
         scroll.setWidget(content)
         scroll.setWidgetResizable(True)
         self.sidedock_layout = QVBoxLayout(content)
-        self.sidedock_layout.addStretch()
+        self.sidedock_layout.addStretch(2)
+
+        self.elements: list[Union[Slider, Treeform, Propertyform]] = []
 
     def init(self):
         self.sidedock.setLayout(self.sidedock_layout)
         self.viewer.window.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.sidedock)
 
-    def add_element(self, element: Union["Slider", "Treeform"]):
+    def add_element(self, element: Union[Slider, Treeform, Propertyform]):
+        """
+        Add an element to the sidedock.
+
+        Parameters
+        ----------
+        element
+            The element to be added to the sidedock.
+
+        """
         self.sidedock_layout.insertWidget(self.sidedock_layout.count() - 1, element, element.stretch)
+        self.elements.append(element)
+        element.viewer = self.viewer
+
+    def update(self):
+        """Update the elements in the sidedock."""
+        for element in self.elements:
+            element.update()

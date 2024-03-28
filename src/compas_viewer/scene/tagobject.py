@@ -15,8 +15,8 @@ from numpy import zeros
 from OpenGL import GL
 
 from compas_viewer import HERE
-from compas_viewer.utilities import make_index_buffer
-from compas_viewer.utilities import make_vertex_buffer
+from compas_viewer.gl import make_index_buffer
+from compas_viewer.gl import make_vertex_buffer
 
 from .sceneobject import ViewerSceneObject
 
