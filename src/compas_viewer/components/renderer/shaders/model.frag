@@ -12,7 +12,6 @@ uniform vec3 selection_color;
 uniform int element_type;
 uniform vec3 single_color;
 uniform bool use_single_color;
-uniform bool use_rgba;
 
 void main()
 {
@@ -31,9 +30,8 @@ void main()
         else {color = selection_color;}
         if (alpha < 0.5) alpha = 0.5;
     }
-    if (use_rgba){
-        alpha *= vertex_alpha;
-    }
+    
+    alpha *= vertex_alpha;
 
     vec3 light_pos=vec3(0,0,0);
     if(is_lighted){

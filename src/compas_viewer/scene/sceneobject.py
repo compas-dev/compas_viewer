@@ -101,7 +101,6 @@ class ViewerSceneObject(SceneObject):
         lineswidth: Optional[float] = None,
         pointssize: Optional[float] = None,
         opacity: Optional[float] = None,
-        use_rgba: bool = False,
         **kwargs,
     ):
         #  Basic
@@ -126,7 +125,6 @@ class ViewerSceneObject(SceneObject):
 
         #  Visual
         self.background: bool = False
-        self.use_rgba = use_rgba
 
         #  Geometric
         self.transformation: Optional[Transformation] = None
@@ -216,23 +214,13 @@ class ViewerSceneObject(SceneObject):
         buffer_dict : dict[str, Any]
             A dict with created buffer indexes.
         """
-        if len(data) == 3:
-            positions, colors, elements = data
-            return {
-                "positions": make_vertex_buffer(list(flatten(positions))),
-                "colors": make_vertex_buffer(list(flatten(colors))),
-                "elements": make_index_buffer(list(flatten(elements))),
-                "n": len(list(flatten(elements))),
-            }
-        elif len(data) == 4:
-            positions, colors, opacities, elements = data
-            return {
-                "positions": make_vertex_buffer(list(flatten(positions))),
-                "colors": make_vertex_buffer(list(flatten(colors))),
-                "opacities": make_vertex_buffer(opacities),
-                "elements": make_index_buffer(list(flatten(elements))),
-                "n": len(list(flatten(elements))),
-            }
+        positions, colors, elements = data
+        return {
+            "positions": make_vertex_buffer(list(flatten(positions))),
+            "colors": make_vertex_buffer(list(flatten(colors))),
+            "elements": make_index_buffer(list(flatten(elements))),
+            "n": len(list(flatten(elements))),
+        }
 
     def update_buffer_from_data(
         self,
@@ -340,6 +328,7 @@ class ViewerSceneObject(SceneObject):
         """Draw the object from its buffers"""
         shader.enable_attribute("position")
         shader.enable_attribute("color")
+        shader.enable_attribute("alpha")
         shader.uniform1i("is_selected", self.is_selected)
         # Matrix
         if self._matrix_buffer is not None:
@@ -347,14 +336,9 @@ class ViewerSceneObject(SceneObject):
         shader.uniform1i("is_lighted", is_lighted)
         shader.uniform1f("object_opacity", self.opacity)
         shader.uniform1i("element_type", 2)
-        if self.use_rgba:
-            shader.enable_attribute("alpha")
-        shader.uniform1i("use_rgba", self.use_rgba)
         if self._frontfaces_buffer is not None and not wireframe:
             shader.bind_attribute("position", self._frontfaces_buffer["positions"])
             shader.bind_attribute("color", self._frontfaces_buffer["colors"])
-            if self.use_rgba and self._frontfaces_buffer.get("opacities") is not None:
-                shader.bind_attribute("alpha", self._frontfaces_buffer["opacities"], step=1)
             shader.draw_triangles(
                 elements=self._frontfaces_buffer["elements"], n=self._frontfaces_buffer["n"], background=self.background
             )
@@ -362,8 +346,6 @@ class ViewerSceneObject(SceneObject):
         if self._backfaces_buffer is not None and not wireframe:
             shader.bind_attribute("position", self._backfaces_buffer["positions"])
             shader.bind_attribute("color", self._backfaces_buffer["colors"])
-            if self.use_rgba and self._backfaces_buffer.get("opacities") is not None:
-                shader.bind_attribute("alpha", self._backfaces_buffer["opacities"], step=1)
             shader.draw_triangles(
                 elements=self._backfaces_buffer["elements"], n=self._backfaces_buffer["n"], background=self.background
             )
@@ -397,8 +379,6 @@ class ViewerSceneObject(SceneObject):
             shader.uniform4x4("transform", list(identity(4).flatten()))
         shader.disable_attribute("position")
         shader.disable_attribute("color")
-        if self.use_rgba:
-            shader.disable_attribute("alpha")
 
     def draw_instance(self, shader, wireframe: bool):
         """Draw the object instance for picking"""
