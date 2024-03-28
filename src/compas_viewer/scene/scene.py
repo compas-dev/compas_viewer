@@ -4,7 +4,8 @@ from typing import Optional
 from typing import Union
 
 from compas.colors import Color
-from compas.data import Data
+from compas.datastructures import Datastructure
+from compas.geometry import Geometry
 from compas.scene import Scene
 
 from compas_viewer.utilities import instance_colors_generator
@@ -12,9 +13,6 @@ from compas_viewer.utilities import instance_colors_generator
 from .sceneobject import ViewerSceneObject
 
 if TYPE_CHECKING:
-    from compas.datastructures import Datastructure
-    from compas.geometry import Geometry
-
     from compas_viewer import Viewer
 
 
@@ -49,7 +47,7 @@ class ViewerScene(Scene):
 
     def add(
         self,
-        item: Union[Geometry, Datastructure],
+        item: Union[Geometry, Datastructure, ViewerSceneObject],
         parent: Optional[ViewerSceneObject] = None,
         is_selected: bool = False,
         is_locked: bool = False,
@@ -78,7 +76,7 @@ class ViewerScene(Scene):
 
         Parameters
         ----------
-        item : Union[:class:`compas.geometry.Geometry`, :class:`compas.datastructures.Datastructure`]
+        item : Union[:class:`compas.geometry.Geometry`, :class:`compas.datastructures.Datastructure`, :class:`compas_viewer.scene.ViewerSceneObject`]
             The geometry to add to the scene.
         parent : :class:`compas_viewer.scene.ViewerSceneObject`, optional
             The parent of the item.
