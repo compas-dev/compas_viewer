@@ -3,7 +3,10 @@ from pathlib import Path
 from typing import Callable
 from typing import Literal
 from typing import Optional
+from typing import Union
 
+from compas.datastructures import Datastructure
+from compas.geometry import Geometry
 from PySide6.QtCore import QCoreApplication
 from PySide6.QtWidgets import QApplication
 from PySide6.QtWidgets import QMainWindow
@@ -21,7 +24,6 @@ from compas_viewer.layout import Layout
 from compas_viewer.scene.scene import ViewerScene
 from compas_viewer.scene.sceneobject import ViewerSceneObject
 from compas_viewer.utilities import Timer
-from compas.data import Data
 
 
 class Viewer:
@@ -148,7 +150,7 @@ class Viewer:
     # Scene
     # ==========================================================================
 
-    def add(self, item: Data, **kwargs):
+    def add(self, item: Union[Geometry, Datastructure, ViewerSceneObject], **kwargs):
         """
         Add an item to the scene.
         This is a compatibility function for the old version of the viewer.
@@ -156,7 +158,8 @@ class Viewer:
 
         Parameters
         ----------
-        item : :class:`compas.data.Data`
+        item : :class:`compas.geometry.Geometry`, :class:`compas.datastructures.Datastructure`,
+            :class:`compas_viewer.scene.ViewerSceneObject`
             The item to be added to the scene.
         **kwargs : dict
             Additional options for the :class:`compas_viewer.scene.ViewerSceneObject`.

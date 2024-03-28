@@ -76,7 +76,8 @@ class ViewerScene(Scene):
 
         Parameters
         ----------
-        item : Union[:class:`compas.geometry.Geometry`, :class:`compas.datastructures.Datastructure`, :class:`compas_viewer.scene.ViewerSceneObject`]
+        item : Union[:class:`compas.geometry.Geometry`, :class:`compas.datastructures.Datastructure`,
+            :class:`compas_viewer.scene.ViewerSceneObject`]
             The geometry to add to the scene.
         parent : :class:`compas_viewer.scene.ViewerSceneObject`, optional
             The parent of the item.
