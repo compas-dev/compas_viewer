@@ -158,7 +158,8 @@ class Viewer:
 
         Parameters
         ----------
-        item : :class:`compas.geometry.Geometry`, :class:`compas.datastructures.Datastructure`, :class:`compas_viewer.scene.ViewerSceneObject`
+        item : :class:`compas.geometry.Geometry`, :class:`compas.datastructures.Datastructure`,
+            :class:`compas_viewer.scene.ViewerSceneObject`
             The item to be added to the scene.
         **kwargs : dict
             Additional options for the :class:`compas_viewer.scene.ViewerSceneObject`.
