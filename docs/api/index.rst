@@ -79,6 +79,14 @@ Useful functions and other helper classes.
     :titlesonly:
     :caption: Utilities
 
-    compas_viewer.utilities
+
+    compas_viewer.gl.gl_info
+    compas_viewer.gl.make_vertex_buffer
+    compas_viewer.gl.make_index_buffer
+    compas_viewer.gl.update_vertex_buffer
+    compas_viewer.gl.update_index_buffer
+    compas_viewer.qt.key_mapper
+    compas_viewer.qt.Timer
+
 
 
