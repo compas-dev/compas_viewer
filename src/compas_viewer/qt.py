@@ -72,7 +72,7 @@ def key_mapper(
 
     Examples
     --------
-    >>> from compas_viewer.utilities import key_mapper
+    >>> from compas_viewer.qt import key_mapper
     >>> key_mapper("a", 0)
     <Key.Key_A: 65>
     >>> key_mapper("h", 0)

@@ -1,3 +1,4 @@
+from typing import TYPE_CHECKING
 from typing import Callable
 from typing import Optional
 
@@ -8,6 +9,9 @@ from PySide6.QtWidgets import QHBoxLayout
 from PySide6.QtWidgets import QLabel
 from PySide6.QtWidgets import QSlider
 from PySide6.QtWidgets import QWidget
+
+if TYPE_CHECKING:
+    from compas_viewer.viewer import Viewer
 
 
 class Slider(QWidget):
@@ -99,7 +103,7 @@ class Slider(QWidget):
             raise ValueError("Slider parameters are invalid. ")
 
         super().__init__()
-
+        self.viewer: "Viewer"
         self.slider = QSlider()
         self._value = max(min(value, max_value), min_value)
         self.action = action

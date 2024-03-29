@@ -90,6 +90,15 @@ class Layout:
 
         self.viewer.window.setCentralWidget(self.central_widget)
 
+    def update(self):
+        """Update all the UI elements."""
+        self.sidedock.update()
+        # self.window.update()
+        # self.statusbar.update()
+        # self.menubar.update()
+        # self.toolbar.update()
+        # self.viewport.update()
+
     # TODO
     # def _resize(self, width: int, height: int):
     #     """Resize the main window programmatically.
