@@ -514,7 +514,6 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../compas_viewer.components.html">compas_viewer.components</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../compas_viewer.configurations.html">compas_viewer.configurations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../compas_viewer.layout.html">compas_viewer.layout</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../compas_viewer.utilities.html">compas_viewer.utilities</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
@@ -594,7 +593,7 @@ document.write(`
 <h1>Viewer.add</h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="compas_viewer.viewer.Viewer.add">
-<span class="sig-prename descclassname"><span class="pre">Viewer.</span></span><span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">item</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/41c3eda/src/compas_viewer/viewer.py#L153"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<span class="sig-prename descclassname"><span class="pre">Viewer.</span></span><span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">item</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/aad6160/src/compas_viewer/viewer.py#L153"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Add an item to the scene.
 This is a compatibility function for the old version of the viewer.
 While <code class="xref py py-func docutils literal notranslate"><span class="pre">compas.scene.Scene.add()</span></code> is the recommended way to add an item to the scene.</p>
@@ -603,6 +602,8 @@ While <code class="xref py py-func docutils literal notranslate"><span class="pr
 <dd class="field-odd"><dl>
 <dt><strong>item</strong><span class="classifier"><a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.geometry.Geometry.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.geometry.Geometry</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">compas.datastructures.Datastructure</span></code>,</span></dt><dd><p><a class="reference internal" href="compas_viewer.scene.ViewerSceneObject.html#compas_viewer.scene.ViewerSceneObject" title="compas_viewer.scene.ViewerSceneObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas_viewer.scene.ViewerSceneObject</span></code></a>
 The item to be added to the scene.</p>
+</dd>
+<dt><strong>*args</strong><span class="classifier">list</span></dt><dd><p>Additional arguments for the <a class="reference internal" href="compas_viewer.scene.ViewerSceneObject.html#compas_viewer.scene.ViewerSceneObject" title="compas_viewer.scene.ViewerSceneObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas_viewer.scene.ViewerSceneObject</span></code></a>.</p>
 </dd>
 <dt><strong>**kwargs</strong><span class="classifier">dict</span></dt><dd><p>Additional options for the <a class="reference internal" href="compas_viewer.scene.ViewerSceneObject.html#compas_viewer.scene.ViewerSceneObject" title="compas_viewer.scene.ViewerSceneObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas_viewer.scene.ViewerSceneObject</span></code></a>.</p>
 </dd>

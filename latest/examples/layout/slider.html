@@ -60,7 +60,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Tree" href="tree.html" />
-    <link rel="prev" title="Layout Examples" href="../layout.html" />
+    <link rel="prev" title="Property Form" href="property_form.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -510,7 +510,6 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../api/compas_viewer.components.html">compas_viewer.components</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../api/compas_viewer.configurations.html">compas_viewer.configurations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../api/compas_viewer.layout.html">compas_viewer.layout</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../api/compas_viewer.utilities.html">compas_viewer.utilities</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
@@ -605,7 +604,7 @@ document.write(`
 
 
 <span class="n">pointobj</span><span class="p">:</span> <span class="n">PointObject</span> <span class="o">=</span> <span class="n">viewer</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Point</span><span class="p">(</span><span class="o">*</span><span class="n">curve</span><span class="o">.</span><span class="n">point_at</span><span class="p">(</span><span class="mi">0</span><span class="p">)),</span> <span class="n">pointssize</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">pointcolor</span><span class="o">=</span><span class="n">Color</span><span class="o">.</span><span class="n">red</span><span class="p">(),</span> <span class="n">show_points</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
-<span class="n">curveobj</span> <span class="o">=</span> <span class="n">viewer</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Polyline</span><span class="p">(</span><span class="n">curve</span><span class="o">.</span><span class="n">to_polyline</span><span class="p">()),</span> <span class="n">lineswidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">linecolor</span><span class="o">=</span><span class="n">Color</span><span class="o">.</span><span class="n">blue</span><span class="p">())</span>
+<span class="n">curveobj</span> <span class="o">=</span> <span class="n">viewer</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Polyline</span><span class="p">(</span><span class="n">curve</span><span class="o">.</span><span class="n">to_polyline</span><span class="p">()),</span> <span class="n">lineswidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">linecolor</span><span class="o">=</span><span class="n">Color</span><span class="o">.</span><span class="n">blue</span><span class="p">(),</span> <span class="n">show_points</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">slide</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">additional_var</span><span class="p">):</span>
