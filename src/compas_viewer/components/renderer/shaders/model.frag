@@ -10,30 +10,22 @@ uniform bool is_lighted;
 uniform bool is_selected;
 uniform vec3 selection_color;
 uniform int element_type;
-uniform vec3 single_color;
-uniform bool use_single_color;
-uniform bool use_rgba;
+// uniform bool use_rgba;
 
 void main()
 {
     float alpha=opacity*object_opacity;
     vec3 color;
     color=vertex_color;
-    if(is_selected){
-        if(element_type==0){color=selection_color*.9;}
-        else if(element_type==1){color=selection_color*.8;}
-        else{color=selection_color;}
-        if(alpha<.5)alpha=.5;
-    }
     if (is_selected) {
         if (element_type == 0) {color = selection_color*0.9;}
         else if (element_type == 1) {color = selection_color*0.8;}
         else {color = selection_color;}
         if (alpha < 0.5) alpha = 0.5;
     }
-    if (use_rgba){
-        alpha *= vertex_alpha;
-    }
+    // if (use_rgba){
+    //     alpha *= vertex_alpha;
+    // }
 
     vec3 light_pos=vec3(0,0,0);
     if(is_lighted){
