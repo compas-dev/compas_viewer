@@ -63,6 +63,8 @@ class SidedockLayout:
     def init(self):
         self.sidedock.setLayout(self.sidedock_layout)
         self.viewer.window.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.sidedock)
+        if not self.elements:
+            self.sidedock.hide()
 
     def add_element(self, element: Union[Slider, Treeform, Propertyform]):
         """
@@ -77,6 +79,9 @@ class SidedockLayout:
         self.sidedock_layout.insertWidget(self.sidedock_layout.count() - 1, element, element.stretch)
         self.elements.append(element)
         element.viewer = self.viewer
+
+        if self.sidedock.isHidden():
+            self.sidedock.show()
 
     def update(self):
         """Update the elements in the sidedock."""

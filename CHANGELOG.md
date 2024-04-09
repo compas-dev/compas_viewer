@@ -36,6 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Changed to the point object is `show_points = True` by default. Refer to [#73](https://github.com/compas-dev/compas_viewer/issues/73).
 * Changed from `super(__t, __obj)` to `super()` as the new version.
 * Temporarily removed `rgba` which is causing blank screen for macos.
+* Automatically hide `sidedock` when it is empty.
 
 ### Removed
 * Removed `utilities` folder.
