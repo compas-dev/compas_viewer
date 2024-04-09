@@ -46,7 +46,7 @@ class SidedockLayout:
     def __init__(self, layout: "Layout"):
         self.layout = layout
         self.viewer = self.layout.viewer
-        # self.config = layout.config.sidedock # TODO: Implement this 
+        # self.config = layout.config.sidedock # TODO: Implement this
         self.sidedock = QDockWidget()
         self.sidedock.setMinimumWidth(200)
         scroll = QScrollArea()
