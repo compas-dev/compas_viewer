@@ -31,8 +31,8 @@ class SidedockLayout:
         The parent layout.
     viewer : :class:`compas_viewer.viewer.Viewer`
         The parent viewer.
-    config : :class:`compas_viewer.configurations.WindowConfig`
-        The window configuration.
+    config : :class:`compas_viewer.configurations.SidedockConfig`
+        The sidedock configuration.
 
     See Also
     --------
@@ -46,8 +46,7 @@ class SidedockLayout:
     def __init__(self, layout: "Layout"):
         self.layout = layout
         self.viewer = self.layout.viewer
-        self.config = layout.config.window
-        self.config = layout.config.toolbar
+        # self.config = layout.config.sidedock # TODO: Implement this 
         self.sidedock = QDockWidget()
         self.sidedock.setMinimumWidth(200)
         scroll = QScrollArea()
