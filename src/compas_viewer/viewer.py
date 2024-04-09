@@ -172,7 +172,7 @@ class Viewer:
             The scene object.
         """
 
-        return self.scene.add(*args, **kwargs)
+        return self.scene.add(item, *args, **kwargs)
 
     # ==========================================================================
     # Runtime
