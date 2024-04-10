@@ -38,6 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Temporarily removed `rgba` which is causing blank screen for macos.
 * Re-enabled `rgba` support by switching to `vec4` for color attributes in shader.
 * Fixed the bug of missing `item` parameter in the `Viewer.add` method.
+* Fixed mouse selection flickering issue.
 
 ### Removed
 * Removed `utilities` folder.
