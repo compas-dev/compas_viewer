@@ -75,7 +75,7 @@ class VectorObject(ViewerSceneObject, GeometryObject):
         shader.enable_attribute("position")
         shader.enable_attribute("color")
         shader.bind_attribute("position", self._lines_buffer["positions"])
-        shader.bind_attribute("color", self._lines_buffer["colors"])
+        shader.bind_attribute("color", self._lines_buffer["colors"], step=4)
         shader.draw_arrows(
             elements=self._lines_buffer["elements"], n=self._lines_buffer["n"], width=self.lineswidth, background=True
         )

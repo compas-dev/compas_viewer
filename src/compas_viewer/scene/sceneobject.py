@@ -216,23 +216,17 @@ class ViewerSceneObject(SceneObject):
         buffer_dict : dict[str, Any]
             A dict with created buffer indexes.
         """
-        if len(data) == 3:
-            positions, colors, elements = data
-            return {
-                "positions": make_vertex_buffer(list(flatten(positions))),
-                "colors": make_vertex_buffer(list(flatten(colors))),
-                "elements": make_index_buffer(list(flatten(elements))),
-                "n": len(list(flatten(elements))),
-            }
-        elif len(data) == 4:
-            positions, colors, opacities, elements = data
-            return {
-                "positions": make_vertex_buffer(list(flatten(positions))),
-                "colors": make_vertex_buffer(list(flatten(colors))),
-                "opacities": make_vertex_buffer(opacities),
-                "elements": make_index_buffer(list(flatten(elements))),
-                "n": len(list(flatten(elements))),
-            }
+        positions, colors, elements = data
+        flat_positions = list(flatten(positions))
+        flat_colors = list(flatten([color.rgba for color in colors]))
+        flat_elements = list(flatten(elements))
+
+        return {
+            "positions": make_vertex_buffer(flat_positions),
+            "colors": make_vertex_buffer(flat_colors),
+            "elements": make_index_buffer(flat_elements),
+            "n": len(flat_elements),
+        }
 
     def update_buffer_from_data(
         self,
@@ -258,13 +252,17 @@ class ViewerSceneObject(SceneObject):
             Whether to update elements in the buffer dict.
         """
         positions, colors, elements = data
+        flat_positions = list(flatten(positions))
+        flat_colors = list(flatten([color.rgba for color in colors]))
+        flat_elements = list(flatten(elements))
+
         if update_positions:
-            update_vertex_buffer(list(flatten(positions)), buffer["positions"])
+            update_vertex_buffer(flat_positions, buffer["positions"])
         if update_colors:
-            update_vertex_buffer(list(flatten(colors)), buffer["colors"])
+            update_vertex_buffer(flat_colors, buffer["colors"])
         if update_elements:
-            update_index_buffer(list(flatten(elements)), buffer["elements"])
-        buffer["n"] = len(list(flatten(elements)))
+            update_index_buffer(flat_elements, buffer["elements"])
+        buffer["n"] = len(flat_elements)
 
     def make_buffers(self):
         """Create all buffers from object's data"""
@@ -381,23 +379,17 @@ class ViewerSceneObject(SceneObject):
         shader.uniform1i("is_lighted", is_lighted)
         shader.uniform1f("object_opacity", self.opacity)
         shader.uniform1i("element_type", 2)
-        # if self.use_rgba:
-        #     shader.enable_attribute("alpha")
         # Frontfaces
         if self._frontfaces_buffer is not None and not wireframe and self.show_faces:
             shader.bind_attribute("position", self._frontfaces_buffer["positions"])
-            shader.bind_attribute("color", self._frontfaces_buffer["colors"])
-            # if self.use_rgba and self._frontfaces_buffer.get("opacities") is not None:
-            #     shader.bind_attribute("alpha", self._frontfaces_buffer["opacities"], step=1)
+            shader.bind_attribute("color", self._frontfaces_buffer["colors"], step=4)
             shader.draw_triangles(
                 elements=self._frontfaces_buffer["elements"], n=self._frontfaces_buffer["n"], background=self.background
             )
         # Backfaces
         if self._backfaces_buffer is not None and not wireframe and self.show_faces:
             shader.bind_attribute("position", self._backfaces_buffer["positions"])
-            shader.bind_attribute("color", self._backfaces_buffer["colors"])
-            # if self.use_rgba and self._backfaces_buffer.get("opacities") is not None:
-            #     shader.bind_attribute("alpha", self._backfaces_buffer["opacities"], step=1)
+            shader.bind_attribute("color", self._backfaces_buffer["colors"], step=4)
             shader.draw_triangles(
                 elements=self._backfaces_buffer["elements"], n=self._backfaces_buffer["n"], background=self.background
             )
@@ -406,7 +398,7 @@ class ViewerSceneObject(SceneObject):
         # Lines
         if self._lines_buffer is not None and self.show_lines:
             shader.bind_attribute("position", self._lines_buffer["positions"])
-            shader.bind_attribute("color", self._lines_buffer["colors"])
+            shader.bind_attribute("color", self._lines_buffer["colors"], step=4)
             shader.draw_lines(
                 width=self.lineswidth,
                 elements=self._lines_buffer["elements"],
@@ -417,7 +409,7 @@ class ViewerSceneObject(SceneObject):
         # Points
         if self._points_buffer is not None and self.show_points:
             shader.bind_attribute("position", self._points_buffer["positions"])
-            shader.bind_attribute("color", self._points_buffer["colors"])
+            shader.bind_attribute("color", self._points_buffer["colors"], step=4)
             shader.draw_points(
                 size=self.pointssize,
                 elements=self._points_buffer["elements"],
@@ -431,8 +423,6 @@ class ViewerSceneObject(SceneObject):
             shader.uniform4x4("transform", list(identity(4).flatten()))
         shader.disable_attribute("position")
         shader.disable_attribute("color")
-        # if self.use_rgba:
-        #     shader.disable_attribute("alpha")
 
     def draw_instance(self, shader, wireframe: bool):
         """Draw the object instance for picking"""
