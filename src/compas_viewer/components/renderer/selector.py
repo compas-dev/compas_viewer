@@ -130,7 +130,7 @@ class Selector(QObject):
         """Drag select the objects in the rectangle area."""
 
         # Ignore drag selection caused by small mouse shift.
-        if abs(self.drag_start_pt.x() - self.drag_end_pt.x()) * abs(self.drag_start_pt.y() - self.drag_end_pt.y()) <=4:
+        if abs(self.drag_start_pt.x() - self.drag_end_pt.x()) * abs(self.drag_start_pt.y() - self.drag_end_pt.y()) <= 4:
             return
 
         # Deselect all objects first
