@@ -10,7 +10,7 @@ void main()
     vec2 xy = gl_PointCoord;
     xy.y -= 0.5;
     xy.y *= text_num;
-    if (xy.y > 0 || xy.y < -0.5) {
+    if (xy.y > 0 || xy.y < -1) {
         discard;
     }
     float a = texture2D(tex, xy).r;
