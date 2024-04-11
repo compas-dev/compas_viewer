@@ -68,6 +68,7 @@ class Renderer(QOpenGLWidget):
         self.grid: "GridObject"
 
         self.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
+        self.grabGesture(QtCore.Qt.PinchGesture)
 
     @property
     def rendermode(self):
@@ -229,6 +230,19 @@ class Renderer(QOpenGLWidget):
     # ==========================================================================
     # Event
     # ==========================================================================
+    def event(self, event):
+        """
+        Event handler for the renderer. Customised to capture multi-touch gestures.
+
+        Parameters
+        ----------
+        event : :PySide6:`PySide6/QtCore/QEvent`
+            The Qt event.
+
+        """
+        if event.type() == QtCore.QEvent.Gesture:
+            return self.gestureEvent(event)
+        return super().event(event)
 
     def mouseMoveEvent(self, event: QMouseEvent):
         """
@@ -293,6 +307,22 @@ class Renderer(QOpenGLWidget):
         """
         if self.isActiveWindow() and self.underMouse():
             self.viewer.controller.mouse_release_action(self, event)
+            self.update()
+
+    def gestureEvent(self, event):
+        """
+        Callback for the gesture event which passes the event to the controller.
+
+        Parameters
+        ----------
+        event : :PySide6:`PySide6/QtCore/QEvent`
+            The Qt event.
+
+        """
+        # Handle pinch gestures
+        pinch = event.gesture(QtCore.Qt.PinchGesture)
+        if pinch:
+            self.viewer.controller.pinch_action(self, pinch)
             self.update()
 
     def wheelEvent(self, event: QWheelEvent):
