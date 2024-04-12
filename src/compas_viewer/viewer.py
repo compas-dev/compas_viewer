@@ -1,18 +1,29 @@
 import sys
 from pathlib import Path
 from typing import Callable
+from typing import Literal
 from typing import Optional
+from typing import Union
 
+from compas.datastructures import Datastructure
+from compas.geometry import Geometry
 from PySide6.QtCore import QCoreApplication
 from PySide6.QtWidgets import QApplication
 from PySide6.QtWidgets import QMainWindow
 
+from compas_viewer.actions import Action
+from compas_viewer.actions import register
 from compas_viewer.components import Renderer
-from compas_viewer.config import Config
+from compas_viewer.configurations import ActionConfig
+from compas_viewer.configurations import ControllerConfig
+from compas_viewer.configurations import LayoutConfig
+from compas_viewer.configurations import RendererConfig
+from compas_viewer.configurations import ViewerConfig
 from compas_viewer.controller import Controller
 from compas_viewer.layout import Layout
 from compas_viewer.qt import Timer
 from compas_viewer.scene.scene import ViewerScene
+from compas_viewer.scene.sceneobject import ViewerSceneObject
 
 
 class Viewer:
@@ -70,12 +81,45 @@ class Viewer:
 
     def __init__(
         self,
-        config: Optional[Config] = None,
+        title: Optional[str] = None,
+        fullscreen: Optional[bool] = None,
+        width: Optional[int] = None,
+        height: Optional[int] = None,
+        rendermode: Optional[Literal["wireframe", "shaded", "ghosted", "lighted", "instance"]] = None,
+        viewmode: Optional[Literal["front", "right", "top", "perspective"]] = None,
+        show_grid: Optional[bool] = None,
         configpath: Optional[str] = None,
     ):
+        # Custom or default config
+        if configpath is None:
+            self.renderer_config = RendererConfig.from_default()
+            self.viewer_config = ViewerConfig.from_default()
+            self.controller_config = ControllerConfig.from_default()
+            self.layout_config = LayoutConfig.from_default()
+        else:
+            self.renderer_config = RendererConfig.from_json(Path(configpath, "renderer.json"))
+            self.viewer_config = ViewerConfig.from_json(Path(configpath, "scene.json"))
+            self.controller_config = ControllerConfig.from_json(Path(configpath, "controller.json"))
+            self.layout_config = LayoutConfig.from_json(Path(configpath, "layout.json"))
 
-        configpath = configpath or Path(__file__).parent / "config.json"
-        self.config = config or Config.from_json(configpath)
+        #  In-code config
+        if title is not None:
+            self.layout_config.window.title = title
+        if fullscreen is not None:
+            self.layout_config.window.fullscreen = fullscreen
+        if width is not None:
+            self.layout_config.window.width = width
+        if height is not None:
+            self.layout_config.window.height = height
+        if rendermode is not None:
+            self.renderer_config.rendermode = rendermode
+        if viewmode is not None:
+            self.renderer_config.viewmode = viewmode
+        if show_grid is not None:
+            self.renderer_config.show_grid = show_grid
+
+        # Viewer
+        self.config = self.viewer_config
 
         #  Application
         self.started = False
@@ -98,6 +142,37 @@ class Viewer:
         # `on` function
         self.timer: Timer
         self.frame_count: int = 0
+
+        #  Primitive
+        self.objects: list[ViewerSceneObject]
+
+    # ==========================================================================
+    # Scene
+    # ==========================================================================
+
+    def add(self, item: Union[Geometry, Datastructure, ViewerSceneObject], *args, **kwargs):
+        """
+        Add an item to the scene.
+        This is a compatibility function for the old version of the viewer.
+        While :func:`compas.scene.Scene.add` is the recommended way to add an item to the scene.
+
+        Parameters
+        ----------
+        item : :class:`compas.geometry.Geometry`, :class:`compas.datastructures.Datastructure`,
+            :class:`compas_viewer.scene.ViewerSceneObject`
+            The item to be added to the scene.
+        *args : list
+            Additional arguments for the :class:`compas_viewer.scene.ViewerSceneObject`.
+        **kwargs : dict
+            Additional options for the :class:`compas_viewer.scene.ViewerSceneObject`.
+
+        Returns
+        -------
+        :class:`compas_viewer.scene.sceneobject.ViewerSceneObject`
+            The scene object.
+        """
+
+        return self.scene.add(item, *args, **kwargs)
 
     # ==========================================================================
     # Runtime
@@ -168,77 +243,76 @@ class Viewer:
 
         return outer
 
-    #  TODO: move to controller
-    # # ==========================================================================
-    # # Action
-    # # ==========================================================================
+    # ==========================================================================
+    # Action
+    # ==========================================================================
 
-    # def add_action(
-    #     self,
-    #     pressed_action: Callable,
-    #     key: str,
-    #     released_action: Optional[Callable] = None,
-    #     modifier: Optional[str] = None,
-    #     name: Optional[str] = None,
-    # ):
-    #     """Add a custom action to the viewer.
+    def add_action(
+        self,
+        pressed_action: Callable,
+        key: str,
+        released_action: Optional[Callable] = None,
+        modifier: Optional[str] = None,
+        name: Optional[str] = None,
+    ):
+        """Add a custom action to the viewer.
 
-    #     Parameters
-    #     ----------
-    #     pressed_action : Callable
-    #         The function to be called when the key is pressed.
-    #     key : str
-    #         The key to be pressed.
-    #     released_action : Callable, optional
-    #         The function to be called when the key is released.
-    #         Default to None.
-    #     modifier : str, optional
-    #         The modifier of the key.
-    #         Default to None.
-    #     name : str, optional
-    #         The name of the action.
-    #         Default to the name of the pressed_action function.
+        Parameters
+        ----------
+        pressed_action : Callable
+            The function to be called when the key is pressed.
+        key : str
+            The key to be pressed.
+        released_action : Callable, optional
+            The function to be called when the key is released.
+            Default to None.
+        modifier : str, optional
+            The modifier of the key.
+            Default to None.
+        name : str, optional
+            The name of the action.
+            Default to the name of the pressed_action function.
 
-    #     Returns
-    #     -------
-    #     :class:`compas_viewer.actions.Action`
-    #         The action object.
+        Returns
+        -------
+        :class:`compas_viewer.actions.Action`
+            The action object.
 
-    #     Examples
-    #     --------
-    #     .. code-block:: python
+        Examples
+        --------
+        .. code-block:: python
 
-    #         from compas.geometry import Scale
-    #         from compas.geometry import Transformation
-    #         from compas_viewer import Viewer
-    #         viewer = Viewer()
-    #         faces = viewer.scene.add(Mesh.from_obj(compas.get("faces.obj")))
-    #         faces.transformation = Transformation()
-    #         def pressed_action():
-    #             faces.transformation *= Scale.from_factors([1.1, 1.1, 1.1], Frame.worldXY())
-    #             faces.update()
-    #         action = viewer.add_action(pressed_action, "p")
-    #         viewer.show()
+            from compas.geometry import Scale
+            from compas.geometry import Transformation
+            from compas_viewer import Viewer
+            viewer = Viewer()
+            faces = viewer.scene.add(Mesh.from_obj(compas.get("faces.obj")))
+            faces.transformation = Transformation()
+            def pressed_action():
+                faces.transformation *= Scale.from_factors([1.1, 1.1, 1.1], Frame.worldXY())
+                faces.update()
+            action = viewer.add_action(pressed_action, "p")
+            viewer.show()
 
-    #     """
+        """
 
-    #     if name is None:
-    #         name = pressed_action.__name__
-    #     if modifier is None:
-    #         modifier = "no"
+        if name is None:
+            name = pressed_action.__name__
+        if modifier is None:
+            modifier = "no"
 
-    #     class CustomAction(Action):
-    #         def pressed_action(self):
-    #             pressed_action()
+        class CustomAction(Action):
+            def pressed_action(self):
+                pressed_action()
 
-    #         def released_action(self):
-    #             if released_action:
-    #                 released_action()
+            def released_action(self):
+                if released_action:
+                    released_action()
 
-    #     register(name, CustomAction)
+        register(name, CustomAction)
 
-    #     action = CustomAction(name, self, ActionConfig(key, modifier))
+        action = CustomAction(name, self, ActionConfig(key, modifier))
 
-    #     self.controller.actions[name] = action
+        self.controller.actions[name] = action
 
-    #     return action
+        return action
