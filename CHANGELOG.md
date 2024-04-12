@@ -39,6 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Re-enabled `rgba` support by switching to `vec4` for color attributes in shader.
 * Fixed the bug of missing `item` parameter in the `Viewer.add` method.
 * Fixed mouse selection flickering issue.
+* Simplified the `Config` classes. (IN PROGRESS)
 
 ### Removed
 * Removed `utilities` folder.
