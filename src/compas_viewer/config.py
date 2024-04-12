@@ -80,3 +80,17 @@ class Config:
             data: dict = json.load(fp)
         config = cls(**data)
         return config
+
+    @classmethod
+    def to_json(cls, config, filepath):
+        data = config.__dict__
+        with open(filepath, "w") as fp:
+            json.dump(data, fp, indent=4)
+
+    @classmethod
+    def from_dict(cls, data):
+        return cls(**data)
+    
+    @classmethod
+    def to_dict(cls, config):
+        return config.__dict__
