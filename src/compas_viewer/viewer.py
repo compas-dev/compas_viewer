@@ -14,11 +14,7 @@ from PySide6.QtWidgets import QMainWindow
 from compas_viewer.actions import Action
 from compas_viewer.actions import register
 from compas_viewer.components import Renderer
-from compas_viewer.configurations import ActionConfig
-from compas_viewer.configurations import ControllerConfig
-from compas_viewer.configurations import LayoutConfig
-from compas_viewer.configurations import RendererConfig
-from compas_viewer.configurations import ViewerConfig
+from compas_viewer.config import Config
 from compas_viewer.controller import Controller
 from compas_viewer.layout import Layout
 from compas_viewer.qt import Timer
@@ -81,45 +77,12 @@ class Viewer:
 
     def __init__(
         self,
-        title: Optional[str] = None,
-        fullscreen: Optional[bool] = None,
-        width: Optional[int] = None,
-        height: Optional[int] = None,
-        rendermode: Optional[Literal["wireframe", "shaded", "ghosted", "lighted", "instance"]] = None,
-        viewmode: Optional[Literal["front", "right", "top", "perspective"]] = None,
-        show_grid: Optional[bool] = None,
+        config: Optional[Config] = None,
         configpath: Optional[str] = None,
     ):
-        # Custom or default config
-        if configpath is None:
-            self.renderer_config = RendererConfig.from_default()
-            self.viewer_config = ViewerConfig.from_default()
-            self.controller_config = ControllerConfig.from_default()
-            self.layout_config = LayoutConfig.from_default()
-        else:
-            self.renderer_config = RendererConfig.from_json(Path(configpath, "renderer.json"))
-            self.viewer_config = ViewerConfig.from_json(Path(configpath, "scene.json"))
-            self.controller_config = ControllerConfig.from_json(Path(configpath, "controller.json"))
-            self.layout_config = LayoutConfig.from_json(Path(configpath, "layout.json"))
 
-        #  In-code config
-        if title is not None:
-            self.layout_config.window.title = title
-        if fullscreen is not None:
-            self.layout_config.window.fullscreen = fullscreen
-        if width is not None:
-            self.layout_config.window.width = width
-        if height is not None:
-            self.layout_config.window.height = height
-        if rendermode is not None:
-            self.renderer_config.rendermode = rendermode
-        if viewmode is not None:
-            self.renderer_config.viewmode = viewmode
-        if show_grid is not None:
-            self.renderer_config.show_grid = show_grid
-
-        # Viewer
-        self.config = self.viewer_config
+        configpath = configpath or Path(__file__).parent / "config.json"
+        self.config = config or Config.from_json(configpath)
 
         #  Application
         self.started = False
@@ -143,8 +106,6 @@ class Viewer:
         self.timer: Timer
         self.frame_count: int = 0
 
-        #  Primitive
-        self.objects: list[ViewerSceneObject]
 
     # ==========================================================================
     # Scene

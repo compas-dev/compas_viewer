@@ -2,7 +2,6 @@ import json
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Literal
-
 from compas.colors import Color
 
 
@@ -24,54 +23,60 @@ class View3dConfig:
     height: float = 580
     show_grid: bool = True
     show_axes: bool = True
+    camera: CameraConfig = field(default_factory=CameraConfig)
 
-    camera: CameraConfig = field(init=False)
-
-    def __post_init__(self):
-        position = [0, -10, 5] if self.viewport == "perspective" else [0, 0, 1]
-        self.camera = CameraConfig(position=position)
-
-
-@dataclass
-class SidebarConfig:
-    show: bool = True
-    items: list[dict[str, str]] = None
 
 @dataclass
 class ToolbarConfig:
     show: bool = True
     items: list[dict[str, str]] = None
 
+
 @dataclass
 class MenubarConfig:
     show: bool = True
     items: list[dict[str, str]] = None
+
 
 @dataclass
 class StatusbarConfig:
     show: bool = True
     items: list[dict[str, str]] = None
 
+
+@dataclass
+class SidebarConfig:
+    show: bool = False
+    items: list[dict[str, str]] = None
+
+
+@dataclass
+class WindowConfig:
+    title: str = "COMPAS Viewer"
+    width: int = 1280
+    height: int = 720
+    fullscreen: bool = False
+    about: str = "Stand-alone viewer for COMPAS."
+
+
 @dataclass
 class UIConfig:
-    menubar: bool = True
-    toolbar: bool = True
-    statusbar: bool = True
+    menubar: MenubarConfig = field(default_factory=MenubarConfig)
+    toolbar: ToolbarConfig = field(default_factory=ToolbarConfig)
+    statusbar: StatusbarConfig = field(default_factory=StatusbarConfig)
     sidebar: SidebarConfig = field(default_factory=SidebarConfig)
     view3d: View3dConfig = field(default_factory=View3dConfig)
+    window: WindowConfig = field(default_factory=WindowConfig)
+
 
 @dataclass
 class Config:
 
-    ui = UIConfig()
+    ui: UIConfig = field(default_factory=UIConfig)
 
     @classmethod
     def from_json(cls, filepath):
         with open(filepath) as fp:
             data: dict = json.load(fp)
-        config = cls()
-        if "ui" in data:
-            if "sidebar" in data["ui"]:
-                config.ui.sidebar.show = data["ui"]["sidebar"].get("show")
-                config.ui.sidebar.items = data["ui"]["sidebar"].get("items")
+        config = cls(**data)
         return config
