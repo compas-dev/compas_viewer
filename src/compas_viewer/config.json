@@ -1,15 +1,7 @@
 {
-    "ui": {
-        "sidebar": {
-            "show": true,
-            "items": [
-                {
-                    "type": "checkbox",
-                    "text": "Show Vertices",
-                    "value": false,
-                    "action": "on_toggle_vertices"
-                }
-            ]
-        }
+    "window": {
+        "title": "Hello World",
+        "width": 800,
+        "height": 600
     }
 }
