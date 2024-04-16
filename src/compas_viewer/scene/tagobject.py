@@ -131,26 +131,56 @@ class TagObject(ViewerSceneObject, GeometryObject):
 
     def make_text_texture(self):
         face = Face(self.geometry.font)
-
-        char_width = 48
-        char_height = 80
         # the size is specified in 1/64 pixel
-        face.set_char_size(64 * char_width)
+        face.set_char_size(64 * 48)
 
         text = self.geometry.text
-        string_buffer = zeros(shape=(char_height, char_width * len(text)))
 
-        for i, c in enumerate(text):
+        space_width = 12
+        spacing = 4
+        total_width = 0
+        max_height = 0
+        max_y_offset = 0
+        for c in text:
             if c == " ":
+                total_width += space_width + spacing
                 continue
             face.load_char(c, FT_LOAD_FLAGS["FT_LOAD_RENDER"])
             glyph = face.glyph
             bitmap = glyph.bitmap
+            total_width += bitmap.width + spacing
+            max_height = max(max_height, bitmap.rows)
+            max_y_offset = max(max_y_offset, bitmap.rows - glyph.bitmap_top)
+
+        # The width and height of the texture must be a multiple of 4
+        total_width = (total_width + 3) // 4 * 4
+        # The height is doubled because the text is rendered in the middle of the texture
+        max_height = (max_height * 2 + 3) // 4 * 4
+
+        string_buffer = zeros(shape=(max_height, total_width), dtype="uint8")
+
+        max_y_offset += 1
+
+        offset = 0
+        for c in text:
+            if c == " ":
+                offset += space_width + spacing
+                continue
+
+            face.load_char(c, FT_LOAD_FLAGS["FT_LOAD_RENDER"])
+            glyph = face.glyph
+            bitmap = glyph.bitmap
+
             char = array(bitmap.buffer)
             char = char.reshape((bitmap.rows, bitmap.width))
-            string_buffer[-char.shape[0] :, i * char_width : i * char_width + char.shape[1]] = char  # noqa: E203
 
-        string_buffer = string_buffer.reshape((string_buffer.shape[0] * string_buffer.shape[1]))
+            y_offset = bitmap.rows - glyph.bitmap_top
+            string_buffer[
+                -char.shape[0] - max_y_offset + y_offset : -max_y_offset + y_offset,  # noqa: E203
+                offset : offset + char.shape[1],  # noqa: E203
+            ] = char
+
+            offset += char.shape[1] + spacing
 
         # create glyph texture
         texture = GL.glGenTextures(1)
@@ -161,8 +191,8 @@ class TagObject(ViewerSceneObject, GeometryObject):
             GL.GL_TEXTURE_2D,
             0,
             GL.GL_R8,
-            char_width * len(text),
-            char_height,
+            total_width,
+            max_height,
             0,
             GL.GL_RED,
             GL.GL_UNSIGNED_BYTE,
