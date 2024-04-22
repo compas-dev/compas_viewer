@@ -3,14 +3,14 @@ name: release
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
 
 jobs:
   build_ubuntu:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python: [ '3.9', '3.11']
+        python: ["3.9", "3.10", "3.11"]
     steps:
       - name: update
         run: sudo apt-get update
@@ -18,18 +18,18 @@ jobs:
         run: sudo apt-get install libegl1
       - name: install python3-opengl
         run: sudo apt-get install python3-opengl
-      - uses: compas-dev/compas-actions.build@v3
+      - uses: compas-dev/compas-actions.build@v4
         with:
-          python: ${{ matrix.python }}
           invoke_lint: true
           invoke_test: true
+          python: ${{ matrix.python }}
 
   build:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [macos-latest, windows-latest]
-        python: [ '3.9', '3.11']
+        python: ["3.9", "3.10", "3.11"]
 
     steps:
       - uses: compas-dev/compas-actions.build@v3
@@ -42,7 +42,7 @@ jobs:
     needs: [build, build_ubuntu]
     runs-on: ubuntu-latest
     steps:
-      - uses: compas-dev/compas-actions.publish@v2
+      - uses: compas-dev/compas-actions.publish@v3
         with:
           pypi_token: ${{ secrets.PYPI }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
