@@ -1,0 +1,1672 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <link rel="icon" href="../../_static/compas.ico" type="image/x-icon">
+    <title>Slider &#8212; COMPAS Viewer</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/compas.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/tabs.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <script src="../../_static/tabs.js"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js"></script>
+    <script src="../../_static/design-tabs.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/generated/compas_viewer.layout.Slider';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/compas-dev/compas_viewer/gh-pages/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '1.1';
+        </script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Slider.acceptDrops" href="compas_viewer.layout.Slider.acceptDrops.html" />
+    <link rel="prev" title="StatusbarLayout.init" href="compas_viewer.layout.StatusbarLayout.init.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  <div class="navbar-header-items__start">
+    
+      <div class="navbar-item">
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/compas_icon_white.png" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="../../_static/compas_icon_white.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+    <p class="title logo__title">COMPAS Viewer</p>
+  
+</a></div>
+    
+  </div>
+  
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item"><nav class="navbar-nav">
+  <!-- <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../index.html">
+                        Introduction
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../installation.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../tutorials/index.html">
+                        Tutorials
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../license.html">
+                        License
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../acknowledgements.html">
+                        Acknowledgements
+                      </a>
+                    </li>
+                
+
+                <li class="nav-item">
+                  <a class="nav-link nav-external" href="https://compas.dev">
+                    COMPAS Framework
+                  </a>
+                </li>
+                
+                </div>
+            </div>
+            
+  </ul> -->
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+        </div>
+      
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button type="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown">
+      1.1  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div class="version-switcher__menu dropdown-menu list-group-flush py-0">
+    <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/compas-dev/compas_viewer" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-github"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="http://forum.compas-framework.org/" title="Discourse" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-discourse"></i></span>
+            <label class="sr-only">Discourse</label></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/compas_viewer/" title="PyPI" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-python"></i></span>
+            <label class="sr-only">PyPI</label></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item"><nav class="navbar-nav">
+  <!-- <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../index.html">
+                        Introduction
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../installation.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../tutorials/index.html">
+                        Tutorials
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../license.html">
+                        License
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../acknowledgements.html">
+                        Acknowledgements
+                      </a>
+                    </li>
+                
+
+                <li class="nav-item">
+                  <a class="nav-link nav-external" href="https://compas.dev">
+                    COMPAS Framework
+                  </a>
+                </li>
+                
+                </div>
+            </div>
+            
+  </ul> -->
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button type="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown">
+      1.1  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div class="version-switcher__menu dropdown-menu list-group-flush py-0">
+    <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/compas-dev/compas_viewer" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-github"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="http://forum.compas-framework.org/" title="Discourse" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-discourse"></i></span>
+            <label class="sr-only">Discourse</label></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/compas_viewer/" title="PyPI" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-python"></i></span>
+            <label class="sr-only">PyPI</label></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/configurations.html">File Structure</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../examples/index.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/basics.html">Basic Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/object.html">Object Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/color.html">Color Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/layout.html">Layout Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/dynamic.html">Dynamic Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/other.html">Other Examples</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../index.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../compas_viewer.viewer.html">compas_viewer.viewer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../compas_viewer.scene.html">compas_viewer.scene</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../compas_viewer.controller.html">compas_viewer.controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../compas_viewer.actions.html">compas_viewer.actions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../compas_viewer.components.html">compas_viewer.components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../compas_viewer.configurations.html">compas_viewer.configurations</a></li>
+<li class="toctree-l2 current active"><a class="reference internal" href="../compas_viewer.layout.html">compas_viewer.layout</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../acknowledgements.html">Acknowledgements</a></li>
+</ul>
+
+    </div>
+</nav></div>
+        <div class="sidebar-primary-item"><div class="sidebar-primary-item">
+    <a href="https://compas.dev" target="_blank">
+        COMPAS.dev <i class="fa fa-external-link" aria-hidden="true"></i>
+    </a>
+</div></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumbs">
+  <ul class="bd-breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">API Reference</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../compas_viewer.layout.html" class="nav-link">compas_viewer.layout</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">Slider</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section id="slider">
+<h1>Slider</h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="compas_viewer.layout.Slider">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Slider</span></span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/2a628e9/src/compas_viewer/layout/slider.py#L18"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QWidget</span></code></p>
+<p>Class representing a horizontal slider wrapped in a grid layout with two rows.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>action</strong><span class="classifier">callable</span></dt><dd><p>The callback connected to the slide action.</p>
+</dd>
+<dt><strong>value</strong><span class="classifier">int, optional</span></dt><dd><p>The initial value of the slider.
+Defaults to 0.</p>
+</dd>
+<dt><strong>min_value</strong><span class="classifier">int, optional</span></dt><dd><p>The minimum value of the sliding range.
+Defaults to 0.</p>
+</dd>
+<dt><strong>max_value</strong><span class="classifier">int, optional</span></dt><dd><p>The maximum value of the sliding range.
+Defaults to 100.</p>
+</dd>
+<dt><strong>step</strong><span class="classifier">int, optional</span></dt><dd><p>Size of value increments.
+Defaults to 1.</p>
+</dd>
+<dt><strong>title</strong><span class="classifier">str, optional</span></dt><dd><p>Title label.</p>
+</dd>
+<dt><strong>annotation</strong><span class="classifier">str, optional</span></dt><dd><p>Value annotation label.</p>
+</dd>
+<dt><strong>interval</strong><span class="classifier">int, optional</span></dt><dd><p>The tick interval size.
+Defaults to 1.</p>
+</dd>
+<dt><strong>bgcolor</strong><span class="classifier"><a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.colors.Color.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.colors.Color</span></code></a>, optional</span></dt><dd><p>Background color of the box containing the slider.</p>
+</dd>
+<dt><strong>stretch</strong><span class="classifier">int, optional</span></dt><dd><p>Stretch factor of the slider in the grid layout.
+Defaults to 0.</p>
+</dd>
+<dt><strong>kwargs</strong><span class="classifier">dict, optional</span></dt><dd><p>Additional keyword arguments for the action.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="compas_viewer.layout.SidedockLayout.html#compas_viewer.layout.SidedockLayout" title="compas_viewer.layout.SidedockLayout"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas_viewer.layout.SidedockLayout</span></code></a></dt><dd></dd>
+</dl>
+</div>
+<p class="rubric">References</p>
+<p><a class="reference external" href="https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QSlider.html">PySide6/QtWidgets/QSlider</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>action</strong><span class="classifier">callable</span></dt><dd><p>Action associated with the button click event.</p>
+</dd>
+<dt><strong>slider</strong><span class="classifier">QtWidgets.QSlider</span></dt><dd><p>The actual slider widget.</p>
+</dd>
+<dt><strong>value</strong><span class="classifier">float</span></dt><dd><p>The current value of the slider.</p>
+</dd>
+<dt><strong>STYLE</strong><span class="classifier">str</span></dt><dd><p>Stylesheet for the visual appearance of the groove and handle of the slider.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Inherited Methods</p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.acceptDrops.html#compas_viewer.layout.Slider.acceptDrops" title="compas_viewer.layout.Slider.acceptDrops"><code class="xref py py-obj docutils literal notranslate"><span class="pre">acceptDrops</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.accessibleDescription.html#compas_viewer.layout.Slider.accessibleDescription" title="compas_viewer.layout.Slider.accessibleDescription"><code class="xref py py-obj docutils literal notranslate"><span class="pre">accessibleDescription</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.accessibleName.html#compas_viewer.layout.Slider.accessibleName" title="compas_viewer.layout.Slider.accessibleName"><code class="xref py py-obj docutils literal notranslate"><span class="pre">accessibleName</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.actionEvent.html#compas_viewer.layout.Slider.actionEvent" title="compas_viewer.layout.Slider.actionEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">actionEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.actions.html#compas_viewer.layout.Slider.actions" title="compas_viewer.layout.Slider.actions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">actions</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.activateWindow.html#compas_viewer.layout.Slider.activateWindow" title="compas_viewer.layout.Slider.activateWindow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">activateWindow</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.addAction.html#compas_viewer.layout.Slider.addAction" title="compas_viewer.layout.Slider.addAction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">addAction</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.addActions.html#compas_viewer.layout.Slider.addActions" title="compas_viewer.layout.Slider.addActions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">addActions</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.adjustSize.html#compas_viewer.layout.Slider.adjustSize" title="compas_viewer.layout.Slider.adjustSize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">adjustSize</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.autoFillBackground.html#compas_viewer.layout.Slider.autoFillBackground" title="compas_viewer.layout.Slider.autoFillBackground"><code class="xref py py-obj docutils literal notranslate"><span class="pre">autoFillBackground</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.backgroundRole.html#compas_viewer.layout.Slider.backgroundRole" title="compas_viewer.layout.Slider.backgroundRole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">backgroundRole</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.backingStore.html#compas_viewer.layout.Slider.backingStore" title="compas_viewer.layout.Slider.backingStore"><code class="xref py py-obj docutils literal notranslate"><span class="pre">backingStore</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.baseSize.html#compas_viewer.layout.Slider.baseSize" title="compas_viewer.layout.Slider.baseSize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">baseSize</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.blockSignals.html#compas_viewer.layout.Slider.blockSignals" title="compas_viewer.layout.Slider.blockSignals"><code class="xref py py-obj docutils literal notranslate"><span class="pre">blockSignals</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.changeEvent.html#compas_viewer.layout.Slider.changeEvent" title="compas_viewer.layout.Slider.changeEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">changeEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.childAt.html#compas_viewer.layout.Slider.childAt" title="compas_viewer.layout.Slider.childAt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">childAt</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.childEvent.html#compas_viewer.layout.Slider.childEvent" title="compas_viewer.layout.Slider.childEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">childEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.children.html#compas_viewer.layout.Slider.children" title="compas_viewer.layout.Slider.children"><code class="xref py py-obj docutils literal notranslate"><span class="pre">children</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.childrenRect.html#compas_viewer.layout.Slider.childrenRect" title="compas_viewer.layout.Slider.childrenRect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">childrenRect</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.childrenRegion.html#compas_viewer.layout.Slider.childrenRegion" title="compas_viewer.layout.Slider.childrenRegion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">childrenRegion</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.clearFocus.html#compas_viewer.layout.Slider.clearFocus" title="compas_viewer.layout.Slider.clearFocus"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clearFocus</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.clearMask.html#compas_viewer.layout.Slider.clearMask" title="compas_viewer.layout.Slider.clearMask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clearMask</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.close.html#compas_viewer.layout.Slider.close" title="compas_viewer.layout.Slider.close"><code class="xref py py-obj docutils literal notranslate"><span class="pre">close</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.closeEvent.html#compas_viewer.layout.Slider.closeEvent" title="compas_viewer.layout.Slider.closeEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">closeEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.colorCount.html#compas_viewer.layout.Slider.colorCount" title="compas_viewer.layout.Slider.colorCount"><code class="xref py py-obj docutils literal notranslate"><span class="pre">colorCount</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.connect.html#compas_viewer.layout.Slider.connect" title="compas_viewer.layout.Slider.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connect</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.connectNotify.html#compas_viewer.layout.Slider.connectNotify" title="compas_viewer.layout.Slider.connectNotify"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connectNotify</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.contentsMargins.html#compas_viewer.layout.Slider.contentsMargins" title="compas_viewer.layout.Slider.contentsMargins"><code class="xref py py-obj docutils literal notranslate"><span class="pre">contentsMargins</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.contentsRect.html#compas_viewer.layout.Slider.contentsRect" title="compas_viewer.layout.Slider.contentsRect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">contentsRect</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.contextMenuEvent.html#compas_viewer.layout.Slider.contextMenuEvent" title="compas_viewer.layout.Slider.contextMenuEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">contextMenuEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.contextMenuPolicy.html#compas_viewer.layout.Slider.contextMenuPolicy" title="compas_viewer.layout.Slider.contextMenuPolicy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">contextMenuPolicy</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.create.html#compas_viewer.layout.Slider.create" title="compas_viewer.layout.Slider.create"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.createWinId.html#compas_viewer.layout.Slider.createWinId" title="compas_viewer.layout.Slider.createWinId"><code class="xref py py-obj docutils literal notranslate"><span class="pre">createWinId</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.createWindowContainer.html#compas_viewer.layout.Slider.createWindowContainer" title="compas_viewer.layout.Slider.createWindowContainer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">createWindowContainer</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.cursor.html#compas_viewer.layout.Slider.cursor" title="compas_viewer.layout.Slider.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.customEvent.html#compas_viewer.layout.Slider.customEvent" title="compas_viewer.layout.Slider.customEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">customEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.deleteLater.html#compas_viewer.layout.Slider.deleteLater" title="compas_viewer.layout.Slider.deleteLater"><code class="xref py py-obj docutils literal notranslate"><span class="pre">deleteLater</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.depth.html#compas_viewer.layout.Slider.depth" title="compas_viewer.layout.Slider.depth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">depth</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.destroy.html#compas_viewer.layout.Slider.destroy" title="compas_viewer.layout.Slider.destroy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">destroy</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.devType.html#compas_viewer.layout.Slider.devType" title="compas_viewer.layout.Slider.devType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">devType</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.devicePixelRatio.html#compas_viewer.layout.Slider.devicePixelRatio" title="compas_viewer.layout.Slider.devicePixelRatio"><code class="xref py py-obj docutils literal notranslate"><span class="pre">devicePixelRatio</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.devicePixelRatioF.html#compas_viewer.layout.Slider.devicePixelRatioF" title="compas_viewer.layout.Slider.devicePixelRatioF"><code class="xref py py-obj docutils literal notranslate"><span class="pre">devicePixelRatioF</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.devicePixelRatioFScale.html#compas_viewer.layout.Slider.devicePixelRatioFScale" title="compas_viewer.layout.Slider.devicePixelRatioFScale"><code class="xref py py-obj docutils literal notranslate"><span class="pre">devicePixelRatioFScale</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.disconnect.html#compas_viewer.layout.Slider.disconnect" title="compas_viewer.layout.Slider.disconnect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">disconnect</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.disconnectNotify.html#compas_viewer.layout.Slider.disconnectNotify" title="compas_viewer.layout.Slider.disconnectNotify"><code class="xref py py-obj docutils literal notranslate"><span class="pre">disconnectNotify</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.dragEnterEvent.html#compas_viewer.layout.Slider.dragEnterEvent" title="compas_viewer.layout.Slider.dragEnterEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dragEnterEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.dragLeaveEvent.html#compas_viewer.layout.Slider.dragLeaveEvent" title="compas_viewer.layout.Slider.dragLeaveEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dragLeaveEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.dragMoveEvent.html#compas_viewer.layout.Slider.dragMoveEvent" title="compas_viewer.layout.Slider.dragMoveEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dragMoveEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.dropEvent.html#compas_viewer.layout.Slider.dropEvent" title="compas_viewer.layout.Slider.dropEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dropEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.dumpObjectInfo.html#compas_viewer.layout.Slider.dumpObjectInfo" title="compas_viewer.layout.Slider.dumpObjectInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dumpObjectInfo</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.dumpObjectTree.html#compas_viewer.layout.Slider.dumpObjectTree" title="compas_viewer.layout.Slider.dumpObjectTree"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dumpObjectTree</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.dynamicPropertyNames.html#compas_viewer.layout.Slider.dynamicPropertyNames" title="compas_viewer.layout.Slider.dynamicPropertyNames"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dynamicPropertyNames</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.effectiveWinId.html#compas_viewer.layout.Slider.effectiveWinId" title="compas_viewer.layout.Slider.effectiveWinId"><code class="xref py py-obj docutils literal notranslate"><span class="pre">effectiveWinId</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.emit.html#compas_viewer.layout.Slider.emit" title="compas_viewer.layout.Slider.emit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">emit</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.ensurePolished.html#compas_viewer.layout.Slider.ensurePolished" title="compas_viewer.layout.Slider.ensurePolished"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ensurePolished</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.enterEvent.html#compas_viewer.layout.Slider.enterEvent" title="compas_viewer.layout.Slider.enterEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">enterEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.event.html#compas_viewer.layout.Slider.event" title="compas_viewer.layout.Slider.event"><code class="xref py py-obj docutils literal notranslate"><span class="pre">event</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.eventFilter.html#compas_viewer.layout.Slider.eventFilter" title="compas_viewer.layout.Slider.eventFilter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eventFilter</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.find.html#compas_viewer.layout.Slider.find" title="compas_viewer.layout.Slider.find"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.findChild.html#compas_viewer.layout.Slider.findChild" title="compas_viewer.layout.Slider.findChild"><code class="xref py py-obj docutils literal notranslate"><span class="pre">findChild</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.findChildren.html#compas_viewer.layout.Slider.findChildren" title="compas_viewer.layout.Slider.findChildren"><code class="xref py py-obj docutils literal notranslate"><span class="pre">findChildren</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.focusInEvent.html#compas_viewer.layout.Slider.focusInEvent" title="compas_viewer.layout.Slider.focusInEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">focusInEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.focusNextChild.html#compas_viewer.layout.Slider.focusNextChild" title="compas_viewer.layout.Slider.focusNextChild"><code class="xref py py-obj docutils literal notranslate"><span class="pre">focusNextChild</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.focusNextPrevChild.html#compas_viewer.layout.Slider.focusNextPrevChild" title="compas_viewer.layout.Slider.focusNextPrevChild"><code class="xref py py-obj docutils literal notranslate"><span class="pre">focusNextPrevChild</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.focusOutEvent.html#compas_viewer.layout.Slider.focusOutEvent" title="compas_viewer.layout.Slider.focusOutEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">focusOutEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.focusPolicy.html#compas_viewer.layout.Slider.focusPolicy" title="compas_viewer.layout.Slider.focusPolicy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">focusPolicy</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.focusPreviousChild.html#compas_viewer.layout.Slider.focusPreviousChild" title="compas_viewer.layout.Slider.focusPreviousChild"><code class="xref py py-obj docutils literal notranslate"><span class="pre">focusPreviousChild</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.focusProxy.html#compas_viewer.layout.Slider.focusProxy" title="compas_viewer.layout.Slider.focusProxy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">focusProxy</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.focusWidget.html#compas_viewer.layout.Slider.focusWidget" title="compas_viewer.layout.Slider.focusWidget"><code class="xref py py-obj docutils literal notranslate"><span class="pre">focusWidget</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.font.html#compas_viewer.layout.Slider.font" title="compas_viewer.layout.Slider.font"><code class="xref py py-obj docutils literal notranslate"><span class="pre">font</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.fontInfo.html#compas_viewer.layout.Slider.fontInfo" title="compas_viewer.layout.Slider.fontInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fontInfo</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.fontMetrics.html#compas_viewer.layout.Slider.fontMetrics" title="compas_viewer.layout.Slider.fontMetrics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fontMetrics</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.foregroundRole.html#compas_viewer.layout.Slider.foregroundRole" title="compas_viewer.layout.Slider.foregroundRole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">foregroundRole</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.frameGeometry.html#compas_viewer.layout.Slider.frameGeometry" title="compas_viewer.layout.Slider.frameGeometry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">frameGeometry</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.frameSize.html#compas_viewer.layout.Slider.frameSize" title="compas_viewer.layout.Slider.frameSize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">frameSize</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.geometry.html#compas_viewer.layout.Slider.geometry" title="compas_viewer.layout.Slider.geometry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">geometry</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.grab.html#compas_viewer.layout.Slider.grab" title="compas_viewer.layout.Slider.grab"><code class="xref py py-obj docutils literal notranslate"><span class="pre">grab</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.grabGesture.html#compas_viewer.layout.Slider.grabGesture" title="compas_viewer.layout.Slider.grabGesture"><code class="xref py py-obj docutils literal notranslate"><span class="pre">grabGesture</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.grabKeyboard.html#compas_viewer.layout.Slider.grabKeyboard" title="compas_viewer.layout.Slider.grabKeyboard"><code class="xref py py-obj docutils literal notranslate"><span class="pre">grabKeyboard</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.grabMouse.html#compas_viewer.layout.Slider.grabMouse" title="compas_viewer.layout.Slider.grabMouse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">grabMouse</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.grabShortcut.html#compas_viewer.layout.Slider.grabShortcut" title="compas_viewer.layout.Slider.grabShortcut"><code class="xref py py-obj docutils literal notranslate"><span class="pre">grabShortcut</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.graphicsEffect.html#compas_viewer.layout.Slider.graphicsEffect" title="compas_viewer.layout.Slider.graphicsEffect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">graphicsEffect</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.graphicsProxyWidget.html#compas_viewer.layout.Slider.graphicsProxyWidget" title="compas_viewer.layout.Slider.graphicsProxyWidget"><code class="xref py py-obj docutils literal notranslate"><span class="pre">graphicsProxyWidget</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.hasFocus.html#compas_viewer.layout.Slider.hasFocus" title="compas_viewer.layout.Slider.hasFocus"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hasFocus</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.hasHeightForWidth.html#compas_viewer.layout.Slider.hasHeightForWidth" title="compas_viewer.layout.Slider.hasHeightForWidth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hasHeightForWidth</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.hasMouseTracking.html#compas_viewer.layout.Slider.hasMouseTracking" title="compas_viewer.layout.Slider.hasMouseTracking"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hasMouseTracking</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.hasTabletTracking.html#compas_viewer.layout.Slider.hasTabletTracking" title="compas_viewer.layout.Slider.hasTabletTracking"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hasTabletTracking</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.height.html#compas_viewer.layout.Slider.height" title="compas_viewer.layout.Slider.height"><code class="xref py py-obj docutils literal notranslate"><span class="pre">height</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.heightForWidth.html#compas_viewer.layout.Slider.heightForWidth" title="compas_viewer.layout.Slider.heightForWidth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">heightForWidth</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.heightMM.html#compas_viewer.layout.Slider.heightMM" title="compas_viewer.layout.Slider.heightMM"><code class="xref py py-obj docutils literal notranslate"><span class="pre">heightMM</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.hide.html#compas_viewer.layout.Slider.hide" title="compas_viewer.layout.Slider.hide"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hide</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.hideEvent.html#compas_viewer.layout.Slider.hideEvent" title="compas_viewer.layout.Slider.hideEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hideEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.inherits.html#compas_viewer.layout.Slider.inherits" title="compas_viewer.layout.Slider.inherits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inherits</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.initPainter.html#compas_viewer.layout.Slider.initPainter" title="compas_viewer.layout.Slider.initPainter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initPainter</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.inputMethodEvent.html#compas_viewer.layout.Slider.inputMethodEvent" title="compas_viewer.layout.Slider.inputMethodEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inputMethodEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.inputMethodHints.html#compas_viewer.layout.Slider.inputMethodHints" title="compas_viewer.layout.Slider.inputMethodHints"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inputMethodHints</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.inputMethodQuery.html#compas_viewer.layout.Slider.inputMethodQuery" title="compas_viewer.layout.Slider.inputMethodQuery"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inputMethodQuery</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.insertAction.html#compas_viewer.layout.Slider.insertAction" title="compas_viewer.layout.Slider.insertAction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">insertAction</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.insertActions.html#compas_viewer.layout.Slider.insertActions" title="compas_viewer.layout.Slider.insertActions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">insertActions</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.installEventFilter.html#compas_viewer.layout.Slider.installEventFilter" title="compas_viewer.layout.Slider.installEventFilter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">installEventFilter</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.internalWinId.html#compas_viewer.layout.Slider.internalWinId" title="compas_viewer.layout.Slider.internalWinId"><code class="xref py py-obj docutils literal notranslate"><span class="pre">internalWinId</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.isActiveWindow.html#compas_viewer.layout.Slider.isActiveWindow" title="compas_viewer.layout.Slider.isActiveWindow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isActiveWindow</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.isAncestorOf.html#compas_viewer.layout.Slider.isAncestorOf" title="compas_viewer.layout.Slider.isAncestorOf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isAncestorOf</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.isEnabled.html#compas_viewer.layout.Slider.isEnabled" title="compas_viewer.layout.Slider.isEnabled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isEnabled</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.isEnabledTo.html#compas_viewer.layout.Slider.isEnabledTo" title="compas_viewer.layout.Slider.isEnabledTo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isEnabledTo</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.isFullScreen.html#compas_viewer.layout.Slider.isFullScreen" title="compas_viewer.layout.Slider.isFullScreen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isFullScreen</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.isHidden.html#compas_viewer.layout.Slider.isHidden" title="compas_viewer.layout.Slider.isHidden"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isHidden</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.isLeftToRight.html#compas_viewer.layout.Slider.isLeftToRight" title="compas_viewer.layout.Slider.isLeftToRight"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isLeftToRight</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.isMaximized.html#compas_viewer.layout.Slider.isMaximized" title="compas_viewer.layout.Slider.isMaximized"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isMaximized</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.isMinimized.html#compas_viewer.layout.Slider.isMinimized" title="compas_viewer.layout.Slider.isMinimized"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isMinimized</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.isModal.html#compas_viewer.layout.Slider.isModal" title="compas_viewer.layout.Slider.isModal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isModal</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.isQuickItemType.html#compas_viewer.layout.Slider.isQuickItemType" title="compas_viewer.layout.Slider.isQuickItemType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isQuickItemType</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.isRightToLeft.html#compas_viewer.layout.Slider.isRightToLeft" title="compas_viewer.layout.Slider.isRightToLeft"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isRightToLeft</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.isSignalConnected.html#compas_viewer.layout.Slider.isSignalConnected" title="compas_viewer.layout.Slider.isSignalConnected"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isSignalConnected</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.isTopLevel.html#compas_viewer.layout.Slider.isTopLevel" title="compas_viewer.layout.Slider.isTopLevel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isTopLevel</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.isVisible.html#compas_viewer.layout.Slider.isVisible" title="compas_viewer.layout.Slider.isVisible"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isVisible</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.isVisibleTo.html#compas_viewer.layout.Slider.isVisibleTo" title="compas_viewer.layout.Slider.isVisibleTo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isVisibleTo</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.isWidgetType.html#compas_viewer.layout.Slider.isWidgetType" title="compas_viewer.layout.Slider.isWidgetType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isWidgetType</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.isWindow.html#compas_viewer.layout.Slider.isWindow" title="compas_viewer.layout.Slider.isWindow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isWindow</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.isWindowModified.html#compas_viewer.layout.Slider.isWindowModified" title="compas_viewer.layout.Slider.isWindowModified"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isWindowModified</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.isWindowType.html#compas_viewer.layout.Slider.isWindowType" title="compas_viewer.layout.Slider.isWindowType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isWindowType</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.keyPressEvent.html#compas_viewer.layout.Slider.keyPressEvent" title="compas_viewer.layout.Slider.keyPressEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">keyPressEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.keyReleaseEvent.html#compas_viewer.layout.Slider.keyReleaseEvent" title="compas_viewer.layout.Slider.keyReleaseEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">keyReleaseEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.keyboardGrabber.html#compas_viewer.layout.Slider.keyboardGrabber" title="compas_viewer.layout.Slider.keyboardGrabber"><code class="xref py py-obj docutils literal notranslate"><span class="pre">keyboardGrabber</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.killTimer.html#compas_viewer.layout.Slider.killTimer" title="compas_viewer.layout.Slider.killTimer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">killTimer</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.layout.html#compas_viewer.layout.Slider.layout" title="compas_viewer.layout.Slider.layout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">layout</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.layoutDirection.html#compas_viewer.layout.Slider.layoutDirection" title="compas_viewer.layout.Slider.layoutDirection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">layoutDirection</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.leaveEvent.html#compas_viewer.layout.Slider.leaveEvent" title="compas_viewer.layout.Slider.leaveEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">leaveEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.locale.html#compas_viewer.layout.Slider.locale" title="compas_viewer.layout.Slider.locale"><code class="xref py py-obj docutils literal notranslate"><span class="pre">locale</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.logicalDpiX.html#compas_viewer.layout.Slider.logicalDpiX" title="compas_viewer.layout.Slider.logicalDpiX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logicalDpiX</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.logicalDpiY.html#compas_viewer.layout.Slider.logicalDpiY" title="compas_viewer.layout.Slider.logicalDpiY"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logicalDpiY</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.lower.html#compas_viewer.layout.Slider.lower" title="compas_viewer.layout.Slider.lower"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lower</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.mapFrom.html#compas_viewer.layout.Slider.mapFrom" title="compas_viewer.layout.Slider.mapFrom"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mapFrom</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.mapFromGlobal.html#compas_viewer.layout.Slider.mapFromGlobal" title="compas_viewer.layout.Slider.mapFromGlobal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mapFromGlobal</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.mapFromParent.html#compas_viewer.layout.Slider.mapFromParent" title="compas_viewer.layout.Slider.mapFromParent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mapFromParent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.mapTo.html#compas_viewer.layout.Slider.mapTo" title="compas_viewer.layout.Slider.mapTo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mapTo</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.mapToGlobal.html#compas_viewer.layout.Slider.mapToGlobal" title="compas_viewer.layout.Slider.mapToGlobal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mapToGlobal</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.mapToParent.html#compas_viewer.layout.Slider.mapToParent" title="compas_viewer.layout.Slider.mapToParent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mapToParent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.mask.html#compas_viewer.layout.Slider.mask" title="compas_viewer.layout.Slider.mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mask</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.maximumHeight.html#compas_viewer.layout.Slider.maximumHeight" title="compas_viewer.layout.Slider.maximumHeight"><code class="xref py py-obj docutils literal notranslate"><span class="pre">maximumHeight</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.maximumSize.html#compas_viewer.layout.Slider.maximumSize" title="compas_viewer.layout.Slider.maximumSize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">maximumSize</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.maximumWidth.html#compas_viewer.layout.Slider.maximumWidth" title="compas_viewer.layout.Slider.maximumWidth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">maximumWidth</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.metaObject.html#compas_viewer.layout.Slider.metaObject" title="compas_viewer.layout.Slider.metaObject"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metaObject</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.metric.html#compas_viewer.layout.Slider.metric" title="compas_viewer.layout.Slider.metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metric</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.minimumHeight.html#compas_viewer.layout.Slider.minimumHeight" title="compas_viewer.layout.Slider.minimumHeight"><code class="xref py py-obj docutils literal notranslate"><span class="pre">minimumHeight</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.minimumSize.html#compas_viewer.layout.Slider.minimumSize" title="compas_viewer.layout.Slider.minimumSize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">minimumSize</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.minimumSizeHint.html#compas_viewer.layout.Slider.minimumSizeHint" title="compas_viewer.layout.Slider.minimumSizeHint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">minimumSizeHint</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.minimumWidth.html#compas_viewer.layout.Slider.minimumWidth" title="compas_viewer.layout.Slider.minimumWidth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">minimumWidth</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.mouseDoubleClickEvent.html#compas_viewer.layout.Slider.mouseDoubleClickEvent" title="compas_viewer.layout.Slider.mouseDoubleClickEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mouseDoubleClickEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.mouseGrabber.html#compas_viewer.layout.Slider.mouseGrabber" title="compas_viewer.layout.Slider.mouseGrabber"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mouseGrabber</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.mouseMoveEvent.html#compas_viewer.layout.Slider.mouseMoveEvent" title="compas_viewer.layout.Slider.mouseMoveEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mouseMoveEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.mousePressEvent.html#compas_viewer.layout.Slider.mousePressEvent" title="compas_viewer.layout.Slider.mousePressEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mousePressEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.mouseReleaseEvent.html#compas_viewer.layout.Slider.mouseReleaseEvent" title="compas_viewer.layout.Slider.mouseReleaseEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mouseReleaseEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.move.html#compas_viewer.layout.Slider.move" title="compas_viewer.layout.Slider.move"><code class="xref py py-obj docutils literal notranslate"><span class="pre">move</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.moveEvent.html#compas_viewer.layout.Slider.moveEvent" title="compas_viewer.layout.Slider.moveEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">moveEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.moveToThread.html#compas_viewer.layout.Slider.moveToThread" title="compas_viewer.layout.Slider.moveToThread"><code class="xref py py-obj docutils literal notranslate"><span class="pre">moveToThread</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.nativeEvent.html#compas_viewer.layout.Slider.nativeEvent" title="compas_viewer.layout.Slider.nativeEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nativeEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.nativeParentWidget.html#compas_viewer.layout.Slider.nativeParentWidget" title="compas_viewer.layout.Slider.nativeParentWidget"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nativeParentWidget</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.nextInFocusChain.html#compas_viewer.layout.Slider.nextInFocusChain" title="compas_viewer.layout.Slider.nextInFocusChain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nextInFocusChain</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.normalGeometry.html#compas_viewer.layout.Slider.normalGeometry" title="compas_viewer.layout.Slider.normalGeometry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">normalGeometry</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.objectName.html#compas_viewer.layout.Slider.objectName" title="compas_viewer.layout.Slider.objectName"><code class="xref py py-obj docutils literal notranslate"><span class="pre">objectName</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.overrideWindowFlags.html#compas_viewer.layout.Slider.overrideWindowFlags" title="compas_viewer.layout.Slider.overrideWindowFlags"><code class="xref py py-obj docutils literal notranslate"><span class="pre">overrideWindowFlags</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.overrideWindowState.html#compas_viewer.layout.Slider.overrideWindowState" title="compas_viewer.layout.Slider.overrideWindowState"><code class="xref py py-obj docutils literal notranslate"><span class="pre">overrideWindowState</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.paintEngine.html#compas_viewer.layout.Slider.paintEngine" title="compas_viewer.layout.Slider.paintEngine"><code class="xref py py-obj docutils literal notranslate"><span class="pre">paintEngine</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.paintEvent.html#compas_viewer.layout.Slider.paintEvent" title="compas_viewer.layout.Slider.paintEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">paintEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.paintingActive.html#compas_viewer.layout.Slider.paintingActive" title="compas_viewer.layout.Slider.paintingActive"><code class="xref py py-obj docutils literal notranslate"><span class="pre">paintingActive</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.palette.html#compas_viewer.layout.Slider.palette" title="compas_viewer.layout.Slider.palette"><code class="xref py py-obj docutils literal notranslate"><span class="pre">palette</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.parent.html#compas_viewer.layout.Slider.parent" title="compas_viewer.layout.Slider.parent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.parentWidget.html#compas_viewer.layout.Slider.parentWidget" title="compas_viewer.layout.Slider.parentWidget"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parentWidget</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.physicalDpiX.html#compas_viewer.layout.Slider.physicalDpiX" title="compas_viewer.layout.Slider.physicalDpiX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">physicalDpiX</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.physicalDpiY.html#compas_viewer.layout.Slider.physicalDpiY" title="compas_viewer.layout.Slider.physicalDpiY"><code class="xref py py-obj docutils literal notranslate"><span class="pre">physicalDpiY</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.pos.html#compas_viewer.layout.Slider.pos" title="compas_viewer.layout.Slider.pos"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pos</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.previousInFocusChain.html#compas_viewer.layout.Slider.previousInFocusChain" title="compas_viewer.layout.Slider.previousInFocusChain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">previousInFocusChain</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.property.html#compas_viewer.layout.Slider.property" title="compas_viewer.layout.Slider.property"><code class="xref py py-obj docutils literal notranslate"><span class="pre">property</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.raise_.html#compas_viewer.layout.Slider.raise_" title="compas_viewer.layout.Slider.raise_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">raise_</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.receivers.html#compas_viewer.layout.Slider.receivers" title="compas_viewer.layout.Slider.receivers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">receivers</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.rect.html#compas_viewer.layout.Slider.rect" title="compas_viewer.layout.Slider.rect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rect</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.redirected.html#compas_viewer.layout.Slider.redirected" title="compas_viewer.layout.Slider.redirected"><code class="xref py py-obj docutils literal notranslate"><span class="pre">redirected</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.releaseKeyboard.html#compas_viewer.layout.Slider.releaseKeyboard" title="compas_viewer.layout.Slider.releaseKeyboard"><code class="xref py py-obj docutils literal notranslate"><span class="pre">releaseKeyboard</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.releaseMouse.html#compas_viewer.layout.Slider.releaseMouse" title="compas_viewer.layout.Slider.releaseMouse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">releaseMouse</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.releaseShortcut.html#compas_viewer.layout.Slider.releaseShortcut" title="compas_viewer.layout.Slider.releaseShortcut"><code class="xref py py-obj docutils literal notranslate"><span class="pre">releaseShortcut</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.removeAction.html#compas_viewer.layout.Slider.removeAction" title="compas_viewer.layout.Slider.removeAction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">removeAction</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.removeEventFilter.html#compas_viewer.layout.Slider.removeEventFilter" title="compas_viewer.layout.Slider.removeEventFilter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">removeEventFilter</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.render.html#compas_viewer.layout.Slider.render" title="compas_viewer.layout.Slider.render"><code class="xref py py-obj docutils literal notranslate"><span class="pre">render</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.repaint.html#compas_viewer.layout.Slider.repaint" title="compas_viewer.layout.Slider.repaint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">repaint</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.resize.html#compas_viewer.layout.Slider.resize" title="compas_viewer.layout.Slider.resize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">resize</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.resizeEvent.html#compas_viewer.layout.Slider.resizeEvent" title="compas_viewer.layout.Slider.resizeEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">resizeEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.restoreGeometry.html#compas_viewer.layout.Slider.restoreGeometry" title="compas_viewer.layout.Slider.restoreGeometry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">restoreGeometry</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.saveGeometry.html#compas_viewer.layout.Slider.saveGeometry" title="compas_viewer.layout.Slider.saveGeometry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">saveGeometry</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.screen.html#compas_viewer.layout.Slider.screen" title="compas_viewer.layout.Slider.screen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">screen</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.scroll.html#compas_viewer.layout.Slider.scroll" title="compas_viewer.layout.Slider.scroll"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scroll</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.sender.html#compas_viewer.layout.Slider.sender" title="compas_viewer.layout.Slider.sender"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sender</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.senderSignalIndex.html#compas_viewer.layout.Slider.senderSignalIndex" title="compas_viewer.layout.Slider.senderSignalIndex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">senderSignalIndex</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setAcceptDrops.html#compas_viewer.layout.Slider.setAcceptDrops" title="compas_viewer.layout.Slider.setAcceptDrops"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setAcceptDrops</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setAccessibleDescription.html#compas_viewer.layout.Slider.setAccessibleDescription" title="compas_viewer.layout.Slider.setAccessibleDescription"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setAccessibleDescription</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setAccessibleName.html#compas_viewer.layout.Slider.setAccessibleName" title="compas_viewer.layout.Slider.setAccessibleName"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setAccessibleName</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setAttribute.html#compas_viewer.layout.Slider.setAttribute" title="compas_viewer.layout.Slider.setAttribute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setAttribute</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setAutoFillBackground.html#compas_viewer.layout.Slider.setAutoFillBackground" title="compas_viewer.layout.Slider.setAutoFillBackground"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setAutoFillBackground</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setBackgroundRole.html#compas_viewer.layout.Slider.setBackgroundRole" title="compas_viewer.layout.Slider.setBackgroundRole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setBackgroundRole</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setBaseSize.html#compas_viewer.layout.Slider.setBaseSize" title="compas_viewer.layout.Slider.setBaseSize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setBaseSize</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setContentsMargins.html#compas_viewer.layout.Slider.setContentsMargins" title="compas_viewer.layout.Slider.setContentsMargins"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setContentsMargins</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setContextMenuPolicy.html#compas_viewer.layout.Slider.setContextMenuPolicy" title="compas_viewer.layout.Slider.setContextMenuPolicy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setContextMenuPolicy</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setCursor.html#compas_viewer.layout.Slider.setCursor" title="compas_viewer.layout.Slider.setCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setCursor</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setDisabled.html#compas_viewer.layout.Slider.setDisabled" title="compas_viewer.layout.Slider.setDisabled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setDisabled</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setEnabled.html#compas_viewer.layout.Slider.setEnabled" title="compas_viewer.layout.Slider.setEnabled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setEnabled</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setFixedHeight.html#compas_viewer.layout.Slider.setFixedHeight" title="compas_viewer.layout.Slider.setFixedHeight"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setFixedHeight</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setFixedSize.html#compas_viewer.layout.Slider.setFixedSize" title="compas_viewer.layout.Slider.setFixedSize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setFixedSize</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setFixedWidth.html#compas_viewer.layout.Slider.setFixedWidth" title="compas_viewer.layout.Slider.setFixedWidth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setFixedWidth</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setFocus.html#compas_viewer.layout.Slider.setFocus" title="compas_viewer.layout.Slider.setFocus"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setFocus</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setFocusPolicy.html#compas_viewer.layout.Slider.setFocusPolicy" title="compas_viewer.layout.Slider.setFocusPolicy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setFocusPolicy</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setFocusProxy.html#compas_viewer.layout.Slider.setFocusProxy" title="compas_viewer.layout.Slider.setFocusProxy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setFocusProxy</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setFont.html#compas_viewer.layout.Slider.setFont" title="compas_viewer.layout.Slider.setFont"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setFont</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setForegroundRole.html#compas_viewer.layout.Slider.setForegroundRole" title="compas_viewer.layout.Slider.setForegroundRole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setForegroundRole</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setGeometry.html#compas_viewer.layout.Slider.setGeometry" title="compas_viewer.layout.Slider.setGeometry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setGeometry</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setGraphicsEffect.html#compas_viewer.layout.Slider.setGraphicsEffect" title="compas_viewer.layout.Slider.setGraphicsEffect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setGraphicsEffect</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setHidden.html#compas_viewer.layout.Slider.setHidden" title="compas_viewer.layout.Slider.setHidden"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setHidden</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setInputMethodHints.html#compas_viewer.layout.Slider.setInputMethodHints" title="compas_viewer.layout.Slider.setInputMethodHints"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setInputMethodHints</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setLayout.html#compas_viewer.layout.Slider.setLayout" title="compas_viewer.layout.Slider.setLayout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setLayout</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setLayoutDirection.html#compas_viewer.layout.Slider.setLayoutDirection" title="compas_viewer.layout.Slider.setLayoutDirection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setLayoutDirection</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setLocale.html#compas_viewer.layout.Slider.setLocale" title="compas_viewer.layout.Slider.setLocale"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setLocale</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setMask.html#compas_viewer.layout.Slider.setMask" title="compas_viewer.layout.Slider.setMask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setMask</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setMaximumHeight.html#compas_viewer.layout.Slider.setMaximumHeight" title="compas_viewer.layout.Slider.setMaximumHeight"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setMaximumHeight</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setMaximumSize.html#compas_viewer.layout.Slider.setMaximumSize" title="compas_viewer.layout.Slider.setMaximumSize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setMaximumSize</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setMaximumWidth.html#compas_viewer.layout.Slider.setMaximumWidth" title="compas_viewer.layout.Slider.setMaximumWidth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setMaximumWidth</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setMinimumHeight.html#compas_viewer.layout.Slider.setMinimumHeight" title="compas_viewer.layout.Slider.setMinimumHeight"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setMinimumHeight</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setMinimumSize.html#compas_viewer.layout.Slider.setMinimumSize" title="compas_viewer.layout.Slider.setMinimumSize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setMinimumSize</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setMinimumWidth.html#compas_viewer.layout.Slider.setMinimumWidth" title="compas_viewer.layout.Slider.setMinimumWidth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setMinimumWidth</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setMouseTracking.html#compas_viewer.layout.Slider.setMouseTracking" title="compas_viewer.layout.Slider.setMouseTracking"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setMouseTracking</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setObjectName.html#compas_viewer.layout.Slider.setObjectName" title="compas_viewer.layout.Slider.setObjectName"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setObjectName</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setPalette.html#compas_viewer.layout.Slider.setPalette" title="compas_viewer.layout.Slider.setPalette"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setPalette</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setParent.html#compas_viewer.layout.Slider.setParent" title="compas_viewer.layout.Slider.setParent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setParent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setProperty.html#compas_viewer.layout.Slider.setProperty" title="compas_viewer.layout.Slider.setProperty"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setProperty</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setScreen.html#compas_viewer.layout.Slider.setScreen" title="compas_viewer.layout.Slider.setScreen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setScreen</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setShortcutAutoRepeat.html#compas_viewer.layout.Slider.setShortcutAutoRepeat" title="compas_viewer.layout.Slider.setShortcutAutoRepeat"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setShortcutAutoRepeat</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setShortcutEnabled.html#compas_viewer.layout.Slider.setShortcutEnabled" title="compas_viewer.layout.Slider.setShortcutEnabled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setShortcutEnabled</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setSizeIncrement.html#compas_viewer.layout.Slider.setSizeIncrement" title="compas_viewer.layout.Slider.setSizeIncrement"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setSizeIncrement</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setSizePolicy.html#compas_viewer.layout.Slider.setSizePolicy" title="compas_viewer.layout.Slider.setSizePolicy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setSizePolicy</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setStatusTip.html#compas_viewer.layout.Slider.setStatusTip" title="compas_viewer.layout.Slider.setStatusTip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setStatusTip</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setStyle.html#compas_viewer.layout.Slider.setStyle" title="compas_viewer.layout.Slider.setStyle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setStyle</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setStyleSheet.html#compas_viewer.layout.Slider.setStyleSheet" title="compas_viewer.layout.Slider.setStyleSheet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setStyleSheet</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setTabOrder.html#compas_viewer.layout.Slider.setTabOrder" title="compas_viewer.layout.Slider.setTabOrder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setTabOrder</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setTabletTracking.html#compas_viewer.layout.Slider.setTabletTracking" title="compas_viewer.layout.Slider.setTabletTracking"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setTabletTracking</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setToolTip.html#compas_viewer.layout.Slider.setToolTip" title="compas_viewer.layout.Slider.setToolTip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setToolTip</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setToolTipDuration.html#compas_viewer.layout.Slider.setToolTipDuration" title="compas_viewer.layout.Slider.setToolTipDuration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setToolTipDuration</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setUpdatesEnabled.html#compas_viewer.layout.Slider.setUpdatesEnabled" title="compas_viewer.layout.Slider.setUpdatesEnabled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setUpdatesEnabled</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setVisible.html#compas_viewer.layout.Slider.setVisible" title="compas_viewer.layout.Slider.setVisible"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setVisible</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setWhatsThis.html#compas_viewer.layout.Slider.setWhatsThis" title="compas_viewer.layout.Slider.setWhatsThis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setWhatsThis</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setWindowFilePath.html#compas_viewer.layout.Slider.setWindowFilePath" title="compas_viewer.layout.Slider.setWindowFilePath"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setWindowFilePath</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setWindowFlag.html#compas_viewer.layout.Slider.setWindowFlag" title="compas_viewer.layout.Slider.setWindowFlag"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setWindowFlag</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setWindowFlags.html#compas_viewer.layout.Slider.setWindowFlags" title="compas_viewer.layout.Slider.setWindowFlags"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setWindowFlags</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setWindowIcon.html#compas_viewer.layout.Slider.setWindowIcon" title="compas_viewer.layout.Slider.setWindowIcon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setWindowIcon</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setWindowIconText.html#compas_viewer.layout.Slider.setWindowIconText" title="compas_viewer.layout.Slider.setWindowIconText"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setWindowIconText</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setWindowModality.html#compas_viewer.layout.Slider.setWindowModality" title="compas_viewer.layout.Slider.setWindowModality"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setWindowModality</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setWindowModified.html#compas_viewer.layout.Slider.setWindowModified" title="compas_viewer.layout.Slider.setWindowModified"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setWindowModified</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setWindowOpacity.html#compas_viewer.layout.Slider.setWindowOpacity" title="compas_viewer.layout.Slider.setWindowOpacity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setWindowOpacity</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setWindowRole.html#compas_viewer.layout.Slider.setWindowRole" title="compas_viewer.layout.Slider.setWindowRole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setWindowRole</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setWindowState.html#compas_viewer.layout.Slider.setWindowState" title="compas_viewer.layout.Slider.setWindowState"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setWindowState</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.setWindowTitle.html#compas_viewer.layout.Slider.setWindowTitle" title="compas_viewer.layout.Slider.setWindowTitle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setWindowTitle</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.sharedPainter.html#compas_viewer.layout.Slider.sharedPainter" title="compas_viewer.layout.Slider.sharedPainter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sharedPainter</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.show.html#compas_viewer.layout.Slider.show" title="compas_viewer.layout.Slider.show"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.showEvent.html#compas_viewer.layout.Slider.showEvent" title="compas_viewer.layout.Slider.showEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">showEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.showFullScreen.html#compas_viewer.layout.Slider.showFullScreen" title="compas_viewer.layout.Slider.showFullScreen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">showFullScreen</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.showMaximized.html#compas_viewer.layout.Slider.showMaximized" title="compas_viewer.layout.Slider.showMaximized"><code class="xref py py-obj docutils literal notranslate"><span class="pre">showMaximized</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.showMinimized.html#compas_viewer.layout.Slider.showMinimized" title="compas_viewer.layout.Slider.showMinimized"><code class="xref py py-obj docutils literal notranslate"><span class="pre">showMinimized</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.showNormal.html#compas_viewer.layout.Slider.showNormal" title="compas_viewer.layout.Slider.showNormal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">showNormal</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.signalsBlocked.html#compas_viewer.layout.Slider.signalsBlocked" title="compas_viewer.layout.Slider.signalsBlocked"><code class="xref py py-obj docutils literal notranslate"><span class="pre">signalsBlocked</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.size.html#compas_viewer.layout.Slider.size" title="compas_viewer.layout.Slider.size"><code class="xref py py-obj docutils literal notranslate"><span class="pre">size</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.sizeHint.html#compas_viewer.layout.Slider.sizeHint" title="compas_viewer.layout.Slider.sizeHint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sizeHint</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.sizeIncrement.html#compas_viewer.layout.Slider.sizeIncrement" title="compas_viewer.layout.Slider.sizeIncrement"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sizeIncrement</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.sizePolicy.html#compas_viewer.layout.Slider.sizePolicy" title="compas_viewer.layout.Slider.sizePolicy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sizePolicy</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.stackUnder.html#compas_viewer.layout.Slider.stackUnder" title="compas_viewer.layout.Slider.stackUnder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stackUnder</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.startTimer.html#compas_viewer.layout.Slider.startTimer" title="compas_viewer.layout.Slider.startTimer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">startTimer</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.statusTip.html#compas_viewer.layout.Slider.statusTip" title="compas_viewer.layout.Slider.statusTip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statusTip</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.style.html#compas_viewer.layout.Slider.style" title="compas_viewer.layout.Slider.style"><code class="xref py py-obj docutils literal notranslate"><span class="pre">style</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.styleSheet.html#compas_viewer.layout.Slider.styleSheet" title="compas_viewer.layout.Slider.styleSheet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">styleSheet</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.tabletEvent.html#compas_viewer.layout.Slider.tabletEvent" title="compas_viewer.layout.Slider.tabletEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tabletEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.testAttribute.html#compas_viewer.layout.Slider.testAttribute" title="compas_viewer.layout.Slider.testAttribute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">testAttribute</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.thread.html#compas_viewer.layout.Slider.thread" title="compas_viewer.layout.Slider.thread"><code class="xref py py-obj docutils literal notranslate"><span class="pre">thread</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.timerEvent.html#compas_viewer.layout.Slider.timerEvent" title="compas_viewer.layout.Slider.timerEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">timerEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.toolTip.html#compas_viewer.layout.Slider.toolTip" title="compas_viewer.layout.Slider.toolTip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">toolTip</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.toolTipDuration.html#compas_viewer.layout.Slider.toolTipDuration" title="compas_viewer.layout.Slider.toolTipDuration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">toolTipDuration</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.topLevelWidget.html#compas_viewer.layout.Slider.topLevelWidget" title="compas_viewer.layout.Slider.topLevelWidget"><code class="xref py py-obj docutils literal notranslate"><span class="pre">topLevelWidget</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.tr.html#compas_viewer.layout.Slider.tr" title="compas_viewer.layout.Slider.tr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tr</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.underMouse.html#compas_viewer.layout.Slider.underMouse" title="compas_viewer.layout.Slider.underMouse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">underMouse</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.ungrabGesture.html#compas_viewer.layout.Slider.ungrabGesture" title="compas_viewer.layout.Slider.ungrabGesture"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ungrabGesture</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.unsetCursor.html#compas_viewer.layout.Slider.unsetCursor" title="compas_viewer.layout.Slider.unsetCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unsetCursor</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.unsetLayoutDirection.html#compas_viewer.layout.Slider.unsetLayoutDirection" title="compas_viewer.layout.Slider.unsetLayoutDirection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unsetLayoutDirection</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.unsetLocale.html#compas_viewer.layout.Slider.unsetLocale" title="compas_viewer.layout.Slider.unsetLocale"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unsetLocale</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.update.html#compas_viewer.layout.Slider.update" title="compas_viewer.layout.Slider.update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.updateGeometry.html#compas_viewer.layout.Slider.updateGeometry" title="compas_viewer.layout.Slider.updateGeometry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">updateGeometry</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.updateMicroFocus.html#compas_viewer.layout.Slider.updateMicroFocus" title="compas_viewer.layout.Slider.updateMicroFocus"><code class="xref py py-obj docutils literal notranslate"><span class="pre">updateMicroFocus</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.updatesEnabled.html#compas_viewer.layout.Slider.updatesEnabled" title="compas_viewer.layout.Slider.updatesEnabled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">updatesEnabled</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.visibleRegion.html#compas_viewer.layout.Slider.visibleRegion" title="compas_viewer.layout.Slider.visibleRegion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">visibleRegion</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.whatsThis.html#compas_viewer.layout.Slider.whatsThis" title="compas_viewer.layout.Slider.whatsThis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">whatsThis</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.wheelEvent.html#compas_viewer.layout.Slider.wheelEvent" title="compas_viewer.layout.Slider.wheelEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wheelEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.width.html#compas_viewer.layout.Slider.width" title="compas_viewer.layout.Slider.width"><code class="xref py py-obj docutils literal notranslate"><span class="pre">width</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.widthMM.html#compas_viewer.layout.Slider.widthMM" title="compas_viewer.layout.Slider.widthMM"><code class="xref py py-obj docutils literal notranslate"><span class="pre">widthMM</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.winId.html#compas_viewer.layout.Slider.winId" title="compas_viewer.layout.Slider.winId"><code class="xref py py-obj docutils literal notranslate"><span class="pre">winId</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.window.html#compas_viewer.layout.Slider.window" title="compas_viewer.layout.Slider.window"><code class="xref py py-obj docutils literal notranslate"><span class="pre">window</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.windowFilePath.html#compas_viewer.layout.Slider.windowFilePath" title="compas_viewer.layout.Slider.windowFilePath"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowFilePath</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.windowFlags.html#compas_viewer.layout.Slider.windowFlags" title="compas_viewer.layout.Slider.windowFlags"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowFlags</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.windowHandle.html#compas_viewer.layout.Slider.windowHandle" title="compas_viewer.layout.Slider.windowHandle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowHandle</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.windowIcon.html#compas_viewer.layout.Slider.windowIcon" title="compas_viewer.layout.Slider.windowIcon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowIcon</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.windowIconText.html#compas_viewer.layout.Slider.windowIconText" title="compas_viewer.layout.Slider.windowIconText"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowIconText</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.windowModality.html#compas_viewer.layout.Slider.windowModality" title="compas_viewer.layout.Slider.windowModality"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowModality</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.windowOpacity.html#compas_viewer.layout.Slider.windowOpacity" title="compas_viewer.layout.Slider.windowOpacity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowOpacity</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.windowRole.html#compas_viewer.layout.Slider.windowRole" title="compas_viewer.layout.Slider.windowRole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowRole</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.windowState.html#compas_viewer.layout.Slider.windowState" title="compas_viewer.layout.Slider.windowState"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowState</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.windowTitle.html#compas_viewer.layout.Slider.windowTitle" title="compas_viewer.layout.Slider.windowTitle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowTitle</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.windowType.html#compas_viewer.layout.Slider.windowType" title="compas_viewer.layout.Slider.windowType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowType</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.x.html#compas_viewer.layout.Slider.x" title="compas_viewer.layout.Slider.x"><code class="xref py py-obj docutils literal notranslate"><span class="pre">x</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.layout.Slider.y.html#compas_viewer.layout.Slider.y" title="compas_viewer.layout.Slider.y"><code class="xref py py-obj docutils literal notranslate"><span class="pre">y</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+              
+              
+                <footer class="bd-footer-article">
+                  
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#compas_viewer.layout.Slider"><code class="docutils literal notranslate"><span class="pre">Slider</span></code></a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+  <p class="copyright">
+    
+      © Copyright COMPAS Association.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item"><p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.13.3.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
