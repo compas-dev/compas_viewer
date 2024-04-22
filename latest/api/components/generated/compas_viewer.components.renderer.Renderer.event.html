@@ -59,8 +59,8 @@
         </script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="Renderer.eventFilter" href="compas_viewer.components.renderer.Renderer.eventFilter.html" />
-    <link rel="prev" title="Renderer.enterEvent" href="compas_viewer.components.renderer.Renderer.enterEvent.html" />
+    <link rel="next" title="Renderer.gestureEvent" href="compas_viewer.components.renderer.Renderer.gestureEvent.html" />
+    <link rel="prev" title="Renderer.clear" href="compas_viewer.components.renderer.Renderer.clear.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -593,8 +593,17 @@ document.write(`
 <h1>Renderer.event</h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="compas_viewer.components.renderer.Renderer.event">
-<span class="sig-prename descclassname"><span class="pre">Renderer.</span></span><span class="sig-name descname"><span class="pre">event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PySide6.QtCore.QEvent</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">Renderer.</span></span><span class="sig-name descname"><span class="pre">event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/1c33701/src/compas_viewer/components/renderer/renderer.py#L233"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Event handler for the renderer. Customised to capture multi-touch gestures.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>event</strong><span class="classifier"><a class="reference external" href="https://doc.qt.io/qtforpython-6/PySide6/QtCore/QEvent.html">PySide6/QtCore/QEvent</a></span></dt><dd><p>The Qt event.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 
