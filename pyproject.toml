@@ -52,6 +52,12 @@ optional-dependencies = { dev = { file = "requirements-dev.txt" } }
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+'src/compas_viewer' = ['config.json']
+'src/compas_viewer/configurations/default_config' = ['*.json', '*.ttf']
+'src/compas_viewer/renderers/shaders' = ['*.frag', '*.vert']
+'src/compas_viewer/icons' = ['*.svg', '*.png']
+
 # ============================================================================
 # replace pytest.ini
 # ============================================================================
