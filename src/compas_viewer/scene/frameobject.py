@@ -52,7 +52,7 @@ class FrameObject(ViewerSceneObject):
         framesize: Optional[tuple[float, int, float, int]] = None,
         linecolor: Optional[Color] = None,
         show_framez: Optional[bool] = None,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(item=frame, **kwargs)
         self.frame = frame

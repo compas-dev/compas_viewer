@@ -82,9 +82,7 @@ class ViewportLayout:
             self.viewport_layout.addWidget(splitter)
             self.viewport_layout.setSizes([1000] * self.viewport_layout.count())
         else:
-            splitters: list[QSplitter] = [
-                self.viewport_layout.widget(i) for i in range(self.viewport_layout.count())
-            ]  # type: ignore
+            splitters: list[QSplitter] = [self.viewport_layout.widget(i) for i in range(self.viewport_layout.count())]  # type: ignore
             min_splitter = min(splitters, key=lambda splitter: splitter.count())
             min_splitter.addWidget(element)
             min_splitter.setSizes([1000] * min_splitter.count())

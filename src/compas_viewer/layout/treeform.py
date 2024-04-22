@@ -2,10 +2,11 @@ from typing import TYPE_CHECKING
 from typing import Callable
 from typing import Optional
 
-from compas.datastructures import Tree
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QTreeWidget
 from PySide6.QtWidgets import QTreeWidgetItem
+
+from compas.datastructures import Tree
 
 if TYPE_CHECKING:
     from compas_viewer.viewer import Viewer
@@ -65,8 +66,8 @@ class Treeform(QTreeWidget):
                 sp = viewer.scene.add(Sphere(0.1, Frame([i, j, 0], [1, 0, 0], [0, 1, 0])), name=f"Sphere_{i}_{j}")
 
         viewer.layout.sidedock.add_element(
-            Treeform(viewer._tree,{"Name": (lambda o: o.object.name), "Object": (lambda o: o.object)})
-            )
+            Treeform(viewer._tree, {"Name": (lambda o: o.object.name), "Object": (lambda o: o.object)})
+        )
 
         viewer.show()
 
@@ -111,7 +112,8 @@ class Treeform(QTreeWidget):
                 node.attributes["widget_item"] = QTreeWidgetItem(self, strings)  # type: ignore
             else:
                 node.attributes["widget_item"] = QTreeWidgetItem(
-                    node.parent.attributes["widget_item"], strings  # type: ignore
+                    node.parent.attributes["widget_item"],
+                    strings,  # type: ignore
                 )
 
             if self._backgrounds:

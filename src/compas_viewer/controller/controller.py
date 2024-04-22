@@ -1,12 +1,11 @@
 from typing import TYPE_CHECKING
 
-
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QKeyEvent
 from PySide6.QtGui import QMouseEvent
 from PySide6.QtGui import QWheelEvent
-from PySide6.QtWidgets import QPinchGesture
 from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QPinchGesture
 
 from compas_viewer.actions import Action
 from compas_viewer.configurations import ControllerConfig
@@ -124,7 +123,9 @@ class Controller:
         if event.buttons() == Qt.MouseButton.LeftButton and event.modifiers() == Qt.KeyboardModifier.NoModifier:
             renderer.selector.select.emit()
         # Multiselect
-        elif event.buttons() == self.config.multiselect.mouse and event.modifiers() == self.config.multiselect.modifier:
+        elif (
+            event.buttons() == self.config.multiselect.mouse and event.modifiers() == self.config.multiselect.modifier
+        ):
             renderer.selector.multiselect.emit()
         # Deselect
         elif event.buttons() == self.config.deselect.mouse and event.modifiers() == self.config.deselect.modifier:

@@ -24,6 +24,7 @@ def gl_info() -> str:
 
         from compas_viewer import Viewer
         from compas_viewer.utilities import gl_info
+
         viewer = Viewer()
         gl_info()
     """

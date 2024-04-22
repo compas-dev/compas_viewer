@@ -2,13 +2,14 @@ from typing import TYPE_CHECKING
 from typing import Callable
 from typing import Optional
 
-from compas.colors import Color
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QGridLayout
 from PySide6.QtWidgets import QHBoxLayout
 from PySide6.QtWidgets import QLabel
 from PySide6.QtWidgets import QSlider
 from PySide6.QtWidgets import QWidget
+
+from compas.colors import Color
 
 if TYPE_CHECKING:
     from compas_viewer.viewer import Viewer

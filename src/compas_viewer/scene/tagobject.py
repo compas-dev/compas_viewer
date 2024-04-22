@@ -3,10 +3,6 @@ from os import path
 from typing import Optional
 from typing import Union
 
-from compas.colors import Color
-from compas.geometry import Geometry
-from compas.geometry import Point
-from compas.scene import GeometryObject
 from freetype import FT_LOAD_FLAGS
 from freetype import Face
 from numpy import array
@@ -14,6 +10,10 @@ from numpy import linalg
 from numpy import zeros
 from OpenGL import GL
 
+from compas.colors import Color
+from compas.geometry import Geometry
+from compas.geometry import Point
+from compas.scene import GeometryObject
 from compas_viewer import HERE
 from compas_viewer.gl import make_index_buffer
 from compas_viewer.gl import make_vertex_buffer
@@ -206,7 +206,8 @@ class TagObject(ViewerSceneObject, GeometryObject):
                 (10 * self.geometry.height)
                 / float(
                     linalg.norm(
-                        array(self.geometry.position) - array([camera_position.x, camera_position.y, camera_position.z])
+                        array(self.geometry.position)
+                        - array([camera_position.x, camera_position.y, camera_position.z])
                     )
                 )
             )

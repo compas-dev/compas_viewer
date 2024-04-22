@@ -58,7 +58,7 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
         facecolor: Optional[ColorDictValueType] = None,
         hide_coplanaredges: Optional[bool] = None,
         use_vertexcolors: Optional[bool] = None,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(mesh=mesh, **kwargs)
 

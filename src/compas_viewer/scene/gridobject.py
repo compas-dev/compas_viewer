@@ -53,7 +53,7 @@ class GridObject(FrameObject):
         framesize: Optional[tuple[float, int, float, int]] = None,
         linecolor: Optional[Color] = None,
         show_framez: Optional[bool] = None,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(frame=frame, framesize=framesize, linecolor=linecolor, show_framez=show_framez, **kwargs)
         self.is_locked = True

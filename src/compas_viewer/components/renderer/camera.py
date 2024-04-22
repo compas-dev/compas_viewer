@@ -3,14 +3,8 @@ from math import radians
 from math import tan
 from typing import TYPE_CHECKING
 from typing import Callable
-
 from typing import Optional
 
-
-from compas.geometry import Rotation
-from compas.geometry import Transformation
-from compas.geometry import Translation
-from compas.geometry import Vector
 from numpy import array
 from numpy import asfortranarray
 from numpy import dot
@@ -18,6 +12,11 @@ from numpy import float32
 from numpy import pi
 from numpy.linalg import det
 from numpy.linalg import norm
+
+from compas.geometry import Rotation
+from compas.geometry import Transformation
+from compas.geometry import Translation
+from compas.geometry import Vector
 
 if TYPE_CHECKING:
     # https://peps.python.org/pep-0484/#runtime-or-type-checking
@@ -278,7 +277,9 @@ class Camera:
         new_direction_pitch /= new_direction_pitch_distance
 
         angle_z = atan2(det([old_direction_xy, new_direction_xy]), dot(old_direction_xy, new_direction_xy))
-        angle_x = -atan2(det([old_direction_pitch, new_direction_pitch]), dot(old_direction_pitch, new_direction_pitch))
+        angle_x = -atan2(
+            det([old_direction_pitch, new_direction_pitch]), dot(old_direction_pitch, new_direction_pitch)
+        )
 
         new_rotation = self.rotation + [angle_x or 0, 0, angle_z or 0]
         self.rotation.set(*new_rotation, pause_update=True)

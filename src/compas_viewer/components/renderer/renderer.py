@@ -2,8 +2,6 @@ import time
 from functools import lru_cache
 from typing import TYPE_CHECKING
 
-from compas.geometry import Frame
-from compas.geometry import transform_points_numpy
 from numpy import float32
 from numpy import identity
 from OpenGL import GL
@@ -13,6 +11,8 @@ from PySide6.QtGui import QMouseEvent
 from PySide6.QtGui import QWheelEvent
 from PySide6.QtOpenGLWidgets import QOpenGLWidget
 
+from compas.geometry import Frame
+from compas.geometry import transform_points_numpy
 from compas_viewer.configurations import RendererConfig
 from compas_viewer.scene import TagObject
 from compas_viewer.scene.collectionobject import CollectionObject
@@ -157,7 +157,8 @@ class Renderer(QOpenGLWidget):
 
         References
         ----------
-        * https://doc.qt.io/qtforpython-6/PySide6/QtOpenGL/QOpenGLWindow.html#PySide6.QtOpenGL.PySide6.QtOpenGL.QOpenGLWindow.initializeGL # noqa: E501
+        * https://doc.qt.io/qtforpython-6/PySide6/QtOpenGL/QOpenGLWindow.html#PySide6.QtOpenGL.PySide6.QtOpenGL.QOpenGLWindow.initializeGL
+
         """
         GL.glClearColor(*self.config.backgroundcolor.rgba)
         GL.glPolygonOffset(1.0, 1.0)
@@ -190,7 +191,8 @@ class Renderer(QOpenGLWidget):
 
         References
         ----------
-        * https://doc.qt.io/qtforpython-6/PySide6/QtOpenGL/QOpenGLWindow.html#PySide6.QtOpenGL.PySide6.QtOpenGL.QOpenGLWindow.resizeGL # noqa: E501
+        * https://doc.qt.io/qtforpython-6/PySide6/QtOpenGL/QOpenGLWindow.html#PySide6.QtOpenGL.PySide6.QtOpenGL.QOpenGLWindow.resizeGL
+
         """
         self.viewer.layout.config.window.width = w
         self.viewer.layout.config.window.height = h
@@ -213,7 +215,8 @@ class Renderer(QOpenGLWidget):
 
         References
         ----------
-        * https://doc.qt.io/qtforpython-6/PySide6/QtOpenGL/QOpenGLWindow.html#PySide6.QtOpenGL.PySide6.QtOpenGL.QOpenGLWindow.paintGL # noqa: E501
+        * https://doc.qt.io/qtforpython-6/PySide6/QtOpenGL/QOpenGLWindow.html#PySide6.QtOpenGL.PySide6.QtOpenGL.QOpenGLWindow.paintGL
+
         """
         self.clear()
         if is_instance or self.rendermode == "instance":
@@ -261,7 +264,8 @@ class Renderer(QOpenGLWidget):
 
         References
         ----------
-        * https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QWidget.html#PySide6.QtWidgets.PySide6.QtWidgets.QWidget.mouseMoveEvent # noqa: E501
+        * https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QWidget.html#PySide6.QtWidgets.PySide6.QtWidgets.QWidget.mouseMoveEvent
+
         """
         if self.isActiveWindow() and self.underMouse():
             self.viewer.controller.mouse_move_action(self, event)
@@ -282,7 +286,8 @@ class Renderer(QOpenGLWidget):
 
         References
         ----------
-        * https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QWidget.html#PySide6.QtWidgets.PySide6.QtWidgets.QWidget.mousePressEvent # noqa: E501
+        * https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QWidget.html#PySide6.QtWidgets.PySide6.QtWidgets.QWidget.mousePressEvent
+
         """
         if self.isActiveWindow() and self.underMouse():
             self.viewer.controller.mouse_press_action(self, event)
@@ -303,7 +308,8 @@ class Renderer(QOpenGLWidget):
 
         References
         ----------
-        * https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QWidget.html#PySide6.QtWidgets.PySide6.QtWidgets.QWidget.mouseReleaseEvent # noqa: E501
+        * https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QWidget.html#PySide6.QtWidgets.PySide6.QtWidgets.QWidget.mouseReleaseEvent
+
         """
         if self.isActiveWindow() and self.underMouse():
             self.viewer.controller.mouse_release_action(self, event)
@@ -340,7 +346,8 @@ class Renderer(QOpenGLWidget):
 
         References
         ----------
-        * https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QWidget.html#PySide6.QtWidgets.PySide6.QtWidgets.QWidget.wheelEvent # noqa: E501
+        * https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QWidget.html#PySide6.QtWidgets.PySide6.QtWidgets.QWidget.wheelEvent
+
         """
         if self.isActiveWindow() and self.underMouse():
             self.viewer.controller.wheel_action(self, event)
@@ -361,7 +368,8 @@ class Renderer(QOpenGLWidget):
 
         References
         ----------
-        * https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QWidget.html#PySide6.QtWidgets.PySide6.QtWidgets.QWidget.keyPressEvent # noqa: E501
+        * https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QWidget.html#PySide6.QtWidgets.PySide6.QtWidgets.QWidget.keyPressEvent
+
         """
         self.viewer.controller.key_press_action(self, event)
 
@@ -380,7 +388,8 @@ class Renderer(QOpenGLWidget):
 
         References
         ----------
-        * https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QWidget.html#PySide6.QtWidgets.PySide6.QtWidgets.QWidget.keyReleaseEvent # noqa: E501
+        * https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QWidget.html#PySide6.QtWidgets.PySide6.QtWidgets.QWidget.keyReleaseEvent
+
         """
         self.viewer.controller.key_release_action(self, event)
 

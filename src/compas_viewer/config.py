@@ -1,13 +1,13 @@
 import json
 from dataclasses import dataclass
-from dataclasses import is_dataclass
 from dataclasses import field
+from dataclasses import is_dataclass
 from typing import Literal
+
 from compas.colors import Color
 
 
 class Base:
-
     @classmethod
     def from_json(cls, filepath):
         with open(filepath) as fp:

@@ -2,16 +2,16 @@ from typing import TYPE_CHECKING
 from typing import Any
 from typing import Optional
 
+from numpy import array
+from numpy import average
+from numpy import identity
+
 from compas.colors import Color
 from compas.geometry import Point
 from compas.geometry import Transformation
 from compas.geometry import transform_points_numpy
 from compas.scene import SceneObject
 from compas.utilities import flatten
-from numpy import array
-from numpy import average
-from numpy import identity
-
 from compas_viewer.components.renderer.shaders import Shader
 from compas_viewer.gl import make_index_buffer
 from compas_viewer.gl import make_vertex_buffer
@@ -384,7 +384,9 @@ class ViewerSceneObject(SceneObject):
             shader.bind_attribute("position", self._frontfaces_buffer["positions"])
             shader.bind_attribute("color", self._frontfaces_buffer["colors"], step=4)
             shader.draw_triangles(
-                elements=self._frontfaces_buffer["elements"], n=self._frontfaces_buffer["n"], background=self.background
+                elements=self._frontfaces_buffer["elements"],
+                n=self._frontfaces_buffer["n"],
+                background=self.background,
             )
         # Backfaces
         if self._backfaces_buffer is not None and not wireframe and self.show_faces:

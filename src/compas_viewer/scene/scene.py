@@ -103,7 +103,7 @@ class ViewerScene(Scene):
         use_vertexcolors: Optional[bool] = None,
         v: int = 16,
         u: int = 16,
-        **kwargs
+        **kwargs,
     ) -> ViewerSceneObject:
         """
         Add an item to the scene.
