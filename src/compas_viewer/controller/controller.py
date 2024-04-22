@@ -5,6 +5,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QKeyEvent
 from PySide6.QtGui import QMouseEvent
 from PySide6.QtGui import QWheelEvent
+from PySide6.QtWidgets import QPinchGesture
 from PySide6.QtWidgets import QApplication
 
 from compas_viewer.actions import Action
@@ -166,6 +167,22 @@ class Controller:
         if event.buttons() == Qt.KeyboardModifier.NoModifier or event.buttons() == Qt.MouseButton.NoButton:
             QApplication.restoreOverrideCursor()
 
+    def pinch_action(self, renderer: "Renderer", event: QPinchGesture):
+        """
+        The pinch action of the renderer object.
+
+        Parameters
+        ----------
+        renderer : :class:`compas_viewer.components.renderer.Renderer`
+            The renderer object.
+        event : :PySide6:`PySide6/QtWidgets/QPinchGesture`
+            The Qt event.
+
+        """
+        steps = event.scaleFactor() - 1
+        steps *= 10
+        renderer.camera.zoom(steps)
+
     def wheel_action(self, renderer: "Renderer", event: QWheelEvent):
         """
         The wheel action of the renderer object.
@@ -180,7 +197,7 @@ class Controller:
         """
         degrees = event.angleDelta().y() / 8
         steps = degrees / 15
-        renderer.camera.zoom(int(steps))
+        renderer.camera.zoom(steps)
 
     def key_press_action(self, renderer: "Renderer", event: QKeyEvent):
         """

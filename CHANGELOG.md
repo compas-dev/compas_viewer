@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added functionality of multiple widgets in main viewport.
 * Added example `object/scale.py`.
 * Added `RobotModelObject` and its example in the documentation.
+* Added support to pinch gesture for zooming on touch pads.
 
 ### Changed
 * Pin the `PySide6` version to `6.6.1`.
@@ -40,6 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fixed the bug of missing `item` parameter in the `Viewer.add` method.
 * Fixed tag text spacing and alignment issue.
 * Fixed mouse selection flickering issue.
+* Fixed the issue of zoom on mac.
 
 ### Removed
 * Removed `utilities` folder.

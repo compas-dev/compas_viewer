@@ -357,12 +357,12 @@ class Camera:
         vector = [M[i][3] for i in range(3)]
         self.target += vector
 
-    def zoom(self, steps: int = 1):
+    def zoom(self, steps: float = 1):
         """Zoom in or out.
 
         Parameters
         ----------
-        steps : int
+        steps : float
             The number of zoom increments, with each increment the size
             of :attr:`compas_viewer.components.renderer.Camera.config.zoomdelta`.
 
