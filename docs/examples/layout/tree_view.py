@@ -19,11 +19,11 @@ for i in range(10):
 
 form_ids = Treeform(viewer.scene, {"Name": (lambda o: o.name), "Object": (lambda o: o)})
 viewer.layout.viewport.add_element(form_ids)
-form_colors = Treeform(
-    viewer.scene,
-    {"Name": (lambda o: o.name), "Object-Color": (lambda o: o.surfacecolor)},
-    backgrounds={"Object-Color": (lambda o: o.surfacecolor)},
-)
-viewer.layout.viewport.add_element(form_colors, False)
+# form_colors = Treeform(
+#     viewer.scene,
+#     {"Name": (lambda o: o.name), "Object-Color": (lambda o: o.surfacecolor)},
+#     backgrounds={"Object-Color": (lambda o: o.surfacecolor)},
+# )
+# viewer.layout.viewport.add_element(form_colors, False)
 
 viewer.show()
