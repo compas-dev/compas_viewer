@@ -3,6 +3,7 @@ from OpenGL import GL
 from PySide6 import QtCore
 from PySide6 import QtWidgets
 from PySide6.QtOpenGLWidgets import QOpenGLWidget
+from compas_viewer.components.default_component_factory import ViewerSetting
 
 if TYPE_CHECKING:
     from .ui import UI
@@ -41,15 +42,18 @@ class View3D:
 class SideBarRight:
     def __init__(self, viewport: "ViewPort") -> None:
         self.viewport = viewport
+        self.setting = ViewerSetting()
+        self.splitter = QtWidgets.QSplitter(QtCore.Qt.Orientation.Vertical)
+        self.splitter.setChildrenCollapsible(True)
         # self.scenetree = SceneTreeView()
         # self.objectlist = ObjectListView()
         # self.camerasettings = CameraSettings()
 
-        self.splitter = QtWidgets.QSplitter(QtCore.Qt.Orientation.Vertical)
-        self.splitter.setChildrenCollapsible(True)
+        
         # self.splitter.addWidget(self.scenetree.widget)
         # self.splitter.addWidget(self.objectlist.widget)
-        # self.splitter.addWidget(self.camerasettings.widget)
+        self.splitter.addWidget(self.setting.camera_all_setting())
+
 
 class ViewPort:
     def __init__(self, ui: "UI"):
@@ -59,25 +63,3 @@ class ViewPort:
         self.splitter = QtWidgets.QSplitter()
         self.splitter.addWidget(self.view3d.renderer)
         self.splitter.addWidget(self.sidebar.splitter)
-
-class CameraSettings:
-    def __init__(self) -> None:
-        self.layout = QtWidgets.QVBoxLayout()
-        self.widget = QtWidgets.QFrame()
-        self.widget.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
-        self.widget.setLayout(self.layout)
-
-        fov = DoubleSpinnerWidget("FOV", 50, 10, 80)
-        near = DoubleSpinnerWidget("NEAR", 0.1, 0.001, 1000)
-        far = DoubleSpinnerWidget("FAR", 1000, 1, 10000000)
-        target = CameraTargetWidget()
-        location = CameraLocationWidget()
-
-        self.layout.addWidget(target.widget)
-        self.layout.addWidget(location.widget)
-        self.layout.addWidget(fov.widget)
-        self.layout.addWidget(near.widget)
-        self.layout.addWidget(far.widget)
-        self.layout.setSpacing(8)
-        self.layout.setContentsMargins(8, 8, 8, 8)
-        self.layout.addStretch()
