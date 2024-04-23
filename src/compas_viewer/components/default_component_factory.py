@@ -1,4 +1,7 @@
 from PySide6 import QtWidgets
+from PySide6.QtCore import Qt
+from compas_viewer.layout import Treeform
+from compas_viewer.scene.scene import ViewerScene
 from .box_factory import BoxFactory
 
 class ViewerSetting:
@@ -54,5 +57,14 @@ class ViewerSetting:
         layout.addStretch()
         return widget
 
+class ViewerTreeForm:
+    def __init__(self, scene: "ViewerScene") -> None:
+        self.scene = scene
 
+    def tree_view(self) -> QtWidgets.QSplitter:
+        form_ids = Treeform(self.scene, {"Name": (lambda o: o.name), "Object": (lambda o: o)})
+        splitter = QtWidgets.QSplitter()
+        splitter.setOrientation(Qt.Orientation.Vertical)
+        splitter.addWidget(form_ids)
+        return splitter
 
