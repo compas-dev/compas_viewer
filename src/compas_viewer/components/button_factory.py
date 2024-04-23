@@ -1,15 +1,17 @@
 import pathlib
-from typing import Callable, TYPE_CHECKING
+from typing import Callable
 from PySide6 import QtCore, QtWidgets, QtGui
 
-ICON_PATH = QtGui.QIcon(
-            str(pathlib.Path(__file__).parent.parent / "icons" / "zoom_selected.svg")
-        )
+def set_icon_path(icon_name: str) -> str:
+    path = QtGui.QIcon(
+            str(pathlib.Path(__file__).parent.parent / "icons" / icon_name)
+        ) 
+    return path
 
 class ButtonFactory(QtWidgets.QPushButton):
-    def __init__(self, icon_path: str, tooltip: str, action: Callable[[], None], parent=None):
+    def __init__(self, icon_name: str, tooltip: str, action: Callable[[], None], parent=None):
         super().__init__(parent)
-        self.setIcon(QtGui.QIcon(icon_path))
+        self.setIcon(QtGui.QIcon(set_icon_path(icon_name)))
         self.setToolTip(tooltip)
         self.setIconSize(QtCore.QSize(12, 12))
         self.clicked.connect(action)
