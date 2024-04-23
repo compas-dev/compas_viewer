@@ -42,6 +42,7 @@ class View3D:
 class SideBarRight:
     def __init__(self, viewport: "ViewPort") -> None:
         self.viewport = viewport
+        self.config = viewport.ui.viewer.config.ui.sidebar
         self.setting = ViewerSetting()
         self.splitter = QtWidgets.QSplitter(QtCore.Qt.Orientation.Vertical)
         self.splitter.setChildrenCollapsible(True)
@@ -53,6 +54,7 @@ class SideBarRight:
         # self.splitter.addWidget(self.scenetree.widget)
         # self.splitter.addWidget(self.objectlist.widget)
         self.splitter.addWidget(self.setting.camera_all_setting())
+        self.splitter.setHidden(not self.config.show)
 
 
 class ViewPort:
@@ -61,5 +63,7 @@ class ViewPort:
         self.view3d = View3D(self)
         self.sidebar = SideBarRight(self)
         self.splitter = QtWidgets.QSplitter()
+
         self.splitter.addWidget(self.view3d.renderer)
         self.splitter.addWidget(self.sidebar.splitter)
+        self.ui.window.centralWidget().layout().addWidget(self.splitter)

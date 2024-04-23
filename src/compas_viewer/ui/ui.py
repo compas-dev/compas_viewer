@@ -12,14 +12,12 @@ class UI:
     def __init__(self, viewer: "Viewer") -> None:
         
         self.viewer = viewer
+
         self.window = MainWindow(self)
         self.menubar = MenuBar(self)
         self.statusbar = SatusBar(self)
         self.toolbar = ToolBar(self)
         self.viewport = ViewPort(self)
-        self.window.centralWidget().layout().addWidget(self.viewport.splitter)
-
-        self.viewport.sidebar.splitter.setHidden(not self.viewer.config.ui.sidebar.show)
 
     def init(self):
         width = self.viewer.config.window.width
