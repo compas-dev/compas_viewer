@@ -2,8 +2,9 @@ from typing import TYPE_CHECKING
 from OpenGL import GL
 from PySide6 import QtCore
 from PySide6 import QtWidgets
+from PySide6.QtGui import QSurfaceFormat
 from PySide6.QtOpenGLWidgets import QOpenGLWidget
-from compas_viewer.components.default_component_factory import ViewerSetting
+from compas_viewer.components.default_component_factory import ViewerSetting, ViewerTreeForm
 
 if TYPE_CHECKING:
     from .ui import UI
@@ -11,6 +12,7 @@ if TYPE_CHECKING:
 class OpenGLWidget(QOpenGLWidget):
     def __init__(self) -> None:
         super().__init__()
+        self.initializeGL()
 
     def clear(self):
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)  # type: ignore
@@ -39,11 +41,15 @@ class View3D:
         self.viewmode = "perspective"
         self.renderer = OpenGLWidget()
 
+class SideBarRightDefault:
+    pass
+
 class SideBarRight:
     def __init__(self, viewport: "ViewPort") -> None:
         self.viewport = viewport
         self.config = viewport.ui.viewer.config.ui.sidebar
         self.setting = ViewerSetting()
+        self.tree_form = ViewerTreeForm(viewport.ui.viewer.scene)
         self.splitter = QtWidgets.QSplitter(QtCore.Qt.Orientation.Vertical)
         self.splitter.setChildrenCollapsible(True)
         # self.scenetree = SceneTreeView()
@@ -53,6 +59,9 @@ class SideBarRight:
         
         # self.splitter.addWidget(self.scenetree.widget)
         # self.splitter.addWidget(self.objectlist.widget)
+        # slot 1
+        self.splitter.addWidget(self.tree_form.tree_view())
+        # slot 2
         self.splitter.addWidget(self.setting.camera_all_setting())
         self.splitter.setHidden(not self.config.show)
 
