@@ -59,3 +59,25 @@ class ViewPort:
         self.splitter = QtWidgets.QSplitter()
         self.splitter.addWidget(self.view3d.renderer)
         self.splitter.addWidget(self.sidebar.splitter)
+
+class CameraSettings:
+    def __init__(self) -> None:
+        self.layout = QtWidgets.QVBoxLayout()
+        self.widget = QtWidgets.QFrame()
+        self.widget.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
+        self.widget.setLayout(self.layout)
+
+        fov = DoubleSpinnerWidget("FOV", 50, 10, 80)
+        near = DoubleSpinnerWidget("NEAR", 0.1, 0.001, 1000)
+        far = DoubleSpinnerWidget("FAR", 1000, 1, 10000000)
+        target = CameraTargetWidget()
+        location = CameraLocationWidget()
+
+        self.layout.addWidget(target.widget)
+        self.layout.addWidget(location.widget)
+        self.layout.addWidget(fov.widget)
+        self.layout.addWidget(near.widget)
+        self.layout.addWidget(far.widget)
+        self.layout.setSpacing(8)
+        self.layout.setContentsMargins(8, 8, 8, 8)
+        self.layout.addStretch()
