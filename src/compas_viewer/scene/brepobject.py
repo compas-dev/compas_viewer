@@ -3,9 +3,9 @@ from typing import Optional
 from compas.datastructures import Mesh
 from compas.geometry import Line
 from compas.geometry import Point
+from compas.itertools import pairwise
 from compas.scene import GeometryObject
 from compas.tolerance import TOL
-from compas.utilities import pairwise
 
 from .geometryobject import GeometryObject as ViewerGeometryObject
 

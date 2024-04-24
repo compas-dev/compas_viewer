@@ -82,7 +82,6 @@ def register_scene_objects():
     register(Ellipse, EllipseObject, context="Viewer")
     register(Cone, ConeObject, context="Viewer")
     register(Capsule, CapsuleObject, context="Viewer")
-    register(NurbsSurface, NurbsSurfaceObject, context="Viewer")
     register(list[Union[Geometry, Mesh]], CollectionObject, context="Viewer")
 
     try:
@@ -90,6 +89,8 @@ def register_scene_objects():
         from .brepobject import BRepObject
 
         register(OCCBrep, BRepObject, context="Viewer")
+        register(NurbsSurface, NurbsSurfaceObject, context="Viewer")
+
     except ImportError:
         pass
 
