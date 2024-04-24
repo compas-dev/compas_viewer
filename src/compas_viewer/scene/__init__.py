@@ -46,7 +46,6 @@ from .cylinderobject import CylinderObject
 from .ellipseobject import EllipseObject
 from .coneobject import ConeObject
 from .capsuleobject import CapsuleObject
-from .nurbssurfaceobject import NurbsSurfaceObject
 from .collectionobject import CollectionObject
 from .geometryobject import GeometryObject
 
@@ -87,6 +86,7 @@ def register_scene_objects():
     try:
         from compas_occ.brep import OCCBrep
         from .brepobject import BRepObject
+        from .nurbssurfaceobject import NurbsSurfaceObject
 
         register(OCCBrep, BRepObject, context="Viewer")
         register(NurbsSurface, NurbsSurfaceObject, context="Viewer")
