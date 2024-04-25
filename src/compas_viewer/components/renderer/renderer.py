@@ -330,6 +330,9 @@ class Renderer(QOpenGLWidget):
         if pinch:
             self.viewer.controller.pinch_action(self, pinch)
             self.update()
+            return True
+        else:
+            return False
 
     def wheelEvent(self, event: QWheelEvent):
         """
