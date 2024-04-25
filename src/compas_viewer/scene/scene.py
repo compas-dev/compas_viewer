@@ -192,4 +192,5 @@ class ViewerScene(Scene):
             **kwargs,
         )
 
+        sceneobject.init()
         return sceneobject

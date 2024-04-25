@@ -20,9 +20,9 @@ def deform_mesh(frame):
         vertex[1] += random() - 0.5
         vertex[2] += random() - 0.5
         mesh.vertex_attributes(v, "xyz", vertex)
-    obj.init()
+    obj.init() # ???
     obj.update()
     print(frame)
 
-
+viewer.renderer.camera.zoom_extents()
 viewer.show()

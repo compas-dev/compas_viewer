@@ -21,6 +21,7 @@ from compas.geometry import Vector
 if TYPE_CHECKING:
     # https://peps.python.org/pep-0484/#runtime-or-type-checking
     from .renderer import Renderer
+    from compas_viewer.scene import ViewerSceneObject
 
 
 class Position(Vector):
@@ -422,3 +423,35 @@ class Camera:
         R = Rotation.from_euler_angles(self.rotation)
         W = T * R
         return list(asfortranarray(W.inverted(), dtype=float32))
+
+    def zoom_extents(self, objects: Optional[list["ViewerSceneObject"]] = None):
+
+        print(objects)
+
+        if not objects:
+            objects = self.renderer.scene.objects
+
+        print(objects)
+
+        extents = []
+
+        for obj in objects:
+            if hasattr(obj, "bounding_box"):
+                extents.append(obj.bounding_box)
+
+        extents = array(extents)
+        print(extents)
+        extents = extents.reshape(-1, 3)
+        max_corner = extents.max(axis=0)
+        min_corner = extents.min(axis=0)
+        self.config.scale = float(
+            (norm(max_corner - min_corner)) / 10
+        )  # 10 is a tunned magic number
+        center = (max_corner + min_corner) / 2
+        distance = max(norm(max_corner - min_corner), 1)
+
+        self.target = center
+        vec = (self.target - self.position) / norm(
+            self.target - self.position
+        )
+        self.position = self.target - vec * distance

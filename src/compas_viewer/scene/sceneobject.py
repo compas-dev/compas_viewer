@@ -145,6 +145,9 @@ class ViewerSceneObject(SceneObject):
         self._frontfaces_buffer: [dict[str, Any]] = None  # type: ignore
         self._backfaces_buffer: [dict[str, Any]] = None  # type: ignore
 
+        # system
+        self._initiated = False
+
     @property
     def is_locked(self):
         return self._is_locked
@@ -160,6 +163,8 @@ class ViewerSceneObject(SceneObject):
 
     @property
     def bounding_box(self):
+        if self._bounding_box is None:
+            self._update_bounding_box()
         return self._bounding_box
 
     @property
@@ -289,12 +294,16 @@ class ViewerSceneObject(SceneObject):
 
     def init(self):
         """Initialize the object"""
+        if self._initiated:
+            return
+
         self._points_data = self._read_points_data()
         self._lines_data = self._read_lines_data()
         self._frontfaces_data = self._read_frontfaces_data()
         self._backfaces_data = self._read_backfaces_data()
         self.make_buffers()
         self._update_matrix()
+        self._initiated = True
 
     def update(self, update_positions: bool = True, update_colors: bool = True, update_elements: bool = True):
         """Update the object.
