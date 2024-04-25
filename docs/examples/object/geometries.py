@@ -1,9 +1,23 @@
 import time
 
 from compas.colors import Color
-from compas.geometry import (Box, Capsule, Circle, Cone, Cylinder, Ellipse,
-                             Frame, NurbsSurface, Plane, Point, Polyline,
-                             Sphere, Torus, Translation, Vector)
+from compas.geometry import (
+    Box,
+    Capsule,
+    Circle,
+    Cone,
+    Cylinder,
+    Ellipse,
+    Frame,
+    NurbsSurface,
+    Plane,
+    Point,
+    Polyline,
+    Sphere,
+    Torus,
+    Translation,
+    Vector,
+)
 from compas_occ.brep import OCCBrep
 from compas_viewer import Viewer
 
@@ -26,9 +40,7 @@ obj = viewer.scene.add(
 obj.transformation = Translation.from_vector(Vector(-1.5, -1.5, 0.0))
 
 plane = Plane([0, 0, 0], [0, 0, 1])
-obj = viewer.scene.add(
-    plane, size=0.5, linecolor=Color(0.5, 0.0, 0.0), surfacecolor=Color(0.0, 0.0, 0.5)
-)
+obj = viewer.scene.add(plane, size=0.5, linecolor=Color(0.5, 0.0, 0.0), surfacecolor=Color(0.0, 0.0, 0.5))
 obj.transformation = Translation.from_vector(Vector(5, 0.0, 0.0))
 
 circle = Circle(0.8, Frame.worldXY())
@@ -53,15 +65,11 @@ cx = OCCBrep.from_cylinder(Cylinder(0.5, 8, frame=Frame.worldYZ()))
 cy = OCCBrep.from_cylinder(Cylinder(0.5, 8, frame=Frame.worldZX()))
 cz = OCCBrep.from_cylinder(Cylinder(0.5, 8, frame=Frame.worldXY()))
 result = box - (cx + cy + cz)
-obj = viewer.scene.add(
-    item=result, surfacecolor=Color(0.0, 0.5, 0.5), use_vertexcolors=False
-)
+obj = viewer.scene.add(item=result, surfacecolor=Color(0.0, 0.5, 0.5), use_vertexcolors=False)
 obj.transformation = Translation.from_vector(Vector(10, 5, 0))
 
 capsule = Capsule(0.8, 1)
-obj = viewer.scene.add(
-    item=capsule, surfacecolor=Color(0.0, 0.0, 0.5), show_lines=False
-)
+obj = viewer.scene.add(item=capsule, surfacecolor=Color(0.0, 0.0, 0.5), show_lines=False)
 obj.transformation = Translation.from_vector(Vector(0, 10, 0))
 
 box = Box(1, 1, 1, Frame.worldXY())
@@ -81,9 +89,7 @@ points = [
     [-0.5, 0.5, 0],
     [-0.5, -0.5, 0],
 ]
-obj = viewer.scene.add(
-    Polyline(points), surfacecolor=Color(0.0, 0.0, 0.5), show_points=True
-)
+obj = viewer.scene.add(Polyline(points), surfacecolor=Color(0.0, 0.0, 0.5), show_points=True)
 obj.transformation = Translation.from_vector(Vector(10, 10, 0))
 
 torus = Torus(radius_axis=1, radius_pipe=0.5)
