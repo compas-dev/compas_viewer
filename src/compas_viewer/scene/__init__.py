@@ -9,6 +9,7 @@ from compas.datastructures import Mesh
 from compas.datastructures import Graph
 from compas.geometry import (
     Point,
+    Pointcloud,
     Line,
     Vector,
     Circle,
@@ -31,6 +32,7 @@ from .sceneobject import ViewerSceneObject
 from .meshobject import MeshObject
 from .graphobject import GraphObject
 from .pointobject import PointObject
+from .pointcloudobject import PointcloudObject
 from .lineobject import LineObject
 from .vectorobject import VectorObject
 from .tagobject import TagObject, Tag
@@ -66,6 +68,7 @@ def register_scene_objects():
     register(Mesh, MeshObject, context="Viewer")
     register(Graph, GraphObject, context="Viewer")
     register(Point, PointObject, context="Viewer")
+    register(Pointcloud, PointcloudObject, context="Viewer")
     register(Line, LineObject, context="Viewer")
     register(Tag, TagObject, context="Viewer")
     register(Frame, FrameObject, context="Viewer")
