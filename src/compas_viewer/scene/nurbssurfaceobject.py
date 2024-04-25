@@ -1,10 +1,14 @@
 from typing import Optional
 
+from compas_occ.brep import OCCBrep
+
 from compas.datastructures import Mesh
 from compas.geometry import Line
 from compas.geometry import NurbsSurface
 from compas.geometry import Point
+from compas.itertools import pairwise
 from compas.scene import GeometryObject
+from compas.tolerance import TOL
 
 from .geometryobject import GeometryObject as ViewerGeometryObject
 
@@ -20,28 +24,25 @@ class NurbsSurfaceObject(ViewerGeometryObject, GeometryObject):
     def __init__(self, surface: NurbsSurface, **kwargs):
         super().__init__(geometry=surface, **kwargs)
         self.geometry: NurbsSurface
+        self._brep: OCCBrep = OCCBrep.from_surface(self.geometry)
+        self._viewmesh, self._boundaries = self._brep.to_tesselation(TOL.lineardeflection)
 
     @property
     def points(self) -> Optional[list[Point]]:
         """The points to be shown in the viewer."""
-        points = []
-        for row in self.geometry.points:
-            points.extend(row)
-        return points
+        return self._brep.points
 
     @property
     def lines(self) -> Optional[list[Line]]:
         """The lines to be shown in the viewer."""
         lines = []
-        for row in self.geometry.points:
-            for i in range(len(row) - 1):
-                lines.append(Line(row[i], row[i + 1]))
-        for col in zip(*self.geometry.points):
-            for i in range(len(col) - 1):
-                lines.append(Line(col[i], col[i + 1]))
+        for polyline in self._boundaries:
+            for pair in pairwise(polyline.points):
+                lines.append(Line(*pair))
+
         return lines
 
     @property
     def viewmesh(self) -> Mesh:
         """The mesh volume to be shown in the viewer."""
-        return self.geometry.to_tesselation()
+        return self._viewmesh
