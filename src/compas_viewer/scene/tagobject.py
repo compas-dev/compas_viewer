@@ -202,15 +202,7 @@ class TagObject(ViewerSceneObject, GeometryObject):
 
     def _calculate_text_height(self, camera_position):
         if self.geometry.absolute_height:
-            return int(
-                (10 * self.geometry.height)
-                / float(
-                    linalg.norm(
-                        array(self.geometry.position)
-                        - array([camera_position.x, camera_position.y, camera_position.z])
-                    )
-                )
-            )
+            return int((10 * self.geometry.height) / float(linalg.norm(array(self.geometry.position) - array([camera_position.x, camera_position.y, camera_position.z]))))
 
         else:
             return self.geometry.height

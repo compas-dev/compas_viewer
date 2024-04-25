@@ -71,16 +71,10 @@ class Controller:
         dy = self.mouse.dy()
 
         # Drag selection
-        if (
-            event.buttons() == self.config.drag_selection.mouse
-            and event.modifiers() == self.config.drag_selection.modifier
-        ):
+        if event.buttons() == self.config.drag_selection.mouse and event.modifiers() == self.config.drag_selection.modifier:
             renderer.selector.on_drag_selection = True
         # Drag deselection
-        elif (
-            event.buttons() == self.config.drag_deselection.mouse
-            and event.modifiers() == self.config.drag_deselection.modifier
-        ):
+        elif event.buttons() == self.config.drag_deselection.mouse and event.modifiers() == self.config.drag_deselection.modifier:
             renderer.selector.on_drag_selection = True
         # Pan
         elif event.buttons() == self.config.pan.mouse and event.modifiers() == self.config.pan.modifier:
@@ -107,35 +101,23 @@ class Controller:
         self.mouse.last_pos = event.pos()
 
         # Drag selection: not in the elif.
-        if (
-            event.buttons() == self.config.drag_selection.mouse
-            and event.modifiers() == self.config.drag_selection.modifier
-        ):
+        if event.buttons() == self.config.drag_selection.mouse and event.modifiers() == self.config.drag_selection.modifier:
             renderer.selector.drag_start_pt = event.pos()
         # Drag deselection
-        elif (
-            event.buttons() == self.config.drag_deselection.mouse
-            and event.modifiers() == self.config.drag_deselection.modifier
-        ):
+        elif event.buttons() == self.config.drag_deselection.mouse and event.modifiers() == self.config.drag_deselection.modifier:
             renderer.selector.drag_start_pt = event.pos()
 
         # Select: single left click.
         if event.buttons() == Qt.MouseButton.LeftButton and event.modifiers() == Qt.KeyboardModifier.NoModifier:
             renderer.selector.select.emit()
         # Multiselect
-        elif (
-            event.buttons() == self.config.multiselect.mouse and event.modifiers() == self.config.multiselect.modifier
-        ):
+        elif event.buttons() == self.config.multiselect.mouse and event.modifiers() == self.config.multiselect.modifier:
             renderer.selector.multiselect.emit()
         # Deselect
         elif event.buttons() == self.config.deselect.mouse and event.modifiers() == self.config.deselect.modifier:
             renderer.selector.deselect.emit()
         # Pan
-        elif (
-            event.buttons() == self.config.pan.mouse
-            and event.modifiers() == self.config.pan.modifier
-            and event.modifiers() != self.config.rotate.modifier
-        ):
+        elif event.buttons() == self.config.pan.mouse and event.modifiers() == self.config.pan.modifier and event.modifiers() != self.config.rotate.modifier:
             QApplication.setOverrideCursor(Qt.CursorShape.OpenHandCursor)
         # Rotate
         elif event.buttons() == self.config.rotate.mouse and event.modifiers() == self.config.rotate.modifier:

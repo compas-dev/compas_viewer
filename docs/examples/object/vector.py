@@ -1,4 +1,6 @@
-from math import cos, radians, sin
+from math import cos
+from math import radians
+from math import sin
 from random import random
 
 from compas.colors import Color

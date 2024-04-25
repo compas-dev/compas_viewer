@@ -1,6 +1,5 @@
 from compas.geometry import Frame
 from compas.geometry import Sphere
-
 from compas_viewer import Viewer
 from compas_viewer.layout import Treeform
 

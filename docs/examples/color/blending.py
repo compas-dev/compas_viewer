@@ -3,7 +3,8 @@ from random import random
 import compas
 from compas.colors import Color
 from compas.datastructures import Mesh
-from compas.geometry import Scale, Translation
+from compas.geometry import Scale
+from compas.geometry import Translation
 from compas_viewer import Viewer
 
 viewer = Viewer()

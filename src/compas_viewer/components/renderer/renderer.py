@@ -418,9 +418,7 @@ class Renderer(QOpenGLWidget):
         for obj in self.scene.objects:
             obj.init()
 
-        projection = self.camera.projection(
-            self.viewer.layout.config.window.width, self.viewer.layout.config.window.height
-        )
+        projection = self.camera.projection(self.viewer.layout.config.window.width, self.viewer.layout.config.window.height)
         viewworld = self.camera.viewworld()
         transform = list(identity(4, dtype=float32))
         # create the program
@@ -449,9 +447,7 @@ class Renderer(QOpenGLWidget):
         self.shader_arrow.uniform4x4("viewworld", viewworld)
         self.shader_arrow.uniform4x4("transform", transform)
         self.shader_arrow.uniform1f("opacity", self.opacity)
-        self.shader_arrow.uniform1f(
-            "aspect", self.viewer.layout.config.window.width / self.viewer.layout.config.window.height
-        )
+        self.shader_arrow.uniform1f("aspect", self.viewer.layout.config.window.width / self.viewer.layout.config.window.height)
         self.shader_arrow.release()
 
         self.shader_instance = Shader(name="instance")
@@ -549,9 +545,7 @@ class Renderer(QOpenGLWidget):
         return opaque_objects + list(transparent_objects)
 
     @lru_cache(maxsize=3)
-    def sort_objects_from_category(
-        self, objs: tuple["MeshObject"]
-    ) -> tuple[list["TagObject"], list["VectorObject"], list["MeshObject"]]:
+    def sort_objects_from_category(self, objs: tuple["MeshObject"]) -> tuple[list["TagObject"], list["VectorObject"], list["MeshObject"]]:
         """Sort objects by their categories
 
         Returns
@@ -607,9 +601,7 @@ class Renderer(QOpenGLWidget):
         viewworld = self.camera.viewworld()
         self.update_projection()
         # Object categorization
-        tag_objs, vector_objs, mesh_objs = self.sort_objects_from_category(
-            (obj for obj in self.scene.objects if obj.is_visible)
-        )
+        tag_objs, vector_objs, mesh_objs = self.sort_objects_from_category((obj for obj in self.scene.objects if obj.is_visible))
 
         # Draw model objects in the scene
         self.shader_model.bind()

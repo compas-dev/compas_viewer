@@ -43,12 +43,7 @@ class CircleObject(ViewerGeometryObject, GeometryObject):
     @property
     def lines(self) -> Optional[list[Line]]:
         """The lines to be shown in the viewer."""
-        return [
-            Line(*pair)
-            for pair in pairwise(
-                self._calculate_circle_points(self.geometry) + [self._calculate_circle_points(self.geometry)[0]]
-            )
-        ]
+        return [Line(*pair) for pair in pairwise(self._calculate_circle_points(self.geometry) + [self._calculate_circle_points(self.geometry)[0]])]
 
     @property
     def viewmesh(self):

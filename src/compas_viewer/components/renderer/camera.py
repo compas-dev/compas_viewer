@@ -277,9 +277,7 @@ class Camera:
         new_direction_pitch /= new_direction_pitch_distance
 
         angle_z = atan2(det([old_direction_xy, new_direction_xy]), dot(old_direction_xy, new_direction_xy))
-        angle_x = -atan2(
-            det([old_direction_pitch, new_direction_pitch]), dot(old_direction_pitch, new_direction_pitch)
-        )
+        angle_x = -atan2(det([old_direction_pitch, new_direction_pitch]), dot(old_direction_pitch, new_direction_pitch))
 
         new_rotation = self.rotation + [angle_x or 0, 0, angle_z or 0]
         self.rotation.set(*new_rotation, pause_update=True)
@@ -351,9 +349,7 @@ class Camera:
             with each increment the size of :attr:`Camera.pan_delta`.
         """
         R = Rotation.from_euler_angles(self.rotation)
-        T = Translation.from_vector(
-            [-dx * self.config.pan_delta * self.config.scale, dy * self.config.pan_delta * self.config.scale, 0]
-        )
+        T = Translation.from_vector([-dx * self.config.pan_delta * self.config.scale, dy * self.config.pan_delta * self.config.scale, 0])
         M = (R * T).matrix
         vector = [M[i][3] for i in range(3)]
         self.target += vector
@@ -392,17 +388,13 @@ class Camera:
         """
         aspect = width / height
         if self.renderer.viewmode == "perspective":
-            P = self.perspective(
-                self.config.fov, aspect, self.config.near * self.config.scale, self.config.far * self.config.scale
-            )
+            P = self.perspective(self.config.fov, aspect, self.config.near * self.config.scale, self.config.far * self.config.scale)
         else:
             left = -self.distance
             right = self.distance
             bottom = -self.distance / aspect
             top = self.distance / aspect
-            P = self.ortho(
-                left, right, bottom, top, self.config.near * self.config.scale, self.config.far * self.config.scale
-            )
+            P = self.ortho(left, right, bottom, top, self.config.near * self.config.scale, self.config.far * self.config.scale)
         return list(asfortranarray(P, dtype=float32))
 
     def viewworld(self) -> list[list[float]]:

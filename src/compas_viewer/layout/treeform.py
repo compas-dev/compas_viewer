@@ -118,9 +118,7 @@ class Treeform(QTreeWidget):
 
             if self._backgrounds:
                 for col, background in self._backgrounds.items():
-                    node.attributes["widget_item"].setBackground(
-                        list(self.columns.keys()).index(col), QColor(*background(node).rgb255)
-                    )
+                    node.attributes["widget_item"].setBackground(list(self.columns.keys()).index(col), QColor(*background(node).rgb255))
 
     def update(self):
         self.tree = self._tree

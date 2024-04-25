@@ -1,5 +1,4 @@
 from compas.geometry import Torus
-
 from compas_viewer import Viewer
 
 viewer = Viewer(rendermode="lighted")

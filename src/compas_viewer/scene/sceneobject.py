@@ -363,9 +363,7 @@ class ViewerSceneObject(SceneObject):
                 return
 
         _positions = array(positions)
-        self._bounding_box = list(
-            transform_points_numpy(array([_positions.min(axis=0), _positions.max(axis=0)]), self.worldtransformation)
-        )
+        self._bounding_box = list(transform_points_numpy(array([_positions.min(axis=0), _positions.max(axis=0)]), self.worldtransformation))
         self._bounding_box_center = Point(*list(average(a=array(self.bounding_box), axis=0)))
 
     def draw(self, shader: Shader, wireframe: bool, is_lighted: bool):
@@ -392,9 +390,7 @@ class ViewerSceneObject(SceneObject):
         if self._backfaces_buffer is not None and not wireframe and self.show_faces:
             shader.bind_attribute("position", self._backfaces_buffer["positions"])
             shader.bind_attribute("color", self._backfaces_buffer["colors"], step=4)
-            shader.draw_triangles(
-                elements=self._backfaces_buffer["elements"], n=self._backfaces_buffer["n"], background=self.background
-            )
+            shader.draw_triangles(elements=self._backfaces_buffer["elements"], n=self._backfaces_buffer["n"], background=self.background)
         shader.uniform1i("is_lighted", False)
         shader.uniform1i("element_type", 1)
         # Lines
@@ -436,9 +432,7 @@ class ViewerSceneObject(SceneObject):
         # Points
         if self._points_buffer is not None and self.show_points:
             shader.bind_attribute("position", self._points_buffer["positions"])
-            shader.draw_points(
-                size=self.pointssize, elements=self._points_buffer["elements"], n=self._points_buffer["n"]
-            )
+            shader.draw_points(size=self.pointssize, elements=self._points_buffer["elements"], n=self._points_buffer["n"])
         # Lines
         if self._lines_buffer is not None and (self.show_lines or wireframe):
             shader.bind_attribute("position", self._lines_buffer["positions"])

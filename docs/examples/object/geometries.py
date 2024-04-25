@@ -1,24 +1,21 @@
-import time
+from compas_occ.brep import OCCBrep
 
 from compas.colors import Color
-from compas.geometry import (
-    Box,
-    Capsule,
-    Circle,
-    Cone,
-    Cylinder,
-    Ellipse,
-    Frame,
-    NurbsSurface,
-    Plane,
-    Point,
-    Polyline,
-    Sphere,
-    Torus,
-    Translation,
-    Vector,
-)
-from compas_occ.brep import OCCBrep
+from compas.geometry import Box
+from compas.geometry import Capsule
+from compas.geometry import Circle
+from compas.geometry import Cone
+from compas.geometry import Cylinder
+from compas.geometry import Ellipse
+from compas.geometry import Frame
+from compas.geometry import NurbsSurface
+from compas.geometry import Plane
+from compas.geometry import Point
+from compas.geometry import Polyline
+from compas.geometry import Sphere
+from compas.geometry import Torus
+from compas.geometry import Translation
+from compas.geometry import Vector
 from compas_viewer import Viewer
 
 viewer = Viewer(rendermode="lighted", fullscreen=True)
