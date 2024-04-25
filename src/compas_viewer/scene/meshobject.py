@@ -7,8 +7,8 @@ from compas.colors import Color
 from compas.datastructures import Mesh
 from compas.geometry import centroid_points
 from compas.geometry import is_coplanar
+from compas.itertools import pairwise
 from compas.scene import MeshObject as BaseMeshObject
-from compas.utilities import pairwise
 
 from .sceneobject import ShaderDataType
 from .sceneobject import ViewerSceneObject

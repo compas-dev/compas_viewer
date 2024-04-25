@@ -10,8 +10,8 @@ from compas.colors import Color
 from compas.geometry import Point
 from compas.geometry import Transformation
 from compas.geometry import transform_points_numpy
+from compas.itertools import flatten
 from compas.scene import SceneObject
-from compas.utilities import flatten
 from compas_viewer.components.renderer.shaders import Shader
 from compas_viewer.gl import make_index_buffer
 from compas_viewer.gl import make_vertex_buffer
