@@ -593,7 +593,6 @@ document.write(`
 <span class="kn">from</span> <span class="nn">compas.geometry</span> <span class="kn">import</span> <span class="n">Bezier</span>
 <span class="kn">from</span> <span class="nn">compas.geometry</span> <span class="kn">import</span> <span class="n">Point</span>
 <span class="kn">from</span> <span class="nn">compas.geometry</span> <span class="kn">import</span> <span class="n">Polyline</span>
-
 <span class="kn">from</span> <span class="nn">compas_viewer</span> <span class="kn">import</span> <span class="n">Viewer</span>
 <span class="kn">from</span> <span class="nn">compas_viewer.layout</span> <span class="kn">import</span> <span class="n">Slider</span>
 <span class="kn">from</span> <span class="nn">compas_viewer.scene</span> <span class="kn">import</span> <span class="n">PointObject</span>
@@ -616,9 +615,7 @@ document.write(`
     <span class="n">viewer</span><span class="o">.</span><span class="n">renderer</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
 
 
-<span class="n">viewer</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">sidedock</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span>
-    <span class="n">Slider</span><span class="p">(</span><span class="n">slide</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Slide Point&quot;</span><span class="p">,</span> <span class="n">additional_var</span><span class="o">=</span><span class="s2">&quot;Slide the point along the curve at &quot;</span><span class="p">)</span>
-<span class="p">)</span>
+<span class="n">viewer</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">sidedock</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">Slider</span><span class="p">(</span><span class="n">slide</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Slide Point&quot;</span><span class="p">,</span> <span class="n">additional_var</span><span class="o">=</span><span class="s2">&quot;Slide the point along the curve at &quot;</span><span class="p">))</span>
 
 
 <span class="n">viewer</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
