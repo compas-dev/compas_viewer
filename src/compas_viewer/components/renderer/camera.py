@@ -3,14 +3,8 @@ from math import radians
 from math import tan
 from typing import TYPE_CHECKING
 from typing import Callable
-
 from typing import Optional
 
-
-from compas.geometry import Rotation
-from compas.geometry import Transformation
-from compas.geometry import Translation
-from compas.geometry import Vector
 from numpy import array
 from numpy import asfortranarray
 from numpy import dot
@@ -18,6 +12,11 @@ from numpy import float32
 from numpy import pi
 from numpy.linalg import det
 from numpy.linalg import norm
+
+from compas.geometry import Rotation
+from compas.geometry import Transformation
+from compas.geometry import Translation
+from compas.geometry import Vector
 
 if TYPE_CHECKING:
     # https://peps.python.org/pep-0484/#runtime-or-type-checking
@@ -350,19 +349,17 @@ class Camera:
             with each increment the size of :attr:`Camera.pan_delta`.
         """
         R = Rotation.from_euler_angles(self.rotation)
-        T = Translation.from_vector(
-            [-dx * self.config.pan_delta * self.config.scale, dy * self.config.pan_delta * self.config.scale, 0]
-        )
+        T = Translation.from_vector([-dx * self.config.pan_delta * self.config.scale, dy * self.config.pan_delta * self.config.scale, 0])
         M = (R * T).matrix
         vector = [M[i][3] for i in range(3)]
         self.target += vector
 
-    def zoom(self, steps: int = 1):
+    def zoom(self, steps: float = 1):
         """Zoom in or out.
 
         Parameters
         ----------
-        steps : int
+        steps : float
             The number of zoom increments, with each increment the size
             of :attr:`compas_viewer.components.renderer.Camera.config.zoomdelta`.
 
@@ -391,17 +388,13 @@ class Camera:
         """
         aspect = width / height
         if self.renderer.viewmode == "perspective":
-            P = self.perspective(
-                self.config.fov, aspect, self.config.near * self.config.scale, self.config.far * self.config.scale
-            )
+            P = self.perspective(self.config.fov, aspect, self.config.near * self.config.scale, self.config.far * self.config.scale)
         else:
             left = -self.distance
             right = self.distance
             bottom = -self.distance / aspect
             top = self.distance / aspect
-            P = self.ortho(
-                left, right, bottom, top, self.config.near * self.config.scale, self.config.far * self.config.scale
-            )
+            P = self.ortho(left, right, bottom, top, self.config.near * self.config.scale, self.config.far * self.config.scale)
         return list(asfortranarray(P, dtype=float32))
 
     def viewworld(self) -> list[list[float]]:

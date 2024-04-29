@@ -1,4 +1,5 @@
 from PySide6.QtGui import QDesktopServices
+
 from .action import Action
 
 

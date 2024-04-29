@@ -3,7 +3,6 @@ from typing import Literal
 from typing import TypedDict
 
 from compas.colors import Color
-
 from compas_viewer import HERE
 
 from .config import Config

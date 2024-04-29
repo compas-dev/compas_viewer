@@ -9,6 +9,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Added `PointcloudObject`.
+
+### Changed
+
+* removed `PyOpenGL-accelerate` from requirements.txt
+* Changed `NurbsSurfaceObject` to use tessellation function of `OCCBrep`, show boundary curves instead of control curves.
+* Automatically hide `sidedock` when it is empty.
+
+### Removed
+
+
+## [1.1.2] 2024-04-22
+
+### Added
+
+### Changed
+
+### Removed
+
+
+## [1.1.1] 2024-04-22
+
+### Added
+
+* Added non-python files to the release.
+
+### Changed
+
+### Removed
+
+
+## [1.1.0] 2024-04-22
+
+### Added
+
 * Added `*args` in the `Viewer.add` method, resolve [#85](https://github.com/compas-dev/compas_viewer/issues/85).
 * Added `Transformation` and `Visualization` sections for the `Propertyform`.
 * Added `Propertyform` and its example in the documentation.
@@ -16,6 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added functionality of multiple widgets in main viewport.
 * Added example `object/scale.py`.
 * Added `RobotModelObject` and its example in the documentation.
+* Added support to pinch gesture for zooming on touch pads.
 
 ### Changed
 * Pin the `PySide6` version to `6.6.1`.
@@ -36,7 +72,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Changed to the point object is `show_points = True` by default. Refer to [#73](https://github.com/compas-dev/compas_viewer/issues/73).
 * Changed from `super(__t, __obj)` to `super()` as the new version.
 * Temporarily removed `rgba` which is causing blank screen for macos.
-* Automatically hide `sidedock` when it is empty.
 
 ### Removed
 * Removed `utilities` folder.

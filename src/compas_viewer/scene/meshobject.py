@@ -7,8 +7,8 @@ from compas.colors import Color
 from compas.datastructures import Mesh
 from compas.geometry import centroid_points
 from compas.geometry import is_coplanar
+from compas.itertools import pairwise
 from compas.scene import MeshObject as BaseMeshObject
-from compas.utilities import pairwise
 
 from .sceneobject import ShaderDataType
 from .sceneobject import ViewerSceneObject
@@ -58,18 +58,14 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
         facecolor: Optional[ColorDictValueType] = None,
         hide_coplanaredges: Optional[bool] = None,
         use_vertexcolors: Optional[bool] = None,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(mesh=mesh, **kwargs)
 
         self.mesh: Mesh
 
-        self.hide_coplanaredges = (
-            hide_coplanaredges if hide_coplanaredges is not None else self.viewer.config.hide_coplanaredges
-        )
-        self.use_vertexcolors = (
-            use_vertexcolors if use_vertexcolors is not None else self.viewer.config.use_vertexcolors
-        )
+        self.hide_coplanaredges = hide_coplanaredges if hide_coplanaredges is not None else self.viewer.config.hide_coplanaredges
+        self.use_vertexcolors = use_vertexcolors if use_vertexcolors is not None else self.viewer.config.use_vertexcolors
 
         if not vertexcolor:
             self.vertexcolor = self.viewer.config.pointcolor

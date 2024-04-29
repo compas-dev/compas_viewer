@@ -2,7 +2,6 @@ import random
 
 from compas.colors import Color
 from compas.geometry import Polyline
-
 from compas_viewer import Viewer
 
 viewer = Viewer()

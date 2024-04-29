@@ -1,4 +1,5 @@
 from compas_occ.brep import OCCBrep
+
 from compas.geometry import Box
 from compas.geometry import Frame
 from compas_viewer import Viewer

@@ -2,8 +2,6 @@ import time
 from functools import lru_cache
 from typing import TYPE_CHECKING
 
-from compas.geometry import Frame
-from compas.geometry import transform_points_numpy
 from numpy import float32
 from numpy import identity
 from OpenGL import GL
@@ -13,6 +11,8 @@ from PySide6.QtGui import QMouseEvent
 from PySide6.QtGui import QWheelEvent
 from PySide6.QtOpenGLWidgets import QOpenGLWidget
 
+from compas.geometry import Frame
+from compas.geometry import transform_points_numpy
 from compas_viewer.configurations import RendererConfig
 from compas_viewer.scene import TagObject
 from compas_viewer.scene.collectionobject import CollectionObject
@@ -68,6 +68,7 @@ class Renderer(QOpenGLWidget):
         self.grid: "GridObject"
 
         self.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
+        self.grabGesture(QtCore.Qt.PinchGesture)
 
     @property
     def rendermode(self):
@@ -156,7 +157,8 @@ class Renderer(QOpenGLWidget):
 
         References
         ----------
-        * https://doc.qt.io/qtforpython-6/PySide6/QtOpenGL/QOpenGLWindow.html#PySide6.QtOpenGL.PySide6.QtOpenGL.QOpenGLWindow.initializeGL # noqa: E501
+        * https://doc.qt.io/qtforpython-6/PySide6/QtOpenGL/QOpenGLWindow.html#PySide6.QtOpenGL.PySide6.QtOpenGL.QOpenGLWindow.initializeGL
+
         """
         GL.glClearColor(*self.config.backgroundcolor.rgba)
         GL.glPolygonOffset(1.0, 1.0)
@@ -189,7 +191,8 @@ class Renderer(QOpenGLWidget):
 
         References
         ----------
-        * https://doc.qt.io/qtforpython-6/PySide6/QtOpenGL/QOpenGLWindow.html#PySide6.QtOpenGL.PySide6.QtOpenGL.QOpenGLWindow.resizeGL # noqa: E501
+        * https://doc.qt.io/qtforpython-6/PySide6/QtOpenGL/QOpenGLWindow.html#PySide6.QtOpenGL.PySide6.QtOpenGL.QOpenGLWindow.resizeGL
+
         """
         self.viewer.layout.config.window.width = w
         self.viewer.layout.config.window.height = h
@@ -212,7 +215,8 @@ class Renderer(QOpenGLWidget):
 
         References
         ----------
-        * https://doc.qt.io/qtforpython-6/PySide6/QtOpenGL/QOpenGLWindow.html#PySide6.QtOpenGL.PySide6.QtOpenGL.QOpenGLWindow.paintGL # noqa: E501
+        * https://doc.qt.io/qtforpython-6/PySide6/QtOpenGL/QOpenGLWindow.html#PySide6.QtOpenGL.PySide6.QtOpenGL.QOpenGLWindow.paintGL
+
         """
         self.clear()
         if is_instance or self.rendermode == "instance":
@@ -229,6 +233,19 @@ class Renderer(QOpenGLWidget):
     # ==========================================================================
     # Event
     # ==========================================================================
+    def event(self, event):
+        """
+        Event handler for the renderer. Customised to capture multi-touch gestures.
+
+        Parameters
+        ----------
+        event : :PySide6:`PySide6/QtCore/QEvent`
+            The Qt event.
+
+        """
+        if event.type() == QtCore.QEvent.Gesture:
+            return self.gestureEvent(event)
+        return super().event(event)
 
     def mouseMoveEvent(self, event: QMouseEvent):
         """
@@ -247,7 +264,8 @@ class Renderer(QOpenGLWidget):
 
         References
         ----------
-        * https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QWidget.html#PySide6.QtWidgets.PySide6.QtWidgets.QWidget.mouseMoveEvent # noqa: E501
+        * https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QWidget.html#PySide6.QtWidgets.PySide6.QtWidgets.QWidget.mouseMoveEvent
+
         """
         if self.isActiveWindow() and self.underMouse():
             self.viewer.controller.mouse_move_action(self, event)
@@ -268,7 +286,8 @@ class Renderer(QOpenGLWidget):
 
         References
         ----------
-        * https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QWidget.html#PySide6.QtWidgets.PySide6.QtWidgets.QWidget.mousePressEvent # noqa: E501
+        * https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QWidget.html#PySide6.QtWidgets.PySide6.QtWidgets.QWidget.mousePressEvent
+
         """
         if self.isActiveWindow() and self.underMouse():
             self.viewer.controller.mouse_press_action(self, event)
@@ -289,11 +308,31 @@ class Renderer(QOpenGLWidget):
 
         References
         ----------
-        * https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QWidget.html#PySide6.QtWidgets.PySide6.QtWidgets.QWidget.mouseReleaseEvent # noqa: E501
+        * https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QWidget.html#PySide6.QtWidgets.PySide6.QtWidgets.QWidget.mouseReleaseEvent
+
         """
         if self.isActiveWindow() and self.underMouse():
             self.viewer.controller.mouse_release_action(self, event)
             self.update()
+
+    def gestureEvent(self, event):
+        """
+        Callback for the gesture event which passes the event to the controller.
+
+        Parameters
+        ----------
+        event : :PySide6:`PySide6/QtCore/QEvent`
+            The Qt event.
+
+        """
+        # Handle pinch gestures
+        pinch = event.gesture(QtCore.Qt.PinchGesture)
+        if pinch:
+            self.viewer.controller.pinch_action(self, pinch)
+            self.update()
+            return True
+        else:
+            return False
 
     def wheelEvent(self, event: QWheelEvent):
         """
@@ -310,7 +349,8 @@ class Renderer(QOpenGLWidget):
 
         References
         ----------
-        * https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QWidget.html#PySide6.QtWidgets.PySide6.QtWidgets.QWidget.wheelEvent # noqa: E501
+        * https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QWidget.html#PySide6.QtWidgets.PySide6.QtWidgets.QWidget.wheelEvent
+
         """
         if self.isActiveWindow() and self.underMouse():
             self.viewer.controller.wheel_action(self, event)
@@ -331,7 +371,8 @@ class Renderer(QOpenGLWidget):
 
         References
         ----------
-        * https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QWidget.html#PySide6.QtWidgets.PySide6.QtWidgets.QWidget.keyPressEvent # noqa: E501
+        * https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QWidget.html#PySide6.QtWidgets.PySide6.QtWidgets.QWidget.keyPressEvent
+
         """
         self.viewer.controller.key_press_action(self, event)
 
@@ -350,7 +391,8 @@ class Renderer(QOpenGLWidget):
 
         References
         ----------
-        * https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QWidget.html#PySide6.QtWidgets.PySide6.QtWidgets.QWidget.keyReleaseEvent # noqa: E501
+        * https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QWidget.html#PySide6.QtWidgets.PySide6.QtWidgets.QWidget.keyReleaseEvent
+
         """
         self.viewer.controller.key_release_action(self, event)
 
@@ -376,9 +418,7 @@ class Renderer(QOpenGLWidget):
         for obj in self.scene.objects:
             obj.init()
 
-        projection = self.camera.projection(
-            self.viewer.layout.config.window.width, self.viewer.layout.config.window.height
-        )
+        projection = self.camera.projection(self.viewer.layout.config.window.width, self.viewer.layout.config.window.height)
         viewworld = self.camera.viewworld()
         transform = list(identity(4, dtype=float32))
         # create the program
@@ -407,9 +447,7 @@ class Renderer(QOpenGLWidget):
         self.shader_arrow.uniform4x4("viewworld", viewworld)
         self.shader_arrow.uniform4x4("transform", transform)
         self.shader_arrow.uniform1f("opacity", self.opacity)
-        self.shader_arrow.uniform1f(
-            "aspect", self.viewer.layout.config.window.width / self.viewer.layout.config.window.height
-        )
+        self.shader_arrow.uniform1f("aspect", self.viewer.layout.config.window.width / self.viewer.layout.config.window.height)
         self.shader_arrow.release()
 
         self.shader_instance = Shader(name="instance")
@@ -507,9 +545,7 @@ class Renderer(QOpenGLWidget):
         return opaque_objects + list(transparent_objects)
 
     @lru_cache(maxsize=3)
-    def sort_objects_from_category(
-        self, objs: tuple["MeshObject"]
-    ) -> tuple[list["TagObject"], list["VectorObject"], list["MeshObject"]]:
+    def sort_objects_from_category(self, objs: tuple["MeshObject"]) -> tuple[list["TagObject"], list["VectorObject"], list["MeshObject"]]:
         """Sort objects by their categories
 
         Returns
@@ -565,9 +601,7 @@ class Renderer(QOpenGLWidget):
         viewworld = self.camera.viewworld()
         self.update_projection()
         # Object categorization
-        tag_objs, vector_objs, mesh_objs = self.sort_objects_from_category(
-            (obj for obj in self.scene.objects if obj.is_visible)
-        )
+        tag_objs, vector_objs, mesh_objs = self.sort_objects_from_category((obj for obj in self.scene.objects if obj.is_visible))
 
         # Draw model objects in the scene
         self.shader_model.bind()

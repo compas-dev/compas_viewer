@@ -3,7 +3,6 @@ from typing import Any
 from compas.geometry import Point
 from compas.geometry import Vector
 from compas.scene import GeometryObject
-
 from compas_viewer.components.renderer.shaders.shader import Shader
 
 from .sceneobject import ShaderDataType
@@ -75,10 +74,8 @@ class VectorObject(ViewerSceneObject, GeometryObject):
         shader.enable_attribute("position")
         shader.enable_attribute("color")
         shader.bind_attribute("position", self._lines_buffer["positions"])
-        shader.bind_attribute("color", self._lines_buffer["colors"])
-        shader.draw_arrows(
-            elements=self._lines_buffer["elements"], n=self._lines_buffer["n"], width=self.lineswidth, background=True
-        )
+        shader.bind_attribute("color", self._lines_buffer["colors"], step=4)
+        shader.draw_arrows(elements=self._lines_buffer["elements"], n=self._lines_buffer["n"], width=self.lineswidth, background=True)
         shader.draw_triangles(elements=self.arrow_buffer["elements"], n=self.arrow_buffer["n"], background=True)
         shader.disable_attribute("position")
         shader.disable_attribute("color")

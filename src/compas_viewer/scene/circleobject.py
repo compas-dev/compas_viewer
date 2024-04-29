@@ -4,8 +4,8 @@ from typing import Optional
 from compas.geometry import Circle
 from compas.geometry import Line
 from compas.geometry import Point
+from compas.itertools import pairwise
 from compas.scene import GeometryObject
-from compas.utilities import pairwise
 
 from .geometryobject import GeometryObject as ViewerGeometryObject
 
@@ -43,12 +43,7 @@ class CircleObject(ViewerGeometryObject, GeometryObject):
     @property
     def lines(self) -> Optional[list[Line]]:
         """The lines to be shown in the viewer."""
-        return [
-            Line(*pair)
-            for pair in pairwise(
-                self._calculate_circle_points(self.geometry) + [self._calculate_circle_points(self.geometry)[0]]
-            )
-        ]
+        return [Line(*pair) for pair in pairwise(self._calculate_circle_points(self.geometry) + [self._calculate_circle_points(self.geometry)[0]])]
 
     @property
     def viewmesh(self):

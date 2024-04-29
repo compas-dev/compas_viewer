@@ -1,15 +1,15 @@
 from typing import Union
 
+import numpy as np
+from numpy import array
+
 from compas.data import Data
 from compas.datastructures import Mesh
 from compas.geometry import Geometry
 from compas.scene import GeometryObject
-from numpy import array
 
 from .sceneobject import ShaderDataType
 from .sceneobject import ViewerSceneObject
-
-import numpy as np
 
 
 class Collection(Data):

@@ -2,16 +2,16 @@ from typing import TYPE_CHECKING
 from typing import Any
 from typing import Optional
 
-from compas.colors import Color
-from compas.geometry import Point
-from compas.geometry import Transformation
-from compas.geometry import transform_points_numpy
-from compas.scene import SceneObject
-from compas.utilities import flatten
 from numpy import array
 from numpy import average
 from numpy import identity
 
+from compas.colors import Color
+from compas.geometry import Point
+from compas.geometry import Transformation
+from compas.geometry import transform_points_numpy
+from compas.itertools import flatten
+from compas.scene import SceneObject
 from compas_viewer.components.renderer.shaders import Shader
 from compas_viewer.gl import make_index_buffer
 from compas_viewer.gl import make_vertex_buffer
@@ -216,23 +216,17 @@ class ViewerSceneObject(SceneObject):
         buffer_dict : dict[str, Any]
             A dict with created buffer indexes.
         """
-        if len(data) == 3:
-            positions, colors, elements = data
-            return {
-                "positions": make_vertex_buffer(list(flatten(positions))),
-                "colors": make_vertex_buffer(list(flatten(colors))),
-                "elements": make_index_buffer(list(flatten(elements))),
-                "n": len(list(flatten(elements))),
-            }
-        elif len(data) == 4:
-            positions, colors, opacities, elements = data
-            return {
-                "positions": make_vertex_buffer(list(flatten(positions))),
-                "colors": make_vertex_buffer(list(flatten(colors))),
-                "opacities": make_vertex_buffer(opacities),
-                "elements": make_index_buffer(list(flatten(elements))),
-                "n": len(list(flatten(elements))),
-            }
+        positions, colors, elements = data
+        flat_positions = list(flatten(positions))
+        flat_colors = list(flatten([color.rgba for color in colors]))
+        flat_elements = list(flatten(elements))
+
+        return {
+            "positions": make_vertex_buffer(flat_positions),
+            "colors": make_vertex_buffer(flat_colors),
+            "elements": make_index_buffer(flat_elements),
+            "n": len(flat_elements),
+        }
 
     def update_buffer_from_data(
         self,
@@ -258,13 +252,17 @@ class ViewerSceneObject(SceneObject):
             Whether to update elements in the buffer dict.
         """
         positions, colors, elements = data
+        flat_positions = list(flatten(positions))
+        flat_colors = list(flatten([color.rgba for color in colors]))
+        flat_elements = list(flatten(elements))
+
         if update_positions:
-            update_vertex_buffer(list(flatten(positions)), buffer["positions"])
+            update_vertex_buffer(flat_positions, buffer["positions"])
         if update_colors:
-            update_vertex_buffer(list(flatten(colors)), buffer["colors"])
+            update_vertex_buffer(flat_colors, buffer["colors"])
         if update_elements:
-            update_index_buffer(list(flatten(elements)), buffer["elements"])
-        buffer["n"] = len(list(flatten(elements)))
+            update_index_buffer(flat_elements, buffer["elements"])
+        buffer["n"] = len(flat_elements)
 
     def make_buffers(self):
         """Create all buffers from object's data"""
@@ -365,9 +363,7 @@ class ViewerSceneObject(SceneObject):
                 return
 
         _positions = array(positions)
-        self._bounding_box = list(
-            transform_points_numpy(array([_positions.min(axis=0), _positions.max(axis=0)]), self.worldtransformation)
-        )
+        self._bounding_box = list(transform_points_numpy(array([_positions.min(axis=0), _positions.max(axis=0)]), self.worldtransformation))
         self._bounding_box_center = Point(*list(average(a=array(self.bounding_box), axis=0)))
 
     def draw(self, shader: Shader, wireframe: bool, is_lighted: bool):
@@ -381,32 +377,26 @@ class ViewerSceneObject(SceneObject):
         shader.uniform1i("is_lighted", is_lighted)
         shader.uniform1f("object_opacity", self.opacity)
         shader.uniform1i("element_type", 2)
-        # if self.use_rgba:
-        #     shader.enable_attribute("alpha")
         # Frontfaces
         if self._frontfaces_buffer is not None and not wireframe and self.show_faces:
             shader.bind_attribute("position", self._frontfaces_buffer["positions"])
-            shader.bind_attribute("color", self._frontfaces_buffer["colors"])
-            # if self.use_rgba and self._frontfaces_buffer.get("opacities") is not None:
-            #     shader.bind_attribute("alpha", self._frontfaces_buffer["opacities"], step=1)
+            shader.bind_attribute("color", self._frontfaces_buffer["colors"], step=4)
             shader.draw_triangles(
-                elements=self._frontfaces_buffer["elements"], n=self._frontfaces_buffer["n"], background=self.background
+                elements=self._frontfaces_buffer["elements"],
+                n=self._frontfaces_buffer["n"],
+                background=self.background,
             )
         # Backfaces
         if self._backfaces_buffer is not None and not wireframe and self.show_faces:
             shader.bind_attribute("position", self._backfaces_buffer["positions"])
-            shader.bind_attribute("color", self._backfaces_buffer["colors"])
-            # if self.use_rgba and self._backfaces_buffer.get("opacities") is not None:
-            #     shader.bind_attribute("alpha", self._backfaces_buffer["opacities"], step=1)
-            shader.draw_triangles(
-                elements=self._backfaces_buffer["elements"], n=self._backfaces_buffer["n"], background=self.background
-            )
+            shader.bind_attribute("color", self._backfaces_buffer["colors"], step=4)
+            shader.draw_triangles(elements=self._backfaces_buffer["elements"], n=self._backfaces_buffer["n"], background=self.background)
         shader.uniform1i("is_lighted", False)
         shader.uniform1i("element_type", 1)
         # Lines
         if self._lines_buffer is not None and self.show_lines:
             shader.bind_attribute("position", self._lines_buffer["positions"])
-            shader.bind_attribute("color", self._lines_buffer["colors"])
+            shader.bind_attribute("color", self._lines_buffer["colors"], step=4)
             shader.draw_lines(
                 width=self.lineswidth,
                 elements=self._lines_buffer["elements"],
@@ -417,7 +407,7 @@ class ViewerSceneObject(SceneObject):
         # Points
         if self._points_buffer is not None and self.show_points:
             shader.bind_attribute("position", self._points_buffer["positions"])
-            shader.bind_attribute("color", self._points_buffer["colors"])
+            shader.bind_attribute("color", self._points_buffer["colors"], step=4)
             shader.draw_points(
                 size=self.pointssize,
                 elements=self._points_buffer["elements"],
@@ -431,8 +421,6 @@ class ViewerSceneObject(SceneObject):
             shader.uniform4x4("transform", list(identity(4).flatten()))
         shader.disable_attribute("position")
         shader.disable_attribute("color")
-        # if self.use_rgba:
-        #     shader.disable_attribute("alpha")
 
     def draw_instance(self, shader, wireframe: bool):
         """Draw the object instance for picking"""
@@ -444,9 +432,7 @@ class ViewerSceneObject(SceneObject):
         # Points
         if self._points_buffer is not None and self.show_points:
             shader.bind_attribute("position", self._points_buffer["positions"])
-            shader.draw_points(
-                size=self.pointssize, elements=self._points_buffer["elements"], n=self._points_buffer["n"]
-            )
+            shader.draw_points(size=self.pointssize, elements=self._points_buffer["elements"], n=self._points_buffer["n"])
         # Lines
         if self._lines_buffer is not None and (self.show_lines or wireframe):
             shader.bind_attribute("position", self._lines_buffer["positions"])

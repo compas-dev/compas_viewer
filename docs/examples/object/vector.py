@@ -1,4 +1,6 @@
-from math import cos, radians, sin
+from math import cos
+from math import radians
+from math import sin
 from random import random
 
 from compas.colors import Color
@@ -15,8 +17,6 @@ for i in range(0, 360, 20):
             cos(radians(j)),
         )
         vector = Vector(sin(radians(i)), cos(radians(i)), cos(radians(j)))
-        viewer.scene.add(
-            vector, anchor=position, linecolor=Color(random(), random(), random())
-        )
+        viewer.scene.add(vector, anchor=position, linecolor=Color(random(), random(), random()))
 
 viewer.show()

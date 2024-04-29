@@ -2,7 +2,6 @@ from compas.colors import Color
 from compas.geometry import Box
 from compas.geometry import Frame
 from compas.geometry import Translation
-
 from compas_viewer import Viewer
 
 viewer = Viewer()

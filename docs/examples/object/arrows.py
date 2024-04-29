@@ -3,7 +3,6 @@ from random import random
 from compas.colors import Color
 from compas.geometry import Point
 from compas.geometry import Vector
-
 from compas_viewer import Viewer
 
 viewer = Viewer()

@@ -2,7 +2,6 @@ from compas.colors import Color
 from compas.geometry import Bezier
 from compas.geometry import Point
 from compas.geometry import Polyline
-
 from compas_viewer import Viewer
 from compas_viewer.layout import Slider
 from compas_viewer.scene import PointObject
@@ -25,9 +24,7 @@ def slide(value, additional_var):
     viewer.renderer.update()
 
 
-viewer.layout.sidedock.add_element(
-    Slider(slide, 0, 0, 100, 1, "Slide Point", additional_var="Slide the point along the curve at ")
-)
+viewer.layout.sidedock.add_element(Slider(slide, 0, 0, 100, 1, "Slide Point", additional_var="Slide the point along the curve at "))
 
 
 viewer.show()

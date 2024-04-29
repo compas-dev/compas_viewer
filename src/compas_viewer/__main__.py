@@ -9,7 +9,6 @@ from os import path
 from compas import json_load
 from compas import json_loadz
 from compas.scene.context import ITEM_SCENEOBJECT
-
 from compas_viewer import Viewer
 
 

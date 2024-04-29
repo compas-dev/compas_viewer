@@ -3,11 +3,6 @@ from typing import TYPE_CHECKING
 from typing import Any
 from typing import Optional
 
-from compas.colors import Color
-from compas.geometry import Rotation
-from compas.geometry import Scale
-from compas.geometry import Transformation
-from compas.geometry import Translation
 from PySide6.QtWidgets import QCheckBox
 from PySide6.QtWidgets import QDoubleSpinBox
 from PySide6.QtWidgets import QHBoxLayout
@@ -17,6 +12,11 @@ from PySide6.QtWidgets import QSpinBox
 from PySide6.QtWidgets import QVBoxLayout
 from PySide6.QtWidgets import QWidget
 
+from compas.colors import Color
+from compas.geometry import Rotation
+from compas.geometry import Scale
+from compas.geometry import Transformation
+from compas.geometry import Translation
 from compas_viewer.scene.geometryobject import GeometryObject
 from compas_viewer.scene.meshobject import MeshObject
 from compas_viewer.scene.sceneobject import ViewerSceneObject

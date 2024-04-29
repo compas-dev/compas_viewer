@@ -2,7 +2,6 @@ from random import random
 
 from compas.colors import Color
 from compas.geometry import Line
-
 from compas_viewer import Viewer
 
 viewer = Viewer()

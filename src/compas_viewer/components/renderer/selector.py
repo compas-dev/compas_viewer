@@ -129,17 +129,17 @@ class Selector(QObject):
     def drag_selection_action(self):
         """Drag select the objects in the rectangle area."""
 
+        # Ignore drag selection caused by small mouse shift.
+        if abs(self.drag_start_pt.x() - self.drag_end_pt.x()) * abs(self.drag_start_pt.y() - self.drag_end_pt.y()) <= 4:
+            return
+
         # Deselect all objects first
         for _, obj in self.renderer.scene.instance_colors.items():
             obj.is_selected = False
 
-        instance_color = self.read_instance_color(
-            (self.drag_start_pt.x(), self.drag_start_pt.y(), self.drag_end_pt.x(), self.drag_end_pt.y())
-        )
+        instance_color = self.read_instance_color((self.drag_start_pt.x(), self.drag_start_pt.y(), self.drag_end_pt.x(), self.drag_end_pt.y()))
         unique_colors = unique(instance_color, axis=0, return_counts=True)
-        unique_colors = array(
-            [unique_colors[0][i] for i, count in enumerate(unique_colors[1]) if count > self.ANTI_ALIASING_FACTOR]
-        )
+        unique_colors = array([unique_colors[0][i] for i, count in enumerate(unique_colors[1]) if count > self.ANTI_ALIASING_FACTOR])
 
         if len(unique_colors) == 0:
             return
@@ -157,13 +157,9 @@ class Selector(QObject):
         :func:`compas_viewer.components.renderer.selector.Selector.drag_selection_action`
         """
 
-        instance_color = self.read_instance_color(
-            (self.drag_start_pt.x(), self.drag_start_pt.y(), self.drag_end_pt.x(), self.drag_end_pt.y())
-        )
+        instance_color = self.read_instance_color((self.drag_start_pt.x(), self.drag_start_pt.y(), self.drag_end_pt.x(), self.drag_end_pt.y()))
         unique_colors = unique(instance_color, axis=0, return_counts=True)
-        unique_colors = array(
-            [unique_colors[0][i] for i, count in enumerate(unique_colors[1]) if count > self.ANTI_ALIASING_FACTOR]
-        )
+        unique_colors = array([unique_colors[0][i] for i, count in enumerate(unique_colors[1]) if count > self.ANTI_ALIASING_FACTOR])
 
         if len(unique_colors) == 0:
             return

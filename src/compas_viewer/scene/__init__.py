@@ -9,6 +9,7 @@ from compas.datastructures import Mesh
 from compas.datastructures import Graph
 from compas.geometry import (
     Point,
+    Pointcloud,
     Line,
     Vector,
     Circle,
@@ -31,6 +32,7 @@ from .sceneobject import ViewerSceneObject
 from .meshobject import MeshObject
 from .graphobject import GraphObject
 from .pointobject import PointObject
+from .pointcloudobject import PointcloudObject
 from .lineobject import LineObject
 from .vectorobject import VectorObject
 from .tagobject import TagObject, Tag
@@ -46,7 +48,6 @@ from .cylinderobject import CylinderObject
 from .ellipseobject import EllipseObject
 from .coneobject import ConeObject
 from .capsuleobject import CapsuleObject
-from .nurbssurfaceobject import NurbsSurfaceObject
 from .collectionobject import CollectionObject
 from .geometryobject import GeometryObject
 
@@ -67,6 +68,7 @@ def register_scene_objects():
     register(Mesh, MeshObject, context="Viewer")
     register(Graph, GraphObject, context="Viewer")
     register(Point, PointObject, context="Viewer")
+    register(Pointcloud, PointcloudObject, context="Viewer")
     register(Line, LineObject, context="Viewer")
     register(Tag, TagObject, context="Viewer")
     register(Frame, FrameObject, context="Viewer")
@@ -82,14 +84,16 @@ def register_scene_objects():
     register(Ellipse, EllipseObject, context="Viewer")
     register(Cone, ConeObject, context="Viewer")
     register(Capsule, CapsuleObject, context="Viewer")
-    register(NurbsSurface, NurbsSurfaceObject, context="Viewer")
     register(list[Union[Geometry, Mesh]], CollectionObject, context="Viewer")
 
     try:
         from compas_occ.brep import OCCBrep
         from .brepobject import BRepObject
+        from .nurbssurfaceobject import NurbsSurfaceObject
 
         register(OCCBrep, BRepObject, context="Viewer")
+        register(NurbsSurface, NurbsSurfaceObject, context="Viewer")
+
     except ImportError:
         pass
 

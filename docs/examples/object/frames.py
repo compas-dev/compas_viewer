@@ -1,5 +1,4 @@
 from compas.geometry import Frame
-
 from compas_viewer import Viewer
 
 viewer = Viewer()

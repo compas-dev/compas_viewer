@@ -1,6 +1,7 @@
 from compas.colors import Color
 from compas.datastructures import Mesh
-from compas.geometry import Frame, Sphere
+from compas.geometry import Frame
+from compas.geometry import Sphere
 from compas_viewer import Viewer
 
 sphere = Sphere(1.0, Frame.worldXY())

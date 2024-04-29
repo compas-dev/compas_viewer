@@ -1,6 +1,5 @@
 from compas.colors import Color
 from compas.geometry import Translation
-
 from compas_viewer import Viewer
 from compas_viewer.scene import Tag
 

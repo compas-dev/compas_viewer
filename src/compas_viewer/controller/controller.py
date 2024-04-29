@@ -1,11 +1,11 @@
 from typing import TYPE_CHECKING
 
-
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QKeyEvent
 from PySide6.QtGui import QMouseEvent
 from PySide6.QtGui import QWheelEvent
 from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QPinchGesture
 
 from compas_viewer.actions import Action
 from compas_viewer.configurations import ControllerConfig
@@ -71,16 +71,10 @@ class Controller:
         dy = self.mouse.dy()
 
         # Drag selection
-        if (
-            event.buttons() == self.config.drag_selection.mouse
-            and event.modifiers() == self.config.drag_selection.modifier
-        ):
+        if event.buttons() == self.config.drag_selection.mouse and event.modifiers() == self.config.drag_selection.modifier:
             renderer.selector.on_drag_selection = True
         # Drag deselection
-        elif (
-            event.buttons() == self.config.drag_deselection.mouse
-            and event.modifiers() == self.config.drag_deselection.modifier
-        ):
+        elif event.buttons() == self.config.drag_deselection.mouse and event.modifiers() == self.config.drag_deselection.modifier:
             renderer.selector.on_drag_selection = True
         # Pan
         elif event.buttons() == self.config.pan.mouse and event.modifiers() == self.config.pan.modifier:
@@ -107,16 +101,10 @@ class Controller:
         self.mouse.last_pos = event.pos()
 
         # Drag selection: not in the elif.
-        if (
-            event.buttons() == self.config.drag_selection.mouse
-            and event.modifiers() == self.config.drag_selection.modifier
-        ):
+        if event.buttons() == self.config.drag_selection.mouse and event.modifiers() == self.config.drag_selection.modifier:
             renderer.selector.drag_start_pt = event.pos()
         # Drag deselection
-        elif (
-            event.buttons() == self.config.drag_deselection.mouse
-            and event.modifiers() == self.config.drag_deselection.modifier
-        ):
+        elif event.buttons() == self.config.drag_deselection.mouse and event.modifiers() == self.config.drag_deselection.modifier:
             renderer.selector.drag_start_pt = event.pos()
 
         # Select: single left click.
@@ -129,11 +117,7 @@ class Controller:
         elif event.buttons() == self.config.deselect.mouse and event.modifiers() == self.config.deselect.modifier:
             renderer.selector.deselect.emit()
         # Pan
-        elif (
-            event.buttons() == self.config.pan.mouse
-            and event.modifiers() == self.config.pan.modifier
-            and event.modifiers() != self.config.rotate.modifier
-        ):
+        elif event.buttons() == self.config.pan.mouse and event.modifiers() == self.config.pan.modifier and event.modifiers() != self.config.rotate.modifier:
             QApplication.setOverrideCursor(Qt.CursorShape.OpenHandCursor)
         # Rotate
         elif event.buttons() == self.config.rotate.mouse and event.modifiers() == self.config.rotate.modifier:
@@ -166,6 +150,22 @@ class Controller:
         if event.buttons() == Qt.KeyboardModifier.NoModifier or event.buttons() == Qt.MouseButton.NoButton:
             QApplication.restoreOverrideCursor()
 
+    def pinch_action(self, renderer: "Renderer", event: QPinchGesture):
+        """
+        The pinch action of the renderer object.
+
+        Parameters
+        ----------
+        renderer : :class:`compas_viewer.components.renderer.Renderer`
+            The renderer object.
+        event : :PySide6:`PySide6/QtWidgets/QPinchGesture`
+            The Qt event.
+
+        """
+        steps = event.scaleFactor() - 1
+        steps *= 10
+        renderer.camera.zoom(steps)
+
     def wheel_action(self, renderer: "Renderer", event: QWheelEvent):
         """
         The wheel action of the renderer object.
@@ -180,7 +180,7 @@ class Controller:
         """
         degrees = event.angleDelta().y() / 8
         steps = degrees / 15
-        renderer.camera.zoom(int(steps))
+        renderer.camera.zoom(steps)
 
     def key_press_action(self, renderer: "Renderer", event: QKeyEvent):
         """

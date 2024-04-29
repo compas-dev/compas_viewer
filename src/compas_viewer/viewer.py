@@ -5,12 +5,12 @@ from typing import Literal
 from typing import Optional
 from typing import Union
 
-from compas.datastructures import Datastructure
-from compas.geometry import Geometry
 from PySide6.QtCore import QCoreApplication
 from PySide6.QtWidgets import QApplication
 from PySide6.QtWidgets import QMainWindow
 
+from compas.datastructures import Datastructure
+from compas.geometry import Geometry
 from compas_viewer.actions import Action
 from compas_viewer.actions import register
 from compas_viewer.components import Renderer
@@ -75,6 +75,7 @@ class Viewer:
     .. code-block:: python
 
         from compas_viewer import Viewer
+
         viewer = Viewer()
         viewer.show()
     """
@@ -172,7 +173,7 @@ class Viewer:
             The scene object.
         """
 
-        return self.scene.add(*args, **kwargs)
+        return self.scene.add(item, *args, **kwargs)
 
     # ==========================================================================
     # Runtime
@@ -216,6 +217,7 @@ class Viewer:
         .. code-block:: python
 
             angle = math.radians(5)
+
 
             @viewer.on(interval=1000)
             def rotate(frame):
@@ -285,12 +287,17 @@ class Viewer:
             from compas.geometry import Scale
             from compas.geometry import Transformation
             from compas_viewer import Viewer
+
             viewer = Viewer()
             faces = viewer.scene.add(Mesh.from_obj(compas.get("faces.obj")))
             faces.transformation = Transformation()
+
+
             def pressed_action():
                 faces.transformation *= Scale.from_factors([1.1, 1.1, 1.1], Frame.worldXY())
                 faces.update()
+
+
             action = viewer.add_action(pressed_action, "p")
             viewer.show()
 

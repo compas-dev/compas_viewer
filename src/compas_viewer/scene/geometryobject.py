@@ -60,9 +60,8 @@ class GeometryObject(ViewerSceneObject, BaseGeometryObject):
         pointcolor: Optional[Color] = None,
         linecolor: Optional[Color] = None,
         surfacecolor: Optional[Color] = None,
-        **kwargs
+        **kwargs,
     ):
-
         super().__init__(geometry=geometry, **kwargs)
         self.geometry: Geometry
 
