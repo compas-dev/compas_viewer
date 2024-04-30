@@ -6,10 +6,16 @@ def new_file():
     print("new file...")
 
 class MenuBar:
-    def __init__(self, ui: "UI") -> None:
-        self.ui = ui
-        self.window = self.ui.window
-        self.widget = self.window.menuBar()
-
+    def __init__(self) -> None:
+        self.widget = None
+    
+    @property
+    def viewer(self):
+        from compas_viewer.main import Viewer
+        return Viewer()
+    
+    def setup_menu(self):
+        self.widget = self.viewer.ui.window.menuBar()
         filemenu = self.widget.addMenu("File")
         filemenu.addAction("New File...", new_file)
+

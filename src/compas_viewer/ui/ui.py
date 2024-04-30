@@ -9,20 +9,29 @@ if TYPE_CHECKING:
     from compas_viewer.main import Viewer
 
 class UI:
-    def __init__(self, viewer: "Viewer") -> None:
-        
-        self.viewer = viewer
+    def __init__(self) -> None:
 
-        self.window = MainWindow(self)
-        self.menubar = MenuBar(self)
-        self.statusbar = SatusBar(self)
-        self.toolbar = ToolBar(self)
-        self.viewport = ViewPort(self)
+        self.window = MainWindow()
+        self.menubar = MenuBar()
+        self.statusbar = SatusBar()
+        self.toolbar = ToolBar()
+        self.viewport = ViewPort()
+
+    @property
+    def viewer(self):
+        from compas_viewer.main import Viewer
+        return Viewer()
 
     def init(self):
         width = self.viewer.config.window.width
         height = self.viewer.config.window.height
+        
         self.resize(width, height)
+        self.window.setup_window()
+        self.menubar.setup_menu()
+        self.statusbar.setup_status_bar()
+        self.toolbar.setup_tool_bar()
+        self.viewport.setup_view_port()
 
     def show(self):
         self.window.show()
