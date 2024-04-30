@@ -58,11 +58,14 @@ class ViewerSetting:
         return widget
 
 class ViewerTreeForm:
-    def __init__(self, scene: "ViewerScene") -> None:
-        self.scene = scene
+    
+    @property
+    def viewer(self):
+        from compas_viewer.main import Viewer
+        return Viewer()
 
     def tree_view(self) -> QtWidgets.QSplitter:
-        form_ids = Treeform(self.scene, {"Name": (lambda o: o.name), "Object": (lambda o: o)})
+        form_ids = Treeform(self.viewer.scene, {"Name": (lambda o: o.name), "Object": (lambda o: o)})
         splitter = QtWidgets.QSplitter()
         splitter.setOrientation(Qt.Orientation.Vertical)
         splitter.addWidget(form_ids)

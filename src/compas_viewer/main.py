@@ -1,3 +1,6 @@
+from compas.colors import Color
+from compas.geometry import Box
+from compas.geometry import Frame
 from compas_viewer.viewer_test import Viewer
 
 if __name__ == "__main__":

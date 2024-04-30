@@ -1,11 +1,7 @@
-from typing import TYPE_CHECKING
 from typing import Optional
 from PySide6 import QtWidgets
 from PySide6.QtWidgets import QWidget
 from PySide6.QtWidgets import QMainWindow
-
-if TYPE_CHECKING:
-    from .ui import UI
 
 class MainWindow(QMainWindow):
     def __init__(self):

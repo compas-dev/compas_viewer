@@ -2,7 +2,7 @@ from OpenGL import GL
 from PySide6 import QtCore
 from PySide6 import QtWidgets
 from PySide6.QtOpenGLWidgets import QOpenGLWidget
-from compas_viewer.components.default_component_factory import ViewerSetting, ViewerTreeForm
+from compas_viewer.components.component_manager import ComponentsManager
 
 from compas_viewer.components.renderer import Renderer
 from compas_viewer.configurations import RendererConfig
@@ -38,49 +38,41 @@ class View3D:
         self.viewmode = "perspective"
         self.renderer = OpenGLWidget()
 
-class SideBarRightDefault:
-    pass
-
-class SideBarRight:
+class SideBarRight(ComponentsManager):
     def __init__(self) -> None:
+        super().__init__()
+        self.default_widgets: list[dict[str, str]] = [{"type": "tree_view", "temp": "temp"}]
+        self.custom_widgets: list[dict[str, str]] = [] #TODO(pitsai): self.viewer.config.ui.sidebar.items
+        self.all_widgets: list = self.default_widgets + self.custom_widgets 
+        # TODO(pitsai): check nameings
+        self.side_right_widget = None
 
-        self.setting = ViewerSetting()
-        self.tree_form = ViewerTreeForm(self.viewer.scene)
-        self.splitter = QtWidgets.QSplitter(QtCore.Qt.Orientation.Vertical)
-        self.splitter.setChildrenCollapsible(True)
-        # self.scenetree = SceneTreeView()
-        # self.objectlist = ObjectListView()
-        # self.camerasettings = CameraSettings()
-
-        
-        # self.splitter.addWidget(self.scenetree.widget)
-        # self.splitter.addWidget(self.objectlist.widget)
-        
-        ### Slot 1
-        self.splitter.addWidget(self.tree_form.tree_view())
-        ### Slot 2
-        self.splitter.addWidget(self.setting.camera_all_setting())
-        self.splitter.setHidden(not self.viewer.config.ui.sidebar.show)
-        pass
-    
     @property
     def viewer(self):
         from compas_viewer.main import Viewer
         return Viewer()
-
+    
+    def setup_sidebar_right(self) -> None:
+        self.side_right_widget = QtWidgets.QSplitter(QtCore.Qt.Orientation.Vertical)
+        self.side_right_widget.setChildrenCollapsible(True)
+        self.add_widgets(self.all_widgets)
+        self.side_right_widget = self.setup_widgets(self.side_right_widget)
+        self.side_right_widget.setHidden(not self.viewer.config.ui.sidebar.show)
 
 class ViewPort:
     def __init__(self):
         self.view3d = View3D()
-        self.sidebar = SideBarRight()
+        self.sidebar_right = SideBarRight()
 
     @property
     def viewer(self):
         from compas_viewer.main import Viewer
         return Viewer()
 
-    def setup_view_port(self):
-        self.splitter = QtWidgets.QSplitter()
-        self.splitter.addWidget(self.view3d.renderer)
-        self.splitter.addWidget(self.sidebar.splitter)
-        self.viewer.ui.window.centralWidget().layout().addWidget(self.splitter)
+    def setup_view_port(self) -> None:
+        self.sidebar_right.setup_sidebar_right()
+
+        self.viewport_widget = QtWidgets.QSplitter()
+        self.viewport_widget.addWidget(self.view3d.renderer)
+        self.viewport_widget.addWidget(self.sidebar_right.side_right_widget)
+        self.viewer.ui.window.centralWidget().layout().addWidget(self.viewport_widget)

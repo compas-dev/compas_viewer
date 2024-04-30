@@ -40,20 +40,21 @@ class Viewer():
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
             cls._instance = super(Viewer, cls).__new__(cls)
-            cls._instance.init(*args, **kwargs)  # Corrected reference here
+            cls._instance.init(*args, **kwargs) 
         return cls._instance
 
     def init(self, *args, **kwargs):
-        if not hasattr(self, 'initialized'):
+        if not hasattr(self, 'initialized'): 
+            
             if not QApplication.instance():
                 self.app = QApplication(sys.argv)
             else:
                 self.app = QApplication.instance()
+
             self.config = Config.from_json("src/compas_viewer/config.json")
             self.scene = ViewerScene(self, name="ViewerScene", context="Viewer")
             self.ui = UI()
-            self.initialized = True  # Mark as initialized
-            print(f"Full config {self.config}")
+            self.initialized = True 
 
     def show(self):
         if hasattr(self, 'ui'):
@@ -62,4 +63,4 @@ class Viewer():
             self.app.exec()
         else:
             print("UI component not initialized.")
-            
+
