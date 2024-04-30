@@ -1,13 +1,11 @@
-from typing import TYPE_CHECKING
 from OpenGL import GL
 from PySide6 import QtCore
 from PySide6 import QtWidgets
-from PySide6.QtGui import QSurfaceFormat
 from PySide6.QtOpenGLWidgets import QOpenGLWidget
 from compas_viewer.components.default_component_factory import ViewerSetting, ViewerTreeForm
 
-if TYPE_CHECKING:
-    from .ui import UI
+from compas_viewer.components.renderer import Renderer
+from compas_viewer.configurations import RendererConfig
 
 class OpenGLWidget(QOpenGLWidget):
     def __init__(self) -> None:
@@ -36,8 +34,7 @@ class OpenGLWidget(QOpenGLWidget):
 
 
 class View3D:
-    def __init__(self, viewport: "ViewPort") -> None:
-        self.viewport = viewport
+    def __init__(self) -> None:
         self.viewmode = "perspective"
         self.renderer = OpenGLWidget()
 
@@ -45,11 +42,10 @@ class SideBarRightDefault:
     pass
 
 class SideBarRight:
-    def __init__(self, viewport: "ViewPort") -> None:
-        self.viewport = viewport
-        self.config = viewport.ui.viewer.config.ui.sidebar
+    def __init__(self) -> None:
+
         self.setting = ViewerSetting()
-        self.tree_form = ViewerTreeForm(viewport.ui.viewer.scene)
+        self.tree_form = ViewerTreeForm(self.viewer.scene)
         self.splitter = QtWidgets.QSplitter(QtCore.Qt.Orientation.Vertical)
         self.splitter.setChildrenCollapsible(True)
         # self.scenetree = SceneTreeView()
@@ -59,20 +55,32 @@ class SideBarRight:
         
         # self.splitter.addWidget(self.scenetree.widget)
         # self.splitter.addWidget(self.objectlist.widget)
-        # slot 1
+        
+        ### Slot 1
         self.splitter.addWidget(self.tree_form.tree_view())
-        # slot 2
+        ### Slot 2
         self.splitter.addWidget(self.setting.camera_all_setting())
-        self.splitter.setHidden(not self.config.show)
+        self.splitter.setHidden(not self.viewer.config.ui.sidebar.show)
+        pass
+    
+    @property
+    def viewer(self):
+        from compas_viewer.main import Viewer
+        return Viewer()
 
 
 class ViewPort:
-    def __init__(self, ui: "UI"):
-        self.ui = ui
-        self.view3d = View3D(self)
-        self.sidebar = SideBarRight(self)
-        self.splitter = QtWidgets.QSplitter()
+    def __init__(self):
+        self.view3d = View3D()
+        self.sidebar = SideBarRight()
 
+    @property
+    def viewer(self):
+        from compas_viewer.main import Viewer
+        return Viewer()
+
+    def setup_view_port(self):
+        self.splitter = QtWidgets.QSplitter()
         self.splitter.addWidget(self.view3d.renderer)
         self.splitter.addWidget(self.sidebar.splitter)
-        self.ui.window.centralWidget().layout().addWidget(self.splitter)
+        self.viewer.ui.window.centralWidget().layout().addWidget(self.splitter)
