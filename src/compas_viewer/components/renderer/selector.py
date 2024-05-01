@@ -1,5 +1,3 @@
-from typing import TYPE_CHECKING
-
 from numpy import all
 from numpy import any
 from numpy import array
@@ -10,10 +8,7 @@ from OpenGL import GL
 from PySide6.QtCore import QObject
 from PySide6.QtCore import QPoint
 from PySide6.QtCore import Signal
-
-if TYPE_CHECKING:
-    from .renderer import Renderer
-
+from compas.colors import Color
 
 class Selector(QObject):
     """Selector class manages all selection operations for the viewer.
@@ -51,19 +46,9 @@ class Selector(QObject):
     drag_selection = Signal()
     drag_deselection = Signal()
 
-    def __init__(
-        self,
-        renderer: "Renderer",
-    ):
-        self.enable_selector = renderer.config.selector.enable_selector
-        if not self.enable_selector:
-            return
+    def __init__(self):
         super().__init__()
-        self.renderer = renderer
-        self.viewer = renderer.viewer
-        self.scene = renderer.scene
-        self.controller = renderer.viewer.controller
-        self.selectioncolor = renderer.config.selector.selectioncolor
+        self.selectioncolor = Color(0, 0, 0) 
 
         #  Drag selection
         self.on_drag_selection: bool = False
@@ -76,19 +61,24 @@ class Selector(QObject):
         self.drag_selection.connect(self.drag_selection_action)
         self.drag_deselection.connect(self.drag_deselection_action)
 
+    @property
+    def viewer(self):
+        from compas_viewer.main import Viewer
+        return Viewer()
+
     def select_action(self):
         """Select the object under the mouse cursor."""
 
         # Deselect all objects first
-        for _, obj in self.renderer.scene.instance_colors.items():
+        for _, obj in self.viewer.scene.instance_colors.items():
             obj.is_selected = False
 
-        x = self.controller.mouse.last_pos.x()
-        y = self.controller.mouse.last_pos.y()
+        x = self.viewer.controller.mouse.last_pos.x()
+        y = self.viewer.controller.mouse.last_pos.y()
         instance_color = self.read_instance_color((x, y, x, y))
         unique_color = unique(instance_color, axis=0, return_counts=False)
 
-        selected_obj = self.renderer.scene.instance_colors.get(tuple(unique_color[0]))  # type: ignore
+        selected_obj = self.viewer.scene.instance_colors.get(tuple(unique_color[0]))  # type: ignore
         if selected_obj:
             selected_obj.is_selected = True
 
@@ -98,12 +88,12 @@ class Selector(QObject):
     def deselect_action(self):
         """Deselect the object under the mouse cursor."""
 
-        x = self.controller.mouse.last_pos.x()
-        y = self.controller.mouse.last_pos.y()
+        x = self.viewer.controller.mouse.last_pos.x()
+        y = self.viewer.controller.mouse.last_pos.y()
         instance_color = self.read_instance_color((x, y, x, y))
         unique_color = unique(instance_color, axis=0, return_counts=False)
 
-        selected_obj = self.renderer.scene.instance_colors.get(tuple(unique_color[0]))  # type: ignore
+        selected_obj = self.viewer.scene.instance_colors.get(tuple(unique_color[0]))  # type: ignore
         if selected_obj:
             selected_obj.is_selected = False
 
@@ -114,12 +104,12 @@ class Selector(QObject):
         --------
         :func:`compas_viewer.components.renderer.selector.Selector.select_action`
         """
-        x = self.controller.mouse.last_pos.x()
-        y = self.controller.mouse.last_pos.y()
+        x = self.viewer.controller.mouse.last_pos.x()
+        y = self.viewer.controller.mouse.last_pos.y()
         instance_color = self.read_instance_color((x, y, x, y))
         unique_color = unique(instance_color, axis=0, return_counts=False)
 
-        selected_obj = self.renderer.scene.instance_colors.get(tuple(unique_color[0]))  # type: ignore
+        selected_obj = self.viewer.scene.instance_colors.get(tuple(unique_color[0]))  # type: ignore
         if selected_obj:
             selected_obj.is_selected = True
 
@@ -134,7 +124,7 @@ class Selector(QObject):
             return
 
         # Deselect all objects first
-        for _, obj in self.renderer.scene.instance_colors.items():
+        for _, obj in self.viewer.scene.instance_colors.items():
             obj.is_selected = False
 
         instance_color = self.read_instance_color((self.drag_start_pt.x(), self.drag_start_pt.y(), self.drag_end_pt.x(), self.drag_end_pt.y()))
@@ -144,7 +134,7 @@ class Selector(QObject):
         if len(unique_colors) == 0:
             return
 
-        for color, obj in self.renderer.scene.instance_colors.items():
+        for color, obj in self.viewer.scene.instance_colors.items():
             if any(all(color == unique_colors, axis=1)):
                 obj.is_selected = True
                 continue
@@ -164,7 +154,7 @@ class Selector(QObject):
         if len(unique_colors) == 0:
             return
 
-        for color, obj in self.renderer.scene.instance_colors.items():
+        for color, obj in self.viewer.scene.instance_colors.items():
             if any(all(color == unique_colors, axis=1)):
                 obj.is_selected = False
                 continue
@@ -206,14 +196,14 @@ class Selector(QObject):
 
         # 0. Get the rectangle area.
         x1, y1, x2, y2 = box
-        x, y = min(x1, x2), self.viewer.layout.config.window.height - max(y1, y2)
+        x, y = min(x1, x2), self.viewer.config.window.height - max(y1, y2)
         width = max(self.PIXEL_SELECTION_INCREMENTAL, abs(x1 - x2))
         height = max(self.PIXEL_SELECTION_INCREMENTAL, abs(y1 - y2))
-        r = self.renderer.devicePixelRatio()
+        r = self.viewer.renderer.devicePixelRatio()
 
         # 1. Repaint the canvas with instance color.
-        self.renderer.makeCurrent()
-        self.renderer.paintGL(is_instance=True)
+        self.viewer.renderer.makeCurrent()
+        self.viewer.renderer.paintGL(is_instance=True)
 
         # 2. Read the instance buffer.
         instance_buffer = GL.glReadPixels(x * r, y * r, width * r, height * r, GL.GL_RGB, GL.GL_UNSIGNED_BYTE)

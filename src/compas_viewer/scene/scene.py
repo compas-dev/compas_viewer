@@ -1,6 +1,5 @@
 from random import randint
 from random import seed
-from typing import TYPE_CHECKING
 from typing import Any
 from typing import Generator
 from typing import Optional
@@ -12,10 +11,6 @@ from compas.geometry import Geometry
 from compas.scene import Scene
 
 from .sceneobject import ViewerSceneObject
-
-if TYPE_CHECKING:
-    from compas_viewer import Viewer
-
 
 def instance_colors_generator(i: int = 0) -> Generator:
     """
@@ -69,9 +64,8 @@ class ViewerScene(Scene):
     :class:`compas.scene.Scene`
     """
 
-    def __init__(self, viewer: "Viewer", name: str, context: str):
+    def __init__(self, name: str, context: str):
         super(ViewerScene, self).__init__(name=name, context=context)
-        self.viewer = viewer
 
         #  Primitive
         self.objects: list[ViewerSceneObject]
@@ -169,7 +163,6 @@ class ViewerScene(Scene):
         sceneobject: ViewerSceneObject = super().add(  # type: ignore
             item=item,
             parent=parent,
-            viewer=self.viewer,
             is_selected=is_selected,
             is_visible=is_visible,
             is_locked=is_locked,

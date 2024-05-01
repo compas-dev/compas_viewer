@@ -67,9 +67,9 @@ class GeometryObject(ViewerSceneObject, BaseGeometryObject):
 
         self.u = u
         self.v = v
-        self.pointcolor = pointcolor or self.viewer.config.pointcolor
-        self.linecolor = linecolor or self.viewer.config.linecolor
-        self.surfacecolor = surfacecolor or self.viewer.config.surfacecolor
+        self.pointcolor = pointcolor if pointcolor is not None else Color(0, 0, 0) 
+        self.linecolor = linecolor if linecolor is not None else Color(0, 0, 0) 
+        self.surfacecolor = surfacecolor if surfacecolor is not None else Color(0, 0, 0)  
 
     @property
     def points(self) -> Optional[list[Point]]:

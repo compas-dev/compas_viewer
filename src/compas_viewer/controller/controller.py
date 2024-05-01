@@ -1,5 +1,3 @@
-from typing import TYPE_CHECKING
-
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QKeyEvent
 from PySide6.QtGui import QMouseEvent
@@ -11,11 +9,6 @@ from compas_viewer.actions import Action
 from compas_viewer.configurations import ControllerConfig
 
 from .mouse import Mouse
-
-if TYPE_CHECKING:
-    from compas_viewer.components import Renderer
-    from compas_viewer.viewer import Viewer
-
 
 class Controller:
     """
@@ -39,8 +32,7 @@ class Controller:
         The mouse object.
     """
 
-    def __init__(self, viewer: "Viewer", config: ControllerConfig):
-        self.viewer = viewer
+    def __init__(self, config: ControllerConfig):
         self.config = config
         self.mouse = Mouse()
         self.actions: dict[str, Action] = {}
@@ -51,7 +43,12 @@ class Controller:
     # Actions
     # ==============================================================================
 
-    def mouse_move_action(self, renderer: "Renderer", event: QMouseEvent):
+    @property
+    def viewer(self):
+        from compas_viewer.main import Viewer
+        return Viewer()
+
+    def mouse_move_action(self, event: QMouseEvent):
         """
         The mouse move action of the renderer object.
         This function introduces elif for different actions, meaning only one action can be performed at a time.
@@ -72,21 +69,21 @@ class Controller:
 
         # Drag selection
         if event.buttons() == self.config.drag_selection.mouse and event.modifiers() == self.config.drag_selection.modifier:
-            renderer.selector.on_drag_selection = True
+            self.viewer.renderer.selector.on_drag_selection = True
         # Drag deselection
         elif event.buttons() == self.config.drag_deselection.mouse and event.modifiers() == self.config.drag_deselection.modifier:
-            renderer.selector.on_drag_selection = True
+            self.viewer.renderer.selector.on_drag_selection = True
         # Pan
         elif event.buttons() == self.config.pan.mouse and event.modifiers() == self.config.pan.modifier:
-            renderer.camera.pan(dx, dy)
+            self.viewer.renderer.camera.pan(dx, dy)
         # Rotate
         elif event.buttons() == self.config.rotate.mouse and event.modifiers() == self.config.rotate.modifier:
-            renderer.camera.rotate(dx, dy)
+            self.viewer.renderer.camera.rotate(dx, dy)
 
         # Record mouse position
         self.mouse.last_pos = event.pos()
 
-    def mouse_press_action(self, renderer: "Renderer", event: QMouseEvent):
+    def mouse_press_action(self, event: QMouseEvent):
         """
         The mouse press action of the renderer object.
         This function introduces elif for different actions, meaning only one action can be performed at a time.
@@ -102,20 +99,20 @@ class Controller:
 
         # Drag selection: not in the elif.
         if event.buttons() == self.config.drag_selection.mouse and event.modifiers() == self.config.drag_selection.modifier:
-            renderer.selector.drag_start_pt = event.pos()
+            self.viewer.renderer.selector.drag_start_pt = event.pos()
         # Drag deselection
         elif event.buttons() == self.config.drag_deselection.mouse and event.modifiers() == self.config.drag_deselection.modifier:
-            renderer.selector.drag_start_pt = event.pos()
+            self.viewer.renderer.selector.drag_start_pt = event.pos()
 
         # Select: single left click.
         if event.buttons() == Qt.MouseButton.LeftButton and event.modifiers() == Qt.KeyboardModifier.NoModifier:
-            renderer.selector.select.emit()
+            self.viewer.renderer.selector.select.emit()
         # Multiselect
         elif event.buttons() == self.config.multiselect.mouse and event.modifiers() == self.config.multiselect.modifier:
-            renderer.selector.multiselect.emit()
+            self.viewer.renderer.selector.multiselect.emit()
         # Deselect
         elif event.buttons() == self.config.deselect.mouse and event.modifiers() == self.config.deselect.modifier:
-            renderer.selector.deselect.emit()
+            self.viewer.renderer.selector.deselect.emit()
         # Pan
         elif event.buttons() == self.config.pan.mouse and event.modifiers() == self.config.pan.modifier and event.modifiers() != self.config.rotate.modifier:
             QApplication.setOverrideCursor(Qt.CursorShape.OpenHandCursor)
@@ -123,7 +120,7 @@ class Controller:
         elif event.buttons() == self.config.rotate.mouse and event.modifiers() == self.config.rotate.modifier:
             QApplication.setOverrideCursor(Qt.CursorShape.SizeAllCursor)
 
-    def mouse_release_action(self, renderer: "Renderer", event: QMouseEvent):
+    def mouse_release_action(self, event: QMouseEvent):
         """
         The mouse release action of the renderer object.
         This function introduces elif for different actions, meaning only one action can be performed at a time.
@@ -137,20 +134,20 @@ class Controller:
         """
 
         # Drag selection
-        if event.modifiers() == self.config.drag_selection.modifier and renderer.selector.on_drag_selection:
-            renderer.selector.on_drag_selection = False
-            renderer.selector.drag_end_pt = event.pos()
-            renderer.selector.drag_selection.emit()
+        if event.modifiers() == self.config.drag_selection.modifier and self.viewer.renderer.selector.on_drag_selection:
+            self.viewer.renderer.selector.on_drag_selection = False
+            self.viewer.renderer.selector.drag_end_pt = event.pos()
+            self.viewer.renderer.selector.drag_selection.emit()
         # Drag deselection
-        elif event.modifiers() == self.config.drag_deselection.modifier and renderer.selector.on_drag_selection:
-            renderer.selector.on_drag_selection = False
-            renderer.selector.drag_end_pt = event.pos()
-            renderer.selector.drag_deselection.emit()
+        elif event.modifiers() == self.config.drag_deselection.modifier and self.viewer.renderer.selector.on_drag_selection:
+            self.viewer.renderer.selector.on_drag_selection = False
+            self.viewer.renderer.selector.drag_end_pt = event.pos()
+            self.viewer.renderer.selector.drag_deselection.emit()
 
         if event.buttons() == Qt.KeyboardModifier.NoModifier or event.buttons() == Qt.MouseButton.NoButton:
             QApplication.restoreOverrideCursor()
 
-    def pinch_action(self, renderer: "Renderer", event: QPinchGesture):
+    def pinch_action(self, event: QPinchGesture):
         """
         The pinch action of the renderer object.
 
@@ -164,9 +161,9 @@ class Controller:
         """
         steps = event.scaleFactor() - 1
         steps *= 10
-        renderer.camera.zoom(steps)
+        self.viewer.renderer.camera.zoom(steps)
 
-    def wheel_action(self, renderer: "Renderer", event: QWheelEvent):
+    def wheel_action(self, event: QWheelEvent):
         """
         The wheel action of the renderer object.
         It is used from zooming action only.
@@ -180,9 +177,9 @@ class Controller:
         """
         degrees = event.angleDelta().y() / 8
         steps = degrees / 15
-        renderer.camera.zoom(steps)
+        self.viewer.renderer.camera.zoom(steps)
 
-    def key_press_action(self, renderer: "Renderer", event: QKeyEvent):
+    def key_press_action(self, event: QKeyEvent):
         """
         The key press action of the renderer object.
         This function introduces break for different actions, meaning only one action can be performed at a time.
@@ -199,7 +196,7 @@ class Controller:
                 action.pressed.emit()
                 break
 
-    def key_release_action(self, renderer: "Renderer", event: QKeyEvent):
+    def key_release_action(self, event: QKeyEvent):
         """
         The key release action of the renderer object.
         This function introduces break for different actions, meaning only one action can be performed at a time.

@@ -1,12 +1,8 @@
-from typing import TYPE_CHECKING
 from .main_window import MainWindow
 from .menu_bar import MenuBar
 from .status_bar import SatusBar
 from .tool_bar import ToolBar
 from .view_port import ViewPort
-
-if TYPE_CHECKING:
-    from compas_viewer.main import Viewer
 
 class UI:
     def __init__(self) -> None:
@@ -32,6 +28,7 @@ class UI:
         self.statusbar.setup_status_bar()
         self.toolbar.setup_tool_bar()
         self.viewport.setup_view_port()
+        self.viewer.renderer.camera.setup_camera()
 
     def show(self):
         self.window.show()

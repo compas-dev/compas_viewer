@@ -1,4 +1,3 @@
-from typing import TYPE_CHECKING
 from typing import Any
 from typing import Optional
 
@@ -17,10 +16,6 @@ from compas_viewer.gl import make_index_buffer
 from compas_viewer.gl import make_vertex_buffer
 from compas_viewer.gl import update_index_buffer
 from compas_viewer.gl import update_vertex_buffer
-
-if TYPE_CHECKING:
-    from compas_viewer import Viewer
-
 
 # Type template of point/line/face data for generating the buffers.
 ShaderDataType = tuple[list[Point], list[Color], list[list[int]]]
@@ -91,7 +86,6 @@ class ViewerSceneObject(SceneObject):
 
     def __init__(
         self,
-        viewer: "Viewer",
         is_selected: bool = False,
         is_locked: bool = False,
         is_visible: bool = True,
@@ -106,23 +100,20 @@ class ViewerSceneObject(SceneObject):
     ):
         #  Basic
         super().__init__(**kwargs)
-        self.viewer = viewer
-        self.scene = viewer.scene
-        self.renderer = viewer.renderer
         self.is_visible = is_visible
-        self.show_points = self.viewer.config.show_points if show_points is None else show_points
-        self.show_lines = self.viewer.config.show_lines if show_lines is None else show_lines
-        self.show_faces = self.viewer.config.show_faces if show_faces is None else show_faces
-        self.lineswidth = lineswidth or self.viewer.config.lineswidth
-        self.pointssize = pointssize or self.viewer.config.pointssize
-        self.opacity = opacity or self.viewer.config.opacity
+        self.show_points = show_points if show_points is not None else True
+        self.show_lines = show_lines if show_lines is not None else True 
+        self.show_faces = show_faces if show_faces is not None else True 
+        self.lineswidth = lineswidth if lineswidth is not None else float(1.0) 
+        self.pointssize = pointssize if pointssize is not None else float(6.0)
+        self.opacity = opacity if opacity is not None else float(1.0)
 
         #  Selection
         self._is_locked = is_locked
         self.is_selected = not is_locked and is_selected
-        self.instance_color = Color.from_rgb255(*next(self.scene._instance_colors_generator))
+        self.instance_color = Color.from_rgb255(*next(self.viewer.scene._instance_colors_generator))
         if not is_locked:
-            self.scene.instance_colors[self.instance_color.rgb255] = self
+            self.viewer.scene.instance_colors[self.instance_color.rgb255] = self
 
         #  Visual
         self.background: bool = False
@@ -146,6 +137,11 @@ class ViewerSceneObject(SceneObject):
         self._backfaces_buffer: [dict[str, Any]] = None  # type: ignore
 
     @property
+    def viewer(self):
+        from compas_viewer.main import Viewer
+        return Viewer()
+
+    @property
     def is_locked(self):
         return self._is_locked
 
@@ -154,9 +150,9 @@ class ViewerSceneObject(SceneObject):
         self._is_locked = value
         if value:
             self.is_selected = False
-            self.scene.instance_colors.pop(self.instance_color.rgb255)
+            self.viewer.scene.instance_colors.pop(self.instance_color.rgb255)
         else:
-            self.scene.instance_colors[self.instance_color.rgb255] = self
+            self.viewer.scene.instance_colors[self.instance_color.rgb255] = self
 
     @property
     def bounding_box(self):
@@ -347,7 +343,7 @@ class ViewerSceneObject(SceneObject):
             )
 
         #  Update the canvas.
-        self.renderer.update()
+        self.viewer.renderer.update()
 
     def _update_bounding_box(self, positions: Optional[list[Point]] = None):
         """Update the bounding box of the object"""
@@ -437,7 +433,7 @@ class ViewerSceneObject(SceneObject):
         if self._lines_buffer is not None and (self.show_lines or wireframe):
             shader.bind_attribute("position", self._lines_buffer["positions"])
             shader.draw_lines(
-                width=self.lineswidth + self.renderer.selector.PIXEL_SELECTION_INCREMENTAL,
+                width=self.lineswidth + self.viewer.renderer.selector.PIXEL_SELECTION_INCREMENTAL,
                 elements=self._lines_buffer["elements"],
                 n=self._lines_buffer["n"],
             )

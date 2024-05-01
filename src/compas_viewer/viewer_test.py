@@ -4,6 +4,11 @@ from compas_viewer.config import Config
 from compas_viewer.scene.scene import ViewerScene
 from compas_viewer.ui.ui import UI
 
+from compas_viewer.controller import Controller
+from compas_viewer.configurations import ControllerConfig
+from compas_viewer.components.renderer import Renderer
+from compas_viewer.configurations import RendererConfig
+
 """
 ├── compas_viewer/                   
 │   ├── __init__.py         # Makes app a Python package
@@ -52,7 +57,9 @@ class Viewer():
                 self.app = QApplication.instance()
 
             self.config = Config.from_json("src/compas_viewer/config.json")
-            self.scene = ViewerScene(self, name="ViewerScene", context="Viewer")
+            self.scene = ViewerScene(name="ViewerScene", context="Viewer")
+            self.renderer = Renderer(RendererConfig.from_default())
+            self.controller = Controller(ControllerConfig.from_default())
             self.ui = UI()
             self.initialized = True 
 
