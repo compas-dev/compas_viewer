@@ -8,8 +8,8 @@ from compas_viewer.viewer_test import Viewer
 if __name__ == "__main__":
     viewer = Viewer()
 
-    # mesh = Mesh.from_off(compas.get("tubemesh.off"))
-    # obj = viewer.scene.add(mesh, surfacecolor=Color.cyan(), use_vertexcolors=False)
+    mesh = Mesh.from_off(compas.get("tubemesh.off"))
+    obj = viewer.scene.add(mesh, use_vertexcolors=False)
 
     for i in range(5):
         for j in range(5):

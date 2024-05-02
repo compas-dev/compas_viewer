@@ -56,12 +56,12 @@ class FrameObject(ViewerSceneObject):
     ):
         super().__init__(item=frame, **kwargs)
         self.frame = frame
-        self.linecolor = linecolor if linecolor is not None else Color(0.5, 0.5, 0.5) 
+        self.linecolor = linecolor if linecolor else Color(0.5, 0.5, 0.5) 
         self.dx = framesize[0] if framesize else float(0.1)
         self.nx = framesize[1] if framesize else int(10)
         self.dy = framesize[2] if framesize else float(0.1)
         self.ny = framesize[3] if framesize else int(10)
-        self.show_framez = show_framez or self.viewer.config.show_framez
+        self.show_framez = show_framez if show_framez else True
         if self.nx % 2 != 0 or self.ny % 2 != 0:
             raise ValueError("The number of grid cells in the X and Y directions must be even numbers.")
         self.show_lines = True

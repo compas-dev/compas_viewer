@@ -104,9 +104,9 @@ class ViewerSceneObject(SceneObject):
         self.show_points = show_points if show_points is not None else True
         self.show_lines = show_lines if show_lines is not None else True 
         self.show_faces = show_faces if show_faces is not None else True 
-        self.lineswidth = lineswidth if lineswidth is not None else float(1.0) 
-        self.pointssize = pointssize if pointssize is not None else float(6.0)
-        self.opacity = opacity if opacity is not None else float(1.0)
+        self.lineswidth = lineswidth if lineswidth is not None else self.viewer.config.ui.display.lineswidth
+        self.pointssize = pointssize if pointssize is not None else self.viewer.config.ui.display.pointssize
+        self.opacity = opacity if opacity is not None else self.viewer.config.ui.display.opacity
 
         #  Selection
         self._is_locked = is_locked

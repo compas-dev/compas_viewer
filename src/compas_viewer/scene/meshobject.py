@@ -64,29 +64,38 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
 
         self.mesh: Mesh
 
-        self.hide_coplanaredges = hide_coplanaredges if hide_coplanaredges is not None else self.viewer.config.hide_coplanaredges
-        self.use_vertexcolors = use_vertexcolors if use_vertexcolors is not None else self.viewer.config.use_vertexcolors
+        self.hide_coplanaredges = hide_coplanaredges if hide_coplanaredges is not None else False
+        self.use_vertexcolors = use_vertexcolors if use_vertexcolors is not None else False
+        # self.vertexcolor = vertexcolor if vertexcolor is not None else self.viewer.config.ui.display.pointcolor
+        # self.edgecolor = edgecolor if edgecolor is not None else self.viewer.config.ui.display.linecolor
+        # self.facecolor = facecolor if facecolor is not None else self.viewer.config.ui.display.surfacecolor
 
+        #TODO(pitsai): check _read_lines_data
         if not vertexcolor:
-            self.vertexcolor = self.viewer.config.pointcolor
+            self.vertexcolor = self.viewer.config.ui.display.pointcolor
             for vertex in self.mesh.vertices():
                 self.vertexcolor[vertex] = self.mesh.vertex_attribute(vertex, "color")  # type: ignore
         else:
             self.vertexcolor = vertexcolor
 
         if not edgecolor:
-            self.edgecolor = self.viewer.config.linecolor
+            self.edgecolor = self.viewer.config.ui.display.linecolor
             for u, v in self.mesh.edges():
                 self.edgecolor[(u, v)] = self.mesh.edge_attribute((u, v), "color")  # type: ignore
         else:
             self.edgecolor = edgecolor
 
         if not facecolor:
-            self.facecolor = self.viewer.config.surfacecolor
+            self.facecolor = self.viewer.config.ui.display.surfacecolor
             for face in self.mesh.faces():
                 self.facecolor[face] = self.mesh.face_attribute(face, "color")  # type: ignore
         else:
             self.facecolor = facecolor
+   
+    @property
+    def viewer(self):
+        from compas_viewer.main import Viewer
+        return Viewer()
 
     def _read_points_data(self) -> ShaderDataType:
         positions = []

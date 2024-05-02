@@ -58,6 +58,7 @@ class Viewer():
 
             self.config = Config.from_json("src/compas_viewer/config.json")
             self.scene = ViewerScene(name="ViewerScene", context="Viewer")
+            #TODO(pitsai): combine config file
             self.renderer = Renderer(RendererConfig.from_default())
             self.controller = Controller(ControllerConfig.from_default())
             self.ui = UI()
