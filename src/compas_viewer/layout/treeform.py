@@ -1,4 +1,3 @@
-from typing import TYPE_CHECKING
 from typing import Callable
 from typing import Optional
 
@@ -6,11 +5,7 @@ from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QTreeWidget
 from PySide6.QtWidgets import QTreeWidgetItem
 
-from compas.datastructures import Tree
 from compas_viewer.scene.scene import ViewerScene
-if TYPE_CHECKING:
-    from compas_viewer.viewer import Viewer
-
 
 class Treeform(QTreeWidget):
     """
@@ -83,7 +78,6 @@ class Treeform(QTreeWidget):
         backgrounds: Optional[dict[str, Callable]] = None,
     ):
         super().__init__()
-        self.viewer: "Viewer"
         self.columns = columns
         self.column_editable = column_editable + [False] * (len(columns) - len(column_editable))
         self.setColumnCount(len(columns))

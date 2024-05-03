@@ -17,8 +17,8 @@ class UI:
     def viewer(self):
         from compas_viewer.main import Viewer
         return Viewer()
-
-    def init(self):
+    
+    def lazy_init(self):
         width = self.viewer.config.window.width
         height = self.viewer.config.window.height
         

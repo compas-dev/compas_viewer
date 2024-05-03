@@ -40,33 +40,32 @@ from compas_viewer.configurations import RendererConfig
 
 class Viewer():
 
-    _instance = None  # Class-level attribute that holds the singleton instance
+    _instance = None
 
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
             cls._instance = super(Viewer, cls).__new__(cls)
-            cls._instance.init(*args, **kwargs) 
+            cls._instance.lazy_init(*args, **kwargs) 
         return cls._instance
+    
+    def lazy_init(self, *args, **kwargs):
 
-    def init(self, *args, **kwargs):
-        if not hasattr(self, 'initialized'): 
-            
-            if not QApplication.instance():
-                self.app = QApplication(sys.argv)
-            else:
-                self.app = QApplication.instance()
+        if not QApplication.instance():
+            self.app = QApplication(sys.argv)
+        else:
+            self.app = QApplication.instance()
 
-            self.config = Config.from_json("src/compas_viewer/config.json")
-            self.scene = ViewerScene(name="ViewerScene", context="Viewer")
-            #TODO(pitsai): combine config file
-            self.renderer = Renderer(RendererConfig.from_default())
-            self.controller = Controller(ControllerConfig.from_default())
-            self.ui = UI()
-            self.initialized = True 
+        self.config = Config.from_json("src/compas_viewer/config.json")
+        self.scene = ViewerScene(name="ViewerScene", context="Viewer")
+        #TODO(pitsai): combine config file
+        self.renderer = Renderer(RendererConfig.from_default())
+        self.controller = Controller(ControllerConfig.from_default())
+        self.ui = UI()
+
 
     def show(self):
         if hasattr(self, 'ui'):
-            self.ui.init()
+            self.ui.lazy_init()
             self.ui.show()
             self.app.exec()
         else:
