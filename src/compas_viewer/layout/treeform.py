@@ -7,6 +7,7 @@ from PySide6.QtWidgets import QTreeWidgetItem
 
 from compas_viewer.scene.scene import ViewerScene
 
+
 class Treeform(QTreeWidget):
     """
     Class for displaying tree-like data.

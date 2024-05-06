@@ -1,7 +1,9 @@
 from typing import Optional
+
 from PySide6 import QtWidgets
-from PySide6.QtWidgets import QWidget
 from PySide6.QtWidgets import QMainWindow
+from PySide6.QtWidgets import QWidget
+
 
 class MainWindow(QMainWindow):
 

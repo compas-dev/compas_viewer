@@ -1,8 +1,8 @@
 import compas
 from compas.colors import Color
+from compas.datastructures import Mesh
 from compas.geometry import Box
 from compas.geometry import Frame
-from compas.datastructures import Mesh
 from compas_viewer._viewer import Viewer
 
 if __name__ == "__main__":

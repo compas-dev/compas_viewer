@@ -1,8 +1,10 @@
 from PySide6 import QtWidgets
 from PySide6.QtCore import Qt
+
 from compas_viewer.layout import Treeform
-from compas_viewer.scene.scene import ViewerScene
+
 from .box_factory import BoxFactory
+
 
 class ViewerSetting:
     def __init__(self) -> None:

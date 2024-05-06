@@ -1,5 +1,5 @@
-from typing import Optional
 from PySide6.QtWidgets import QLabel
+
 
 class LabelFactory(QLabel):
 

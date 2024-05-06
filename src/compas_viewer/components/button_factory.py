@@ -1,6 +1,10 @@
 import pathlib
 from typing import Callable
-from PySide6 import QtCore, QtWidgets, QtGui
+
+from PySide6 import QtCore
+from PySide6 import QtGui
+from PySide6 import QtWidgets
+
 
 def set_icon_path(icon_name: str) -> str:
     path = QtGui.QIcon(

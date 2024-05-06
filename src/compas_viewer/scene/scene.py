@@ -12,6 +12,7 @@ from compas.scene import Scene
 
 from .sceneobject import ViewerSceneObject
 
+
 def instance_colors_generator(i: int = 0) -> Generator:
     """
     Generate a set of non-repetitive random colors for instance colors.

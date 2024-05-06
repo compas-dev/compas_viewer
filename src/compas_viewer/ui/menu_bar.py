@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
-    from .ui import UI
+    pass
 
 def new_file():
     print("new file...")

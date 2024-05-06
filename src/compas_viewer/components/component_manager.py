@@ -1,5 +1,8 @@
 from PySide6.QtWidgets import QWidget
-from .default_component_factory import ViewerSetting, ViewerTreeForm
+
+from .default_component_factory import ViewerSetting
+from .default_component_factory import ViewerTreeForm
+
 
 class ComponentsManager:
     def __init__(self) -> None:

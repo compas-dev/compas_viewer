@@ -20,7 +20,7 @@ from compas.geometry import Vector
 
 if TYPE_CHECKING:
     # https://peps.python.org/pep-0484/#runtime-or-type-checking
-    from .renderer import Renderer
+    pass
 
 
 class Position(Vector):

@@ -8,7 +8,9 @@ from OpenGL import GL
 from PySide6.QtCore import QObject
 from PySide6.QtCore import QPoint
 from PySide6.QtCore import Signal
+
 from compas.colors import Color
+
 
 class Selector(QObject):
     """Selector class manages all selection operations for the viewer.

@@ -1,5 +1,6 @@
 from compas_viewer.components.label_factory import LabelFactory
 
+
 class SatusBar:
     def __init__(self) -> None:
         self.label = LabelFactory()

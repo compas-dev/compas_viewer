@@ -1,5 +1,6 @@
-from PySide6 import QtWidgets
 from PySide6 import QtGui
+from PySide6 import QtWidgets
+
 
 class BoxFactory():
     def __init__(self) -> None:

@@ -10,6 +10,7 @@ from compas_viewer.configurations import ControllerConfig
 
 from .mouse import Mouse
 
+
 class Controller:
     """
     The Controller class is the main entry of all the key and mouse events.
