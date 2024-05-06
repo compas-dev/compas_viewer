@@ -4,9 +4,7 @@ from PySide6 import QtWidgets
 
 class BoxFactory:
     def __init__(self) -> None:
-        self.spacing = float(8)
-
-        pass
+        self.spacing: int = 8
 
     def double_edit_widget(self, label_name: str, value: float, minval: float, maxval: float) -> QtWidgets.QWidget:
         widget = QtWidgets.QWidget()
@@ -20,7 +18,7 @@ class BoxFactory:
         line_edit.setValidator(validator)
         layout.addWidget(label)
         layout.addWidget(line_edit)
-        layout.setSpacing(8)
+        layout.setSpacing(self.spacing)
         layout.setContentsMargins(0, 0, 0, 0)
         widget.setLayout(layout)
         return widget
@@ -36,7 +34,7 @@ class BoxFactory:
         spinner.setValue(value)
         layout.addWidget(label)
         layout.addWidget(spinner)
-        layout.setSpacing(8)
+        layout.setSpacing(self.spacing)
         layout.setContentsMargins(0, 0, 0, 0)
         widget.setLayout(layout)
         return widget

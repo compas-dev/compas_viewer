@@ -36,9 +36,9 @@ class Controller:
     def __init__(self, config: ControllerConfig):
         self.config = config
         self.mouse = Mouse()
-        self.actions: dict[str, Action] = {}
-        for k, v in self.config.actions.items():
-            self.actions[k] = Action(k, v)
+        # self.actions: dict[str, Action] = {}
+        # for k, v in self.config.actions.items():
+        #     self.actions[k] = Action(k, v)
 
     # ==============================================================================
     # Actions
@@ -181,36 +181,36 @@ class Controller:
         steps = degrees / 15
         self.viewer.renderer.camera.zoom(steps)
 
-    def key_press_action(self, event: QKeyEvent):
-        """
-        The key press action of the renderer object.
-        This function introduces break for different actions, meaning only one action can be performed at a time.
+    # def key_press_action(self, event: QKeyEvent):
+    #     """
+    #     The key press action of the renderer object.
+    #     This function introduces break for different actions, meaning only one action can be performed at a time.
 
-        Parameters
-        ----------
-        renderer : :class:`compas_viewer.components.renderer.Renderer`
-            The renderer object.
-        event : :PySide6:`PySide6/QtGui/QKeyEvent`
-            The Qt event.
-        """
-        for action in self.actions.values():
-            if event.key() == action.key and event.modifiers() == action.modifier:
-                action.pressed.emit()
-                break
+    #     Parameters
+    #     ----------
+    #     renderer : :class:`compas_viewer.components.renderer.Renderer`
+    #         The renderer object.
+    #     event : :PySide6:`PySide6/QtGui/QKeyEvent`
+    #         The Qt event.
+    #     """
+    #     for action in self.actions.values():
+    #         if event.key() == action.key and event.modifiers() == action.modifier:
+    #             action.pressed.emit()
+    #             break
 
-    def key_release_action(self, event: QKeyEvent):
-        """
-        The key release action of the renderer object.
-        This function introduces break for different actions, meaning only one action can be performed at a time.
+    # def key_release_action(self, event: QKeyEvent):
+    #     """
+    #     The key release action of the renderer object.
+    #     This function introduces break for different actions, meaning only one action can be performed at a time.
 
-        Parameters
-        ----------
-        renderer : :class:`compas_viewer.components.renderer.Renderer`
-            The renderer object.
-        event : :PySide6:`PySide6/QtGui/QKeyEvent`
-            The Qt event.
-        """
-        for action in self.actions.values():
-            if event.key() == action.key and event.modifiers() == action.modifier:
-                action.released.emit()
-                break
+    #     Parameters
+    #     ----------
+    #     renderer : :class:`compas_viewer.components.renderer.Renderer`
+    #         The renderer object.
+    #     event : :PySide6:`PySide6/QtGui/QKeyEvent`
+    #         The Qt event.
+    #     """
+    #     for action in self.actions.values():
+    #         if event.key() == action.key and event.modifiers() == action.modifier:
+    #             action.released.emit()
+    #             break

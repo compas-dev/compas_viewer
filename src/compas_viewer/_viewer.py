@@ -36,9 +36,6 @@ class Viewer:
             self._is_initialised = True
 
     def show(self):
-        if hasattr(self, "ui"):
-            self.ui.lazy_init()
-            self.ui.show()
-            self.app.exec()
-        else:
-            print("UI component not initialized.")
+        self.ui.lazy_init()
+        self.ui.show()
+        self.app.exec()

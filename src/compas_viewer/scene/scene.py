@@ -66,7 +66,7 @@ class ViewerScene(Scene):
     """
 
     def __init__(self, name: str, context: str):
-        super(ViewerScene, self).__init__(name=name, context=context)
+        super().__init__(name=name, context=context)
 
         #  Primitive
         self.objects: list[ViewerSceneObject]

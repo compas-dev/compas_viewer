@@ -1,8 +1,8 @@
-from .main_window import MainWindow
-from .menu_bar import MenuBar
-from .status_bar import SatusBar
-from .tool_bar import ToolBar
-from .view_port import ViewPort
+from .mainwindow import MainWindow
+from .menubar import MenuBar
+from .statusbar import SatusBar
+from .toolbar import ToolBar
+from .viewport import ViewPort
 
 
 class UI:
