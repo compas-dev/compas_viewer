@@ -8,7 +8,7 @@ from .box_factory import BoxFactory
 
 class ViewerSetting:
     def __init__(self) -> None:
-        self.box_factory=BoxFactory()
+        self.box_factory = BoxFactory()
 
     def camera_target_setting(self) -> QtWidgets.QGroupBox:
         widget = QtWidgets.QGroupBox()
@@ -20,8 +20,8 @@ class ViewerSetting:
         layout.setContentsMargins(4, 4, 4, 4)
         widget.setTitle("Camera target")
         widget.setLayout(layout)
-        return widget 
-    
+        return widget
+
     def camera_location_setting(self) -> QtWidgets.QGroupBox:
         widget = QtWidgets.QGroupBox()
         layout = QtWidgets.QVBoxLayout()
@@ -32,7 +32,7 @@ class ViewerSetting:
         layout.setContentsMargins(4, 4, 4, 4)
         widget.setTitle("Camera location")
         widget.setLayout(layout)
-        return widget 
+        return widget
 
     def camera_pov_setting(self) -> QtWidgets.QGroupBox:
         widget = QtWidgets.QGroupBox()
@@ -44,8 +44,8 @@ class ViewerSetting:
         layout.setContentsMargins(4, 4, 4, 4)
         widget.setTitle("Camera pov")
         widget.setLayout(layout)
-        return widget 
-    
+        return widget
+
     def camera_all_setting(self) -> QtWidgets.QVBoxLayout:
         layout = QtWidgets.QVBoxLayout()
         widget = QtWidgets.QFrame()
@@ -59,11 +59,12 @@ class ViewerSetting:
         layout.addStretch()
         return widget
 
+
 class ViewerTreeForm:
-    
     @property
     def viewer(self):
         from compas_viewer.main import Viewer
+
         return Viewer()
 
     def tree_view(self) -> QtWidgets.QSplitter:
@@ -72,4 +73,3 @@ class ViewerTreeForm:
         splitter.setOrientation(Qt.Orientation.Vertical)
         splitter.addWidget(form_ids)
         return splitter
-

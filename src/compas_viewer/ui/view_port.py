@@ -8,22 +8,24 @@ class SideBarRight(ComponentsManager):
     def __init__(self) -> None:
         super().__init__()
         self.default_widgets: list[dict[str, str]] = [{"type": "tree_view", "temp": "temp"}]
-        self.custom_widgets: list[dict[str, str]] = [] #TODO(pitsai): self.viewer.config.ui.sidebar.items
-        self.all_widgets: list = self.default_widgets + self.custom_widgets 
+        self.custom_widgets: list[dict[str, str]] = []  # TODO(pitsai): self.viewer.config.ui.sidebar.items
+        self.all_widgets: list = self.default_widgets + self.custom_widgets
         # TODO(pitsai): check nameings
         self.side_right_widget = None
 
     @property
     def viewer(self):
         from compas_viewer.main import Viewer
+
         return Viewer()
-    
+
     def setup_sidebar_right(self) -> None:
         self.side_right_widget = QtWidgets.QSplitter(QtCore.Qt.Orientation.Vertical)
         self.side_right_widget.setChildrenCollapsible(True)
         self.add_widgets(self.all_widgets)
         self.side_right_widget = self.setup_widgets(self.side_right_widget)
         self.side_right_widget.setHidden(not self.viewer.config.ui.sidebar.show)
+
 
 class ViewPort:
     def __init__(self):
@@ -32,6 +34,7 @@ class ViewPort:
     @property
     def viewer(self):
         from compas_viewer.main import Viewer
+
         return Viewer()
 
     def setup_view_port(self) -> None:

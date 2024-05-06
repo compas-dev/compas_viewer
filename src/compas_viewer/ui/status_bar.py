@@ -9,6 +9,7 @@ class SatusBar:
     @property
     def viewer(self):
         from compas_viewer.main import Viewer
+
         return Viewer()
 
     def setup_status_bar(self):

@@ -47,7 +47,7 @@ class Controller:
     @property
     def viewer(self):
         from compas_viewer.main import Viewer
-        
+
         return Viewer()
 
     def mouse_move_action(self, event: QMouseEvent):

@@ -7,10 +7,9 @@ from PySide6 import QtWidgets
 
 
 def set_icon_path(icon_name: str) -> str:
-    path = QtGui.QIcon(
-            str(pathlib.Path(__file__).parent.parent / "icons" / icon_name)
-        ) 
+    path = QtGui.QIcon(str(pathlib.Path(__file__).parent.parent / "icons" / icon_name))
     return path
+
 
 class ButtonFactory(QtWidgets.QPushButton):
     def __init__(self, icon_name: str, tooltip: str, action: Callable[[], None], parent=None):

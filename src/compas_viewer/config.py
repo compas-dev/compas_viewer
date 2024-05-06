@@ -49,14 +49,16 @@ class CameraConfig(Base):
     far: float = 1000
     fov: float = 50
 
+
 @dataclass
 class DisplayConfig(Base):
-    pointcolor: Color =  Color.black() # Black
-    linecolor: Color = Color.black() # Black
-    surfacecolor: Color = Color.grey() # Grey
+    pointcolor: Color = Color.black()  # Black
+    linecolor: Color = Color.black()  # Black
+    surfacecolor: Color = Color.grey()  # Grey
     pointssize: float = float(6.0)
     lineswidth: float = float(1.0)
     opacity: float = float(1.0)
+
 
 @dataclass
 class View3dConfig(Base):
@@ -108,6 +110,7 @@ class UIConfig(Base):
     sidebar: SidebarConfig = field(default_factory=SidebarConfig)
     view3d: View3dConfig = field(default_factory=View3dConfig)
     display: DisplayConfig = field(default_factory=DisplayConfig)
+
 
 @dataclass
 class ControllerConfig(Base):

@@ -2,17 +2,13 @@ from PySide6 import QtGui
 from PySide6 import QtWidgets
 
 
-class BoxFactory():
+class BoxFactory:
     def __init__(self) -> None:
         self.spacing = float(8)
 
         pass
 
-    def double_edit_widget(self, 
-                           label_name: str,
-                           value: float,
-                           minval: float,
-                           maxval: float) -> QtWidgets.QWidget:
+    def double_edit_widget(self, label_name: str, value: float, minval: float, maxval: float) -> QtWidgets.QWidget:
         widget = QtWidgets.QWidget()
         layout = QtWidgets.QHBoxLayout()
         validator = QtGui.QDoubleValidator()
@@ -28,12 +24,8 @@ class BoxFactory():
         layout.setContentsMargins(0, 0, 0, 0)
         widget.setLayout(layout)
         return widget
-    
-    def double_spinner_widget(self,
-                              label_name: str,
-                              value: float,
-                              minval: float,
-                              maxval: float) -> QtWidgets.QWidget:
+
+    def double_spinner_widget(self, label_name: str, value: float, minval: float, maxval: float) -> QtWidgets.QWidget:
         widget = QtWidgets.QWidget()
         layout = QtWidgets.QHBoxLayout()
         spinner = QtWidgets.QSpinBox()

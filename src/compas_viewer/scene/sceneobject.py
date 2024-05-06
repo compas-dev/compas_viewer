@@ -102,8 +102,8 @@ class ViewerSceneObject(SceneObject):
         super().__init__(**kwargs)
         self.is_visible = is_visible
         self.show_points = show_points if show_points is not None else True
-        self.show_lines = show_lines if show_lines is not None else True 
-        self.show_faces = show_faces if show_faces is not None else True 
+        self.show_lines = show_lines if show_lines is not None else True
+        self.show_faces = show_faces if show_faces is not None else True
         self.lineswidth = lineswidth if lineswidth is not None else self.viewer.config.ui.display.lineswidth
         self.pointssize = pointssize if pointssize is not None else self.viewer.config.ui.display.pointssize
         self.opacity = opacity if opacity is not None else self.viewer.config.ui.display.opacity
@@ -139,6 +139,7 @@ class ViewerSceneObject(SceneObject):
     @property
     def viewer(self):
         from compas_viewer.main import Viewer
+
         return Viewer()
 
     @property

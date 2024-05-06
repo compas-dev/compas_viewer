@@ -127,18 +127,18 @@ class Camera:
         The scale factor for camera's near, far and pan_delta.
     """
 
-    def __init__(self,
-                 fov: Optional[float] = 45.0,
-                 near: Optional[float] = 0.1,
-                 far: Optional[float] = 1000.0,
-                 init_position: Optional[tuple] = [10.0, 10.0, 10.0],
-                 init_target: Optional[tuple] = [0.0, 0.0, 0.0],
-                 scale: Optional[float] = 1.0,
-                 zoomdelta: Optional[float] = 0.05,
-                 rotationdelta: Optional[float] = 0.01,
-                 pan_delta: Optional[float] = 0.05
-                 ) -> None:
-        
+    def __init__(
+        self,
+        fov: Optional[float] = 45.0,
+        near: Optional[float] = 0.1,
+        far: Optional[float] = 1000.0,
+        init_position: Optional[tuple] = [10.0, 10.0, 10.0],
+        init_target: Optional[tuple] = [0.0, 0.0, 0.0],
+        scale: Optional[float] = 1.0,
+        zoomdelta: Optional[float] = 0.05,
+        rotationdelta: Optional[float] = 0.01,
+        pan_delta: Optional[float] = 0.05,
+    ) -> None:
         self.fov = fov
         self.near = near
         self.far = far
@@ -164,6 +164,7 @@ class Camera:
     @property
     def viewer(self):
         from compas_viewer.main import Viewer
+
         return Viewer()
 
     @property
@@ -412,21 +413,13 @@ class Camera:
         """
         aspect = width / height
         if self.viewer.renderer.viewmode == "perspective":
-            P = self.perspective(self.fov, 
-                                 aspect, 
-                                 self.near * self.scale, 
-                                 self.far * self.scale)
+            P = self.perspective(self.fov, aspect, self.near * self.scale, self.far * self.scale)
         else:
             left = -self.distance
             right = self.distance
             bottom = -self.distance / aspect
             top = self.distance / aspect
-            P = self.ortho(left, 
-                           right, 
-                           bottom, 
-                           top, 
-                           self.near * self.scale,
-                           self.far * self.scale)
+            P = self.ortho(left, right, bottom, top, self.near * self.scale, self.far * self.scale)
         return list(asfortranarray(P, dtype=float32))
 
     def viewworld(self) -> list[list[float]]:

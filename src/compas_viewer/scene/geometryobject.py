@@ -67,13 +67,14 @@ class GeometryObject(ViewerSceneObject, BaseGeometryObject):
 
         self.u = u
         self.v = v
-        self.pointcolor = pointcolor if pointcolor is not None else self.viewer.config.ui.display.pointcolor 
+        self.pointcolor = pointcolor if pointcolor is not None else self.viewer.config.ui.display.pointcolor
         self.linecolor = linecolor if linecolor is not None else self.viewer.config.ui.display.linecolor
         self.surfacecolor = surfacecolor if surfacecolor is not None else self.viewer.config.ui.display.surfacecolor
 
     @property
     def viewer(self):
         from compas_viewer.main import Viewer
+
         return Viewer()
 
     @property

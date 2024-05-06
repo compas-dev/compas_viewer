@@ -70,7 +70,7 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
         # self.edgecolor = edgecolor if edgecolor is not None else self.viewer.config.ui.display.linecolor
         # self.facecolor = facecolor if facecolor is not None else self.viewer.config.ui.display.surfacecolor
 
-        #TODO(pitsai): check _read_lines_data
+        # TODO(pitsai): check _read_lines_data
         if not vertexcolor:
             self.vertexcolor = self.viewer.config.ui.display.pointcolor
             for vertex in self.mesh.vertices():
@@ -91,10 +91,11 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
                 self.facecolor[face] = self.mesh.face_attribute(face, "color")  # type: ignore
         else:
             self.facecolor = facecolor
-   
+
     @property
     def viewer(self):
         from compas_viewer.main import Viewer
+
         return Viewer()
 
     def _read_points_data(self) -> ShaderDataType:

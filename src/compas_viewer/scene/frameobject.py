@@ -56,7 +56,7 @@ class FrameObject(ViewerSceneObject):
     ):
         super().__init__(item=frame, **kwargs)
         self.frame = frame
-        self.linecolor = linecolor if linecolor else Color(0.5, 0.5, 0.5) 
+        self.linecolor = linecolor if linecolor else Color(0.5, 0.5, 0.5)
         self.dx = framesize[0] if framesize else float(0.1)
         self.nx = framesize[1] if framesize else int(10)
         self.dy = framesize[2] if framesize else float(0.1)

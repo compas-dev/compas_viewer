@@ -50,7 +50,7 @@ class Selector(QObject):
 
     def __init__(self):
         super().__init__()
-        self.selectioncolor = Color(0, 0, 0) 
+        self.selectioncolor = Color(0, 0, 0)
 
         #  Drag selection
         self.on_drag_selection: bool = False
@@ -66,6 +66,7 @@ class Selector(QObject):
     @property
     def viewer(self):
         from compas_viewer.main import Viewer
+
         return Viewer()
 
     def select_action(self):

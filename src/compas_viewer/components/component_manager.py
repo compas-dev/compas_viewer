@@ -11,10 +11,10 @@ class ComponentsManager:
         self.tree_form = ViewerTreeForm()
 
     def create_widget(self, widget_type: str):
-        if widget_type == 'tree_view':
-            return self.tree_form.tree_view()  
-        elif widget_type == 'camera_all_settings':
-            return self.setting.camera_all_setting()  
+        if widget_type == "tree_view":
+            return self.tree_form.tree_view()
+        elif widget_type == "camera_all_settings":
+            return self.setting.camera_all_setting()
         else:
             raise ValueError(f"Unknown widget type: {widget_type}")
 

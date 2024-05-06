@@ -61,9 +61,7 @@ class Treeform(QTreeWidget):
             for j in range(10):
                 sp = viewer.scene.add(Sphere(0.1, Frame([i, j, 0], [1, 0, 0], [0, 1, 0])), name=f"Sphere_{i}_{j}")
 
-        viewer.layout.sidedock.add_element(
-            Treeform(viewer._tree, {"Name": (lambda o: o.object.name), "Object": (lambda o: o.object)})
-        )
+        viewer.layout.sidedock.add_element(Treeform(viewer._tree, {"Name": (lambda o: o.object.name), "Object": (lambda o: o.object)}))
 
         viewer.show()
 

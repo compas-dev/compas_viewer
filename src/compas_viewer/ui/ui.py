@@ -7,7 +7,6 @@ from .view_port import ViewPort
 
 class UI:
     def __init__(self) -> None:
-
         self.window = MainWindow()
         self.menubar = MenuBar()
         self.statusbar = SatusBar()
@@ -17,12 +16,13 @@ class UI:
     @property
     def viewer(self):
         from compas_viewer.main import Viewer
+
         return Viewer()
-    
+
     def lazy_init(self):
         width = self.viewer.config.window.width
         height = self.viewer.config.window.height
-        
+
         self.resize(width, height)
         self.window.setup_window()
         self.menubar.setup_menu()
