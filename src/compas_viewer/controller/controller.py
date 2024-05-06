@@ -38,7 +38,7 @@ class Controller:
         self.mouse = Mouse()
         self.actions: dict[str, Action] = {}
         for k, v in self.config.actions.items():
-            self.actions[k] = Action(k, self.viewer, v)
+            self.actions[k] = Action(k, v)
 
     # ==============================================================================
     # Actions
@@ -47,6 +47,7 @@ class Controller:
     @property
     def viewer(self):
         from compas_viewer.main import Viewer
+        
         return Viewer()
 
     def mouse_move_action(self, event: QMouseEvent):

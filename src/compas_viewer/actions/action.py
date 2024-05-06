@@ -1,5 +1,4 @@
 from abc import abstractmethod
-from typing import TYPE_CHECKING
 
 from PySide6.QtCore import QObject
 from PySide6.QtCore import Signal
@@ -7,9 +6,6 @@ from PySide6.QtCore import Signal
 from compas_viewer.configurations import ActionConfig
 
 from . import get_action_cls
-
-if TYPE_CHECKING:
-    from compas_viewer.viewer import Viewer
 
 
 class Action(QObject):
@@ -46,20 +42,24 @@ class Action(QObject):
     pressed = Signal()
     released = Signal()
 
-    def __new__(cls, name: str, viewer: "Viewer", config: ActionConfig, **kwargs):
+    def __new__(cls, name: str, config: ActionConfig, **kwargs):
         action_cls = get_action_cls(name)
         return super(Action, cls).__new__(action_cls, **kwargs)
 
-    def __init__(self, name: str, viewer: "Viewer", config: ActionConfig):
+    def __init__(self, name: str, config: ActionConfig):
         super().__init__()
         self.name = name
-        self.viewer = viewer
-        self.scene = viewer.scene
         self.config = config
         self.key = self.config.key
         self.modifier = self.config.modifier
         self.pressed.connect(self.pressed_action)
         self.released.connect(self.released_action)
+
+    @property
+    def viewer(self):
+        from compas_viewer.main import Viewer
+
+        return Viewer()
 
     @abstractmethod
     def pressed_action(self, **kwargs):

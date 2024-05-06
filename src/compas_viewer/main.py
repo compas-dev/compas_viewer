@@ -21,6 +21,5 @@ if __name__ == "__main__":
                 name=f"Box_{i}_{j}",
             )
             print()
-    
-    viewer.show()
 
+    viewer.show()
