@@ -111,6 +111,7 @@ class ViewerSceneObject(SceneObject):
         #  Selection
         self._is_locked = is_locked
         self.is_selected = not is_locked and is_selected
+        # TODO scene
         self.instance_color = Color.from_rgb255(*next(self.viewer.scene._instance_colors_generator))
         if not is_locked:
             self.viewer.scene.instance_colors[self.instance_color.rgb255] = self
@@ -138,7 +139,7 @@ class ViewerSceneObject(SceneObject):
 
     @property
     def viewer(self):
-        from compas_viewer.main import Viewer
+        from compas_viewer.viewer import Viewer
 
         return Viewer()
 
@@ -151,6 +152,7 @@ class ViewerSceneObject(SceneObject):
         self._is_locked = value
         if value:
             self.is_selected = False
+            # scene parent
             self.viewer.scene.instance_colors.pop(self.instance_color.rgb255)
         else:
             self.viewer.scene.instance_colors[self.instance_color.rgb255] = self

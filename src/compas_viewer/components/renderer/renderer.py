@@ -70,7 +70,7 @@ class Renderer(QOpenGLWidget):
 
     @property
     def viewer(self):
-        from compas_viewer.main import Viewer
+        from compas_viewer.viewer import Viewer
 
         return Viewer()
 

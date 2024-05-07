@@ -3,7 +3,7 @@ from compas.colors import Color
 from compas.datastructures import Mesh
 from compas.geometry import Box
 from compas.geometry import Frame
-from compas_viewer._viewer import Viewer
+from compas_viewer.viewer import Viewer
 
 if __name__ == "__main__":
     viewer = Viewer()

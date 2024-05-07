@@ -9,16 +9,17 @@ class SideBarRight:
         super().__init__()
         self.side_right_widget = None
         self.default_widgets: list[str] = ["TreeForm"]
-        self.custom_widgets: list[str] = ["Camera_Target"]  # TODO(pitsai): self.viewer.config.ui.sidebar.items
+        self.custom_widgets: list[str] = []  # TODO(pitsai): self.viewer.config.ui.sidebar.items
         self.widget_list: list = self.default_widgets + self.custom_widgets
 
     @property
     def viewer(self):
-        from compas_viewer.main import Viewer
+        from compas_viewer.viewer import Viewer
 
         return Viewer()
 
     def setup_sidebar_right(self) -> None:
+        # TODO(pitsai): call at ui or viewer
         self.component_manager = ComponentsManager()
         self.side_right_widget = QtWidgets.QSplitter(QtCore.Qt.Orientation.Vertical)
         self.side_right_widget.setChildrenCollapsible(True)
@@ -33,7 +34,7 @@ class ViewPort:
 
     @property
     def viewer(self):
-        from compas_viewer.main import Viewer
+        from compas_viewer.viewer import Viewer
 
         return Viewer()
 
