@@ -1,7 +1,7 @@
 from PySide6 import QtWidgets
 
-from .treeform_components import TreeformComponents
 from .setting_components import SettingComponents
+from .treeform_components import TreeformComponents
 
 
 class ComponentsManager:

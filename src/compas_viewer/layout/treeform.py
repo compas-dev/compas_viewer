@@ -5,7 +5,7 @@ from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QTreeWidget
 from PySide6.QtWidgets import QTreeWidgetItem
 
-from compas_viewer.scene.scene import ViewerScene
+from compas.datastructures import Tree
 
 
 class Treeform(QTreeWidget):
@@ -69,7 +69,7 @@ class Treeform(QTreeWidget):
 
     def __init__(
         self,
-        tree: ViewerScene,
+        tree: Tree,
         columns: dict[str, Callable],
         column_editable: list[bool] = [False],
         show_headers: bool = True,
@@ -89,13 +89,13 @@ class Treeform(QTreeWidget):
         self._tree = tree
 
     @property
-    def tree(self) -> ViewerScene:
+    def tree(self) -> Tree:
         return self._tree
 
     @tree.setter
-    def tree(self, tree: ViewerScene):
+    def tree(self, tree: Tree):
         self.clear()
-        for node in tree.tree.traverse("breadthfirst"):
+        for node in tree.traverse("breadthfirst"):
             if node.is_root:
                 continue
 

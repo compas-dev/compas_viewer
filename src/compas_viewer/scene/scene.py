@@ -65,7 +65,7 @@ class ViewerScene(Scene):
     :class:`compas.scene.Scene`
     """
 
-    def __init__(self, name: str, context: str):
+    def __init__(self, name: str = "ViewerScene", context: str = "Viewer"):
         super().__init__(name=name, context=context)
 
         #  Primitive
