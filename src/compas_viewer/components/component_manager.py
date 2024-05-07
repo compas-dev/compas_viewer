@@ -1,37 +1,73 @@
-from PySide6.QtWidgets import QWidget
+from PySide6 import QtWidgets
 
-from .default_component_factory import ViewerSetting
-from .default_component_factory import ViewerTreeForm
+from .treeform_components import TreeformComponents
+from .setting_components import SettingComponents
 
 
 class ComponentsManager:
-    def __init__(self) -> None:
+    """
+    The ComponentsManager class is designed to manage and integrate various UI components
+    from different component groups within a single manager. This enables efficient
+    aggregation and control of widgets from separate component classes, facilitating
+    easier management of complex GUI structures.
+
+    This class combines widgets from setting components and treeform components or more,
+    allowing them to be added dynamically to any specified parent widget within a Qt application.
+
+    Attributes
+    ----------
+    setting_components : :class:`SettingComponents`
+        An instance of SettingComponents which manages individual setting-related widgets.
+    treeform_components : :class:`TreeformComponents`
+        An instance of TreeformComponents which manages tree structure-related widgets.
+    all_widgets : dict
+        A dictionary containing all widgets from all components.
+    manager_widgets : dict
+        A dictionary to store widgets that are actively managed and displayed in the UI.
+
+    Methods
+    -------
+    add_widgets(widget_keys: list[str])
+        Adds widgets to the manager's active list based on the provided widget keys. If a key is not
+        found, it prints an error message.
+    setup_widgets(parent_widget: :class:`QtWidgets.QWidget`)
+        Adds all managed widgets to the specified parent widget, ensuring they are displayed in the GUI.
+
+    Raises
+    ------
+    TypeError
+        If the provided parent_widget is not an instance of :class:`QtWidgets.QWidget`.
+
+    See Also
+    --------
+    :class:`SettingComponents`
+    :class:`TreeformComponents`
+
+    Examples
+    --------
+    >>> manager = ComponentsManager()
+    >>> manager.add_widgets(["setting1", "treeform1"])
+    >>> parent_widget = QtWidgets.QWidget()
+    >>> manager.setup_widgets(parent_widget)
+    """
+
+    def __init__(self):
+        self.setting_components = SettingComponents()
+        self.treeform_components = TreeformComponents()
+        self.all_widgets = {**self.setting_components.widgets, **self.treeform_components.widgets}
         self.manager_widgets = {}
-        self.setting = ViewerSetting()
-        self.tree_form = ViewerTreeForm()
 
-    def create_widget(self, widget_type: str):
-        if widget_type == "tree_view":
-            return self.tree_form.tree_view()
-        elif widget_type == "camera_all_settings":
-            return self.setting.camera_all_setting()
-        else:
-            raise ValueError(f"Unknown widget type: {widget_type}")
-
-    def add_widgets(self, widget_list: list[dict[str, str]]):
-        for widget in widget_list:
-            widget_instance = self.create_widget(widget["type"])
-            if widget_instance:  # Check if widget instance is not None
-                self.manager_widgets[widget["type"]] = widget_instance
+    def add_widgets(self, widget_keys: list[str]):
+        for key in widget_keys:
+            widget_instance = self.all_widgets.get(key)
+            if widget_instance:
+                self.manager_widgets[key] = widget_instance
             else:
-                print(f"Failed to create widget of type {widget['type']}")
+                print(f"Components manager failed to locate widget of type {key}")
 
-    def setup_widgets(self, parent_widget):
-        for widget_type, widget_instance in self.manager_widgets.items():
-            if not isinstance(parent_widget, QWidget):
-                raise TypeError("parent_widget must be a QtWidgets")
-            if isinstance(widget_instance, QWidget):
-                parent_widget.addWidget(widget_instance)
-            else:
-                raise TypeError(f"Widget instance of type {widget_type} is not a QWidget")
+    def setup_widgets(self, parent_widget: QtWidgets.QWidget):
+        if not isinstance(parent_widget, QtWidgets.QWidget):
+            raise TypeError("parent_widget must be a QtWidgets.QWidget")
+        for widget in self.manager_widgets.values():
+            parent_widget.addWidget(widget)
         return parent_widget

@@ -1,9 +1,9 @@
-from compas_viewer.components.label_factory import LabelFactory
+from compas_viewer.components.widget_tools import LabelWidget
 
 
 class SatusBar:
     def __init__(self) -> None:
-        self.label = LabelFactory()
+        self.label = LabelWidget()
         self.widget = None
 
     @property
@@ -15,4 +15,4 @@ class SatusBar:
     def setup_status_bar(self):
         self.widget = self.viewer.ui.window.statusBar()
         self.widget.setHidden(not self.viewer.config.ui.statusbar.show)
-        self.widget.addWidget(self.label.set_text(text="Ready..."))
+        self.widget.addWidget(self.label(text="Ready..."))

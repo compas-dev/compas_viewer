@@ -4,14 +4,13 @@ from PySide6 import QtWidgets
 from compas_viewer.components.component_manager import ComponentsManager
 
 
-class SideBarRight(ComponentsManager):
+class SideBarRight:
     def __init__(self) -> None:
         super().__init__()
-        self.default_widgets: list[dict[str, str]] = [{"type": "tree_view", "temp": "temp"}]
-        self.custom_widgets: list[dict[str, str]] = []  # TODO(pitsai): self.viewer.config.ui.sidebar.items
-        self.all_widgets: list = self.default_widgets + self.custom_widgets
-        # TODO(pitsai): check nameings
         self.side_right_widget = None
+        self.default_widgets: list[str] = ["TreeForm"]
+        self.custom_widgets: list[str] = ["Camera_Target"]  # TODO(pitsai): self.viewer.config.ui.sidebar.items
+        self.widget_list: list = self.default_widgets + self.custom_widgets
 
     @property
     def viewer(self):
@@ -20,10 +19,11 @@ class SideBarRight(ComponentsManager):
         return Viewer()
 
     def setup_sidebar_right(self) -> None:
+        self.component_manager = ComponentsManager()
         self.side_right_widget = QtWidgets.QSplitter(QtCore.Qt.Orientation.Vertical)
         self.side_right_widget.setChildrenCollapsible(True)
-        self.add_widgets(self.all_widgets)
-        self.side_right_widget = self.setup_widgets(self.side_right_widget)
+        self.component_manager.add_widgets(self.widget_list)
+        self.side_right_widget = self.component_manager.setup_widgets(self.side_right_widget)
         self.side_right_widget.setHidden(not self.viewer.config.ui.sidebar.show)
 
 

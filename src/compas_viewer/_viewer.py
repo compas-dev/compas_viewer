@@ -16,7 +16,7 @@ class Viewer:
 
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
-            cls._instance = super(Viewer, cls).__new__(cls)
+            cls._instance = super().__new__(cls)
             cls._is_initialised = False
         return cls._instance
 

@@ -16,9 +16,8 @@ class MainWindow(QMainWindow):
         self.set_window_title()
         self.set_window_central()
 
-    def set_window_title(self, title: Optional[str] = None) -> None:
-        if title is None:
-            title = self.viewer.config.window.title
+    def set_window_title(self) -> None:
+        title = self.viewer.config.window.title
         self.setWindowTitle(title)
 
     def set_window_central(self) -> None:
