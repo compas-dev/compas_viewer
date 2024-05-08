@@ -59,7 +59,7 @@
         </script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Viewer.add" href="compas_viewer.viewer.Viewer.add.html" />
+    <link rel="next" title="Viewer.show" href="compas_viewer.viewer.Viewer.show.html" />
     <link rel="prev" title="compas_viewer.viewer" href="../compas_viewer.viewer.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -588,74 +588,13 @@ document.write(`
 <h1>Viewer</h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="compas_viewer.viewer.Viewer">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Viewer</span></span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/32ea97a/src/compas_viewer/viewer.py#L29"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Viewer</span></span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/c783fcc/src/compas_viewer/viewer.py#L14"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<p>The Viewer class is the main entry of the viewer. It contains the scene and create the GUI application.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>title</strong><span class="classifier">str, optional</span></dt><dd><p>The title of the viewer window.  It will override the value in the config file.</p>
-</dd>
-<dt><strong>fullscreen</strong><span class="classifier">bool, optional</span></dt><dd><p>The fullscreen mode of the viewer window. It will override the value in the config file.</p>
-</dd>
-<dt><strong>width</strong><span class="classifier">int, optional</span></dt><dd><p>The width of the viewer window at startup. It will override the value in the config file.</p>
-</dd>
-<dt><strong>height</strong><span class="classifier">int, optional</span></dt><dd><p>The height of the viewer window at startup. It will override the value in the config file.</p>
-</dd>
-<dt><strong>rendermode</strong><span class="classifier">Literal[‘shaded’, ‘ghosted’, ‘wireframe’, ‘lighted’], optional</span></dt><dd><p>The display mode of the OpenGL view. It will override the value in the config file.</p>
-</dd>
-<dt><strong>viewmode</strong><span class="classifier">Literal[‘front’, ‘right’, ‘top’, ‘perspective’], optional</span></dt><dd><p>The view mode of the OpenGL view. It will override the value in the config file.
-In ‘ghosted’ mode, all objects have a default opacity of 0.7.</p>
-</dd>
-<dt><strong>show_grid</strong><span class="classifier">bool, optional</span></dt><dd><p>Show the XY plane. It will override the value in the config file.</p>
-</dd>
-<dt><strong>configpath</strong><span class="classifier">str, optional</span></dt><dd><p>The path to the config folder.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-<p class="rubric">Notes</p>
-<p>The viewer has a (main) window with a central OpenGL widget,
-and a menubar, toolbar, and statusbar.
-The menubar provides access to all supported ‘actions’.
-The toolbar is meant to be a ‘quicknav’ to a selected set of actions.
-The viewer supports rotate/pan/zoom, and object selection via picking or box selections.
-Currently the viewer uses OpenGL 2.2 and GLSL 120 with a ‘compatibility’ profile.</p>
-<p class="rubric">Examples</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">compas_viewer</span> <span class="kn">import</span> <span class="n">Viewer</span>
-
-<span class="n">viewer</span> <span class="o">=</span> <span class="n">Viewer</span><span class="p">()</span>
-<span class="n">viewer</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-</div>
-<dl class="field-list">
-<dt class="field-odd">Attributes<span class="colon">:</span></dt>
-<dd class="field-odd"><dl>
-<dt><strong>scene</strong><span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas_viewer.scene.ViewerScene</span></code></span></dt><dd><p>The scene of the viewer.</p>
-</dd>
-<dt><strong>render</strong><span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas_viewer.components.render.Render</span></code></span></dt><dd><p>The render component of the viewer.</p>
-</dd>
-<dt><strong>controller</strong><span class="classifier"><a class="reference internal" href="compas_viewer.controller.Controller.html#compas_viewer.controller.Controller" title="compas_viewer.controller.Controller"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas_viewer.controller.Controller</span></code></a></span></dt><dd><p>The controller component of the viewer.</p>
-</dd>
-<dt><strong>layout</strong><span class="classifier"><a class="reference internal" href="compas_viewer.layout.Layout.html#compas_viewer.layout.Layout" title="compas_viewer.layout.Layout"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas_viewer.layout.Layout</span></code></a></span></dt><dd><p>The layout component of the viewer.</p>
-</dd>
-</dl>
-</dd>
-</dl>
 <p class="rubric">Methods</p>
 <table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.viewer.Viewer.add.html#compas_viewer.viewer.Viewer.add" title="compas_viewer.viewer.Viewer.add"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add</span></code></a></p></td>
-<td><p>Add an item to the scene.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.viewer.Viewer.add_action.html#compas_viewer.viewer.Viewer.add_action" title="compas_viewer.viewer.Viewer.add_action"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_action</span></code></a></p></td>
-<td><p>Add a custom action to the viewer.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.viewer.Viewer.on.html#compas_viewer.viewer.Viewer.on" title="compas_viewer.viewer.Viewer.on"><code class="xref py py-obj docutils literal notranslate"><span class="pre">on</span></code></a></p></td>
-<td><p>Decorator for callbacks of a dynamic drawing process.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.viewer.Viewer.show.html#compas_viewer.viewer.Viewer.show" title="compas_viewer.viewer.Viewer.show"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show</span></code></a></p></td>
-<td><p>Show the viewer window.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.viewer.Viewer.show.html#compas_viewer.viewer.Viewer.show" title="compas_viewer.viewer.Viewer.show"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show</span></code></a></p></td>
+<td><p></p></td>
 </tr>
 </tbody>
 </table>
