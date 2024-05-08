@@ -92,12 +92,6 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
         else:
             self.facecolor = facecolor
 
-    @property
-    def viewer(self):
-        from compas_viewer.viewer import Viewer
-
-        return Viewer()
-
     def _read_points_data(self) -> ShaderDataType:
         positions = []
         colors = []

@@ -13,6 +13,7 @@ from PySide6.QtOpenGLWidgets import QOpenGLWidget
 
 from compas.geometry import Frame
 from compas.geometry import transform_points_numpy
+from compas_viewer.base import Base
 from compas_viewer.configurations import RendererConfig
 from compas_viewer.scene import TagObject
 from compas_viewer.scene.collectionobject import CollectionObject
@@ -29,7 +30,7 @@ if TYPE_CHECKING:
     from compas_viewer.scene.meshobject import MeshObject
 
 
-class Renderer(QOpenGLWidget):
+class Renderer(QOpenGLWidget, Base):
     """
     Renderer class for 3D rendering of COMPAS geometry.
     We constantly use OpenGL version 2.1 and GLSL 120 with a Compatibility Profile at the moment.
@@ -67,12 +68,6 @@ class Renderer(QOpenGLWidget):
 
         self.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
         self.grabGesture(QtCore.Qt.PinchGesture)
-
-    @property
-    def viewer(self):
-        from compas_viewer.viewer import Viewer
-
-        return Viewer()
 
     @property
     def rendermode(self):
