@@ -10,9 +10,10 @@ from PySide6.QtCore import QPoint
 from PySide6.QtCore import Signal
 
 from compas.colors import Color
+from compas_viewer.base import Base
 
 
-class Selector(QObject):
+class Selector(QObject, Base):
     """Selector class manages all selection operations for the viewer.
 
     Parameters
@@ -62,12 +63,6 @@ class Selector(QObject):
         self.multiselect.connect(self.multiselect_action)
         self.drag_selection.connect(self.drag_selection_action)
         self.drag_deselection.connect(self.drag_deselection_action)
-
-    @property
-    def viewer(self):
-        from compas_viewer.viewer import Viewer
-
-        return Viewer()
 
     def select_action(self):
         """Select the object under the mouse cursor."""

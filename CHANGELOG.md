@@ -10,10 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 * Added `PointcloudObject`.
+* Added `compas_viewer.base.Base` to access viewer singleton.
+* Added `compas_viewer.singleton.SingletonMeta` and `compas_viewer.singleton.Singleton`.
 
 ### Changed
 
 * Changed `NurbsSurfaceObject` to use tessellation function of `OCCBrep`, show boundary curves instead of control curves.
+* Renamed all lazy setup functions to `lazy_init`.
 
 ### Removed
 

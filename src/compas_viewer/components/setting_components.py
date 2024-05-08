@@ -7,7 +7,7 @@ class SettingComponents:
     def __init__(self) -> None:
         self.widgets = {}
 
-    def initialize_settings(self):
+    def lazy_init(self):
         # Dynamically call methods based on naming convention
         for name in dir(self):
             if name.endswith("_setting") and callable(getattr(self, name)):
