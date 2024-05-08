@@ -18,7 +18,7 @@ class MenuBar:
 
         return Viewer()
 
-    def setup_menu(self):
+    def lazy_init(self):
         self.widget = self.viewer.ui.window.menuBar()
         filemenu = self.widget.addMenu("File")
         filemenu.addAction("New File...", new_file)

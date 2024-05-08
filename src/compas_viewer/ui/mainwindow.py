@@ -10,7 +10,7 @@ class MainWindow(QMainWindow):
 
         return Viewer()
 
-    def setup_window(self):
+    def lazy_init(self):
         self.set_window_title()
         self.set_window_central()
 

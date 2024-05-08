@@ -15,7 +15,7 @@ class ToolBar:
 
         return Viewer()
 
-    def setup_tool_bar(self):
+    def lazy_init(self):
         self.widget = self.viewer.ui.window.addToolBar("Tools")
         self.widget.setMovable(False)
         self.widget.setObjectName("Tools")

@@ -27,13 +27,13 @@ class UI:
         height = self.viewer.config.window.height
 
         self.resize(width, height)
-        self.components_manager.setup_manager()
-        self.window.setup_window()
-        self.menubar.setup_menu()
-        self.statusbar.setup_status_bar()
-        self.toolbar.setup_tool_bar()
-        self.viewport.setup_view_port()
-        self.viewer.renderer.camera.setup_camera()
+        self.components_manager.lazy_init()
+        self.window.lazy_init()
+        self.menubar.lazy_init()
+        self.statusbar.lazy_init()
+        self.toolbar.lazy_init()
+        self.viewport.lazy_init()
+        self.viewer.renderer.camera.lazy_init()
 
     def show(self):
         self.window.show()
