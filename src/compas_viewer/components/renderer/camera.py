@@ -17,6 +17,7 @@ from compas.geometry import Rotation
 from compas.geometry import Transformation
 from compas.geometry import Translation
 from compas.geometry import Vector
+from compas_viewer.base import Base
 
 if TYPE_CHECKING:
     # https://peps.python.org/pep-0484/#runtime-or-type-checking
@@ -85,7 +86,7 @@ class RotationEuler(Position):
     pass
 
 
-class Camera:
+class Camera(Base):
     """Camera object for the default view.
 
     Parameters
@@ -160,12 +161,6 @@ class Camera:
         self.reset_position()
         # if self.renderer.config.viewmode == "perspective":
         #     self.position = Position(self.config.position)
-
-    @property
-    def viewer(self):
-        from compas_viewer.viewer import Viewer
-
-        return Viewer()
 
     @property
     def position(self) -> Position:
