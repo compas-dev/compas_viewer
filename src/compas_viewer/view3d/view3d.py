@@ -131,16 +131,6 @@ class View3D(InteractiveOpenGLWidget):
         self.camera = Camera()
 
     def lazy_init(self):
-        self.camera.lazy_init()
-        for obj in self.viewer.scene.objects:
-            obj.init()
-
-    def paintGL(self):
-        self.clear()
-        super().paintGL()
-        self.renderCustomScene()
-
-    def renderCustomScene(self):
         """
         Paint all the items in the render, which only be called by the paintGL function
         and determines the performance of the renders
@@ -152,6 +142,12 @@ class View3D(InteractiveOpenGLWidget):
         :func:`compas_viewer.components.render.Render.paintGL`
         :func:`compas_viewer.components.render.Render.paint_instance`
         """
+
+        self.camera.lazy_init()
+
+        for obj in self.viewer.scene.objects:
+            obj.init()
+
         # TODO(pitsai): impliment shader
         projection = self.camera.projection(self.w, self.h)
         viewworld = self.camera.viewworld()
@@ -180,6 +176,10 @@ class View3D(InteractiveOpenGLWidget):
             obj.draw(self.shader_model, True, False)
         self.shader_model.release()
 
+    def paintGL(self):
+        self.clear()
+        super().paintGL()
+
     def update_projection(self, w=None, h=None):
         """
         Update the projection matrix.
@@ -191,7 +191,7 @@ class View3D(InteractiveOpenGLWidget):
         h : int, optional
             The height of the renderer, by default None.
         """
-
+        # TODO(pitsai): recalculating is only performed when the viewport size changes.
         projection = self.camera.projection(self.w, self.h)
         self.shader_model.bind()
         self.shader_model.uniform4x4("projection", projection)
