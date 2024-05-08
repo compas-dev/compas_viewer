@@ -1,10 +1,10 @@
+from compas_viewer.components.component_manager import ComponentsManager
+
 from .mainwindow import MainWindow
 from .menubar import MenuBar
 from .statusbar import SatusBar
 from .toolbar import ToolBar
 from .viewport import ViewPort
-
-from compas_viewer.components.component_manager import ComponentsManager
 
 
 class UI:

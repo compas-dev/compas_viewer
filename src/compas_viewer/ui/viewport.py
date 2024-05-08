@@ -1,8 +1,6 @@
 from PySide6 import QtCore
 from PySide6 import QtWidgets
 
-from compas_viewer.components.component_manager import ComponentsManager
-
 
 class SideBarRight:
     def __init__(self) -> None:
