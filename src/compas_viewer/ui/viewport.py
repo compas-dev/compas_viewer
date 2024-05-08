@@ -1,7 +1,7 @@
 from PySide6 import QtCore
 from PySide6 import QtWidgets
 
-from compas_viewer.components.component_manager import ComponentsManager
+from compas_viewer.view3d.view3d import View3D
 
 
 class SideBarRight:
@@ -40,6 +40,6 @@ class ViewPort:
         self.sidebar_right.setup_sidebar_right()
 
         self.viewport_widget = QtWidgets.QSplitter()
-        self.viewport_widget.addWidget(self.viewer.renderer)
+        self.viewport_widget.addWidget(View3D())
         self.viewport_widget.addWidget(self.sidebar_right.side_right_widget)
         self.viewer.ui.window.centralWidget().layout().addWidget(self.viewport_widget)
