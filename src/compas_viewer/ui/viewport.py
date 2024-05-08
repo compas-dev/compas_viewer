@@ -19,12 +19,10 @@ class SideBarRight:
         return Viewer()
 
     def setup_sidebar_right(self) -> None:
-        # TODO(pitsai): call at ui or viewer
-        self.component_manager = ComponentsManager()
         self.side_right_widget = QtWidgets.QSplitter(QtCore.Qt.Orientation.Vertical)
         self.side_right_widget.setChildrenCollapsible(True)
-        self.component_manager.add_widgets(self.widget_list)
-        self.side_right_widget = self.component_manager.setup_widgets(self.side_right_widget)
+        self.viewer.ui.components_manager.add_widgets(self.widget_list)
+        self.side_right_widget = self.viewer.ui.components_manager.setup_widgets(self.side_right_widget)
         self.side_right_widget.setHidden(not self.viewer.config.ui.sidebar.show)
 
 

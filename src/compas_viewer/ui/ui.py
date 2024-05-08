@@ -4,9 +4,12 @@ from .statusbar import SatusBar
 from .toolbar import ToolBar
 from .viewport import ViewPort
 
+from compas_viewer.components.component_manager import ComponentsManager
+
 
 class UI:
     def __init__(self) -> None:
+        self.components_manager = ComponentsManager()
         self.window = MainWindow()
         self.menubar = MenuBar()
         self.statusbar = SatusBar()
@@ -24,6 +27,7 @@ class UI:
         height = self.viewer.config.window.height
 
         self.resize(width, height)
+        self.components_manager.setup_manager()
         self.window.setup_window()
         self.menubar.setup_menu()
         self.statusbar.setup_status_bar()

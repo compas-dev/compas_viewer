@@ -6,7 +6,6 @@ from .widget_tools import DoubleEditWidget
 class SettingComponents:
     def __init__(self) -> None:
         self.widgets = {}
-        self.initialize_settings()
 
     def initialize_settings(self):
         # Dynamically call methods based on naming convention

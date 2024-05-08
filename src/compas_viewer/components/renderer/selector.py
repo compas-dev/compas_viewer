@@ -86,7 +86,8 @@ class Selector(QObject):
             selected_obj.is_selected = True
 
         # Update the layout.
-        self.viewer.layout.update()
+        # TODO: This is a temporary solution to update the layout.
+        # self.viewer.layout.update()
 
     def deselect_action(self):
         """Deselect the object under the mouse cursor."""

@@ -8,7 +8,6 @@ from compas_viewer.layout import Treeform
 class TreeformComponents:
     def __init__(self) -> None:
         self.widgets = {}
-        self.initialize_settings()
 
     def initialize_settings(self):
         for name in dir(self):
