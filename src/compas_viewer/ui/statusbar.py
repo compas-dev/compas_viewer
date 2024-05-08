@@ -1,16 +1,11 @@
+from compas_viewer.base import Base
 from compas_viewer.components.widget_tools import LabelWidget
 
 
-class SatusBar:
+class SatusBar(Base):
     def __init__(self) -> None:
         self.label = LabelWidget()
         self.widget = None
-
-    @property
-    def viewer(self):
-        from compas_viewer.viewer import Viewer
-
-        return Viewer()
 
     def setup_status_bar(self):
         self.widget = self.viewer.ui.window.statusBar()

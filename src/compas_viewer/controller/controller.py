@@ -6,12 +6,13 @@ from PySide6.QtWidgets import QApplication
 from PySide6.QtWidgets import QPinchGesture
 
 from compas_viewer.actions import Action
+from compas_viewer.base import Base
 from compas_viewer.configurations import ControllerConfig
 
 from .mouse import Mouse
 
 
-class Controller:
+class Controller(Base):
     """
     The Controller class is the main entry of all the key and mouse events.
     It is used to manage actions and events in the viewer.
@@ -43,12 +44,6 @@ class Controller:
     # ==============================================================================
     # Actions
     # ==============================================================================
-
-    @property
-    def viewer(self):
-        from compas_viewer.viewer import Viewer
-
-        return Viewer()
 
     def mouse_move_action(self, event: QMouseEvent):
         """

@@ -1,13 +1,14 @@
+from compas_viewer.base import Base
+from compas_viewer.components.component_manager import ComponentsManager
+
 from .mainwindow import MainWindow
 from .menubar import MenuBar
 from .statusbar import SatusBar
 from .toolbar import ToolBar
 from .viewport import ViewPort
 
-from compas_viewer.components.component_manager import ComponentsManager
 
-
-class UI:
+class UI(Base):
     def __init__(self) -> None:
         self.components_manager = ComponentsManager()
         self.window = MainWindow()
@@ -15,12 +16,6 @@ class UI:
         self.statusbar = SatusBar()
         self.toolbar = ToolBar()
         self.viewport = ViewPort()
-
-    @property
-    def viewer(self):
-        from compas_viewer.viewer import Viewer
-
-        return Viewer()
 
     def lazy_init(self):
         width = self.viewer.config.window.width

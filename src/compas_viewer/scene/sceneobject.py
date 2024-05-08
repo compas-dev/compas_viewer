@@ -11,6 +11,7 @@ from compas.geometry import Transformation
 from compas.geometry import transform_points_numpy
 from compas.itertools import flatten
 from compas.scene import SceneObject
+from compas_viewer.base import Base
 from compas_viewer.components.renderer.shaders import Shader
 from compas_viewer.gl import make_index_buffer
 from compas_viewer.gl import make_vertex_buffer
@@ -21,7 +22,7 @@ from compas_viewer.gl import update_vertex_buffer
 ShaderDataType = tuple[list[Point], list[Color], list[list[int]]]
 
 
-class ViewerSceneObject(SceneObject):
+class ViewerSceneObject(SceneObject, Base):
     """
     Base class for all Viewer scene objects
     which also includes the  GL buffer creation and drawing methods.
@@ -138,12 +139,6 @@ class ViewerSceneObject(SceneObject):
         self._backfaces_buffer: [dict[str, Any]] = None  # type: ignore
 
     @property
-    def viewer(self):
-        from compas_viewer.viewer import Viewer
-
-        return Viewer()
-
-    @property
     def is_locked(self):
         return self._is_locked
 
@@ -153,9 +148,9 @@ class ViewerSceneObject(SceneObject):
         if value:
             self.is_selected = False
             # scene parent
-            self.viewer.scene.instance_colors.pop(self.instance_color.rgb255)
+            self.scene.instance_colors.pop(self.instance_color.rgb255)
         else:
-            self.viewer.scene.instance_colors[self.instance_color.rgb255] = self
+            self.scene.instance_colors[self.instance_color.rgb255] = self
 
     @property
     def bounding_box(self):

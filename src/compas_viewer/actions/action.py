@@ -3,12 +3,13 @@ from abc import abstractmethod
 from PySide6.QtCore import QObject
 from PySide6.QtCore import Signal
 
+from compas_viewer.base import Base
 from compas_viewer.configurations import ActionConfig
 
 from . import get_action_cls
 
 
-class Action(QObject):
+class Action(QObject, Base):
     """
     Actions are functions that are called when a certain event happens, such as mouse and keyboard click.
 
@@ -54,12 +55,6 @@ class Action(QObject):
         self.modifier = self.config.modifier
         self.pressed.connect(self.pressed_action)
         self.released.connect(self.released_action)
-
-    @property
-    def viewer(self):
-        from compas_viewer.viewer import Viewer
-
-        return Viewer()
 
     @abstractmethod
     def pressed_action(self, **kwargs):
