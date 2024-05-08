@@ -9,7 +9,7 @@ class TreeformComponents:
     def __init__(self) -> None:
         self.widgets = {}
 
-    def initialize_settings(self):
+    def lazy_init(self):
         for name in dir(self):
             if name.endswith("_setting") and callable(getattr(self, name)):
                 method = getattr(self, name)
