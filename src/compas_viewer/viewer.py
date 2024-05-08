@@ -18,7 +18,7 @@ class Viewer(Singleton):
         self.config = Config()
         self.scene = ViewerScene()
         # TODO(pitsai): combine config file
-        self.renderer = Renderer(RendererConfig.from_default())
+        # self.renderer = Renderer(RendererConfig.from_default())
         self.controller = Controller(ControllerConfig.from_default())
         self.ui = UI()
 

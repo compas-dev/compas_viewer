@@ -326,14 +326,15 @@ class Camera(Base):
     def reset_position(self):
         """Reset the position of the camera based current view type."""
         self.target.set(0, 0, 0, False)
-        if self.viewer.renderer.viewmode == "perspective":
-            self.rotation.set(pi / 4, 0, -pi / 4, False)
-        if self.viewer.renderer.viewmode == "top":
-            self.rotation.set(0, 0, 0, False)
-        if self.viewer.renderer.viewmode == "front":
-            self.rotation.set(pi / 2, 0, 0, False)
-        if self.viewer.renderer.viewmode == "right":
-            self.rotation.set(pi / 2, 0, pi / 2, False)
+        self.rotation.set(pi / 4, 0, -pi / 4, False)
+        # if self.viewer.renderer.viewmode == "perspective":
+        #     self.rotation.set(pi / 4, 0, -pi / 4, False)
+        # if self.viewer.renderer.viewmode == "top":
+        #     self.rotation.set(0, 0, 0, False)
+        # if self.viewer.renderer.viewmode == "front":
+        #     self.rotation.set(pi / 2, 0, 0, False)
+        # if self.viewer.renderer.viewmode == "right":
+        #     self.rotation.set(pi / 2, 0, pi / 2, False)
 
     def rotate(self, dx: float, dy: float):
         """Rotate the camera based on current mouse movement.

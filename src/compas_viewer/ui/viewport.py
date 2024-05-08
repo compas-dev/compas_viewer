@@ -13,7 +13,7 @@ class SideBarRight(Base):
         self.custom_widgets: list[str] = []  # TODO(pitsai): self.viewer.config.ui.sidebar.items
         self.widget_list: list = self.default_widgets + self.custom_widgets
 
-    def setup_sidebar_right(self) -> None:
+    def lazy_init(self) -> None:
         self.side_right_widget = QtWidgets.QSplitter(QtCore.Qt.Orientation.Vertical)
         self.side_right_widget.setChildrenCollapsible(True)
         self.viewer.ui.components_manager.add_widgets(self.widget_list)
@@ -23,12 +23,13 @@ class SideBarRight(Base):
 
 class ViewPort(Base):
     def __init__(self):
+        self.view3d = View3D()
         self.sidebar_right = SideBarRight()
 
     def lazy_init(self) -> None:
-        self.sidebar_right.setup_sidebar_right()
+        self.sidebar_right.lazy_init()
 
         self.viewport_widget = QtWidgets.QSplitter()
-        self.viewport_widget.addWidget(View3D())
+        self.viewport_widget.addWidget(self.view3d)
         self.viewport_widget.addWidget(self.sidebar_right.side_right_widget)
         self.viewer.ui.window.centralWidget().layout().addWidget(self.viewport_widget)

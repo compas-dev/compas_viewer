@@ -28,7 +28,6 @@ class UI(Base):
         self.statusbar.lazy_init()
         self.toolbar.lazy_init()
         self.viewport.lazy_init()
-        self.viewer.renderer.camera.lazy_init()
 
     def show(self):
         self.window.show()

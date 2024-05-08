@@ -4,13 +4,15 @@ from typing import Any
 from typing import Generator
 from typing import Optional
 from typing import Union
-
+from collections import defaultdict
 from compas.colors import Color
 from compas.datastructures import Datastructure
 from compas.geometry import Geometry
 from compas.scene import Scene
 
 from .sceneobject import ViewerSceneObject
+from .collectionobject import CollectionObject
+from .meshobject import MeshObject
 
 
 def instance_colors_generator(i: int = 0) -> Generator:
@@ -187,3 +189,20 @@ class ViewerScene(Scene):
         )
 
         return sceneobject
+
+    def sort_objects_from_category(self, output_type: str):
+        sorted_objs = defaultdict(list)
+
+        def sort(obj):
+            if isinstance(obj, CollectionObject):
+                [sort(item) for item in obj.objects]
+            else:
+                sorted_objs[type(obj)].append(obj)
+
+        for obj in self.objects:
+            sort(obj)
+
+        if output_type == "MeshObject":
+            output_type = MeshObject
+
+        return sorted_objs[output_type]
