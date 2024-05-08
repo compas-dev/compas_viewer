@@ -23,7 +23,7 @@ class Viewer:
     def __init__(self, *args, **kwargs):
         if not self._is_initialised:
             self.app = QApplication(sys.argv)
-            self.config = Config.from_json("src/compas_viewer/config.json")
+            self.config = Config()
             self.scene = ViewerScene()
             # TODO(pitsai): combine config file
             self.renderer = Renderer(RendererConfig.from_default())

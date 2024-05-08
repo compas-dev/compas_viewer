@@ -20,6 +20,5 @@ if __name__ == "__main__":
                 surfacecolor=Color(i / 10, j / 10, 0.0),
                 name=f"Box_{i}_{j}",
             )
-            print()
 
     viewer.show()

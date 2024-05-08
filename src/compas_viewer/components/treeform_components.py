@@ -35,5 +35,5 @@ class TreeformComponents:
         self.register_widget(title, splitter)
 
     def treeform_setting(self) -> None:
-        form_ids = Treeform(self.viewer.scene.tree, {"Name": (lambda o: o.name), "Object": (lambda o: o)})
+        form_ids = Treeform(self.viewer.scene, {"Name": (lambda o: o.name), "Object": (lambda o: o)})
         self.create_setting_group("TreeForm", form_ids)
