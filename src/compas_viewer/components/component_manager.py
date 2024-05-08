@@ -57,9 +57,9 @@ class ComponentsManager:
         self.all_widgets: dict = None
         self.manager_widgets = {}
 
-    def setup_manager(self):
-        self.setting_components.initialize_settings()
-        self.treeform_components.initialize_settings()
+    def lazy_init(self):
+        self.setting_components.lazy_init()
+        self.treeform_components.lazy_init()
         self.all_widgets = {**self.setting_components.widgets, **self.treeform_components.widgets}
 
     def add_widgets(self, widget_keys: list[str]):

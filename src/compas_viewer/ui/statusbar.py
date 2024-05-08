@@ -7,7 +7,7 @@ class SatusBar(Base):
         self.label = LabelWidget()
         self.widget = None
 
-    def setup_status_bar(self):
+    def lazy_init(self):
         self.widget = self.viewer.ui.window.statusBar()
         self.widget.setHidden(not self.viewer.config.ui.statusbar.show)
         self.widget.addWidget(self.label(text="Ready..."))

@@ -24,7 +24,7 @@ class ViewPort(Base):
     def __init__(self):
         self.sidebar_right = SideBarRight()
 
-    def setup_view_port(self) -> None:
+    def lazy_init(self) -> None:
         self.sidebar_right.setup_sidebar_right()
 
         self.viewport_widget = QtWidgets.QSplitter()

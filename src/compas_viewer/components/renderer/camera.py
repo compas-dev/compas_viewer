@@ -156,7 +156,7 @@ class Camera(Base):
         self._target.pause_update = False
         self.target = Position(init_target)
 
-    def setup_camera(self) -> None:
+    def lazy_init(self) -> None:
         # Camera position only modifiable in perspective view mode.
         self.reset_position()
         # if self.renderer.config.viewmode == "perspective":
