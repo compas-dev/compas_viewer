@@ -20,7 +20,7 @@ from compas.geometry import Vector
 
 if TYPE_CHECKING:
     # https://peps.python.org/pep-0484/#runtime-or-type-checking
-    from .renderer import Renderer
+    pass
 
 
 class Position(Vector):
@@ -127,20 +127,45 @@ class Camera:
         The scale factor for camera's near, far and pan_delta.
     """
 
-    def __init__(self, renderer: "Renderer"):
-        self.renderer = renderer
-        self.config = renderer.config.camera
-        self._position = Position((0.0, 0.0, 10.0 * self.config.scale), on_update=self._on_position_update)
+    def __init__(
+        self,
+        fov: Optional[float] = 45.0,
+        near: Optional[float] = 0.1,
+        far: Optional[float] = 1000.0,
+        init_position: Optional[tuple] = [10.0, 10.0, 10.0],
+        init_target: Optional[tuple] = [0.0, 0.0, 0.0],
+        scale: Optional[float] = 1.0,
+        zoomdelta: Optional[float] = 0.05,
+        rotationdelta: Optional[float] = 0.01,
+        pan_delta: Optional[float] = 0.05,
+    ) -> None:
+        self.fov = fov
+        self.near = near
+        self.far = far
+        self.scale = scale
+        self.zoomdelta = zoomdelta
+        self.rotationdelta = rotationdelta
+        self.pan_delta = pan_delta
+
+        self._position = Position(init_position, on_update=self._on_position_update)
         self._rotation = RotationEuler((0, 0, 0), on_update=self._on_rotation_update)
-        self._target = Position((0, 0, 0), on_update=self._on_target_update)
+        self._target = Position(init_target, on_update=self._on_target_update)
         self._position.pause_update = False
         self._rotation.pause_update = False
         self._target.pause_update = False
+        self.target = Position(init_target)
+
+    def setup_camera(self) -> None:
         # Camera position only modifiable in perspective view mode.
         self.reset_position()
-        if self.renderer.config.viewmode == "perspective":
-            self.position = Position(self.config.position)
-        self.target = Position(self.config.target)
+        # if self.renderer.config.viewmode == "perspective":
+        #     self.position = Position(self.config.position)
+
+    @property
+    def viewer(self):
+        from compas_viewer.viewer import Viewer
+
+        return Viewer()
 
     @property
     def position(self) -> Position:
@@ -306,13 +331,13 @@ class Camera:
     def reset_position(self):
         """Reset the position of the camera based current view type."""
         self.target.set(0, 0, 0, False)
-        if self.renderer.viewmode == "perspective":
+        if self.viewer.renderer.viewmode == "perspective":
             self.rotation.set(pi / 4, 0, -pi / 4, False)
-        if self.renderer.viewmode == "top":
+        if self.viewer.renderer.viewmode == "top":
             self.rotation.set(0, 0, 0, False)
-        if self.renderer.viewmode == "front":
+        if self.viewer.renderer.viewmode == "front":
             self.rotation.set(pi / 2, 0, 0, False)
-        if self.renderer.viewmode == "right":
+        if self.viewer.renderer.viewmode == "right":
             self.rotation.set(pi / 2, 0, pi / 2, False)
 
     def rotate(self, dx: float, dy: float):
@@ -333,8 +358,8 @@ class Camera:
         is a perspective view (``camera.renderer.config.viewmode == "perspective"``).
 
         """
-        if self.renderer.config.viewmode == "perspective":
-            self.rotation += [-self.config.rotationdelta * dy, 0, -self.config.rotationdelta * dx]
+        if self.viewer.renderer.config.viewmode == "perspective":
+            self.rotation += [-self.rotationdelta * dy, 0, -self.rotationdelta * dx]
 
     def pan(self, dx: float, dy: float):
         """Pan the camera based on current mouse movement.
@@ -349,7 +374,7 @@ class Camera:
             with each increment the size of :attr:`Camera.pan_delta`.
         """
         R = Rotation.from_euler_angles(self.rotation)
-        T = Translation.from_vector([-dx * self.config.pan_delta * self.config.scale, dy * self.config.pan_delta * self.config.scale, 0])
+        T = Translation.from_vector([-dx * self.pan_delta * self.scale, dy * self.pan_delta * self.scale, 0])
         M = (R * T).matrix
         vector = [M[i][3] for i in range(3)]
         self.target += vector
@@ -364,7 +389,7 @@ class Camera:
             of :attr:`compas_viewer.components.renderer.Camera.config.zoomdelta`.
 
         """
-        self.distance -= steps * self.config.zoomdelta * self.distance
+        self.distance -= steps * self.zoomdelta * self.distance
 
     def projection(self, width: int, height: int) -> list[list[float]]:
         """Compute the projection matrix corresponding to the current camera settings.
@@ -387,14 +412,14 @@ class Camera:
 
         """
         aspect = width / height
-        if self.renderer.viewmode == "perspective":
-            P = self.perspective(self.config.fov, aspect, self.config.near * self.config.scale, self.config.far * self.config.scale)
+        if self.viewer.renderer.viewmode == "perspective":
+            P = self.perspective(self.fov, aspect, self.near * self.scale, self.far * self.scale)
         else:
             left = -self.distance
             right = self.distance
             bottom = -self.distance / aspect
             top = self.distance / aspect
-            P = self.ortho(left, right, bottom, top, self.config.near * self.config.scale, self.config.far * self.config.scale)
+            P = self.ortho(left, right, bottom, top, self.near * self.scale, self.far * self.scale)
         return list(asfortranarray(P, dtype=float32))
 
     def viewworld(self) -> list[list[float]]:

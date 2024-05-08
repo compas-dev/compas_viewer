@@ -1,7 +1,27 @@
 {
     "window": {
-        "title": "Hello World",
-        "width": 800,
-        "height": 600
+        "title": "COMPAS Viewer",
+        "width": 1280,
+        "height": 720,
+        "fullscreen": false,
+        "about": "Stand-alone viewer for COMPAS."
+    },
+    "ui": {
+        "menubar": {
+            "show": true
+        },
+        "toolbar": {
+            "show": true
+        },
+        "statusbar": {
+            "show": true
+        },
+        "sidebar": {
+            "show": true
+        },
+        "view3d": {
+            "viewport": "perspective"
+        }
+
     }
 }

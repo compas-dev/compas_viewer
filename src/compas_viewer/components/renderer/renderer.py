@@ -24,7 +24,7 @@ from .shaders import Shader
 
 if TYPE_CHECKING:
     # https://peps.python.org/pep-0484/#runtime-or-type-checking
-    from compas_viewer import Viewer
+    # from compas_viewer import Viewer
     from compas_viewer.scene.gridobject import GridObject
     from compas_viewer.scene.meshobject import MeshObject
 
@@ -43,12 +43,10 @@ class Renderer(QOpenGLWidget):
         The renderer configuration.
     """
 
-    def __init__(self, viewer: "Viewer", config: RendererConfig):
+    def __init__(self, config: RendererConfig):
         super().__init__()
 
         self.config = config
-        self.viewer = viewer
-        self.scene = viewer.scene
 
         self._viewmode = self.config.viewmode
         self._rendermode = self.config.rendermode
@@ -63,12 +61,18 @@ class Renderer(QOpenGLWidget):
         self.shader_instance: Shader
         self.shader_grid: Shader
 
-        self.camera = Camera(self)
-        self.selector = Selector(self)
+        self.camera = Camera()
+        self.selector = Selector()
         self.grid: "GridObject"
 
         self.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
         self.grabGesture(QtCore.Qt.PinchGesture)
+
+    @property
+    def viewer(self):
+        from compas_viewer.viewer import Viewer
+
+        return Viewer()
 
     @property
     def rendermode(self):
@@ -113,7 +117,7 @@ class Renderer(QOpenGLWidget):
         self.shader_model.bind()
         self.shader_model.uniform4x4(
             "projection",
-            self.camera.projection(self.viewer.layout.config.window.width, self.viewer.layout.config.window.height),
+            self.camera.projection(self.viewer.config.window.width, self.viewer.config.window.height),
         )
         self.shader_model.release()
         self.camera.reset_position()
@@ -194,8 +198,8 @@ class Renderer(QOpenGLWidget):
         * https://doc.qt.io/qtforpython-6/PySide6/QtOpenGL/QOpenGLWindow.html#PySide6.QtOpenGL.PySide6.QtOpenGL.QOpenGLWindow.resizeGL
 
         """
-        self.viewer.layout.config.window.width = w
-        self.viewer.layout.config.window.height = h
+        self.viewer.config.window.width = w
+        self.viewer.config.window.height = h
         GL.glViewport(0, 0, w, h)
         self.resize(w, h)
 
@@ -268,7 +272,7 @@ class Renderer(QOpenGLWidget):
 
         """
         if self.isActiveWindow() and self.underMouse():
-            self.viewer.controller.mouse_move_action(self, event)
+            self.viewer.controller.mouse_move_action(event)
             self.update()
 
     def mousePressEvent(self, event: QMouseEvent):
@@ -290,7 +294,7 @@ class Renderer(QOpenGLWidget):
 
         """
         if self.isActiveWindow() and self.underMouse():
-            self.viewer.controller.mouse_press_action(self, event)
+            self.viewer.controller.mouse_press_action(event)
             self.update()
 
     def mouseReleaseEvent(self, event: QMouseEvent):
@@ -312,7 +316,7 @@ class Renderer(QOpenGLWidget):
 
         """
         if self.isActiveWindow() and self.underMouse():
-            self.viewer.controller.mouse_release_action(self, event)
+            self.viewer.controller.mouse_release_action(event)
             self.update()
 
     def gestureEvent(self, event):
@@ -328,7 +332,7 @@ class Renderer(QOpenGLWidget):
         # Handle pinch gestures
         pinch = event.gesture(QtCore.Qt.PinchGesture)
         if pinch:
-            self.viewer.controller.pinch_action(self, pinch)
+            self.viewer.controller.pinch_action(pinch)
             self.update()
             return True
         else:
@@ -353,7 +357,7 @@ class Renderer(QOpenGLWidget):
 
         """
         if self.isActiveWindow() and self.underMouse():
-            self.viewer.controller.wheel_action(self, event)
+            self.viewer.controller.wheel_action(event)
             self.update()
 
     def keyPressEvent(self, event: QKeyEvent):
@@ -374,7 +378,7 @@ class Renderer(QOpenGLWidget):
         * https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QWidget.html#PySide6.QtWidgets.PySide6.QtWidgets.QWidget.keyPressEvent
 
         """
-        self.viewer.controller.key_press_action(self, event)
+        self.viewer.controller.key_press_action(event)
 
     def keyReleaseEvent(self, event: QKeyEvent):
         """
@@ -394,7 +398,7 @@ class Renderer(QOpenGLWidget):
         * https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QWidget.html#PySide6.QtWidgets.PySide6.QtWidgets.QWidget.keyReleaseEvent
 
         """
-        self.viewer.controller.key_release_action(self, event)
+        self.viewer.controller.key_release_action(event)
 
     # ==========================================================================
     # view
@@ -404,7 +408,7 @@ class Renderer(QOpenGLWidget):
         """Initialize the renderer."""
 
         # Init the grid
-        self.grid: GridObject = self.scene.add(  # type: ignore
+        self.grid: GridObject = self.viewer.scene.add(  # type: ignore
             Frame.worldXY(),
             framesize=self.config.gridsize,
             show_framez=self.config.show_gridz,
@@ -415,10 +419,10 @@ class Renderer(QOpenGLWidget):
         self.grid.init()  # type: ignore
 
         # Init the buffers
-        for obj in self.scene.objects:
+        for obj in self.viewer.scene.objects:
             obj.init()
 
-        projection = self.camera.projection(self.viewer.layout.config.window.width, self.viewer.layout.config.window.height)
+        projection = self.camera.projection(self.viewer.config.window.width, self.viewer.config.window.height)
         viewworld = self.camera.viewworld()
         transform = list(identity(4, dtype=float32))
         # create the program
@@ -447,7 +451,7 @@ class Renderer(QOpenGLWidget):
         self.shader_arrow.uniform4x4("viewworld", viewworld)
         self.shader_arrow.uniform4x4("transform", transform)
         self.shader_arrow.uniform1f("opacity", self.opacity)
-        self.shader_arrow.uniform1f("aspect", self.viewer.layout.config.window.width / self.viewer.layout.config.window.height)
+        self.shader_arrow.uniform1f("aspect", self.viewer.config.window.width / self.viewer.config.window.height)
         self.shader_arrow.release()
 
         self.shader_instance = Shader(name="instance")
@@ -475,8 +479,8 @@ class Renderer(QOpenGLWidget):
         h : int, optional
             The height of the renderer, by default None.
         """
-        w = w or self.viewer.layout.config.window.width
-        h = h or self.viewer.layout.config.window.height
+        w = w or self.viewer.config.window.width
+        h = h or self.viewer.config.window.height
 
         projection = self.camera.projection(w, h)
         self.shader_model.bind()
@@ -601,7 +605,7 @@ class Renderer(QOpenGLWidget):
         viewworld = self.camera.viewworld()
         self.update_projection()
         # Object categorization
-        tag_objs, vector_objs, mesh_objs = self.sort_objects_from_category((obj for obj in self.scene.objects if obj.is_visible))
+        tag_objs, vector_objs, mesh_objs = self.sort_objects_from_category((obj for obj in self.viewer.scene.objects if obj.is_visible))
 
         # Draw model objects in the scene
         self.shader_model.bind()
@@ -625,7 +629,7 @@ class Renderer(QOpenGLWidget):
         self.shader_tag.release()
 
         # draw 2D box for multi-selection
-        if self.selector.on_drag_selection and self.selector.enable_selector:
+        if self.selector.on_drag_selection:
             self.shader_model.draw_2d_box(
                 (
                     self.selector.drag_start_pt.x(),
@@ -633,8 +637,8 @@ class Renderer(QOpenGLWidget):
                     self.viewer.controller.mouse.last_pos.x(),
                     self.viewer.controller.mouse.last_pos.y(),
                 ),
-                self.viewer.layout.config.window.width,
-                self.viewer.layout.config.window.height,
+                self.viewer.config.window.width,
+                self.viewer.config.window.height,
             )
 
     def paint_instance(self):
@@ -653,7 +657,7 @@ class Renderer(QOpenGLWidget):
         viewworld = self.camera.viewworld()
         self.update_projection()
         # Object categorization
-        _, _, mesh_objs = self.sort_objects_from_category(tuple(self.scene.objects))
+        _, _, mesh_objs = self.sort_objects_from_category(tuple(self.viewer.scene.objects))
         # Draw instance maps
         GL.glDisable(GL.GL_POINT_SMOOTH)
         GL.glDisable(GL.GL_LINE_SMOOTH)
