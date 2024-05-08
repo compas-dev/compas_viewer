@@ -72,12 +72,6 @@ class GeometryObject(ViewerSceneObject, BaseGeometryObject):
         self.surfacecolor = surfacecolor if surfacecolor is not None else Color.grey()
 
     @property
-    def viewer(self):
-        from compas_viewer.viewer import Viewer
-
-        return Viewer()
-
-    @property
     def points(self) -> Optional[list[Point]]:
         """The points to be shown in the viewer."""
         raise NotImplementedError

@@ -1,3 +1,4 @@
+from compas_viewer.base import Base
 from compas_viewer.components.button_factory import ButtonFactory
 
 
@@ -5,15 +6,9 @@ def test_action() -> None:
     print("test action...")
 
 
-class ToolBar:
+class ToolBar(Base):
     def __init__(self) -> None:
         self.widget = None
-
-    @property
-    def viewer(self):
-        from compas_viewer.viewer import Viewer
-
-        return Viewer()
 
     def setup_tool_bar(self):
         self.widget = self.viewer.ui.window.addToolBar("Tools")

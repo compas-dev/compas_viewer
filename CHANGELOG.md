@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 * Added `PointcloudObject`.
+* Added `compas_viewer.base.Base` to access viewer singleton.
 
 ### Changed
 

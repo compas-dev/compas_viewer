@@ -2,14 +2,10 @@ from PySide6 import QtWidgets
 from PySide6.QtWidgets import QMainWindow
 from PySide6.QtWidgets import QWidget
 
+from compas_viewer.base import Base
 
-class MainWindow(QMainWindow):
-    @property
-    def viewer(self):
-        from compas_viewer.viewer import Viewer
 
-        return Viewer()
-
+class MainWindow(QMainWindow, Base):
     def setup_window(self):
         self.set_window_title()
         self.set_window_central()
