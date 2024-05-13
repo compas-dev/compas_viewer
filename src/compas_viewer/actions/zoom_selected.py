@@ -8,7 +8,9 @@ class ZoomSelected(Action):
     """Look at action."""
 
     def pressed_action(self):
-        selected_objs = [obj for obj in self.scene.objects if obj.is_selected]
+        selected_objs = [obj for obj in self.viewer.scene.objects if obj.is_selected]
+        if len(selected_objs) == 0:
+            selected_objs = self.viewer.scene.objects
         extents = []
 
         for obj in selected_objs:
@@ -24,7 +26,7 @@ class ZoomSelected(Action):
         extents = extents.reshape(-1, 3)
         max_corner = extents.max(axis=0)
         min_corner = extents.min(axis=0)
-        self.viewer.renderer.camera.config.scale = float((norm(max_corner - min_corner)) / 10)  # 10 is a tunned magic number
+        self.viewer.renderer.camera.scale = float((norm(max_corner - min_corner)) / 10)  # 10 is a tunned magic number
         center = (max_corner + min_corner) / 2
         distance = max(norm(max_corner - min_corner), 1)
 
