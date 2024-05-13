@@ -52,9 +52,9 @@ class CameraConfig(Base):
 
 @dataclass
 class DisplayConfig(Base):
-    pointcolor: Color = Color.black()  # Black
-    linecolor: Color = Color.black()  # Black
-    surfacecolor: Color = Color.grey()  # Grey
+    pointcolor: Color = field(default_factory=Color.black)
+    linecolor: Color = field(default_factory=Color.black)
+    surfacecolor: Color = field(default_factory=Color.grey)
     pointssize: float = float(6.0)
     lineswidth: float = float(1.0)
     opacity: float = float(1.0)
