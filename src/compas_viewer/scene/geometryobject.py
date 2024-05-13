@@ -55,8 +55,8 @@ class GeometryObject(ViewerSceneObject, BaseGeometryObject):
     def __init__(
         self,
         geometry: Geometry,
-        u: int,
-        v: int,
+        u: Optional[int] = 16,
+        v: Optional[int] = 16,
         pointcolor: Optional[Color] = None,
         linecolor: Optional[Color] = None,
         surfacecolor: Optional[Color] = None,
