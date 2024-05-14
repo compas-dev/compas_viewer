@@ -1,5 +1,4 @@
 from compas_viewer.base import Base
-from compas_viewer.components.component_manager import ComponentsManager
 
 from .mainwindow import MainWindow
 from .menubar import MenuBar
@@ -10,7 +9,6 @@ from .viewport import ViewPort
 
 class UI(Base):
     def __init__(self) -> None:
-        self.components_manager = ComponentsManager()
         self.window = MainWindow()
         self.menubar = MenuBar()
         self.statusbar = SatusBar()
@@ -22,7 +20,6 @@ class UI(Base):
         height = self.viewer.config.window.height
 
         self.resize(width, height)
-        self.components_manager.lazy_init()
         self.window.lazy_init()
         self.menubar.lazy_init()
         self.statusbar.lazy_init()

@@ -1,5 +1,5 @@
 from compas_viewer.base import Base
-from compas_viewer.components.button_factory import ButtonFactory
+from compas_viewer.components.button import Button
 
 
 def test_action() -> None:
@@ -15,4 +15,4 @@ class ToolBar(Base):
         self.widget.setMovable(False)
         self.widget.setObjectName("Tools")
         self.widget.setHidden(not self.viewer.config.ui.toolbar.show)
-        self.widget.addWidget(ButtonFactory("zoom_selected.svg", "zoom", test_action()))
+        self.widget.addWidget(Button("zoom_selected.svg", "zoom", test_action()))
