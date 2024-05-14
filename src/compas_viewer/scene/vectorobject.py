@@ -25,7 +25,7 @@ class VectorObject(ViewerSceneObject, GeometryObject):
     Notes
     -----
     The frame object is always unselectable.
-    Apart from the :attr:`compas_viewer.scene.vectorobject.VectorObject.config.lineswidth`
+    Apart from the :attr:`compas_viewer.scene.vectorobject.VectorObject.config.linewidth`
     that controls the width of the vector,
     the :attr:`compas_viewer.scene.vectorobject.VectorObject.config.vectorsize`
     (float 0-1) controls the size of the arrow.
@@ -75,7 +75,7 @@ class VectorObject(ViewerSceneObject, GeometryObject):
         shader.enable_attribute("color")
         shader.bind_attribute("position", self._lines_buffer["positions"])
         shader.bind_attribute("color", self._lines_buffer["colors"], step=4)
-        shader.draw_arrows(elements=self._lines_buffer["elements"], n=self._lines_buffer["n"], width=self.lineswidth, background=True)
+        shader.draw_arrows(elements=self._lines_buffer["elements"], n=self._lines_buffer["n"], width=self.linewidth, background=True)
         shader.draw_triangles(elements=self.arrow_buffer["elements"], n=self.arrow_buffer["n"], background=True)
         shader.disable_attribute("position")
         shader.disable_attribute("color")

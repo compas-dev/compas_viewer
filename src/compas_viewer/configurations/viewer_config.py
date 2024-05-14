@@ -25,9 +25,9 @@ class ViewerConfig(Config):
         The default setting for showing the lines.
     show_faces : bool
         The default setting for showing the faces.
-    lineswidth : float
+    linewidth : float
         The default width of the lines.
-    pointssize : float
+    pointsize : float
         The default size of the points.
     opacity : float
         The default opacity of the objects.
@@ -56,8 +56,8 @@ class ViewerConfig(Config):
         show_points: bool,
         show_lines: bool,
         show_faces: bool,
-        lineswidth: float,
-        pointssize: float,
+        linewidth: float,
+        pointsize: float,
         opacity: float,
         hide_coplanaredges: bool,
         use_vertexcolors: bool,
@@ -73,8 +73,8 @@ class ViewerConfig(Config):
         self.show_points = show_points
         self.show_lines = show_lines
         self.show_faces = show_faces
-        self.lineswidth = lineswidth
-        self.pointssize = pointssize
+        self.linewidth = linewidth
+        self.pointsize = pointsize
         self.opacity = opacity
         self.hide_coplanaredges = hide_coplanaredges
         self.use_vertexcolors = use_vertexcolors
