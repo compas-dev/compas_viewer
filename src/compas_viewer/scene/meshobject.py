@@ -84,7 +84,7 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
     @property
     def pointcolor(self) -> Color:
         return self.vertexcolor
-    
+
     @pointcolor.setter
     def pointcolor(self, color: Color):
         self.vertexcolor = color
@@ -92,7 +92,7 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
     @property
     def linecolor(self) -> Color:
         return self.edgecolor
-    
+
     @linecolor.setter
     def linecolor(self, color: Color):
         self.edgecolor = color
@@ -100,15 +100,15 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
     @property
     def show_points(self) -> bool:
         return self.show_vertices
-    
+
     @show_points.setter
     def show_points(self, show: bool):
         self.show_vertices = show
-    
+
     @property
     def show_lines(self) -> bool:
         return self.show_edges
-    
+
     @show_lines.setter
     def show_lines(self, show: bool):
         self.show_edges = show
@@ -116,19 +116,18 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
     @property
     def pointsize(self) -> float:
         return self.vertexsize
-    
+
     @pointsize.setter
     def pointsize(self, size: float):
         self.vertexsize = size
-    
+
     @property
     def linewidth(self) -> float:
         return self.edgesize
-    
+
     @linewidth.setter
     def linewidth(self, size: float):
         self.edgesize = size
-
 
     def _read_points_data(self) -> ShaderDataType:
         positions = []

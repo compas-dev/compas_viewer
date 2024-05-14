@@ -71,7 +71,7 @@ class GeometryObject(ViewerSceneObject, BaseGeometryObject):
     def facecolor(self) -> Color:
         """The color of the faces."""
         return self.surfacecolor
-    
+
     @facecolor.setter
     def facecolor(self, color: Color) -> None:
         self.surfacecolor = color
