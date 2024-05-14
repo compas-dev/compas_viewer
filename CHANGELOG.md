@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Changed `NurbsSurfaceObject` to use tessellation function of `OCCBrep`, show boundary curves instead of control curves.
 * Renamed all lazy setup functions to `lazy_init`.
 * Fixed camera initialization issue.
+* Fixed and brought back `CollectionObject`.
 
 ### Removed
 
