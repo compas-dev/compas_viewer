@@ -11,9 +11,9 @@ def set_icon_path(icon_name: str) -> str:
     return path
 
 
-class ButtonFactory(QtWidgets.QPushButton):
+class Button(QtWidgets.QPushButton):
     def __init__(self, icon_name: str, tooltip: str, action: Callable[[], None], parent=None):
-        super().__init__(parent)
+        super().__init__()
         self.setIcon(QtGui.QIcon(set_icon_path(icon_name)))
         self.setToolTip(tooltip)
         self.setIconSize(QtCore.QSize(12, 12))
