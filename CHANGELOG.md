@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added `compas_viewer.singleton.SingletonMeta` and `compas_viewer.singleton.Singleton`.
 * Added `compas_viewer.scene.Group` and `compas_viewer.scene.GroupObject`.
 * Added `PolyhedronObject`.
+* Added `compas_viewer.scene.NurbsCurveObject`.
 * Added `button`, `double_edit` and `treeform` components.
 
 ### Changed
