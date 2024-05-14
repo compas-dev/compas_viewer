@@ -92,9 +92,12 @@ def register_scene_objects():
         from compas_occ.brep import OCCBrep
         from .brepobject import BRepObject
         from .nurbssurfaceobject import NurbsSurfaceObject
+        from compas.geometry import NurbsCurve
+        from .nurbscurveobject import NurbsCurveObject
 
         register(OCCBrep, BRepObject, context="Viewer")
         register(NurbsSurface, NurbsSurfaceObject, context="Viewer")
+        register(NurbsCurve, NurbsCurveObject, context="Viewer")
 
     except ImportError:
         pass
