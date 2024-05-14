@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added `compas_viewer.base.Base` to access viewer singleton.
 * Added `compas_viewer.singleton.SingletonMeta` and `compas_viewer.singleton.Singleton`.
 * Added `compas_viewer.scene.Group` and `compas_viewer.scene.GroupObject`.
+* Added `PolyhedronObject`.
 * Added `compas_viewer.scene.NurbsCurveObject`.
 
 ### Changed
@@ -24,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Updated objects color settings to align to `pointcolor`, `linecolor`, `facecolor`.
 * Updated objects visibility settings to align to `show_points`, `show_lines`, `show_faces`.
 * Updated objects drawing settings to align to `linewidth`, `pointsize`.
+* Updated `PolygonObject` show faces.
 
 ### Removed
 
