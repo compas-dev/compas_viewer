@@ -45,10 +45,10 @@ class ComponentsManager:
 
     Examples
     --------
-    >>> manager = ComponentsManager()                   # doctest: +SKIP
+    >>> manager = ComponentsManager()  # doctest: +SKIP
     >>> manager.add_widgets(["setting1", "treeform1"])  # doctest: +SKIP
-    >>> parent_widget = QtWidgets.QWidget()             # doctest: +SKIP
-    >>> manager.setup_widgets(parent_widget)            # doctest: +SKIP
+    >>> parent_widget = QtWidgets.QWidget()  # doctest: +SKIP
+    >>> manager.setup_widgets(parent_widget)  # doctest: +SKIP
 
     """
 
