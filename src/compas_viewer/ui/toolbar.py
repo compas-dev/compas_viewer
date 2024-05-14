@@ -3,7 +3,7 @@ from compas_viewer.components.button_factory import ButtonFactory
 
 
 def test_action() -> None:
-    print("test action...")
+    pass
 
 
 class ToolBar(Base):

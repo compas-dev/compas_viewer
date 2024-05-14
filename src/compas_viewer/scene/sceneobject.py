@@ -43,10 +43,10 @@ class ViewerSceneObject(SceneObject, Base):
         Whether to show lines/edges of the object. Default is the value of `show_lines` in `viewer.config`.
     show_faces : bool, optional
         Whether to show faces of the object. Default is the value of `show_faces` in `viewer.config`.
-    lineswidth : float, optional
-        The line width to be drawn on screen. Default is the value of `lineswidth` in `viewer.config`.
-    pointssize : float, optional
-        The point size to be drawn on screen. Default is the value of `pointssize` in `viewer.config`.
+    linewidth : float, optional
+        The line width to be drawn on screen. Default is the value of `linewidth` in `viewer.config`.
+    pointsize : float, optional
+        The point size to be drawn on screen. Default is the value of `pointsize` in `viewer.config`.
     opacity : float, optional
         The opacity of the object. Default is the value of `opacity` in `viewer.config`.
     **kwargs : dict, optional
@@ -67,9 +67,9 @@ class ViewerSceneObject(SceneObject, Base):
         Whether to show lines/edges of the object.
     show_faces : bool
         Whether to show faces of the object.
-    lineswidth : float
+    linewidth : float
         The line width to be drawn on screen
-    pointssize : float
+    pointsize : float
         The point size to be drawn on screen.
     opacity : float
         The opacity of the object.
@@ -93,8 +93,8 @@ class ViewerSceneObject(SceneObject, Base):
         show_points: Optional[bool] = None,
         show_lines: Optional[bool] = None,
         show_faces: Optional[bool] = None,
-        lineswidth: Optional[float] = None,
-        pointssize: Optional[float] = None,
+        linewidth: Optional[float] = None,
+        pointsize: Optional[float] = None,
         opacity: Optional[float] = None,
         use_rgba: bool = False,
         **kwargs,
@@ -102,11 +102,11 @@ class ViewerSceneObject(SceneObject, Base):
         #  Basic
         super().__init__(**kwargs)
         self.is_visible = is_visible
-        self.show_points = show_points if show_points is not None else True
+        self.show_points = show_points if show_points is not None else False
         self.show_lines = show_lines if show_lines is not None else True
         self.show_faces = show_faces if show_faces is not None else True
-        self.lineswidth = lineswidth if lineswidth is not None else self.viewer.config.ui.display.lineswidth
-        self.pointssize = pointssize if pointssize is not None else self.viewer.config.ui.display.pointssize
+        self.linewidth = linewidth if linewidth is not None else self.viewer.config.ui.display.linewidth
+        self.pointsize = pointsize if pointsize is not None else self.viewer.config.ui.display.pointsize
         self.opacity = opacity if opacity is not None else self.viewer.config.ui.display.opacity
 
         #  Selection
@@ -392,7 +392,7 @@ class ViewerSceneObject(SceneObject, Base):
             shader.bind_attribute("position", self._lines_buffer["positions"])
             shader.bind_attribute("color", self._lines_buffer["colors"], step=4)
             shader.draw_lines(
-                width=self.lineswidth,
+                width=self.linewidth,
                 elements=self._lines_buffer["elements"],
                 n=self._lines_buffer["n"],
                 background=self.background,
@@ -403,7 +403,7 @@ class ViewerSceneObject(SceneObject, Base):
             shader.bind_attribute("position", self._points_buffer["positions"])
             shader.bind_attribute("color", self._points_buffer["colors"], step=4)
             shader.draw_points(
-                size=self.pointssize,
+                size=self.pointsize,
                 elements=self._points_buffer["elements"],
                 n=self._points_buffer["n"],
                 background=self.background,
@@ -426,12 +426,12 @@ class ViewerSceneObject(SceneObject, Base):
         # Points
         if self._points_buffer is not None and self.show_points:
             shader.bind_attribute("position", self._points_buffer["positions"])
-            shader.draw_points(size=self.pointssize, elements=self._points_buffer["elements"], n=self._points_buffer["n"])
+            shader.draw_points(size=self.pointsize, elements=self._points_buffer["elements"], n=self._points_buffer["n"])
         # Lines
         if self._lines_buffer is not None and (self.show_lines or wireframe):
             shader.bind_attribute("position", self._lines_buffer["positions"])
             shader.draw_lines(
-                width=self.lineswidth + self.viewer.renderer.selector.PIXEL_SELECTION_INCREMENTAL,
+                width=self.linewidth + self.viewer.renderer.selector.PIXEL_SELECTION_INCREMENTAL,
                 elements=self._lines_buffer["elements"],
                 n=self._lines_buffer["n"],
             )

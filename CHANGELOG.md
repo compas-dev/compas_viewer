@@ -19,6 +19,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Changed `NurbsSurfaceObject` to use tessellation function of `OCCBrep`, show boundary curves instead of control curves.
 * Renamed all lazy setup functions to `lazy_init`.
 * Fixed camera initialization issue.
+* Updated objects color settings to align to `pointcolor`, `linecolor`, `facecolor`.
+* Updated objects visibility settings to align to `show_points`, `show_lines`, `show_faces`.
+* Updated objects drawing settings to align to `linewidth`, `pointsize`.
 
 ### Removed
 

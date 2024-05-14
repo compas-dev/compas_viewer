@@ -53,9 +53,13 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
     def __init__(
         self,
         mesh: Mesh,
-        vertexcolor: Optional[ColorDictValueType] = None,
-        edgecolor: Optional[ColorDictValueType] = None,
-        facecolor: Optional[ColorDictValueType] = None,
+        show_points: Optional[bool] = None,
+        show_lines: Optional[bool] = None,
+        pointcolor: Optional[Color] = None,
+        linecolor: Optional[Color] = None,
+        facecolor: Optional[Color] = None,
+        pointsize: Optional[float] = None,
+        linewidth: Optional[int] = None,
         hide_coplanaredges: Optional[bool] = None,
         use_vertexcolors: Optional[bool] = None,
         **kwargs,
@@ -64,33 +68,67 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
 
         self.mesh: Mesh
 
+        self.show_points = show_points if show_points is not None else False
+        self.show_lines = show_lines if show_lines is not None else True
+
+        self.pointcolor = pointcolor
+        self.linecolor = linecolor
+        self.facecolor = facecolor or Color(0.9, 0.9, 0.9)
+
+        self.pointsize = pointsize if pointsize is not None else 6.0
+        self.linewidth = linewidth if linewidth is not None else 1.0
+
         self.hide_coplanaredges = hide_coplanaredges if hide_coplanaredges is not None else False
         self.use_vertexcolors = use_vertexcolors if use_vertexcolors is not None else False
-        # self.vertexcolor = vertexcolor if vertexcolor is not None else self.viewer.config.ui.display.pointcolor
-        # self.edgecolor = edgecolor if edgecolor is not None else self.viewer.config.ui.display.linecolor
-        # self.facecolor = facecolor if facecolor is not None else self.viewer.config.ui.display.surfacecolor
 
-        # TODO(pitsai): check _read_lines_data
-        if not vertexcolor:
-            self.vertexcolor = self.viewer.config.ui.display.pointcolor
-            for vertex in self.mesh.vertices():
-                self.vertexcolor[vertex] = self.mesh.vertex_attribute(vertex, "color")  # type: ignore
-        else:
-            self.vertexcolor = vertexcolor
+    @property
+    def pointcolor(self) -> Color:
+        return self.vertexcolor
+    
+    @pointcolor.setter
+    def pointcolor(self, color: Color):
+        self.vertexcolor = color
 
-        if not edgecolor:
-            self.edgecolor = self.viewer.config.ui.display.linecolor
-            for u, v in self.mesh.edges():
-                self.edgecolor[(u, v)] = self.mesh.edge_attribute((u, v), "color")  # type: ignore
-        else:
-            self.edgecolor = edgecolor
+    @property
+    def linecolor(self) -> Color:
+        return self.edgecolor
+    
+    @linecolor.setter
+    def linecolor(self, color: Color):
+        self.edgecolor = color
 
-        if not facecolor:
-            self.facecolor = self.viewer.config.ui.display.surfacecolor
-            for face in self.mesh.faces():
-                self.facecolor[face] = self.mesh.face_attribute(face, "color")  # type: ignore
-        else:
-            self.facecolor = facecolor
+    @property
+    def show_points(self) -> bool:
+        return self.show_vertices
+    
+    @show_points.setter
+    def show_points(self, show: bool):
+        self.show_vertices = show
+    
+    @property
+    def show_lines(self) -> bool:
+        return self.show_edges
+    
+    @show_lines.setter
+    def show_lines(self, show: bool):
+        self.show_edges = show
+
+    @property
+    def pointsize(self) -> float:
+        return self.vertexsize
+    
+    @pointsize.setter
+    def pointsize(self, size: float):
+        self.vertexsize = size
+    
+    @property
+    def linewidth(self) -> float:
+        return self.edgesize
+    
+    @linewidth.setter
+    def linewidth(self, size: float):
+        self.edgesize = size
+
 
     def _read_points_data(self) -> ShaderDataType:
         positions = []
