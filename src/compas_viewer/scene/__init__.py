@@ -22,6 +22,7 @@ from compas.geometry import (
     Ellipse,
     Cone,
     Capsule,
+    Polyhedron,
     Frame,
     NurbsSurface,
 )
@@ -46,6 +47,7 @@ from .cylinderobject import CylinderObject
 from .ellipseobject import EllipseObject
 from .coneobject import ConeObject
 from .capsuleobject import CapsuleObject
+from .polyhedronobject import PolyhedronObject
 from .geometryobject import GeometryObject
 from .groupobject import Group
 from .groupobject import GroupObject
@@ -85,6 +87,7 @@ def register_scene_objects():
     register(Ellipse, EllipseObject, context="Viewer")
     register(Cone, ConeObject, context="Viewer")
     register(Capsule, CapsuleObject, context="Viewer")
+    register(Polyhedron, PolyhedronObject, context="Viewer")
     register(list, GroupObject, context="Viewer")
     register(Collection, CollectionObject, context="Viewer")
 

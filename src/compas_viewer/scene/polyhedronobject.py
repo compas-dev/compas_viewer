@@ -3,24 +3,23 @@ from typing import Optional
 from compas.datastructures import Mesh
 from compas.geometry import Line
 from compas.geometry import Point
-from compas.geometry import Polygon
-from compas.geometry import earclip_polygon
+from compas.geometry import Polyhedron
 from compas.scene import GeometryObject
 
 from .geometryobject import GeometryObject as ViewerGeometryObject
 
 
-class PolygonObject(ViewerGeometryObject, GeometryObject):
-    """Viewer scene object for displaying COMPAS Polygon geometry.
+class PolyhedronObject(ViewerGeometryObject, GeometryObject):
+    """Viewer scene object for displaying COMPAS Polyhedron geometry.
 
     See Also
     --------
-    :class:`compas.geometry.Polygon`
+    :class:`compas.geometry.Polyhedron`
     """
 
-    def __init__(self, polygon: Polygon, **kwargs):
-        super().__init__(geometry=polygon, **kwargs)
-        self.geometry: Polygon
+    def __init__(self, polyhedron: Polyhedron, **kwargs):
+        super().__init__(geometry=polyhedron, **kwargs)
+        self.geometry: Polyhedron
 
     @property
     def points(self) -> Optional[list[Point]]:
@@ -29,11 +28,12 @@ class PolygonObject(ViewerGeometryObject, GeometryObject):
 
     @property
     def lines(self) -> Optional[list[Line]]:
+        """The lines to be shown in the viewer."""
         return self.geometry.lines
 
     @property
     def viewmesh(self):
         """The mesh volume to be shown in the viewer."""
-        vertices = self.geometry.points
-        faces = earclip_polygon(self.geometry)
+        mesh = self.geometry.to_mesh()
+        vertices, faces = mesh.to_vertices_and_faces(triangulated=True)
         return Mesh.from_vertices_and_faces(vertices, faces)
