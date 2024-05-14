@@ -59,8 +59,8 @@
         </script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="FrameObject.add" href="compas_viewer.scene.FrameObject.add.html" />
-    <link rel="prev" title="TagObject.update_buffer_from_data" href="compas_viewer.scene.TagObject.update_buffer_from_data.html" />
+    <link rel="next" title="FrameObject.ToString" href="compas_viewer.scene.FrameObject.ToString.html" />
+    <link rel="prev" title="TagObject.validate_data" href="compas_viewer.scene.TagObject.validate_data.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -588,7 +588,7 @@ document.write(`
 <h1>FrameObject</h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="compas_viewer.scene.FrameObject">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">FrameObject</span></span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/1ec232a/src/compas_viewer/scene/frameobject.py#L12"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">FrameObject</span></span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/534da86/src/compas_viewer/scene/frameobject.py#L12"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <a class="reference internal" href="compas_viewer.scene.ViewerSceneObject.html#compas_viewer.scene.ViewerSceneObject" title="compas_viewer.scene.sceneobject.ViewerSceneObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">ViewerSceneObject</span></code></a></p>
 <p>The scene object of the COMPAS Frame.
 With its modifiable cell size and dimension.</p>
@@ -634,17 +634,29 @@ Notice that the <cite>nx</cite> and <cite>ny</cite> must be even numbers.</p>
 <p class="rubric">Inherited Methods</p>
 <table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.FrameObject.add.html#compas_viewer.scene.FrameObject.add" title="compas_viewer.scene.FrameObject.add"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.FrameObject.ToString.html#compas_viewer.scene.FrameObject.ToString" title="compas_viewer.scene.FrameObject.ToString"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ToString</span></code></a></p></td>
+<td><p>Converts the instance to a string.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.FrameObject.add.html#compas_viewer.scene.FrameObject.add" title="compas_viewer.scene.FrameObject.add"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add</span></code></a></p></td>
 <td><p>Add a child item to the scene object.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.FrameObject.clear.html#compas_viewer.scene.FrameObject.clear" title="compas_viewer.scene.FrameObject.clear"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.FrameObject.clear.html#compas_viewer.scene.FrameObject.clear" title="compas_viewer.scene.FrameObject.clear"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear</span></code></a></p></td>
 <td><p>The main clearing method.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.FrameObject.copy.html#compas_viewer.scene.FrameObject.copy" title="compas_viewer.scene.FrameObject.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a></p></td>
+<td><p>Make an independent copy of the data object.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.FrameObject.draw.html#compas_viewer.scene.FrameObject.draw" title="compas_viewer.scene.FrameObject.draw"><code class="xref py py-obj docutils literal notranslate"><span class="pre">draw</span></code></a></p></td>
 <td><p>Draw the object from its buffers</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.FrameObject.draw_instance.html#compas_viewer.scene.FrameObject.draw_instance" title="compas_viewer.scene.FrameObject.draw_instance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">draw_instance</span></code></a></p></td>
 <td><p>Draw the object instance for picking</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.FrameObject.from_json.html#compas_viewer.scene.FrameObject.from_json" title="compas_viewer.scene.FrameObject.from_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_json</span></code></a></p></td>
+<td><p>Construct an object of this type from a JSON file.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.FrameObject.from_jsonstring.html#compas_viewer.scene.FrameObject.from_jsonstring" title="compas_viewer.scene.FrameObject.from_jsonstring"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_jsonstring</span></code></a></p></td>
+<td><p>Construct an object of this type from a JSON string.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.FrameObject.init.html#compas_viewer.scene.FrameObject.init" title="compas_viewer.scene.FrameObject.init"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init</span></code></a></p></td>
 <td><p>Initialize the object</p></td>
@@ -655,11 +667,29 @@ Notice that the <cite>nx</cite> and <cite>ny</cite> must be even numbers.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.FrameObject.make_buffers.html#compas_viewer.scene.FrameObject.make_buffers" title="compas_viewer.scene.FrameObject.make_buffers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_buffers</span></code></a></p></td>
 <td><p>Create all buffers from object's data</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.FrameObject.update.html#compas_viewer.scene.FrameObject.update" title="compas_viewer.scene.FrameObject.update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.FrameObject.remove.html#compas_viewer.scene.FrameObject.remove" title="compas_viewer.scene.FrameObject.remove"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove</span></code></a></p></td>
+<td><p>Remove a child node from this node.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.FrameObject.sha256.html#compas_viewer.scene.FrameObject.sha256" title="compas_viewer.scene.FrameObject.sha256"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sha256</span></code></a></p></td>
+<td><p>Compute a hash of the data for comparison during version control using the sha256 algorithm.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.FrameObject.to_json.html#compas_viewer.scene.FrameObject.to_json" title="compas_viewer.scene.FrameObject.to_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_json</span></code></a></p></td>
+<td><p>Convert an object to its native data representation and save it to a JSON file.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.FrameObject.to_jsonstring.html#compas_viewer.scene.FrameObject.to_jsonstring" title="compas_viewer.scene.FrameObject.to_jsonstring"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_jsonstring</span></code></a></p></td>
+<td><p>Convert an object to its native data representation and save it to a JSON string.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.FrameObject.traverse.html#compas_viewer.scene.FrameObject.traverse" title="compas_viewer.scene.FrameObject.traverse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">traverse</span></code></a></p></td>
+<td><p>Traverse the tree from this node.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.FrameObject.update.html#compas_viewer.scene.FrameObject.update" title="compas_viewer.scene.FrameObject.update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code></a></p></td>
 <td><p>Update the object.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.FrameObject.update_buffer_from_data.html#compas_viewer.scene.FrameObject.update_buffer_from_data" title="compas_viewer.scene.FrameObject.update_buffer_from_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_buffer_from_data</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.FrameObject.update_buffer_from_data.html#compas_viewer.scene.FrameObject.update_buffer_from_data" title="compas_viewer.scene.FrameObject.update_buffer_from_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_buffer_from_data</span></code></a></p></td>
 <td><p>Update existing buffers from point/line/face data.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.FrameObject.validate_data.html#compas_viewer.scene.FrameObject.validate_data" title="compas_viewer.scene.FrameObject.validate_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_data</span></code></a></p></td>
+<td><p>Validate the data against the object's data schema.</p></td>
 </tr>
 </tbody>
 </table>
