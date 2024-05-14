@@ -1,8 +1,10 @@
 from typing import Optional
 
+from compas.datastructures import Mesh
 from compas.geometry import Line
 from compas.geometry import Point
 from compas.geometry import Polygon
+from compas.geometry import earclip_polygon
 from compas.scene import GeometryObject
 
 from .geometryobject import GeometryObject as ViewerGeometryObject
@@ -19,7 +21,6 @@ class PolygonObject(ViewerGeometryObject, GeometryObject):
     def __init__(self, polygon: Polygon, **kwargs):
         super().__init__(geometry=polygon, **kwargs)
         self.geometry: Polygon
-        self.show_lines = True
 
     @property
     def points(self) -> Optional[list[Point]]:
@@ -33,4 +34,6 @@ class PolygonObject(ViewerGeometryObject, GeometryObject):
     @property
     def viewmesh(self):
         """The mesh volume to be shown in the viewer."""
-        return None
+        vertices = self.geometry.points
+        faces = earclip_polygon(self.geometry)
+        return Mesh.from_vertices_and_faces(vertices, faces)

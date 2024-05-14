@@ -20,8 +20,6 @@ class PolyhedronObject(ViewerGeometryObject, GeometryObject):
     def __init__(self, polyhedron: Polyhedron, **kwargs):
         super().__init__(geometry=polyhedron, **kwargs)
         self.geometry: Polyhedron
-        self.show_points = False
-        self.show_lines = True
 
     @property
     def points(self) -> Optional[list[Point]]:
@@ -37,6 +35,5 @@ class PolyhedronObject(ViewerGeometryObject, GeometryObject):
     def viewmesh(self):
         """The mesh volume to be shown in the viewer."""
         mesh = self.geometry.to_mesh()
-        vert, face = mesh.to_vertices_and_faces(triangulated=True)
-        mesh = Mesh.from_vertices_and_faces(vert, face)
-        return mesh
+        vertices, faces = mesh.to_vertices_and_faces(triangulated=True)
+        return Mesh.from_vertices_and_faces(vertices, faces)

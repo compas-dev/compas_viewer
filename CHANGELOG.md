@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Updated objects color settings to align to `pointcolor`, `linecolor`, `facecolor`.
 * Updated objects visibility settings to align to `show_points`, `show_lines`, `show_faces`.
 * Updated objects drawing settings to align to `linewidth`, `pointsize`.
+* Updated `PolygonObject` show faces.
 
 ### Removed
 
