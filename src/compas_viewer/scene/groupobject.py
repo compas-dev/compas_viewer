@@ -28,7 +28,9 @@ class GroupObject(SceneObject):
             if isinstance(item, (Data, list)):
                 self.add(item, **kwargs)
             elif isinstance(item, tuple) and len(item) == 2 and isinstance(item[0], (Data, list)):
-                self.add(item[0], **item[1])
+                item_kwargs = kwargs.copy()
+                item_kwargs.update(item[1])
+                self.add(item[0], **item_kwargs)
             else:
                 print(item)
                 raise TypeError("Group items must be of type `Data` or a tuple of (`Data`, kwargs).")
