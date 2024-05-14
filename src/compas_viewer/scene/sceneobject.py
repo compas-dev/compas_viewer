@@ -126,7 +126,6 @@ class ViewerSceneObject(SceneObject, Base):
         self._matrix_buffer: Optional[list[list[float]]] = None
         self._bounding_box: Optional[list[float]] = None
         self._bounding_box_center: Optional[Point] = None
-        self._is_collection = False
 
         #  Primitive
         self._points_data: Optional[ShaderDataType] = None

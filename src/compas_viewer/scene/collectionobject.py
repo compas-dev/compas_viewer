@@ -15,22 +15,22 @@ from .sceneobject import ViewerSceneObject
 class Collection(Data):
     """Viewer scene object for displaying a collection of COMPAS geometries."""
 
-    def __init__(self, items: list[Union[Geometry, Mesh]], **kwargs):
+    def __init__(self, items: list[Union[Geometry, Mesh]] = None, **kwargs):
         super().__init__(**kwargs)
         self.items = items
 
     @property
     def __data__(self):
-        return self.items
+        return {"items": self.items}
 
 
 class CollectionObject(ViewerSceneObject, GeometryObject):
     """Viewer scene object for displaying a collection of COMPAS geometries."""
 
-    def __init__(self, items: list[Union[Geometry, Mesh]], **kwargs):
-        self.collection = Collection(items)
+    def __init__(self, collection: Collection, **kwargs):
+        self.collection = collection
         super().__init__(geometry=self.collection, **kwargs)
-        self.objects = [ViewerSceneObject(item=item, **kwargs) for item in self.collection.items]
+        self.objects = [ViewerSceneObject(item, **kwargs) for item in self.collection.items]
 
     def _read_points_data(self) -> ShaderDataType:
         positions = []
@@ -43,6 +43,7 @@ class CollectionObject(ViewerSceneObject, GeometryObject):
             colors += c
             elements += (array(e) + count).tolist()
             count += len(p)
+
         return positions, colors, elements
 
     def _read_lines_data(self) -> ShaderDataType:
@@ -56,56 +57,33 @@ class CollectionObject(ViewerSceneObject, GeometryObject):
             colors += c
             elements += (array(e) + count).tolist()
             count += len(p)
+
         return positions, colors, elements
 
     def _read_frontfaces_data(self) -> ShaderDataType:
         positions = []
         colors = []
-        opacities = []
         elements = []
         count = 0
         for obj in self.objects:
-            if obj.use_rgba:
-                p, c, o, e = obj._read_frontfaces_data() or ([], [], [])
-                positions += p
-                colors += c
-                opacities += o
-                elements += (np.array(e) + count).tolist()
-                count += len(p)
-            else:
-                p, c, e = obj._read_frontfaces_data() or ([], [], [])
-                positions += p
-                colors += c
-                elements += (np.array(e) + count).tolist()
-                count += len(p)
+            p, c, e = obj._read_frontfaces_data() or ([], [], [])
+            positions += p
+            colors += c
+            elements += (np.array(e) + count).tolist()
+            count += len(p)
 
-        if opacities:
-            return positions, colors, opacities, elements
-        else:
-            return positions, colors, elements
+        return positions, colors, elements
 
     def _read_backfaces_data(self) -> ShaderDataType:
         positions = []
         colors = []
-        opacities = []
         elements = []
         count = 0
         for obj in self.objects:
-            if obj.use_rgba:
-                p, c, o, e = obj._read_backfaces_data() or ([], [], [])
-                positions += p
-                colors += c
-                opacities += o
-                elements += (np.array(e) + count).tolist()
-                count += len(p)
-            else:
-                p, c, e = obj._read_backfaces_data() or ([], [], [])
-                positions += p
-                colors += c
-                elements += (np.array(e) + count).tolist()
-                count += len(p)
+            p, c, e = obj._read_backfaces_data() or ([], [], [])
+            positions += p
+            colors += c
+            elements += (np.array(e) + count).tolist()
+            count += len(p)
 
-        if opacities:
-            return positions, colors, opacities, elements
-        else:
-            return positions, colors, elements
+        return positions, colors, elements

@@ -16,7 +16,6 @@ from compas.geometry import transform_points_numpy
 from compas_viewer.base import Base
 from compas_viewer.configurations import RendererConfig
 from compas_viewer.scene import TagObject
-from compas_viewer.scene.collectionobject import CollectionObject
 from compas_viewer.scene.vectorobject import VectorObject
 
 from .camera import Camera
@@ -576,10 +575,7 @@ class Renderer(QOpenGLWidget, Base):
                 mesh_objs.append(obj)
 
         for obj in objs:
-            if isinstance(obj, CollectionObject):
-                [sort(item) for item in obj.objects]
-            else:
-                sort(obj)
+            sort(obj)
 
         return tag_objs, vector_objs, mesh_objs
 
