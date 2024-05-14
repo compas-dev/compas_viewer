@@ -59,7 +59,7 @@
         </script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="Camera.lazy_init" href="compas_viewer.components.renderer.Camera.lazy_init.html" />
+    <link rel="next" title="Camera.ortho" href="compas_viewer.components.renderer.Camera.ortho.html" />
     <link rel="prev" title="Renderer.y" href="compas_viewer.components.renderer.Renderer.y.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -593,7 +593,7 @@ document.write(`
 <h1>Camera</h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="compas_viewer.components.renderer.Camera">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Camera</span></span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/0090be0/src/compas_viewer/components/renderer/camera.py#L89"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Camera</span></span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/9f8a2e3/src/compas_viewer/components/renderer/camera.py#L76"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></p>
 <p>Camera object for the default view.</p>
 <dl class="field-list">
@@ -642,31 +642,28 @@ Default is the origin of the world coordinate system.</p>
 <p class="rubric">Methods</p>
 <table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.renderer.Camera.lazy_init.html#compas_viewer.components.renderer.Camera.lazy_init" title="compas_viewer.components.renderer.Camera.lazy_init"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lazy_init</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.renderer.Camera.ortho.html#compas_viewer.components.renderer.Camera.ortho" title="compas_viewer.components.renderer.Camera.ortho"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ortho</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.renderer.Camera.ortho.html#compas_viewer.components.renderer.Camera.ortho" title="compas_viewer.components.renderer.Camera.ortho"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ortho</span></code></a></p></td>
 <td><p>Construct an orthogonal projection matrix.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.renderer.Camera.pan.html#compas_viewer.components.renderer.Camera.pan" title="compas_viewer.components.renderer.Camera.pan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pan</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.renderer.Camera.pan.html#compas_viewer.components.renderer.Camera.pan" title="compas_viewer.components.renderer.Camera.pan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pan</span></code></a></p></td>
 <td><p>Pan the camera based on current mouse movement.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.renderer.Camera.perspective.html#compas_viewer.components.renderer.Camera.perspective" title="compas_viewer.components.renderer.Camera.perspective"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perspective</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.renderer.Camera.perspective.html#compas_viewer.components.renderer.Camera.perspective" title="compas_viewer.components.renderer.Camera.perspective"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perspective</span></code></a></p></td>
 <td><p>Construct a perspective projection matrix.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.renderer.Camera.projection.html#compas_viewer.components.renderer.Camera.projection" title="compas_viewer.components.renderer.Camera.projection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">projection</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.renderer.Camera.projection.html#compas_viewer.components.renderer.Camera.projection" title="compas_viewer.components.renderer.Camera.projection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">projection</span></code></a></p></td>
 <td><p>Compute the projection matrix corresponding to the current camera settings.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.renderer.Camera.reset_position.html#compas_viewer.components.renderer.Camera.reset_position" title="compas_viewer.components.renderer.Camera.reset_position"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reset_position</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.renderer.Camera.reset_position.html#compas_viewer.components.renderer.Camera.reset_position" title="compas_viewer.components.renderer.Camera.reset_position"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reset_position</span></code></a></p></td>
 <td><p>Reset the position of the camera based current view type.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.renderer.Camera.rotate.html#compas_viewer.components.renderer.Camera.rotate" title="compas_viewer.components.renderer.Camera.rotate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rotate</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.renderer.Camera.rotate.html#compas_viewer.components.renderer.Camera.rotate" title="compas_viewer.components.renderer.Camera.rotate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rotate</span></code></a></p></td>
 <td><p>Rotate the camera based on current mouse movement.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.renderer.Camera.viewworld.html#compas_viewer.components.renderer.Camera.viewworld" title="compas_viewer.components.renderer.Camera.viewworld"><code class="xref py py-obj docutils literal notranslate"><span class="pre">viewworld</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.renderer.Camera.viewworld.html#compas_viewer.components.renderer.Camera.viewworld" title="compas_viewer.components.renderer.Camera.viewworld"><code class="xref py py-obj docutils literal notranslate"><span class="pre">viewworld</span></code></a></p></td>
 <td><p>Compute the view-world matrix corresponding to the current camera settings.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.renderer.Camera.zoom.html#compas_viewer.components.renderer.Camera.zoom" title="compas_viewer.components.renderer.Camera.zoom"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zoom</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.renderer.Camera.zoom.html#compas_viewer.components.renderer.Camera.zoom" title="compas_viewer.components.renderer.Camera.zoom"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zoom</span></code></a></p></td>
 <td><p>Zoom in or out.</p></td>
 </tr>
 </tbody>
