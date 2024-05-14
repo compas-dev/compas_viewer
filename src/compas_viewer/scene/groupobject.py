@@ -5,9 +5,13 @@ from compas.scene.sceneobject import SceneObject
 class Group(Data):
     """A group of compas.data.Data items."""
 
-    def __init__(self, items):
+    def __init__(self, items: list[Data] = None):
         super().__init__()
-        self.items = items
+        self.items = items or []
+
+    @property
+    def __data__(self):
+        return {"items": self.items}
 
 
 class GroupObject(SceneObject):
