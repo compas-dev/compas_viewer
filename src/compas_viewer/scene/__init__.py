@@ -49,6 +49,8 @@ from .capsuleobject import CapsuleObject
 from .geometryobject import GeometryObject
 from .groupobject import Group
 from .groupobject import GroupObject
+from .collectionobject import Collection
+from .collectionobject import CollectionObject
 
 
 @plugin(category="drawing-utils", requires=["compas_viewer"])
@@ -84,6 +86,7 @@ def register_scene_objects():
     register(Cone, ConeObject, context="Viewer")
     register(Capsule, CapsuleObject, context="Viewer")
     register(list, GroupObject, context="Viewer")
+    register(Collection, CollectionObject, context="Viewer")
 
     try:
         from compas_occ.brep import OCCBrep
@@ -138,4 +141,6 @@ __all__ = [
     "GeometryObject",
     "Group",
     "GroupObject",
+    "Collection",
+    "CollectionObject",
 ]
