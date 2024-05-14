@@ -15,7 +15,6 @@ class SideBarRight(Base):
         self.side_right_widget = QtWidgets.QSplitter(QtCore.Qt.Orientation.Vertical)
         self.side_right_widget.setChildrenCollapsible(True)
         self.side_right_widget.addWidget(Treeform(self.viewer.scene, {"Name": (lambda o: o.name), "Object": (lambda o: o)}))
-        self.side_right_widget.addWidget(DoubleEditGroup("Camera_Target", [("X", 0, 0, 100000), ("Y", 0, 0, 100000), ("Z", 0, 0, 100000)]))
         self.side_right_widget.setSizes([800, 200])
         self.side_right_widget.setHidden(not self.viewer.config.ui.sidebar.show)
 
