@@ -1,10 +1,8 @@
 from PySide6 import QtWidgets
 
-from .widget_tools import DoubleEditWidget
 
-
-class DoubleEditWidget(QtWidgets.QWidget):
-    def __init__(self, name, default, min_val, max_val):
+class DoubleEdit(QtWidgets.QWidget):
+    def __init__(self, name: str, default: float, min_val: float, max_val: float):
         super().__init__()
         self.layout = QtWidgets.QHBoxLayout()
         self.label = QtWidgets.QLabel(name)
@@ -26,7 +24,7 @@ class DoubleEditGroup(QtWidgets.QWidget):
         group_layout = QtWidgets.QVBoxLayout()
 
         for setting in settings:
-            widget = DoubleEditWidget(*setting)
+            widget = DoubleEdit(*setting)
             group_layout.addWidget(widget)
 
         group_layout.setSpacing(4)
