@@ -9,24 +9,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Added `PointcloudObject`.
+* Added `compas_viewer.base.Base` to access viewer singleton.
+* Added `compas_viewer.singleton.SingletonMeta` and `compas_viewer.singleton.Singleton`.
+* Added `compas_viewer.scene.Group` and `compas_viewer.scene.GroupObject`.
 * Added `PolyhedronObject`.
 
 ### Changed
 
-* removed `PyOpenGL-accelerate` from requirements.txt
 * Changed `NurbsSurfaceObject` to use tessellation function of `OCCBrep`, show boundary curves instead of control curves.
+* Renamed all lazy setup functions to `lazy_init`.
+* Fixed camera initialization issue.
+* Fixed and brought back `CollectionObject`.
+* Updated objects color settings to align to `pointcolor`, `linecolor`, `facecolor`.
+* Updated objects visibility settings to align to `show_points`, `show_lines`, `show_faces`.
+* Updated objects drawing settings to align to `linewidth`, `pointsize`.
 
 ### Removed
 
+* removed `PyOpenGL-accelerate` from requirements.txt
 
 ## [1.1.2] 2024-04-22
 
 ### Added
-
+* Added singletone `compas_viewer.viewer`
+* Added singletone `compas_viewer.config`
+* Added `compas_viewer.ui.ui` and `compas_viewer.components`.
 ### Changed
-
+* Changed `compas_viewer.layout` to `compas_viewer.ui.ui`.
 ### Removed
-
+* Removed old version of `compas_viewer.viewer`.
 
 ## [1.1.1] 2024-04-22
 

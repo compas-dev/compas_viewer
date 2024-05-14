@@ -1,6 +1,5 @@
 from random import randint
 from random import seed
-from typing import TYPE_CHECKING
 from typing import Any
 from typing import Generator
 from typing import Optional
@@ -12,9 +11,6 @@ from compas.geometry import Geometry
 from compas.scene import Scene
 
 from .sceneobject import ViewerSceneObject
-
-if TYPE_CHECKING:
-    from compas_viewer import Viewer
 
 
 def instance_colors_generator(i: int = 0) -> Generator:
@@ -69,9 +65,8 @@ class ViewerScene(Scene):
     :class:`compas.scene.Scene`
     """
 
-    def __init__(self, viewer: "Viewer", name: str, context: str):
-        super(ViewerScene, self).__init__(name=name, context=context)
-        self.viewer = viewer
+    def __init__(self, name: str = "ViewerScene", context: str = "Viewer"):
+        super().__init__(name=name, context=context)
 
         #  Primitive
         self.objects: list[ViewerSceneObject]
@@ -92,12 +87,11 @@ class ViewerScene(Scene):
         show_faces: Optional[bool] = None,
         pointcolor: Optional[Color] = None,
         linecolor: Optional[Color] = None,
-        surfacecolor: Optional[Color] = None,
         vertexcolor: Optional[Union[Color, dict[Any, Color]]] = None,
         edgecolor: Optional[Union[Color, dict[Any, Color]]] = None,
         facecolor: Optional[Union[Color, dict[Any, Color]]] = None,
-        lineswidth: Optional[float] = None,
-        pointssize: Optional[float] = None,
+        linewidth: Optional[float] = None,
+        pointsize: Optional[float] = None,
         opacity: Optional[float] = None,
         hide_coplanaredges: Optional[bool] = None,
         use_vertexcolors: Optional[bool] = None,
@@ -135,17 +129,15 @@ class ViewerScene(Scene):
             The single color of colors of the points in the COMPAS Geometry.
         linecolor : :class:`compas.colors.Color`, optional
             The single color of colors of the lines in the COMPAS Geometry.
-        surfacecolor : :class:`compas.colors.Color`, optional
-            The single color of colors the surfaces in the COMPAS Geometry.
         vertexcolor : Union[:class:`compas.colors.Color`, dict[Any, :class:`compas.colors.Color`], optional
             The color or the dict of colors of the vertices in the COMPAS Mesh.
         edgecolor : Union[:class:`compas.colors.Color`, dict[Any, :class:`compas.colors.Color`], optional
             The color or the dict of colors of the edges in the COMPAS Mesh.
         facecolor : Union[:class:`compas.colors.Color`, dict[Any, :class:`compas.colors.Color`], optional
             The color or the dict of colors of the faces in the COMPAS Mesh.
-        lineswidth : float, optional
+        linewidth : float, optional
             The line width to be drawn on screen
-        pointssize : float, optional
+        pointsize : float, optional
             The point size to be drawn on screen
         opacity : float, optional
             The opacity of the object.
@@ -169,7 +161,6 @@ class ViewerScene(Scene):
         sceneobject: ViewerSceneObject = super().add(  # type: ignore
             item=item,
             parent=parent,
-            viewer=self.viewer,
             is_selected=is_selected,
             is_visible=is_visible,
             is_locked=is_locked,
@@ -179,11 +170,10 @@ class ViewerScene(Scene):
             pointcolor=pointcolor,
             linecolor=linecolor,
             facecolor=facecolor,
-            surfacecolor=surfacecolor,
             vertexcolor=vertexcolor,
             edgecolor=edgecolor,
-            lineswidth=lineswidth,
-            pointssize=pointssize,
+            linewidth=linewidth,
+            pointsize=pointsize,
             opacity=opacity,
             hide_coplanaredges=hide_coplanaredges,
             use_vertexcolors=use_vertexcolors,

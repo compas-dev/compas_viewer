@@ -316,7 +316,7 @@ class Propertyform(QWidget):
 
         self.map_number(
             obj,
-            "pointssize",
+            "pointsize",
             collapsibleBox.content_area.layout(),  # type: ignore
             "Point Size",
             minimum=1,
@@ -326,7 +326,7 @@ class Propertyform(QWidget):
 
         self.map_number(
             obj,
-            "lineswidth",
+            "linewidth",
             collapsibleBox.content_area.layout(),  # type: ignore
             "Line Width",
             minimum=1,

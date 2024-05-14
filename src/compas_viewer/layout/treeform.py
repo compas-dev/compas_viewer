@@ -1,4 +1,3 @@
-from typing import TYPE_CHECKING
 from typing import Callable
 from typing import Optional
 
@@ -7,9 +6,6 @@ from PySide6.QtWidgets import QTreeWidget
 from PySide6.QtWidgets import QTreeWidgetItem
 
 from compas.datastructures import Tree
-
-if TYPE_CHECKING:
-    from compas_viewer.viewer import Viewer
 
 
 class Treeform(QTreeWidget):
@@ -65,9 +61,7 @@ class Treeform(QTreeWidget):
             for j in range(10):
                 sp = viewer.scene.add(Sphere(0.1, Frame([i, j, 0], [1, 0, 0], [0, 1, 0])), name=f"Sphere_{i}_{j}")
 
-        viewer.layout.sidedock.add_element(
-            Treeform(viewer._tree, {"Name": (lambda o: o.object.name), "Object": (lambda o: o.object)})
-        )
+        viewer.layout.sidedock.add_element(Treeform(viewer._tree, {"Name": (lambda o: o.object.name), "Object": (lambda o: o.object)}))
 
         viewer.show()
 
@@ -83,7 +77,6 @@ class Treeform(QTreeWidget):
         backgrounds: Optional[dict[str, Callable]] = None,
     ):
         super().__init__()
-        self.viewer: "Viewer"
         self.columns = columns
         self.column_editable = column_editable + [False] * (len(columns) - len(column_editable))
         self.setColumnCount(len(columns))

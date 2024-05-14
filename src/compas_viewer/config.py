@@ -51,6 +51,16 @@ class CameraConfig(Base):
 
 
 @dataclass
+class DisplayConfig(Base):
+    pointcolor: Color = field(default_factory=Color.black)
+    linecolor: Color = field(default_factory=Color.black)
+    surfacecolor: Color = field(default_factory=Color.grey)
+    pointsize: float = float(6.0)
+    linewidth: float = float(1.0)
+    opacity: float = float(1.0)
+
+
+@dataclass
 class View3dConfig(Base):
     viewport: Literal["top", "perspective"] = "perspective"
     background: Color = field(default_factory=lambda: Color.from_hex("#eeeeee"))
@@ -99,6 +109,7 @@ class UIConfig(Base):
     statusbar: StatusbarConfig = field(default_factory=StatusbarConfig)
     sidebar: SidebarConfig = field(default_factory=SidebarConfig)
     view3d: View3dConfig = field(default_factory=View3dConfig)
+    display: DisplayConfig = field(default_factory=DisplayConfig)
 
 
 @dataclass
