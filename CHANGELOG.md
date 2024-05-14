@@ -14,6 +14,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 
+## [1.1.4] 2024-05-14
+
+### Added
+
+* Added `button`, `double_edit` and `treeform` components.
+
+### Changed
+
+### Removed
+
+
 ## [1.1.3] 2024-05-14
 
 ### Added
@@ -24,7 +35,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added `compas_viewer.scene.Group` and `compas_viewer.scene.GroupObject`.
 * Added `PolyhedronObject`.
 * Added `compas_viewer.scene.NurbsCurveObject`.
-* Added `button`, `double_edit` and `treeform` components.
 
 ### Changed
 
