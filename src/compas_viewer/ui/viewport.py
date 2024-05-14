@@ -23,13 +23,12 @@ class SideBarRight(Base):
 
 class ViewPort(Base):
     def __init__(self):
-        self.view3d = View3D()
         self.sidebar_right = SideBarRight()
 
     def lazy_init(self) -> None:
         self.sidebar_right.lazy_init()
 
         self.viewport_widget = QtWidgets.QSplitter()
-        self.viewport_widget.addWidget(self.view3d)
+        self.viewport_widget.addWidget(self.viewer.view3d)
         self.viewport_widget.addWidget(self.sidebar_right.side_right_widget)
         self.viewer.ui.window.centralWidget().layout().addWidget(self.viewport_widget)

@@ -6,10 +6,11 @@ from compas_viewer.components.renderer import Renderer
 from compas_viewer.config import Config
 from compas_viewer.configurations import ControllerConfig
 from compas_viewer.configurations import RendererConfig
-from compas_viewer.controller import Controller
+# from compas_viewer.controller import Controller
 from compas_viewer.scene.scene import ViewerScene
 from compas_viewer.singleton import Singleton
 from compas_viewer.ui.ui import UI
+from compas_viewer.view3d.view3d import View3D
 
 
 class Viewer(Singleton):
@@ -17,9 +18,11 @@ class Viewer(Singleton):
         self.app = QApplication(sys.argv)
         self.config = Config()
         self.scene = ViewerScene()
+        
         # TODO(pitsai): combine config file
         # self.renderer = Renderer(RendererConfig.from_default())
-        self.controller = Controller(ControllerConfig.from_default())
+        self.view3d = View3D()
+        
         self.ui = UI()
 
     def show(self):
