@@ -37,8 +37,6 @@ class Viewer(Singleton):
         Parameters
         interval : int
             Interval between subsequent calls to this function, in milliseconds.
-        timeout : int, optional
-            Timeout between subsequent calls to this function, in milliseconds.
         frames : int, optional
             The number of frames of the process.
             If no frame number is provided, the process continues until the viewer is closed.
