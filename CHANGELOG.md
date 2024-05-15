@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Added `@viewer.on`.
+
 ### Changed
 
 ### Removed
@@ -19,7 +21,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 * Added `button`, `double_edit` and `treeform` components.
-* Added `@viewer.on`.
 
 ### Changed
 
