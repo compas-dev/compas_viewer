@@ -32,8 +32,7 @@ class Viewer(Singleton):
         self.app.exec()
 
     def on(self, interval: int, frames: Optional[int] = None) -> Callable:
-        """Decorator for callbacks of a dynamic drawing process with fixed intervals."""
-        """Decorator for callbacks of a dynamic drawing process.
+        """Decorator for callbacks of a dynamic drawing process with fixed intervals.
 
         Parameters
         interval : int
