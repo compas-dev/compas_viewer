@@ -62,7 +62,7 @@ class CameraSettingsDialog(QDialog, Base):
 
         coordinates = {
             "Camera_Target": [("X", current_camera.target.x, 0, 10000), ("Y", current_camera.target.y, 0, 10000), ("Z", current_camera.target.z, 0, 10000)],
-            "Camera_Position": [("X", current_camera.position.x, 1, 10000), ("Y", current_camera.position.x, 1, 10000), ("Z", current_camera.position.x, 1, 10000)],
+            "Camera_Position": [("X", current_camera.position.x, 1, 10000), ("Y", current_camera.position.y, 1, 10000), ("Z", current_camera.position.z, 1, 10000)],
         }
 
         for coord in coordinates:
