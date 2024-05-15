@@ -1,9 +1,11 @@
 from compas_viewer.base import Base
 from compas_viewer.components.button import Button
+from compas_viewer.components.dialog import CameraSettingsDialog
 
 
-def test_action() -> None:
-    pass
+def openDialog():
+    dialog = CameraSettingsDialog()
+    dialog.exec()
 
 
 class ToolBar(Base):
@@ -15,4 +17,4 @@ class ToolBar(Base):
         self.widget.setMovable(False)
         self.widget.setObjectName("Tools")
         self.widget.setHidden(not self.viewer.config.ui.toolbar.show)
-        self.widget.addWidget(Button("zoom_selected.svg", "zoom", test_action()))
+        self.widget.addWidget(Button("camera_info.svg", "Camera_Settings", openDialog))
