@@ -24,13 +24,6 @@ class CameraSettingsDialog(QDialog, Base):
     update_button : QPushButton
         Button for applying the updated camera settings and closing the dialog.
 
-    Methods
-    -------
-    __init__(self):
-        Initializes the dialog with spin boxes for camera position and target settings.
-    updateCameraTarget(self):
-        Updates the camera's position and target based on the spin box values and closes the dialog.
-
     Notes
     -----
     This class assumes that there is an existing viewer with a renderer and camera attribute.
@@ -45,18 +38,18 @@ class CameraSettingsDialog(QDialog, Base):
 
     References
     ----------
-    * https://doc.qt.io/qt-5/qdialog.html
-    * https://doc.qt.io/qt-5/qlayout.html
-    * https://doc.qt.io/qt-5/qpushbutton.html
+    * https://doc.qt.io/qt-6/qdialog.html
+    * https://doc.qt.io/qt-6/qlayout.html
+    * https://doc.qt.io/qt-6/qpushbutton.html
 
     """
 
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Camera Settings")
-        self.layout = QVBoxLayout(self)
 
         # Create layout for spin boxes
+        self.layout = QVBoxLayout(self)
         self.spin_boxes = {}
         current_camera = self.viewer.renderer.camera
 
