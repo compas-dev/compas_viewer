@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* Changed `mouse left` to rotate, `mouse right` to pan, `mouse left + shit` to drag select.
+
 ### Removed
 
 
