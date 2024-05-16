@@ -1,13 +1,7 @@
-from typing import TYPE_CHECKING
+from PySide6.QtGui import QAction
 
 from compas_viewer.base import Base
-
-if TYPE_CHECKING:
-    pass
-
-
-def new_file():
-    print("new file...")
+from compas_viewer.components.combobox import ViewModeAction
 
 
 class MenuBar(Base):
@@ -16,5 +10,14 @@ class MenuBar(Base):
 
     def lazy_init(self):
         self.widget = self.viewer.ui.window.menuBar()
-        filemenu = self.widget.addMenu("File")
-        filemenu.addAction("New File...", new_file)
+        camera_filemenu = self.widget.addMenu("Camera")
+        viewmode_menu = camera_filemenu.addMenu("Viewmode")
+        viewmode_menu.addAction(self.viewmode_action("perspective"))
+        viewmode_menu.addAction(self.viewmode_action("top"))
+        viewmode_menu.addAction(self.viewmode_action("front"))
+        viewmode_menu.addAction(self.viewmode_action("right"))
+
+    def viewmode_action(self, mode: str):
+        action = QAction(mode, self.widget)
+        action.triggered.connect(lambda check=False, mode=mode: ViewModeAction().change_view(mode))
+        return action

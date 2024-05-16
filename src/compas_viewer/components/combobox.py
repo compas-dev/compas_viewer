@@ -17,31 +17,20 @@ class ComboBox(QComboBox):
 
         :param items: List of tuples, each containing the display text and user data
         """
-        for text, data in items:
-            self.addItem(text, data)
+        for item in items:
+            self.addItem(item, item)
 
 
-class ViewComboBox(QWidget, Base):
+class ViewModeAction(QWidget, Base):
     def __init__(self):
         super().__init__()
+        self.view_options = ["perspective", "top", "front", "right"]
+
+    def combobox(self):
         self.layout = QVBoxLayout(self)
-        view_options = [("Perspective", "perspective"), ("Top", "top"), ("Front", "front"), ("Right", "right"), ("Left", "left")]
-        self.view_selector = ComboBox(view_options, self.change_view)
+        self.view_selector = ComboBox(self.view_options, self.change_view)
         self.layout.addWidget(self.view_selector)
+        return self
 
-    def change_view(self, view):
-        """
-        Change the view of the renderer based on the selected option.
-
-        :param view: The user data associated with the selected item
-        """
-        if view == "perspective":
-            self.viewer.renderer.viewmode = "perspective"
-        elif view == "top":
-            self.viewer.renderer.viewmode = "top"
-        elif view == "front":
-            self.viewer.renderer.viewmode = "front"
-        elif view == "right":
-            self.viewer.renderer.viewmode = "right"
-        elif view == "left":
-            self.viewer.renderer.viewmode = "left"
+    def change_view(self, mode):
+        self.viewer.renderer.viewmode = mode
