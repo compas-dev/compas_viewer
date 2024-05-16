@@ -1,7 +1,6 @@
 from math import atan2
 from math import radians
 from math import tan
-from typing import TYPE_CHECKING
 from typing import Optional
 
 from numpy import array
@@ -17,10 +16,6 @@ from compas.geometry import Transformation
 from compas.geometry import Translation
 from compas.geometry import Vector
 from compas_viewer.base import Base
-
-if TYPE_CHECKING:
-    # https://peps.python.org/pep-0484/#runtime-or-type-checking
-    pass
 
 
 class Position(Vector):

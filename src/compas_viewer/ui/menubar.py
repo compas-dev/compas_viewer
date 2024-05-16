@@ -2,6 +2,12 @@ from PySide6.QtGui import QAction
 
 from compas_viewer.base import Base
 from compas_viewer.components.combobox import ViewModeAction
+from compas_viewer.components.dialog import CameraSettingsDialog
+
+
+def openDialog():
+    dialog = CameraSettingsDialog()
+    dialog.exec()
 
 
 class MenuBar(Base):
@@ -10,6 +16,8 @@ class MenuBar(Base):
 
     def lazy_init(self):
         self.widget = self.viewer.ui.window.menuBar()
+        filemenu = self.widget.addMenu("Camera")
+        filemenu.addAction("Camera_Settings", openDialog)
         camera_filemenu = self.widget.addMenu("Camera")
         viewmode_menu = camera_filemenu.addMenu("Viewmode")
         viewmode_menu.addAction(self.viewmode_action("perspective"))
