@@ -1,13 +1,10 @@
-from typing import TYPE_CHECKING
-
 from compas_viewer.base import Base
-
-if TYPE_CHECKING:
-    pass
+from compas_viewer.components.dialog import CameraSettingsDialog
 
 
-def new_file():
-    print("new file...")
+def openDialog():
+    dialog = CameraSettingsDialog()
+    dialog.exec()
 
 
 class MenuBar(Base):
@@ -16,5 +13,5 @@ class MenuBar(Base):
 
     def lazy_init(self):
         self.widget = self.viewer.ui.window.menuBar()
-        filemenu = self.widget.addMenu("File")
-        filemenu.addAction("New File...", new_file)
+        filemenu = self.widget.addMenu("Camera")
+        filemenu.addAction("Camera_Settings", openDialog)
