@@ -113,7 +113,7 @@ class Selector(QObject, Base):
             selected_obj.is_selected = True
 
         # Update the layout.
-        self.viewer.layout.update()
+        # self.viewer.layout.update()
 
     def drag_selection_action(self):
         """Drag select the objects in the rectangle area."""

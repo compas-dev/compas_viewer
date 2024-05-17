@@ -1,10 +1,13 @@
+import os
 import sys
 from typing import Callable
 from typing import Optional
 
 from PySide6.QtCore import QTimer
+from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication
 
+from compas_viewer import HERE
 from compas_viewer.components.renderer import Renderer
 from compas_viewer.config import Config
 from compas_viewer.configurations import ControllerConfig
@@ -18,6 +21,7 @@ from compas_viewer.ui.ui import UI
 class Viewer(Singleton):
     def __init__(self, *args, **kwargs):
         self.app = QApplication(sys.argv)
+        self.app.setWindowIcon(QIcon(os.path.join(HERE, "icons", "compas_icon_white.png")))
         self.timer = QTimer()
         self.config = Config()
         self.scene = ViewerScene()
