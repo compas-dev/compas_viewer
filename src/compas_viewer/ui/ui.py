@@ -2,6 +2,7 @@ from compas_viewer.base import Base
 
 from .mainwindow import MainWindow
 from .menubar import MenuBar
+from .sidedock import SideDock
 from .statusbar import SatusBar
 from .toolbar import ToolBar
 from .viewport import ViewPort
@@ -14,6 +15,7 @@ class UI(Base):
         self.statusbar = SatusBar()
         self.toolbar = ToolBar()
         self.viewport = ViewPort()
+        self.sidedock = SideDock()
 
     def lazy_init(self):
         width = self.viewer.config.window.width
@@ -25,6 +27,7 @@ class UI(Base):
         self.statusbar.lazy_init()
         self.toolbar.lazy_init()
         self.viewport.lazy_init()
+        self.sidedock.lazy_init()
 
     def show(self):
         self.window.show()
