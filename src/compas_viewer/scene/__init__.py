@@ -2,7 +2,6 @@
 This package provides scene object plugins for visualizing COMPAS objects in `compas_viewer`.
 """
 
-from typing import Union
 from compas.scene import register
 from compas.plugins import plugin
 from compas.datastructures import Mesh
@@ -23,9 +22,9 @@ from compas.geometry import (
     Ellipse,
     Cone,
     Capsule,
+    Polyhedron,
     Frame,
     NurbsSurface,
-    Geometry,
 )
 
 from .sceneobject import ViewerSceneObject
@@ -48,8 +47,12 @@ from .cylinderobject import CylinderObject
 from .ellipseobject import EllipseObject
 from .coneobject import ConeObject
 from .capsuleobject import CapsuleObject
-from .collectionobject import CollectionObject
+from .polyhedronobject import PolyhedronObject
 from .geometryobject import GeometryObject
+from .groupobject import Group
+from .groupobject import GroupObject
+from .collectionobject import Collection
+from .collectionobject import CollectionObject
 
 
 @plugin(category="drawing-utils", requires=["compas_viewer"])
@@ -84,15 +87,20 @@ def register_scene_objects():
     register(Ellipse, EllipseObject, context="Viewer")
     register(Cone, ConeObject, context="Viewer")
     register(Capsule, CapsuleObject, context="Viewer")
-    register(list[Union[Geometry, Mesh]], CollectionObject, context="Viewer")
+    register(Polyhedron, PolyhedronObject, context="Viewer")
+    register(list, GroupObject, context="Viewer")
+    register(Collection, CollectionObject, context="Viewer")
 
     try:
         from compas_occ.brep import OCCBrep
         from .brepobject import BRepObject
         from .nurbssurfaceobject import NurbsSurfaceObject
+        from compas.geometry import NurbsCurve
+        from .nurbscurveobject import NurbsCurveObject
 
         register(OCCBrep, BRepObject, context="Viewer")
         register(NurbsSurface, NurbsSurfaceObject, context="Viewer")
+        register(NurbsCurve, NurbsCurveObject, context="Viewer")
 
     except ImportError:
         pass
@@ -137,4 +145,8 @@ __all__ = [
     "NurbsSurface",
     "NurbsSurfaceObject",
     "GeometryObject",
+    "Group",
+    "GroupObject",
+    "Collection",
+    "CollectionObject",
 ]

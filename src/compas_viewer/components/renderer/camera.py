@@ -1,8 +1,6 @@
 from math import atan2
 from math import radians
 from math import tan
-from typing import TYPE_CHECKING
-from typing import Callable
 from typing import Optional
 
 from numpy import array
@@ -19,28 +17,21 @@ from compas.geometry import Translation
 from compas.geometry import Vector
 from compas_viewer.base import Base
 
-if TYPE_CHECKING:
-    # https://peps.python.org/pep-0484/#runtime-or-type-checking
-    pass
-
 
 class Position(Vector):
-    """
-    The position of the camera.
-
-    Parameters
-    ----------
-    vector : tuple[float, float, float]
-        The position of the camera.
-    on_update : Callable
-        A callback function that is called when the position changes.
-
-    """
-
-    def __init__(self, vector: tuple[float, float, float], on_update: Optional[Callable] = None):
-        self.on_update = on_update
-        self.pause_update = True
+    def __init__(self, vector, on_update=None):
         super().__init__(*vector)
+        self.pause_update = False
+        if on_update:
+            self.on_update = on_update
+
+    def set(self, x, y, z, pause_update=False):
+        pause_update = pause_update or self.pause_update
+        if hasattr(self, "on_update") and not pause_update:
+            self.on_update([x, y, z])
+        self._x = x
+        self._y = y
+        self._z = z
 
     @property
     def x(self):
@@ -48,7 +39,7 @@ class Position(Vector):
 
     @x.setter
     def x(self, x):
-        if self.on_update is not None and not self.pause_update:
+        if hasattr(self, "on_update") and not self.pause_update:
             self.on_update([x, self.y, self.z])
         self._x = float(x)
 
@@ -58,7 +49,7 @@ class Position(Vector):
 
     @y.setter
     def y(self, y):
-        if self.on_update is not None and not self.pause_update:
+        if hasattr(self, "on_update") and not self.pause_update:
             self.on_update([self.x, y, self.z])
         self._y = float(y)
 
@@ -68,18 +59,9 @@ class Position(Vector):
 
     @z.setter
     def z(self, z):
-        if self.on_update is not None and not self.pause_update:
+        if hasattr(self, "on_update") and not self.pause_update:
             self.on_update([self.x, self.y, z])
         self._z = float(z)
-
-    def set(self, x: float, y: float, z: float, pause_update: bool = False):
-        """Set the position of the camera."""
-        pause_update = pause_update or self.pause_update
-        if self.on_update is not None and not pause_update:
-            self.on_update([x, y, z])
-        self._x = x
-        self._y = y
-        self._z = z
 
 
 class RotationEuler(Position):
@@ -148,20 +130,13 @@ class Camera(Base):
         self.rotationdelta = rotationdelta
         self.pan_delta = pan_delta
 
-        self._position = Position(init_position, on_update=self._on_position_update)
-        self._rotation = RotationEuler((0, 0, 0), on_update=self._on_rotation_update)
-        self._target = Position(init_target, on_update=self._on_target_update)
-        self._position.pause_update = False
-        self._rotation.pause_update = False
-        self._target.pause_update = False
-        self.target = Position(init_target)
-        self.reset_position()
-   
-    # def lazy_init(self) -> None:
-    #     # Camera position only modifiable in perspective view mode.
-    #     self.reset_position()
-    #     # if self.renderer.config.viewmode == "perspective":
-    #     #     self.position = Position(self.config.position)
+        self._position = Position([0, 0, 10 * scale], on_update=self._on_position_update)
+        self._rotation = RotationEuler([0, 0, 0], on_update=self._on_rotation_update)
+        self._target = Position([0, 0, 0], on_update=self._on_target_update)
+
+        self.reset_position(viewmode="perspective")
+        self.target.set(*init_target)
+        self.position.set(*init_position)
 
     @property
     def position(self) -> Position:
@@ -324,18 +299,19 @@ class Camera(Base):
         self.target.set(*target, pause_update=True)
         self.position.set(*position, pause_update=True)
 
-    def reset_position(self):
+    def reset_position(self, viewmode: Optional[str] = None):
         """Reset the position of the camera based current view type."""
         self.target.set(0, 0, 0, False)
-        self.rotation.set(pi / 4, 0, -pi / 4, False)
-        # if self.viewer.renderer.viewmode == "perspective":
-        #     self.rotation.set(pi / 4, 0, -pi / 4, False)
-        # if self.viewer.renderer.viewmode == "top":
-        #     self.rotation.set(0, 0, 0, False)
-        # if self.viewer.renderer.viewmode == "front":
-        #     self.rotation.set(pi / 2, 0, 0, False)
-        # if self.viewer.renderer.viewmode == "right":
-        #     self.rotation.set(pi / 2, 0, pi / 2, False)
+        viewmode = viewmode or self.viewer.renderer.viewmode
+
+        if viewmode == "perspective":
+            self.rotation.set(pi / 4, 0, -pi / 4, False)
+        if viewmode == "top":
+            self.rotation.set(0, 0, 0, False)
+        if viewmode == "front":
+            self.rotation.set(pi / 2, 0, 0, False)
+        if viewmode == "right":
+            self.rotation.set(pi / 2, 0, pi / 2, False)
 
     def rotate(self, dx: float, dy: float):
         """Rotate the camera based on current mouse movement.

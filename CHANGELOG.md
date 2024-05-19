@@ -9,14 +9,62 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Added `compas_viewer.components.dialog` component which handle camera setting popup window.
+
+* Added `compas_viewer.components.combo_box` component
+* Added `ViewComboBox` component handle viewmode change
+
+### Changed
+
+* Changed `mouse left` to rotate, `mouse right` to pan, `mouse left + shit` to drag select.
+* Fixed `action` bug.
+
+### Removed
+
+
+## [1.1.5] 2024-05-15
+
+### Added
+
+* Added `@viewer.on`.
+
+### Changed
+
+### Removed
+
+
+## [1.1.4] 2024-05-14
+
+### Added
+
+* Added `button`, `double_edit` and `treeform` components.
+
+### Changed
+
+### Removed
+
+
+## [1.1.3] 2024-05-14
+
+### Added
+
 * Added `PointcloudObject`.
 * Added `compas_viewer.base.Base` to access viewer singleton.
 * Added `compas_viewer.singleton.SingletonMeta` and `compas_viewer.singleton.Singleton`.
+* Added `compas_viewer.scene.Group` and `compas_viewer.scene.GroupObject`.
+* Added `PolyhedronObject`.
+* Added `compas_viewer.scene.NurbsCurveObject`.
 
 ### Changed
 
 * Changed `NurbsSurfaceObject` to use tessellation function of `OCCBrep`, show boundary curves instead of control curves.
 * Renamed all lazy setup functions to `lazy_init`.
+* Fixed camera initialization issue.
+* Fixed and brought back `CollectionObject`.
+* Updated objects color settings to align to `pointcolor`, `linecolor`, `facecolor`.
+* Updated objects visibility settings to align to `show_points`, `show_lines`, `show_faces`.
+* Updated objects drawing settings to align to `linewidth`, `pointsize`.
+* Updated `PolygonObject` show faces.
 
 ### Removed
 

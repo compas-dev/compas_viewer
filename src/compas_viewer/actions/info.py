@@ -33,7 +33,7 @@ class SelectionInfo(Action):
     def pressed_action(self):
         info = "Selected objects: \n"
 
-        for i, obj in enumerate(self.scene.objects):
+        for i, obj in enumerate(self.viewer.scene.objects):
             if obj.is_selected:
                 info += f"Object {i}: {obj} \n"
 

@@ -2,6 +2,7 @@ from PySide6 import QtCore
 from PySide6 import QtWidgets
 
 from compas_viewer.base import Base
+from compas_viewer.components.treeform import Treeform
 from compas_viewer.view3d.view3d import View3D
 
 
@@ -9,15 +10,12 @@ class SideBarRight(Base):
     def __init__(self) -> None:
         super().__init__()
         self.side_right_widget = None
-        self.default_widgets: list[str] = ["TreeForm"]
-        self.custom_widgets: list[str] = []  # TODO(pitsai): self.viewer.config.ui.sidebar.items
-        self.widget_list: list = self.default_widgets + self.custom_widgets
 
     def lazy_init(self) -> None:
         self.side_right_widget = QtWidgets.QSplitter(QtCore.Qt.Orientation.Vertical)
         self.side_right_widget.setChildrenCollapsible(True)
-        self.viewer.ui.components_manager.add_widgets(self.widget_list)
-        self.side_right_widget = self.viewer.ui.components_manager.setup_widgets(self.side_right_widget)
+        self.side_right_widget.addWidget(Treeform(self.viewer.scene, {"Name": (lambda o: o.name), "Object": (lambda o: o)}))
+        self.side_right_widget.setSizes([800, 200])
         self.side_right_widget.setHidden(not self.viewer.config.ui.sidebar.show)
 
 
@@ -31,4 +29,5 @@ class ViewPort(Base):
         self.viewport_widget = QtWidgets.QSplitter()
         self.viewport_widget.addWidget(self.viewer.view3d)
         self.viewport_widget.addWidget(self.sidebar_right.side_right_widget)
+        self.viewport_widget.setSizes([800, 200])
         self.viewer.ui.window.centralWidget().layout().addWidget(self.viewport_widget)

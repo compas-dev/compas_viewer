@@ -55,8 +55,8 @@ class DisplayConfig(Base):
     pointcolor: Color = field(default_factory=Color.black)
     linecolor: Color = field(default_factory=Color.black)
     surfacecolor: Color = field(default_factory=Color.grey)
-    pointssize: float = float(6.0)
-    lineswidth: float = float(1.0)
+    pointsize: float = float(6.0)
+    linewidth: float = float(1.0)
     opacity: float = float(1.0)
 
 

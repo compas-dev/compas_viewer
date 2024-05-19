@@ -55,11 +55,9 @@ class GeometryObject(ViewerSceneObject, BaseGeometryObject):
     def __init__(
         self,
         geometry: Geometry,
-        u: int,
-        v: int,
-        pointcolor: Optional[Color] = None,
-        linecolor: Optional[Color] = None,
-        surfacecolor: Optional[Color] = None,
+        u: Optional[int] = 16,
+        v: Optional[int] = 16,
+        facecolor: Optional[Color] = None,
         **kwargs,
     ):
         super().__init__(geometry=geometry, **kwargs)
@@ -67,9 +65,16 @@ class GeometryObject(ViewerSceneObject, BaseGeometryObject):
 
         self.u = u
         self.v = v
-        self.pointcolor = pointcolor if pointcolor is not None else Color.black()
-        self.linecolor = linecolor if linecolor is not None else Color.black()
-        self.surfacecolor = surfacecolor if surfacecolor is not None else Color.grey()
+        self.facecolor = facecolor or Color(0.9, 0.9, 0.9)
+
+    @property
+    def facecolor(self) -> Color:
+        """The color of the faces."""
+        return self.surfacecolor
+
+    @facecolor.setter
+    def facecolor(self, color: Color) -> None:
+        self.surfacecolor = color
 
     @property
     def points(self) -> Optional[list[Point]]:
@@ -110,7 +115,7 @@ class GeometryObject(ViewerSceneObject, BaseGeometryObject):
         if self.viewmesh is None:
             return [], [], []
         positions, elements = self.viewmesh.to_vertices_and_faces()
-        colors = [self.surfacecolor] * 3 * len(positions)
+        colors = [self.facecolor] * 3 * len(positions)
         return positions, colors, elements  # type: ignore
 
     def _read_backfaces_data(self) -> ShaderDataType:
@@ -119,5 +124,5 @@ class GeometryObject(ViewerSceneObject, BaseGeometryObject):
         positions, elements = self.viewmesh.to_vertices_and_faces()
         for element in elements:
             element.reverse()
-        colors = [self.surfacecolor] * 3 * len(positions)
+        colors = [self.facecolor] * 3 * len(positions)
         return positions, colors, elements  # type: ignore
