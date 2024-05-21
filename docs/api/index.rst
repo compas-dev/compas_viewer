@@ -58,18 +58,6 @@ Components and the corresponding configurations of them.
     compas_viewer.configurations
 
 
-Layout and UI
---------------------
-The layout and UI of the viewer.
-
-.. toctree::
-    :maxdepth: 1
-    :titlesonly:
-    :caption: Layout and UI
-
-    compas_viewer.layout
-
-
 Utilities
 ---------
 Useful functions and other helper classes.
