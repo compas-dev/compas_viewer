@@ -1,4 +1,3 @@
-from typing import TYPE_CHECKING
 from typing import Callable
 from typing import Optional
 
@@ -10,12 +9,10 @@ from PySide6.QtWidgets import QSlider
 from PySide6.QtWidgets import QWidget
 
 from compas.colors import Color
-
-if TYPE_CHECKING:
-    from compas_viewer.viewer import Viewer
+from compas_viewer.base import Base
 
 
-class Slider(QWidget):
+class Slider(QWidget, Base):
     """Class representing a horizontal slider wrapped in a grid layout with two rows.
 
     Parameters
@@ -100,16 +97,17 @@ class Slider(QWidget):
         stretch: int = 0,
         **kwargs,
     ):
+        super().__init__()
+
         if min_value > max_value or interval > max_value - min_value:
             raise ValueError("Slider parameters are invalid. ")
 
-        super().__init__()
-        self.viewer: "Viewer"
+        self.kwargs = kwargs
+
         self.slider = QSlider()
         self._value = max(min(value, max_value), min_value)
         self.action = action
         self.stretch = stretch
-        self.kwargs = kwargs
 
         # Row containing labels with horizontal box layout.
         row1 = QWidget()
@@ -118,6 +116,7 @@ class Slider(QWidget):
         row1_layout = QHBoxLayout()
         row1_layout.setContentsMargins(12, 6, 12, 0)
         row1.setLayout(row1_layout)
+
         # The title label if provided
         if title:
             row1_layout.addWidget(QLabel(title))
