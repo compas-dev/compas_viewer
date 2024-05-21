@@ -1,5 +1,5 @@
 from compas_viewer.base import Base
-from compas_viewer.components.button import Button
+from compas_viewer.components import Button
 from compas_viewer.components.combobox import ViewModeAction
 from compas_viewer.components.dialog import CameraSettingsDialog
 
@@ -19,4 +19,4 @@ class ToolBar(Base):
         self.widget.setObjectName("Tools")
         self.widget.setHidden(not self.viewer.config.ui.toolbar.show)
         self.widget.addWidget(ViewModeAction().combobox())
-        self.widget.addWidget(Button("camera_info.svg", "Camera_Settings", openDialog))
+        self.widget.addWidget(Button(icon_path="camera_info.svg", tooltip="Camera_Settings", action=openDialog))
