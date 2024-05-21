@@ -23,20 +23,17 @@ class GroupObject(SceneObject):
         self.is_selected = False
         self.opacity = 1.0
         self.bounding_box = None
-        self.objects = []
 
         for item in items:
             if isinstance(item, (Data, list)):
-                obj = self.add(item, **kwargs)
+                self.add(item, **kwargs)
             elif isinstance(item, tuple) and len(item) == 2 and isinstance(item[0], (Data, list)):
                 item_kwargs = kwargs.copy()
                 item_kwargs.update(item[1])
-                obj = self.add(item[0], **item_kwargs)
+                self.add(item[0], **item_kwargs)
             else:
                 print(item)
                 raise TypeError("Group items must be of type `Data` or a tuple of (`Data`, kwargs).")
-
-            self.objects.append(obj)
 
     def init(self, *args, **kwargs):
         pass
