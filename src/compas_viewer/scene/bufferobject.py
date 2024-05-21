@@ -1,17 +1,18 @@
+from typing import Optional
+
 import numpy as np
 from numpy import array
 from numpy import identity
 from numpy.typing import NDArray
 
-from compas.geometry import Geometry
 from compas.colors import Color
+from compas.geometry import Geometry
 from compas.scene import SceneObject
 from compas_viewer.base import Base
 from compas_viewer.components.renderer.shaders import Shader
 from compas_viewer.gl import make_index_buffer
 from compas_viewer.gl import make_vertex_buffer
 from compas_viewer.gl import update_vertex_buffer
-from typing import Optional
 
 
 class AttributeBuffer:
