@@ -14,9 +14,9 @@ def open_camera_settings_dialog():
     dialog.exec()
 
 
-def change_viewmode(mode, *args, **kwargs):
+def change_viewmode(mode: str, *args, **kwargs):
     from compas_viewer import Viewer
 
     viewer = Viewer()
-    viewer.renderer.viewmode = mode
+    viewer.renderer.viewmode = mode.lower()
     viewer.renderer.update()

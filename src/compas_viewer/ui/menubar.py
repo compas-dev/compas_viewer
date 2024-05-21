@@ -27,14 +27,21 @@ class MenuBar(Base):
 
             if itemtype == "separator":
                 parent.addSeparator()
+            elif itemtype == "button":
+                self.add_action(text=text, action=action, parent=parent)
+            elif itemtype == "action":
+                self.add_action(text=text, action=action, parent=parent)
             elif action:
                 self.add_action(text=text, action=action, parent=parent)
             else:
-                if not itemtype or itemtype == "menu":
-                    menu = parent.addMenu(text)
-                    self.add_menu(items=item["items"], parent=menu)
-                elif itemtype == "radio":
-                    raise NotImplementedError
+                if items := item.get("items"):
+                    if not itemtype or itemtype == "menu" or itemtype == "select":
+                        menu = parent.addMenu(text)
+                        self.add_menu(items=items, parent=menu)
+                    elif itemtype == "radio":
+                        raise NotImplementedError
+                    else:
+                        raise NotImplementedError
                 else:
                     raise NotImplementedError
 

@@ -76,9 +76,28 @@ class View3dConfig(Base):
 @dataclass
 class ToolbarConfig(Base):
     show: bool = True
-    items: list[dict[str, str]] = field(default_factory=lambda: [])
+    items: list[dict[str, str]] = field(
+        default_factory=lambda: [
+            {
+                "title": "Camera Settings",
+                "icon": "camera_info.svg",
+                "action": open_camera_settings_dialog,
+            },
+            {
+                "type": "select",
+                "action": change_viewmode,
+                "items": [
+                    {"title": "Perspective"},
+                    {"title": "Top"},
+                    {"title": "Front"},
+                    {"title": "Right"},
+                ],
+            },
+        ]
+    )
 
 
+# we could add a class for the items if that makes thing more concise...
 @dataclass
 class MenubarConfig(Base):
     show: bool = True
