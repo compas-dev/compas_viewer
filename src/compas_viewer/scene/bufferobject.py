@@ -72,9 +72,9 @@ class AttributeBuffer:
 
         """
         if positions is not None:
-            update_vertex_buffer(self.positions, positions.ravel())
+            update_vertex_buffer(positions.ravel(), self.positions)
         if colors is not None:
-            update_vertex_buffer(self.colors, colors.ravel())
+            update_vertex_buffer(colors.ravel(), self.colors)
 
 
 class BufferGeometry(Geometry):
