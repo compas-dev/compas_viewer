@@ -7,8 +7,8 @@ from typing import Literal
 
 from compas.colors import Color
 
-from .actioncontroller import change_viewmode
-from .actioncontroller import open_camera_settings_dialog
+from ._actions import change_viewmode
+from ._actions import open_camera_settings_dialog
 
 
 class Base:
@@ -79,25 +79,19 @@ class ToolbarConfig(Base):
     items: list[dict[str, str]] = field(
         default_factory=lambda: [
             {
-                "title": "Camera Settings",
-                "icon": "camera_info.svg",
-                "action": open_camera_settings_dialog,
-            },
-            {
                 "type": "select",
                 "action": change_viewmode,
                 "items": [
-                    {"title": "Perspective"},
-                    {"title": "Top"},
-                    {"title": "Front"},
-                    {"title": "Right"},
+                    {"title": "Perspective", "value": "perspective"},
+                    {"title": "Top", "value": "top"},
+                    {"title": "Front", "value": "front"},
+                    {"title": "Right", "value": "right"},
                 ],
             },
         ]
     )
 
 
-# we could add a class for the items if that makes thing more concise...
 @dataclass
 class MenubarConfig(Base):
     show: bool = True

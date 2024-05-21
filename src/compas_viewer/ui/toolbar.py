@@ -4,8 +4,6 @@ from typing import Callable
 from typing import Optional
 
 from PySide6.QtWidgets import QComboBox
-from PySide6.QtWidgets import QVBoxLayout
-from PySide6.QtWidgets import QWidget
 
 from compas_viewer.base import Base
 from compas_viewer.components import Button
@@ -55,11 +53,8 @@ class ToolBar(Base):
         return self.widget.addWidget(Button(text=text, icon_path=icon, action=partial(action, *args, **kwargs)))
 
     def add_combobox(self, items, action, title=None):
-        widget = QWidget()
-        layout = QVBoxLayout(widget)
         combobox = QComboBox()
         for item in items:
-            combobox.addItem(item["title"], item["title"])
+            combobox.addItem(item["title"], item.get("value", item["title"]))
         combobox.currentIndexChanged.connect(lambda index: action(combobox.itemData(index)))
-        layout.addWidget(combobox)
-        self.widget.addWidget(widget)
+        self.widget.addWidget(combobox)
