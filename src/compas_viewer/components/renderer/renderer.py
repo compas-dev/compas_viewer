@@ -241,7 +241,7 @@ class Renderer(QOpenGLWidget, Base):
             The Qt event.
 
         """
-        if event.type() == QtCore.QEvent.Gesture:
+        if event.type() == QtCore.QEvent:
             return self.gestureEvent(event)
         return super().event(event)
 
