@@ -285,8 +285,7 @@ class Camera(Base):
         M = (R * T).matrix
         vector = [M[i][3] for i in range(3)]
         position = self.target + vector
-
-        self.position.set(*position, pause_update=True)
+        self.position.set(*position, pause_update=False)
 
     def _on_target_update(self, target: Position):
         """Update camera position when target changes."""

@@ -52,10 +52,10 @@ class CameraSettingsDialog(QDialog, Base):
         self.layout = QVBoxLayout(self)
         self.spin_boxes = {}
         current_camera = self.viewer.renderer.camera
-
+        print(current_camera.position)
         coordinates = {
-            "Camera_Target": [("X", current_camera.target.x, 0, 10000), ("Y", current_camera.target.y, 0, 10000), ("Z", current_camera.target.z, 0, 10000)],
-            "Camera_Position": [("X", current_camera.position.x, 1, 10000), ("Y", current_camera.position.y, 1, 10000), ("Z", current_camera.position.z, 1, 10000)],
+            "Camera_Target": [("X", current_camera.target.x, -10000, 10000), ("Y", current_camera.target.y, -10000, 10000), ("Z", current_camera.target.z, -10000, 10000)],
+            "Camera_Position": [("X", current_camera.position.x, -10000, 10000), ("Y", current_camera.position.y, -10000, 10000), ("Z", current_camera.position.z, -10000, 10000)],
         }
 
         for coord in coordinates:
@@ -76,14 +76,14 @@ class CameraSettingsDialog(QDialog, Base):
         self.layout.addWidget(self.update_button)
 
     def updateCameraTarget(self):
-        self.viewer.renderer.camera.target = [
+        self.viewer.renderer.camera.target.set(
             self.spin_boxes["Camera_Target_X"].spinbox.value(),
             self.spin_boxes["Camera_Target_Y"].spinbox.value(),
             self.spin_boxes["Camera_Target_Z"].spinbox.value(),
-        ]
-        self.viewer.renderer.camera.position = [
+        )
+        self.viewer.renderer.camera.position.set(
             self.spin_boxes["Camera_Position_X"].spinbox.value(),
             self.spin_boxes["Camera_Position_Y"].spinbox.value(),
             self.spin_boxes["Camera_Position_Z"].spinbox.value(),
-        ]
+        )
         self.accept()  # Close the dialog
