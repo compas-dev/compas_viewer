@@ -16,6 +16,8 @@ from compas.geometry import transform_points_numpy
 from compas_viewer.base import Base
 from compas_viewer.configurations import RendererConfig
 from compas_viewer.scene import TagObject
+from compas_viewer.scene import FrameObject
+from compas_viewer.scene.gridobject import GridObject
 from compas_viewer.scene.vectorobject import VectorObject
 
 from .camera import Camera
@@ -63,7 +65,8 @@ class Renderer(QOpenGLWidget, Base):
 
         self.camera = Camera()
         self.selector = Selector()
-        self.grid: "GridObject"
+        self.grid = GridObject(Frame.worldXY())
+        self.grid.init()
 
         self.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
         self.grabGesture(QtCore.Qt.PinchGesture)
@@ -402,15 +405,15 @@ class Renderer(QOpenGLWidget, Base):
         """Initialize the renderer."""
 
         # Init the grid
-        self.grid: GridObject = self.viewer.scene.add(  # type: ignore
-            Frame.worldXY(),
-            framesize=self.config.gridsize,
-            show_framez=self.config.show_gridz,
-            is_selected=False,
-            is_locked=True,
-            is_visible=self.config.show_grid,
-        )
-        self.grid.init()  # type: ignore
+        # self.grid: GridObject = self.viewer.scene.add(  # type: ignore
+        #     Frame.worldXY(),
+        #     framesize=self.config.gridsize,
+        #     show_framez=self.config.show_gridz,
+        #     is_selected=False,
+        #     is_locked=True,
+        #     is_visible=self.config.show_grid,
+        # )
+        # self.grid.init()  # type: ignore
 
         # Init the buffers
         for obj in self.viewer.scene.objects:
@@ -601,6 +604,7 @@ class Renderer(QOpenGLWidget, Base):
         # Draw model objects in the scene
         self.shader_model.bind()
         self.shader_model.uniform4x4("viewworld", viewworld)
+        self.grid.draw(self.shader_model)
         for obj in self.sort_objects_from_viewworld(mesh_objs, viewworld):
             obj.draw(self.shader_model, self.rendermode == "wireframe", self.rendermode == "lighted")
         self.shader_model.release()
