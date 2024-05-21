@@ -1,40 +1,127 @@
 import numpy as np
 from numpy import array
 from numpy import identity
+from numpy.typing import NDArray
 
 from compas.geometry import Geometry
+from compas.colors import Color
 from compas.scene import SceneObject
 from compas_viewer.base import Base
 from compas_viewer.components.renderer.shaders import Shader
 from compas_viewer.gl import make_index_buffer
 from compas_viewer.gl import make_vertex_buffer
+from compas_viewer.gl import update_vertex_buffer
+from typing import Optional
 
 
 class AttributeBuffer:
-    def __init__(self, positions=None, colors=None, defaultcolor=None, dynamic=False) -> None:
-        if positions is None:
-            positions = np.zeros((0, 3), dtype=float)
-        else:
-            positions = array(positions, dtype=float).reshape(-1, 3)
+    """The buffer for the attributes of the object.
 
-        if colors is None:
-            defaultcolor = defaultcolor or [0.8, 0.8, 0.8, 1.0]
-            colors = np.full((positions.shape[0], 4), defaultcolor, dtype=float)
-        else:
-            colors = array(colors)
+    Parameters
+    ----------
+    positions : Optional[NDArray], optional
+        The flat list for vertex positions, in the form of [x1, y1, z1, x2, y2, z2, ...].
+    colors : Optional[NDArray], optional
+        The flat list for vertex colors, in the form of [r1, g1, b1, a1, r2, g2, b2, a2, ...].
+    defaultcolor : Optional[Color], optional
+        The default color for the vertices, if colors is not provided.
+    dynamic : bool, optional
+        Whether the buffer is dynamic or not.
 
-        elements = np.arange(positions.shape[0], dtype=int)
+    Attributes
+    ----------
+    positions : int
+        The vertex buffer ID for the positions.
+    colors : int
+        The vertex buffer ID for the colors.
+    elements : int
+        The index buffer ID for the elements.
+    elements_reversed : int
+        The index buffer ID for the reversed elements (such as backfaces).
+    n : int
+        The number of elements.
+
+    """
+
+    def __init__(self, positions: Optional[NDArray] = None, colors: Optional[NDArray] = None, defaultcolor: Optional[Color] = None, dynamic: bool = True) -> None:
+
+        positions = array([], dtype=float) if positions is None else positions.ravel()
+        defaultcolor = defaultcolor or [0.8, 0.8, 0.8, 1.0]
+        colors = np.full((positions.shape[0] // 3, 4), defaultcolor, dtype=float).ravel() if colors is None else colors.ravel()
+        elements = np.arange(positions.shape[0] // 3, dtype=int)
+
         self.n = len(elements)
+        self.positions = make_vertex_buffer(positions, dynamic)
+        self.colors = make_vertex_buffer(colors, dynamic)
+        self.elements = make_index_buffer(elements, dynamic)
+        self.elements_reversed = make_index_buffer(np.flip(elements, axis=0), dynamic)
 
-        self.dynamic = dynamic
-        self.positions = make_vertex_buffer(positions.ravel(), dynamic)
-        self.colors = make_vertex_buffer(colors.ravel(), dynamic)
-        self.elements = make_index_buffer(elements.ravel(), dynamic)
-        self.elements_reversed = make_index_buffer(np.flip(elements, axis=0).ravel(), dynamic)
+    def update(self, positions: Optional[NDArray] = None, colors: Optional[NDArray] = None) -> None:
+        """Update the buffer with new data.
+
+        Parameters
+        ----------
+        positions : Optional[NDArray], optional
+            The flat list for vertex positions, in the form of [x1, y1, z1, x2, y2, z2, ...].
+        colors : Optional[NDArray], optional
+            The flat list for vertex colors, in the form of [r1, g1, b1, a1, r2, g2, b2, a2, ...].
+
+        Returns
+        -------
+        None
+
+        """
+        if positions is not None:
+            update_vertex_buffer(self.positions, positions.ravel())
+        if colors is not None:
+            update_vertex_buffer(self.colors, colors.ravel())
 
 
 class BufferGeometry(Geometry):
-    def __init__(self, points=None, lines=None, faces=None, pointcolor=None, linecolor=None, facecolor=None, **kwargs) -> None:
+    """A geometry defined directly from the buffer data.
+
+    Parameters
+    ----------
+    points : Optional[NDArray], optional
+        The flat list of point locations, in the form of [x1, y1, z1, x2, y2, z2, ...].
+    lines : Optional[NDArray], optional
+        The flat list of line segment vertices, in the form of [x1, y1, z1, x2, y2, z2, ...].
+    faces : Optional[NDArray], optional
+        The flat list of face vertices, in the form of [x1, y1, z1, x2, y2, z2, ...].
+    pointcolor : Optional[NDArray], optional
+        The flat list of point colors, in the form of [r1, g1, b1, a1, r2, g2, b2, a2, ...].
+    linecolor : Optional[NDArray], optional
+        The flat list of line vertices colors, in the form of [r1, g1, b1, a1, r2, g2, b2, a2, ...].
+    facecolor : Optional[NDArray], optional
+        The flat list of face vertices colors, in the form of [r1, g1, b1, a1, r2, g2, b2, a2, ...].
+
+    Attributes
+    ----------
+    points : NDArray
+        The flat list of point locations, in the form of [x1, y1, z1, x2, y2, z2, ...].
+    lines : NDArray
+        The flat list of line segment vertices, in the form of [x1, y1, z1, x2, y2, z2, ...].
+    faces : NDArray
+        The flat list of face vertices, in the form of [x1, y1, z1, x2, y2, z2, ...].
+    pointcolor : NDArray
+        The flat list of point colors, in the form of [r1, g1, b1, a1, r2, g2, b2, a2, ...].
+    linecolor : NDArray
+        The flat list of line vertices colors, in the form of [r1, g1, b1, a1, r2, g2, b2, a2, ...].
+    facecolor : NDArray
+        The flat list of face vertices colors, in the form of [r1, g1, b1, a1, r2, g2, b2, a2, ...].
+
+    """
+
+    def __init__(
+        self,
+        points: Optional[NDArray] = None,
+        lines: Optional[NDArray] = None,
+        faces: Optional[NDArray] = None,
+        pointcolor: Optional[NDArray] = None,
+        linecolor: Optional[NDArray] = None,
+        facecolor: Optional[NDArray] = None,
+        **kwargs,
+    ) -> None:
         super().__init__(**kwargs)
         self.points = points
         self.lines = lines
@@ -45,28 +132,97 @@ class BufferGeometry(Geometry):
 
 
 class BufferObject(SceneObject, Base):
-    """ """
+    """The SceneObject for the BufferGeometry.
 
-    def __init__(self, buffergeometry: BufferGeometry, **kwargs):
+    Parameters
+    ----------
+    buffergeometry : BufferGeometry
+        The buffer geometry to be displayed.
+    show_points : Optional[bool], optional
+        Whether to show the points or not.
+    show_lines : Optional[bool], optional
+        Whether to show the lines or not.
+    show_faces : Optional[bool], optional
+        Whether to show the faces or not.
+    pointsize : Optional[float], optional
+        The size of the points.
+    linewidth : Optional[float], optional
+        The width of the lines.
+    opacity : Optional[float], optional
+        The opacity of the object.
+    doublesided : Optional[bool], optional
+        Whether to show the backfaces or not.
+    is_visiable : Optional[bool], optional
+        Whether the object is visible or not.
+    kwargs : dict
+        Additional keyword arguments.
+
+    Attributes
+    ----------
+    buffergeometry : BufferGeometry
+        The buffer geometry to be displayed.
+    show_points : bool
+        Whether to show the points or not.
+    show_lines : bool
+        Whether to show the lines or not.
+    show_faces : bool
+        Whether to show the faces or not.
+    pointsize : float
+        The size of the points.
+    linewidth : float
+        The width of the lines.
+    opacity : float
+        The opacity of the object.
+    doublesided : bool
+        Whether to show the backfaces or not.
+    is_visible : bool
+        Whether the object is visible or not.
+    is_selected : bool
+        Whether the object is selected or not.
+    background : bool
+        Whether the object is in the background or not.
+
+
+    """
+
+    def __init__(
+        self,
+        buffergeometry: BufferGeometry,
+        show_points: Optional[bool] = None,
+        show_lines: Optional[bool] = None,
+        show_faces: Optional[bool] = None,
+        pointsize: Optional[float] = None,
+        linewidth: Optional[float] = None,
+        opacity: Optional[float] = None,
+        doublesided: Optional[bool] = None,
+        is_visiable: Optional[bool] = None,
+        **kwargs,
+    ):
         super().__init__(item=buffergeometry, **kwargs)
         self.buffergeometry = buffergeometry
 
-        self.is_visible = True
+        self.show_points = True if show_points is None else show_points
+        self.show_lines = True if show_lines is None else show_lines
+        self.show_faces = True if show_faces is None else show_faces
+        self.pointsize = 10.0 if pointsize is None else pointsize
+        self.linewidth = 1.0 if linewidth is None else linewidth
+        self.opacity = 1.0 if opacity is None else opacity
+        self.doublesided = True if doublesided is None else doublesided
+        self.is_visible = True if is_visiable is None else is_visiable
+
         self.is_selected = False
-        self.opacity = 1.0
-        self._matrix_buffer = None
-
-        self.show_points = True
-        self.pointsize = 20
-        self.show_lines = True
-        self.linewidth = 1
-        self.show_faces = True
-
         self.background = False
+        self._matrix_buffer = None
 
     def init(self):
         """Initialize the object"""
+        self.instance_color = Color.from_rgb255(*next(self.scene._instance_colors_generator))
+        self.scene.instance_colors[self.instance_color.rgb255] = self
         self.make_buffers()
+
+    def update(self):
+        """Update the object"""
+        self.update_buffers()
 
     def make_buffers(self):
         """Make the buffers for the object"""
@@ -88,7 +244,19 @@ class BufferObject(SceneObject, Base):
         )
 
     def update_buffers(self):
-        raise NotImplementedError()
+        """Update the buffers for the object"""
+        self.pointsbuffer.update(
+            positions=self.buffergeometry.points,
+            colors=self.buffergeometry.pointcolor,
+        )
+        self.linesbuffer.update(
+            positions=self.buffergeometry.lines,
+            colors=self.buffergeometry.linecolor,
+        )
+        self.facesbuffer.update(
+            positions=self.buffergeometry.faces,
+            colors=self.buffergeometry.facecolor,
+        )
 
     def draw(self, shader: Shader, wireframe: bool, is_lighted: bool):
         """Draw the object from its buffers"""
@@ -111,14 +279,14 @@ class BufferObject(SceneObject, Base):
                 background=self.background,
             )
         # Backfaces
-        if not wireframe and self.show_faces:
+        if not wireframe and self.show_faces and self.doublesided:
             shader.bind_attribute("position", self.facesbuffer.positions)
             shader.bind_attribute("color", self.facesbuffer.colors, step=4)
             shader.draw_triangles(elements=self.facesbuffer.elements_reversed, n=self.facesbuffer.n, background=self.background)
         shader.uniform1i("is_lighted", False)
         shader.uniform1i("element_type", 1)
         # Lines
-        if self.show_lines:
+        if self.show_lines or wireframe:
             shader.bind_attribute("position", self.linesbuffer.positions)
             shader.bind_attribute("color", self.linesbuffer.colors, step=4)
             shader.draw_lines(
@@ -148,34 +316,33 @@ class BufferObject(SceneObject, Base):
 
     def draw_instance(self, shader, wireframe: bool):
         """Draw the object instance for picking"""
-        pass
-        # shader.enable_attribute("position")
-        # shader.uniform3f("instance_color", self.instance_color.rgb)
-        # # Matrix
-        # if self._matrix_buffer is not None:
-        #     shader.uniform4x4("transform", self._matrix_buffer)
-        # # Points
-        # if self._points_buffer is not None and self.show_points:
-        #     shader.bind_attribute("position", self._points_buffer["positions"])
-        #     shader.draw_points(size=self.pointsize, elements=self._points_buffer["elements"], n=self._points_buffer["n"])
-        # # Lines
-        # if self._lines_buffer is not None and (self.show_lines or wireframe):
-        #     shader.bind_attribute("position", self._lines_buffer["positions"])
-        #     shader.draw_lines(
-        #         width=self.linewidth + self.viewer.renderer.selector.PIXEL_SELECTION_INCREMENTAL,
-        #         elements=self._lines_buffer["elements"],
-        #         n=self._lines_buffer["n"],
-        #     )
-        # # Frontfaces
-        # if self._frontfaces_buffer is not None and not wireframe and self.show_faces:
-        #     shader.bind_attribute("position", self._frontfaces_buffer["positions"])
-        #     shader.draw_triangles(elements=self._frontfaces_buffer["elements"], n=self._frontfaces_buffer["n"])
-        # # Backfaces
-        # if self._backfaces_buffer is not None and not wireframe and self.show_faces:
-        #     shader.bind_attribute("position", self._backfaces_buffer["positions"])
-        #     shader.draw_triangles(elements=self._backfaces_buffer["elements"], n=self._backfaces_buffer["n"])
-        # # Reset
-        # if self._matrix_buffer is not None:
-        #     shader.uniform4x4("transform", identity(4).flatten())
-        # shader.uniform3f("instance_color", [0, 0, 0])
-        # shader.disable_attribute("position")
+        shader.enable_attribute("position")
+        shader.uniform3f("instance_color", self.instance_color.rgb)
+        # Matrix
+        if self._matrix_buffer is not None:
+            shader.uniform4x4("transform", self._matrix_buffer)
+        # Points
+        if self.show_points:
+            shader.bind_attribute("position", self.pointsbuffer.positions)
+            shader.draw_points(size=self.pointsize, elements=self.pointsbuffer.elements, n=self.pointsbuffer.n)
+        # Lines
+        if self.show_lines or wireframe:
+            shader.bind_attribute("position", self.linesbuffer.positions)
+            shader.draw_lines(
+                width=self.linewidth + self.viewer.renderer.selector.PIXEL_SELECTION_INCREMENTAL,
+                elements=self.linesbuffer.elements,
+                n=self.linesbuffer.n,
+            )
+        # Frontfaces
+        if not wireframe and self.show_faces:
+            shader.bind_attribute("position", self.facesbuffer.positions)
+            shader.draw_triangles(elements=self.facesbuffer.elements, n=self.facesbuffer.n)
+        # Backfaces
+        if not wireframe and self.show_faces and self.doublesided:
+            shader.bind_attribute("position", self.facesbuffer.positions)
+            shader.draw_triangles(elements=self.facesbuffer.elements_reversed, n=self.facesbuffer.n)
+        # Reset
+        if self._matrix_buffer is not None:
+            shader.uniform4x4("transform", identity(4).flatten())
+        shader.uniform3f("instance_color", [0, 0, 0])
+        shader.disable_attribute("position")
