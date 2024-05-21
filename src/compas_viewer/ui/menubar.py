@@ -1,13 +1,11 @@
-from PySide6.QtGui import QAction
+from functools import partial
+from typing import Any
+from typing import Callable
+from typing import Optional
+
+from PySide6.QtWidgets import QWidget
 
 from compas_viewer.base import Base
-from compas_viewer.components.combobox import ViewModeAction
-from compas_viewer.components.dialog import CameraSettingsDialog
-
-
-def openDialog():
-    dialog = CameraSettingsDialog()
-    dialog.exec()
 
 
 class MenuBar(Base):
@@ -16,17 +14,42 @@ class MenuBar(Base):
 
     def lazy_init(self):
         self.widget = self.viewer.ui.window.menuBar()
+        self.add_menu(items=self.viewer.config.ui.menubar.items, parent=self.widget)
 
-        camera_filemenu = self.widget.addMenu("Camera")
+    def add_menu(self, *, items, parent):
+        if not items:
+            return
 
-        camera_filemenu.addAction("Camera_Settings", openDialog)
-        viewmode_menu = camera_filemenu.addMenu("Viewmode")
-        viewmode_menu.addAction(self.viewmode_action("perspective"))
-        viewmode_menu.addAction(self.viewmode_action("top"))
-        viewmode_menu.addAction(self.viewmode_action("front"))
-        viewmode_menu.addAction(self.viewmode_action("right"))
+        for item in items:
+            text = item.get("title", None)
+            itemtype = item.get("type", None)
+            action = item.get("action", None)
 
-    def viewmode_action(self, mode: str):
-        action = QAction(mode, self.widget)
-        action.triggered.connect(lambda check=False, mode=mode: ViewModeAction().change_view(mode))
-        return action
+            if itemtype == "separator":
+                parent.addSeparator()
+            elif action:
+                self.add_action(text=text, action=action, parent=parent)
+            else:
+                if not itemtype or itemtype == "menu":
+                    menu = parent.addMenu(text)
+                    self.add_menu(items=item["items"], parent=menu)
+                elif itemtype == "radio":
+                    raise NotImplementedError
+                else:
+                    raise NotImplementedError
+
+    def add_action(
+        self,
+        *,
+        text: str,
+        action: Callable,
+        parent: QWidget,
+        args: Optional[list[Any]] = None,
+        kwargs: Optional[dict] = None,
+        icon: Optional[str] = None,
+    ):
+        args = args or []
+        kwargs = kwargs or {}
+        if icon:
+            raise NotImplementedError
+        return parent.addAction(text, partial(action, *args, **kwargs))
