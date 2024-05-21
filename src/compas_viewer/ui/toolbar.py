@@ -1,12 +1,14 @@
+from functools import partial
+from typing import Any
+from typing import Callable
+from typing import Optional
+
+from PySide6.QtWidgets import QComboBox
+from PySide6.QtWidgets import QVBoxLayout
+from PySide6.QtWidgets import QWidget
+
 from compas_viewer.base import Base
 from compas_viewer.components import Button
-from compas_viewer.components.combobox import ViewModeAction
-from compas_viewer.components.dialog import CameraSettingsDialog
-
-
-def openDialog():
-    dialog = CameraSettingsDialog()
-    dialog.exec()
 
 
 class ToolBar(Base):
@@ -18,5 +20,46 @@ class ToolBar(Base):
         self.widget.setMovable(False)
         self.widget.setObjectName("Tools")
         self.widget.setHidden(not self.viewer.config.ui.toolbar.show)
-        self.widget.addWidget(ViewModeAction().combobox())
-        self.widget.addWidget(Button(icon_path="camera_info.svg", tooltip="Camera_Settings", action=openDialog))
+
+        items = self.viewer.config.ui.toolbar.items
+        if not items:
+            return
+
+        for item in items:
+            text = item.get("title", None)
+            itemtype = item.get("type", None)
+            action = item.get("action", None)
+
+            if itemtype == "separator":
+                raise NotImplementedError
+            elif itemtype == "button":
+                self.add_action(text=text, action=action)
+            elif itemtype == "action":
+                self.add_action(text=text, action=action)
+            elif itemtype == "select":
+                self.add_combobox(item["items"], item["action"])
+            elif action:
+                self.add_action(text=text, action=action)
+
+    def add_action(
+        self,
+        *,
+        text: str,
+        action: Callable,
+        args: Optional[list[Any]] = None,
+        kwargs: Optional[dict] = None,
+        icon: Optional[str] = None,
+    ):
+        args = args or []
+        kwargs = kwargs or {}
+        return self.widget.addWidget(Button(text=text, icon_path=icon, action=partial(action, *args, **kwargs)))
+
+    def add_combobox(self, items, action, title=None):
+        widget = QWidget()
+        layout = QVBoxLayout(widget)
+        combobox = QComboBox()
+        for item in items:
+            combobox.addItem(item["title"], item["title"])
+        combobox.currentIndexChanged.connect(lambda index: action(combobox.itemData(index)))
+        layout.addWidget(combobox)
+        self.widget.addWidget(widget)

@@ -19,11 +19,11 @@ from compas_viewer.ui.ui import UI
 
 
 class Viewer(Singleton):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, config: Config = None, **kwargs):
         self.app = QApplication(sys.argv)
         self.app.setWindowIcon(QIcon(os.path.join(HERE, "icons", "compas_icon_white.png")))
         self.timer = QTimer()
-        self.config = Config()
+        self.config = config or Config()
         self.scene = ViewerScene()
         # TODO(pitsai): combine config file
         self.renderer = Renderer(RendererConfig.from_default())
