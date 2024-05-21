@@ -1,16 +1,18 @@
 from compas_assembly.geometry import Arch
 from compas_model.elements import BlockElement
 from compas_model.models import Model
-from compas_viewer import Viewer
+
 from compas.colors import Color
-from compas_viewer.scene import GroupObject
-from compas.scene import register, register_scene_objects
 from compas.plugins import plugin
+from compas.scene import register
+from compas.scene import register_scene_objects
+from compas_viewer import Viewer
+from compas_viewer.scene import GroupObject
 
 
 class ModelObject(GroupObject):
     def __init__(self, model, **kwargs):
-        
+
         elements = []
 
         for element in model.elements():
@@ -23,13 +25,17 @@ class ModelObject(GroupObject):
                 color = Color(0.8, 0.8, 0.8)
                 show_faces = False
 
-            elements.append((element.geometry,{
-                "show_faces": show_faces,
-                "surfacecolor": color,
-                "linecolor": color.contrast,
-                "show_points": False,
-            }))
-
+            elements.append(
+                (
+                    element.geometry,
+                    {
+                        "show_faces": show_faces,
+                        "surfacecolor": color,
+                        "linecolor": color.contrast,
+                        "show_points": False,
+                    },
+                )
+            )
 
         blocks = (elements, {"name": "blocks"})
         interfaces = ([], {"name": "interfaces"})
@@ -37,7 +43,7 @@ class ModelObject(GroupObject):
         super().__init__([blocks, interfaces, forces], name=model.name, **kwargs)
 
 
-register_scene_objects() # This has to be called before registering the model object
+register_scene_objects()  # This has to be called before registering the model object
 register(Model, ModelObject, context="Viewer")
 
 

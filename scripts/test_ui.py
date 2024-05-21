@@ -1,13 +1,14 @@
 import pathlib
 import sys
+
 from OpenGL import GL
 from PySide6 import QtCore
-from PySide6 import QtWidgets
 from PySide6 import QtGui
+from PySide6 import QtWidgets
+from PySide6.QtOpenGLWidgets import QOpenGLWidget
 from PySide6.QtWidgets import QApplication
 from PySide6.QtWidgets import QMainWindow
 from PySide6.QtWidgets import QWidget
-from PySide6.QtOpenGLWidgets import QOpenGLWidget
 
 from compas_viewer.config import Config
 from compas_viewer.scene.scene import ViewerScene
@@ -39,9 +40,7 @@ class ToolBar:
         self.widget.setMovable(False)
         self.widget.setObjectName("Tools")
 
-        icon = QtGui.QIcon(
-            str(pathlib.Path(__file__).parent.parent / "src" / "compas_viewer" / "icons" / "zoom_selected.svg")
-        )
+        icon = QtGui.QIcon(str(pathlib.Path(__file__).parent.parent / "src" / "compas_viewer" / "icons" / "zoom_selected.svg"))
         button = QtWidgets.QPushButton()
         button.setToolTip("Zoom")
         button.setIcon(icon)

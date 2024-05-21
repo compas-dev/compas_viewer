@@ -1,15 +1,15 @@
-from compas.geometry import Box
-from compas.geometry import Frame
-from compas_viewer.viewer import Viewer
-
-from compas_ifc.model import Model
-from compas_ifc.entities import Project
-from compas_ifc.entities import Site
 from compas_ifc.entities import Building
 from compas_ifc.entities import BuildingStorey
 from compas_ifc.entities import Column
-from compas_ifc.entities import Wall
+from compas_ifc.entities import Project
+from compas_ifc.entities import Site
 from compas_ifc.entities import Slab
+from compas_ifc.entities import Wall
+from compas_ifc.model import Model
+
+from compas.geometry import Box
+from compas.geometry import Frame
+from compas_viewer.viewer import Viewer
 
 
 def make_column(thickness=300, height=3000):
@@ -25,6 +25,7 @@ def make_wall(thickness=150, length=5000, height=3000):
 def make_floor(thickness=150, length=5000, width=5000):
     floor = Box.from_diagonal([[0, 0, -thickness], [length, width, 0]])
     return floor
+
 
 # Create a simple model
 

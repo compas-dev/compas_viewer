@@ -1,9 +1,10 @@
-from compas.geometry import Box
-from compas.geometry import Line
-from compas.geometry import Frame
-from compas_viewer.viewer import Viewer
-from compas_viewer.scene import Collection
 from random import random
+
+from compas.geometry import Box
+from compas.geometry import Frame
+from compas.geometry import Line
+from compas_viewer.scene import Collection
+from compas_viewer.viewer import Viewer
 
 viewer = Viewer()
 

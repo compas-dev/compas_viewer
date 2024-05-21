@@ -5,7 +5,6 @@ from compas.geometry import Box
 from compas.geometry import Frame
 from compas_viewer.viewer import Viewer
 
-
 viewer = Viewer()
 
 mesh = Mesh.from_off(compas.get("tubemesh.off"))
