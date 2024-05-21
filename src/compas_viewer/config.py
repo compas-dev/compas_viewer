@@ -87,42 +87,21 @@ class MenubarConfig(Base):
             {
                 "title": "Test",
                 "items": [
-                    {
-                        "title": "a",
-                        "action": lambda: print("a"),
-                    },
-                    {
-                        "title": "b",
-                        "action": lambda: print("b"),
-                    },
+                    {"title": "a", "action": lambda: print("a")},
+                    {"title": "b", "action": lambda: print("b")},
                 ],
             },
             {
                 "title": "Camera",
                 "items": [
-                    {
-                        "title": "Target and Position",
-                        "action": open_camera_settings_dialog,
-                    },
+                    {"title": "Target and Position", "action": open_camera_settings_dialog},
                     {
                         "title": "Viewmode",
                         "items": [
-                            {
-                                "title": "Perspective",
-                                "action": partial(change_viewmode, "perspective"),
-                            },
-                            {
-                                "title": "Top",
-                                "action": partial(change_viewmode, "top"),
-                            },
-                            {
-                                "title": "Front",
-                                "action": partial(change_viewmode, "front"),
-                            },
-                            {
-                                "title": "Left",
-                                "action": partial(change_viewmode, "left"),
-                            },
+                            {"title": "Perspective", "action": partial(change_viewmode, "perspective")},
+                            {"title": "Top", "action": partial(change_viewmode, "top")},
+                            {"title": "Front", "action": partial(change_viewmode, "front")},
+                            {"title": "Left", "action": partial(change_viewmode, "left")},
                         ],
                     },
                 ],
