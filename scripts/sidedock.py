@@ -1,8 +1,18 @@
+from compas.geometry import Box
 from compas_viewer import Viewer
-from compas_viewer.components.button import Button
+from compas_viewer.components import Button
 
 viewer = Viewer()
-viewer.ui.sidedock.show = True
-viewer.ui.sidedock.add(Button("camera_info.svg", "tool tips", lambda: print("do something")))
 
+box = Box(1, 1, 1)
+boxobj = viewer.scene.add(box)
+
+
+def toggle_box():
+    boxobj.is_visible = not boxobj.is_visible
+    boxobj.update()
+
+
+viewer.ui.sidedock.show = True
+viewer.ui.sidedock.add(Button(text="Toggle Box", action=toggle_box))
 viewer.show()
