@@ -2,9 +2,13 @@ import json
 from dataclasses import dataclass
 from dataclasses import field
 from dataclasses import is_dataclass
+from functools import partial
 from typing import Literal
 
 from compas.colors import Color
+
+from .actioncontroller import change_viewmode
+from .actioncontroller import open_camera_settings_dialog
 
 
 class Base:
@@ -72,13 +76,59 @@ class View3dConfig(Base):
 @dataclass
 class ToolbarConfig(Base):
     show: bool = True
-    items: list[dict[str, str]] = None
+    items: list[dict[str, str]] = field(default_factory=lambda: [])
 
 
 @dataclass
 class MenubarConfig(Base):
     show: bool = True
-    items: list[dict[str, str]] = None
+    items: list[dict[str, str]] = field(
+        default_factory=lambda: [
+            {
+                "title": "Test",
+                "items": [
+                    {
+                        "title": "a",
+                        "action": lambda: print("a"),
+                    },
+                    {
+                        "title": "b",
+                        "action": lambda: print("b"),
+                    },
+                ],
+            },
+            {
+                "title": "Camera",
+                "items": [
+                    {
+                        "title": "Target and Position",
+                        "action": open_camera_settings_dialog,
+                    },
+                    {
+                        "title": "Viewmode",
+                        "items": [
+                            {
+                                "title": "Perspective",
+                                "action": partial(change_viewmode, "perspective"),
+                            },
+                            {
+                                "title": "Top",
+                                "action": partial(change_viewmode, "top"),
+                            },
+                            {
+                                "title": "Front",
+                                "action": partial(change_viewmode, "front"),
+                            },
+                            {
+                                "title": "Left",
+                                "action": partial(change_viewmode, "left"),
+                            },
+                        ],
+                    },
+                ],
+            },
+        ]
+    )
 
 
 @dataclass
@@ -122,13 +172,3 @@ class Config(Base):
     ui: UIConfig = field(default_factory=UIConfig)
     window: WindowConfig = field(default_factory=WindowConfig)
     controller: ControllerConfig = field(default_factory=ControllerConfig)
-
-
-if __name__ == "__main__":
-    config = Config.from_json("src/compas_viewer/config.json")
-
-    print("Full config:")
-    print(config)
-
-    print("\nWindow config:")
-    print(config.window)
