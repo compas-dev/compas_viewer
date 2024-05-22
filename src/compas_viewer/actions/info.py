@@ -1,5 +1,3 @@
-from compas_viewer.gl import gl_info
-
 from .action import Action
 
 
