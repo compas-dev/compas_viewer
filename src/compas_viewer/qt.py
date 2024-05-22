@@ -1,36 +1,7 @@
-from typing import Callable
 from typing import Literal
 from typing import Union
 
 from PySide6.QtCore import Qt
-from PySide6.QtCore import QTimer
-
-
-class Timer:
-    """
-    A simple timer that calls a function at specified intervals.
-
-    Parameters
-    ----------
-    interval : int
-        Interval between subsequent calls to this function, in milliseconds.
-    callback : Callable
-        The function to call.
-    singleshot : bool, optional
-        If True, the timer is a singleshot timer.
-        Default is False.
-
-    """
-
-    def __init__(self, interval: int, callback: Callable, singleshot: bool = False):
-        self.timer = QTimer()
-        self.timer.setInterval(interval)
-        self.timer.timeout.connect(callback)
-        self.timer.setSingleShot(singleshot)
-        self.timer.start()
-
-    def stop(self):
-        self.timer.stop()
 
 
 def key_mapper(
@@ -114,6 +85,7 @@ def key_mapper(
             if v.name.replace("Key", "").replace("_", "").lower() == key:
                 return Qt.Key(v.value)
         raise ValueError(f"Key mapping of {key} not found in Qt.Key. Check your typing?")
+
     elif type == 1:
         for v in Qt.KeyboardModifier:
             if v.name.replace("Modifier", "").lower() == key:
@@ -121,10 +93,12 @@ def key_mapper(
         if key == "no":
             return Qt.KeyboardModifier.NoModifier  # Some times the no modifier is not recognized.
         raise ValueError(f"Key mapping of {key} not found in Qt.KeyboardModifier. Check your typing?")
+
     elif type == 2:
         for v in Qt.MouseButton:
             if v.name.replace("Button", "").lower() == key:
                 return Qt.MouseButton(v.value)
         raise ValueError(f"Key mapping of {key} not found in Qt.MouseButton. Check your typing?")
+
     else:
         raise ValueError("The type should be 0, 1, or 2.")

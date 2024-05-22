@@ -53,9 +53,9 @@ from .groupobject import Group
 from .groupobject import GroupObject
 from .collectionobject import Collection
 from .collectionobject import CollectionObject
-
 from .bufferobject import BufferGeometry
 from .bufferobject import BufferObject
+from .scene import ViewerScene
 
 
 @plugin(category="drawing-utils", requires=["compas_viewer"])
@@ -155,4 +155,5 @@ __all__ = [
     "CollectionObject",
     "BufferGeometry",
     "BufferObject",
+    "ViewerScene",
 ]

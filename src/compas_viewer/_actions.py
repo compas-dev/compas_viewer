@@ -1,12 +1,16 @@
 from compas_viewer.components import CameraSettingsDialog
 
 
-def a():
-    print("action a")
+def delete_selected():
+    from compas_viewer import Viewer
 
+    viewer = Viewer()
 
-def b():
-    print("action b")
+    for obj in viewer.scene.objects:
+        if obj.is_selected:
+            viewer.scene.remove(obj)
+            del obj
+    viewer.renderer.update()
 
 
 def open_camera_settings_dialog():

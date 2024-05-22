@@ -1,5 +1,6 @@
 from compas.data import Data
-from compas.scene.sceneobject import SceneObject
+
+from .sceneobject import SceneObject
 
 
 class Group(Data):
