@@ -373,7 +373,8 @@ class Renderer(QOpenGLWidget, Base):
         * https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QWidget.html#PySide6.QtWidgets.PySide6.QtWidgets.QWidget.keyPressEvent
 
         """
-        self.viewer.controller.key_press_action(event)
+        # self.viewer.controller.key_press_action(event)
+        self.viewer.eventmanager.delegate_keypress(event)
 
     def keyReleaseEvent(self, event: QKeyEvent):
         """
@@ -393,7 +394,8 @@ class Renderer(QOpenGLWidget, Base):
         * https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QWidget.html#PySide6.QtWidgets.PySide6.QtWidgets.QWidget.keyReleaseEvent
 
         """
-        self.viewer.controller.key_release_action(event)
+        # self.viewer.controller.key_release_action(event)
+        self.viewer.eventmanager.delegate_keyrelease(event)
 
     # ==========================================================================
     # view

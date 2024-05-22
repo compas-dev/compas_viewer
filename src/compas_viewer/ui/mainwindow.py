@@ -1,4 +1,5 @@
 from PySide6 import QtWidgets
+from PySide6.QtGui import QKeyEvent
 from PySide6.QtWidgets import QMainWindow
 from PySide6.QtWidgets import QWidget
 
@@ -13,3 +14,9 @@ class MainWindow(QMainWindow, Base):
         central = QWidget()
         central.setLayout(layout)
         self.setCentralWidget(central)
+
+    def keyPressEvent(self, event: QKeyEvent) -> None:
+        print(event.key())
+        print(event.modifiers())
+        print(event.keyCombination())
+        return super().keyPressEvent(event)
