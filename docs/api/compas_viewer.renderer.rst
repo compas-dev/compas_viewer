@@ -1,8 +1,8 @@
 *******************************************************************************
-compas_viewer.components.renderer
+compas_viewer.renderer
 *******************************************************************************
 
-.. currentmodule:: compas_viewer.components.renderer
+.. currentmodule:: compas_viewer.renderer
 
 Classes
 =======
