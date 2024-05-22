@@ -305,6 +305,11 @@ class ViewerSceneObject(SceneObject, Base):
         # Update the matrix from object's translation, rotation and scale.
         self._update_matrix()
 
+        self._points_data = self._read_points_data()
+        self._lines_data = self._read_lines_data()
+        self._frontfaces_data = self._read_frontfaces_data()
+        self._backfaces_data = self._read_backfaces_data()
+
         # Update all buffers from object's data.
         if self._points_data is not None:
             self.update_buffer_from_data(
@@ -339,8 +344,6 @@ class ViewerSceneObject(SceneObject, Base):
                 update_elements,
             )
 
-        #  Update the canvas.
-        self.viewer.renderer.update()
 
     def _update_bounding_box(self, positions: Optional[list[Point]] = None):
         """Update the bounding box of the object"""
