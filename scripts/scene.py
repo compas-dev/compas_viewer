@@ -8,7 +8,7 @@ from compas.data import json_dump
 from compas.data import json_load
 from compas.scene import Scene
 
-# Save and load a scene
+
 viewer = Viewer()
 mesh = Mesh.from_off(compas.get("tubemesh.off"))
 obj = viewer.scene.add(mesh, show_points=True, facecolor=Color.blue(), linecolor=Color.red(), pointcolor=Color.green())
@@ -24,16 +24,18 @@ for i in range(5):
             name=f"Box_{i}_{j}",
         )
 
-json_dump(viewer.scene, "temp/scene1.json")
+# Save a scene to a file
+json_dump(viewer.scene, "temp/scene.json")
 viewer.show()
 
 
-viewer.scene = json_load("temp/scene1.json")
+# Load a scene from a file
+viewer.scene = json_load("temp/scene.json")
 viewer.show()
 
 
 
-# Viewer with a generic scene
+# Using a generic scene
 # Note the generic scene can be more limited in visualization options
 # depending on what's available in the compas.scene.SceneObject classes
 

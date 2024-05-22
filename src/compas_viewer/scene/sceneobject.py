@@ -450,6 +450,7 @@ class ViewerSceneObject(SceneObject, Base):
     @property
     def settings(self):
         settings = {
+            "name": self.name,
             "is_selected": self.is_selected,
             "is_locked": self.is_locked,
             "show": self.show,
