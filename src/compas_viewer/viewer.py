@@ -21,13 +21,14 @@ from compas_viewer.ui import UI
 # because it might be created somewhere else too early
 # without the custom configuration
 class Viewer(Singleton):
-    def __init__(self, config: Config = None, **kwargs):
+    def __init__(self, config: Config = None, show_grid: bool = True, **kwargs):
         self.app = QApplication(sys.argv)
         self.app.setWindowIcon(QIcon(os.path.join(HERE, "icons", "compas_icon_white.png")))
 
         self.timer = QTimer()
 
         self.config = config or Config()
+        self.config.renderer.show_grid = show_grid
 
         # otherwise this results in a circular import
         # both of these should be removed from this __init__
