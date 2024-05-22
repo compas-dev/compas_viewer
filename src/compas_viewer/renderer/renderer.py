@@ -14,10 +14,8 @@ from PySide6.QtOpenGLWidgets import QOpenGLWidget
 from compas.geometry import Frame
 from compas.geometry import transform_points_numpy
 from compas_viewer.base import Base
-from compas_viewer.configurations import RendererConfig
+from compas_viewer.config import Config
 from compas_viewer.scene import TagObject
-from compas_viewer.scene import FrameObject
-from compas_viewer.scene.gridobject import GridObject
 from compas_viewer.scene.vectorobject import VectorObject
 
 from .camera import Camera
@@ -45,14 +43,13 @@ class Renderer(QOpenGLWidget, Base):
         The renderer configuration.
     """
 
-    def __init__(self, config: RendererConfig):
+    def __init__(self, config: Config):
         super().__init__()
 
         self.config = config
-
-        self._viewmode = self.config.viewmode
-        self._rendermode = self.config.rendermode
-        self._opacity = self.config.ghostopacity if self.rendermode == "ghosted" else 1.0
+        self._viewmode = self.config.renderer.viewmode
+        self._rendermode = self.config.renderer.rendermode
+        self._opacity = self.config.renderer.ghostopacity if self.rendermode == "ghosted" else 1.0
 
         self._frames = 0
         self._now = time.time()
@@ -65,7 +62,7 @@ class Renderer(QOpenGLWidget, Base):
 
         self.camera = Camera()
         self.selector = Selector()
- 
+        self.grid: "GridObject"
 
         self.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
         self.grabGesture(QtCore.Qt.PinchGesture)
@@ -84,9 +81,9 @@ class Renderer(QOpenGLWidget, Base):
     @rendermode.setter
     def rendermode(self, rendermode):
         self._rendermode = rendermode
-        self.config.rendermode = rendermode
+        self.config.renderer.rendermode = rendermode
         if rendermode == "ghosted":
-            self._opacity = self.config.ghostopacity
+            self._opacity = self.config.renderer.ghostopacity
         else:
             self._opacity = 1.0
         if self.shader_model:
@@ -109,7 +106,7 @@ class Renderer(QOpenGLWidget, Base):
     @viewmode.setter
     def viewmode(self, viewmode):
         self._viewmode = viewmode
-        self.config.viewmode = viewmode
+        self.config.renderer.viewmode = viewmode
         self.shader_model.bind()
         self.shader_model.uniform4x4(
             "projection",
@@ -160,7 +157,7 @@ class Renderer(QOpenGLWidget, Base):
         * https://doc.qt.io/qtforpython-6/PySide6/QtOpenGL/QOpenGLWindow.html#PySide6.QtOpenGL.PySide6.QtOpenGL.QOpenGLWindow.initializeGL
 
         """
-        GL.glClearColor(*self.config.backgroundcolor.rgba)
+        GL.glClearColor(*self.config.renderer.backgroundcolor.rgba)
         GL.glPolygonOffset(1.0, 1.0)
         GL.glEnable(GL.GL_POLYGON_OFFSET_FILL)
         GL.glEnable(GL.GL_CULL_FACE)
@@ -233,6 +230,7 @@ class Renderer(QOpenGLWidget, Base):
     # ==========================================================================
     # Event
     # ==========================================================================
+
     def event(self, event):
         """
         Event handler for the renderer. Customised to capture multi-touch gestures.
@@ -404,13 +402,15 @@ class Renderer(QOpenGLWidget, Base):
         """Initialize the renderer."""
 
         # Init the grid
-        self.grid = GridObject(
+        self.grid: GridObject = self.viewer.scene.add(  # type: ignore
             Frame.worldXY(),
-            framesize=self.config.gridsize,
-            show_framez=self.config.show_gridz,
-            is_visible=self.config.show_grid,
-            )
-        self.grid.init()
+            framesize=self.config.renderer.gridsize,
+            show_framez=self.config.renderer.show_gridz,
+            is_selected=False,
+            is_locked=True,
+            is_visible=self.config.renderer.show_grid,
+        )
+        self.grid.init()  # type: ignore
 
         # Init the buffers
         for obj in self.viewer.scene.objects:
@@ -601,9 +601,8 @@ class Renderer(QOpenGLWidget, Base):
         # Draw model objects in the scene
         self.shader_model.bind()
         self.shader_model.uniform4x4("viewworld", viewworld)
-        self.grid.draw(self.shader_model)
         for obj in self.sort_objects_from_viewworld(mesh_objs, viewworld):
-            obj.draw(self.shader_model, self.rendermode == "wireframe", self.rendermode == "lighted")
+            obj.draw(self.shader_model, self.rendermode == "wireframe", self.rendermode == "lightened")
         self.shader_model.release()
 
         # Draw vector arrows

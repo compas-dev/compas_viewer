@@ -8,29 +8,39 @@ from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication
 
 from compas_viewer import HERE
-from compas_viewer.components.renderer import Renderer
 from compas_viewer.config import Config
-from compas_viewer.configurations import ControllerConfig
-from compas_viewer.configurations import RendererConfig
 from compas_viewer.controller import Controller
-from compas_viewer.scene.scene import ViewerScene
+from compas_viewer.renderer import Renderer
+from compas_viewer.scene import ViewerScene
 from compas_viewer.singleton import Singleton
-from compas_viewer.ui.ui import UI
+from compas_viewer.ui import UI
 
 
+# this should not be a singleton
+# because it might be created somewhere else too early
+# without the custom configuration
 class Viewer(Singleton):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, config: Config = None, **kwargs):
         self.app = QApplication(sys.argv)
         self.app.setWindowIcon(QIcon(os.path.join(HERE, "icons", "compas_icon_white.png")))
+
         self.timer = QTimer()
-        self.config = Config()
+
+        self.config = config or Config()
         self.scene = ViewerScene()
-        # TODO(pitsai): combine config file
-        self.renderer = Renderer(RendererConfig.from_default())
-        self.controller = Controller(ControllerConfig.from_default())
+
+        # otherwise this results in a circular import
+        # both of these should be removed from this __init__
+        # renderer needs to go to view3d
+        # controller needs to be refactored to eventmanager
+        self.renderer = Renderer(self.config)
+        self.controller = Controller(self.config)
+
         self.ui = UI()
 
     def show(self):
+        # none of these lazy inits should be necessary
+        # it just covers up for a design flaw
         self.ui.lazy_init()
         self.ui.show()
         self.app.exec()

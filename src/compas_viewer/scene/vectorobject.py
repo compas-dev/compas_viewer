@@ -3,7 +3,7 @@ from typing import Any
 from compas.geometry import Point
 from compas.geometry import Vector
 from compas.scene import GeometryObject
-from compas_viewer.components.renderer.shaders.shader import Shader
+from compas_viewer.renderer.shaders import Shader
 
 from .sceneobject import ShaderDataType
 from .sceneobject import ViewerSceneObject

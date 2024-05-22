@@ -4,7 +4,6 @@ from PySide6.QtCore import QObject
 from PySide6.QtCore import Signal
 
 from compas_viewer.base import Base
-from compas_viewer.configurations import ActionConfig
 
 from . import get_action_cls
 
@@ -43,11 +42,11 @@ class Action(QObject, Base):
     pressed = Signal()
     released = Signal()
 
-    def __new__(cls, name: str, config: ActionConfig, **kwargs):
+    def __new__(cls, name: str, config, **kwargs):
         action_cls = get_action_cls(name)
         return super(Action, cls).__new__(action_cls, **kwargs)
 
-    def __init__(self, name: str, config: ActionConfig):
+    def __init__(self, name: str, config):
         super().__init__()
         self.name = name
         self.config = config

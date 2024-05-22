@@ -1,5 +1,3 @@
-from compas_viewer.gl import gl_info
-
 from .action import Action
 
 
@@ -14,13 +12,13 @@ class CameraInfo(Action):
         Camera position: {self.viewer.renderer.camera.position}
         Camera target: {self.viewer.renderer.camera.target}
         Camera distance: {self.viewer.renderer.camera.distance}
-        Camera fov: {self.viewer.renderer.camera.config.fov}
-        Camera near: {self.viewer.renderer.camera.config.near}
-        Camera far: {self.viewer.renderer.camera.config.far}
-        Camera scale : {self.viewer.renderer.camera.config.scale}
-        Camera zoomdelta : {self.viewer.renderer.camera.config.zoomdelta}
-        Camera rotationdelta : {self.viewer.renderer.camera.config.rotationdelta}
-        Camera pan_delta : {self.viewer.renderer.camera.config.pan_delta}
+        Camera fov: {self.viewer.config.camera.fov}
+        Camera near: {self.viewer.config.camera.near}
+        Camera far: {self.viewer.config.camera.far}
+        Camera scale : {self.viewer.config.camera.scale}
+        Camera zoomdelta : {self.viewer.config.camera.zoomdelta}
+        Camera rotationdelta : {self.viewer.config.camera.rotationdelta}
+        Camera pan_delta : {self.viewer.config.camera.pan_delta}
         """
         self.viewer.layout.window.info(info)
 
@@ -37,7 +35,7 @@ class SelectionInfo(Action):
             if obj.is_selected:
                 info += f"Object {i}: {obj} \n"
 
-        self.viewer.layout.window.info(info)
+        raise NotImplementedError
 
 
 class GLInfo(Action):
@@ -46,4 +44,4 @@ class GLInfo(Action):
     """
 
     def pressed_action(self):
-        self.viewer.layout.window.info(gl_info())
+        raise NotImplementedError

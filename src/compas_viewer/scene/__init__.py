@@ -54,6 +54,8 @@ from .groupobject import GroupObject
 from .collectionobject import Collection
 from .collectionobject import CollectionObject
 
+from .scene import ViewerScene
+
 
 @plugin(category="drawing-utils", requires=["compas_viewer"])
 def clear(guids: list[str]):
@@ -149,4 +151,5 @@ __all__ = [
     "GroupObject",
     "Collection",
     "CollectionObject",
+    "ViewerScene",
 ]
