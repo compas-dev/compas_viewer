@@ -45,29 +45,16 @@ Actions are functions that are called when a certain event happens, such as mous
     compas_viewer.actions
 
 
-Components and Configurations
------------------------------
-Components and the corresponding configurations of them.
+Components
+----------
+Components...
 
 .. toctree::
     :maxdepth: 1
     :titlesonly:
-    :caption: Components and Configurations
+    :caption: Components
 
     compas_viewer.components
-    compas_viewer.configurations
-
-
-Layout and UI
---------------------
-The layout and UI of the viewer.
-
-.. toctree::
-    :maxdepth: 1
-    :titlesonly:
-    :caption: Layout and UI
-
-    compas_viewer.layout
 
 
 Utilities

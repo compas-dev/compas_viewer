@@ -330,7 +330,7 @@ class Camera(Base):
         is a perspective view (``camera.renderer.config.viewmode == "perspective"``).
 
         """
-        if self.viewer.renderer.config.viewmode == "perspective":
+        if self.viewer.renderer.viewmode == "perspective":
             self.rotation += [-self.rotationdelta * dy, 0, -self.rotationdelta * dx]
 
     def pan(self, dx: float, dy: float):

@@ -12,11 +12,11 @@ from compas.geometry import transform_points_numpy
 from compas.itertools import flatten
 from compas.scene import SceneObject
 from compas_viewer.base import Base
-from compas_viewer.components.renderer.shaders import Shader
 from compas_viewer.gl import make_index_buffer
 from compas_viewer.gl import make_vertex_buffer
 from compas_viewer.gl import update_index_buffer
 from compas_viewer.gl import update_vertex_buffer
+from compas_viewer.renderer.shaders import Shader
 
 # Type template of point/line/face data for generating the buffers.
 ShaderDataType = tuple[list[Point], list[Color], list[list[int]]]
