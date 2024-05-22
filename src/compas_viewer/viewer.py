@@ -7,6 +7,7 @@ from PySide6.QtCore import QTimer
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication
 
+from compas.scene import Scene
 from compas_viewer import HERE
 from compas_viewer.config import Config
 from compas_viewer.controller import Controller
@@ -20,14 +21,14 @@ from compas_viewer.ui import UI
 # because it might be created somewhere else too early
 # without the custom configuration
 class Viewer(Singleton):
-    def __init__(self, config: Config = None, **kwargs):
+    def __init__(self, config: Config = None, show_grid: bool = True, **kwargs):
         self.app = QApplication(sys.argv)
         self.app.setWindowIcon(QIcon(os.path.join(HERE, "icons", "compas_icon_white.png")))
 
         self.timer = QTimer()
 
         self.config = config or Config()
-        self.scene = ViewerScene()
+        self.config.renderer.show_grid = show_grid
 
         # otherwise this results in a circular import
         # both of these should be removed from this __init__
@@ -37,6 +38,17 @@ class Viewer(Singleton):
         self.controller = Controller(self.config)
 
         self.ui = UI()
+        self._scene = None
+
+    @property
+    def scene(self) -> ViewerScene:
+        if self._scene is None:
+            self._scene = ViewerScene()
+        return self._scene
+
+    @scene.setter
+    def scene(self, scene: Scene):
+        self._scene = ViewerScene.__from_data__(scene.__data__)
 
     def show(self):
         # none of these lazy inits should be necessary

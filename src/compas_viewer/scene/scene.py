@@ -75,20 +75,19 @@ class ViewerScene(Scene):
         self.instance_colors: dict[tuple[int, int, int], ViewerSceneObject] = {}
         self._instance_colors_generator = instance_colors_generator()
 
+    # TODO: These fixed kwargs could be moved to COMPAS core.
     def add(
         self,
         item: Union[Geometry, Datastructure, ViewerSceneObject],
         parent: Optional[ViewerSceneObject] = None,
         is_selected: bool = False,
         is_locked: bool = False,
-        is_visible: bool = True,
+        show: bool = True,
         show_points: Optional[bool] = None,
         show_lines: Optional[bool] = None,
         show_faces: Optional[bool] = None,
-        pointcolor: Optional[Color] = None,
-        linecolor: Optional[Color] = None,
-        vertexcolor: Optional[Union[Color, dict[Any, Color]]] = None,
-        edgecolor: Optional[Union[Color, dict[Any, Color]]] = None,
+        pointcolor: Optional[Union[Color, dict[Any, Color]]] = None,
+        linecolor: Optional[Union[Color, dict[Any, Color]]] = None,
         facecolor: Optional[Union[Color, dict[Any, Color]]] = None,
         linewidth: Optional[float] = None,
         pointsize: Optional[float] = None,
@@ -116,7 +115,7 @@ class ViewerScene(Scene):
         is_locked : bool, optional
             Whether the object is locked (not selectable).
             Default to False.
-        is_visible : bool, optional
+        show : bool, optional
             Whether to show object.
             Default to True.
         show_points : bool, optional
@@ -125,16 +124,12 @@ class ViewerScene(Scene):
             Whether to show lines/edges of the object.
         show_faces : bool, optional
             Whether to show faces of the object.
-        pointcolor : :class:`compas.colors.Color`, optional
-            The single color of colors of the points in the COMPAS Geometry.
-        linecolor : :class:`compas.colors.Color`, optional
-            The single color of colors of the lines in the COMPAS Geometry.
-        vertexcolor : Union[:class:`compas.colors.Color`, dict[Any, :class:`compas.colors.Color`], optional
-            The color or the dict of colors of the vertices in the COMPAS Mesh.
-        edgecolor : Union[:class:`compas.colors.Color`, dict[Any, :class:`compas.colors.Color`], optional
-            The color or the dict of colors of the edges in the COMPAS Mesh.
+        pointcolor : Union[:class:`compas.colors.Color`, dict[Any, :class:`compas.colors.Color`], optional
+            The color or the dict of colors of the points/vertices of object.
+        linecolor : Union[:class:`compas.colors.Color`, dict[Any, :class:`compas.colors.Color`], optional
+            The color or the dict of colors of the lines/edges of object.
         facecolor : Union[:class:`compas.colors.Color`, dict[Any, :class:`compas.colors.Color`], optional
-            The color or the dict of colors of the faces in the COMPAS Mesh.
+            The color or the dict of colors of the faces of object.
         linewidth : float, optional
             The line width to be drawn on screen
         pointsize : float, optional
@@ -162,7 +157,7 @@ class ViewerScene(Scene):
             item=item,
             parent=parent,
             is_selected=is_selected,
-            is_visible=is_visible,
+            show=show,
             is_locked=is_locked,
             show_points=show_points,
             show_lines=show_lines,
@@ -170,8 +165,6 @@ class ViewerScene(Scene):
             pointcolor=pointcolor,
             linecolor=linecolor,
             facecolor=facecolor,
-            vertexcolor=vertexcolor,
-            edgecolor=edgecolor,
             linewidth=linewidth,
             pointsize=pointsize,
             opacity=opacity,

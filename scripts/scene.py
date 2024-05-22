@@ -1,0 +1,54 @@
+import compas
+from compas.colors import Color
+from compas.datastructures import Mesh
+from compas.geometry import Box
+from compas.geometry import Frame
+from compas_viewer.viewer import Viewer
+from compas.data import json_dump
+from compas.data import json_load
+from compas.scene import Scene
+
+
+viewer = Viewer()
+mesh = Mesh.from_off(compas.get("tubemesh.off"))
+obj = viewer.scene.add(mesh, show_points=True, facecolor=Color.blue(), linecolor=Color.red(), pointcolor=Color.green())
+for i in range(5):
+    for j in range(5):
+        viewer.scene.add(
+            Box(0.5, 0.5, 0.5, Frame([i, j, 0], [1, 0, 0], [0, 1, 0])),
+            show_points=True,
+            linecolor=Color.white(),
+            pointcolor=Color.black(),
+            pointsize=10,
+            facecolor=Color(i / 10, j / 10, 0.0),
+            name=f"Box_{i}_{j}",
+        )
+
+# Save a scene to a file
+json_dump(viewer.scene, "temp/scene.json")
+viewer.show()
+
+
+# Load a scene from a file
+viewer.scene = json_load("temp/scene.json")
+viewer.show()
+
+
+
+# Using a generic scene
+# Note the generic scene can be more limited in visualization options
+# depending on what's available in the compas.scene.SceneObject classes
+
+scene = Scene()
+mesh = Mesh.from_off(compas.get("tubemesh.off"))
+scene.add(mesh)
+for i in range(5):
+    for j in range(5):
+        scene.add(
+            Box(0.5, 0.5, 0.5, Frame([i, j, 0], [1, 0, 0], [0, 1, 0])),
+            name=f"Box_{i}_{j}",
+        )
+
+viewer = Viewer()
+viewer.scene = scene
+viewer.show()

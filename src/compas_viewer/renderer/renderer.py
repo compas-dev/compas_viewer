@@ -16,6 +16,7 @@ from compas.geometry import transform_points_numpy
 from compas_viewer.base import Base
 from compas_viewer.config import Config
 from compas_viewer.scene import TagObject
+from compas_viewer.scene.gridobject import GridObject
 from compas_viewer.scene.vectorobject import VectorObject
 
 from .camera import Camera
@@ -46,6 +47,7 @@ class Renderer(QOpenGLWidget, Base):
     def __init__(self, config: Config):
         super().__init__()
 
+        self.grid = None
         self.config = config
         self._viewmode = self.config.renderer.viewmode
         self._rendermode = self.config.renderer.rendermode
@@ -62,7 +64,6 @@ class Renderer(QOpenGLWidget, Base):
 
         self.camera = Camera()
         self.selector = Selector()
-        self.grid: "GridObject"
 
         self.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
         self.grabGesture(QtCore.Qt.PinchGesture)
@@ -402,15 +403,14 @@ class Renderer(QOpenGLWidget, Base):
         """Initialize the renderer."""
 
         # Init the grid
-        self.grid: GridObject = self.viewer.scene.add(  # type: ignore
-            Frame.worldXY(),
-            framesize=self.config.renderer.gridsize,
-            show_framez=self.config.renderer.show_gridz,
-            is_selected=False,
-            is_locked=True,
-            is_visible=self.config.renderer.show_grid,
-        )
-        self.grid.init()  # type: ignore
+        if self.config.renderer.show_grid:
+            self.grid = GridObject(
+                Frame.worldXY(),
+                framesize=self.config.renderer.gridsize,
+                show_framez=self.config.renderer.show_gridz,
+                is_visible=self.config.renderer.show_grid,
+            )
+            self.grid.init()
 
         # Init the buffers
         for obj in self.viewer.scene.objects:
@@ -596,11 +596,13 @@ class Renderer(QOpenGLWidget, Base):
         viewworld = self.camera.viewworld()
         self.update_projection()
         # Object categorization
-        tag_objs, vector_objs, mesh_objs = self.sort_objects_from_category((obj for obj in self.viewer.scene.objects if obj.is_visible))
+        tag_objs, vector_objs, mesh_objs = self.sort_objects_from_category((obj for obj in self.viewer.scene.objects if obj.show))
 
         # Draw model objects in the scene
         self.shader_model.bind()
         self.shader_model.uniform4x4("viewworld", viewworld)
+        if self.grid is not None:
+            self.grid.draw(self.shader_model)
         for obj in self.sort_objects_from_viewworld(mesh_objs, viewworld):
             obj.draw(self.shader_model, self.rendermode == "wireframe", self.rendermode == "lightened")
         self.shader_model.release()
