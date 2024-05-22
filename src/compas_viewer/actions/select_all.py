@@ -6,6 +6,6 @@ class SelectAll(Action):
 
     def pressed_action(self):
         for obj in self.viewer.scene.objects:
-            if obj.is_visible and not obj.is_locked:
+            if obj.show and not obj.is_locked:
                 obj.is_selected = True
         self.viewer.renderer.update()

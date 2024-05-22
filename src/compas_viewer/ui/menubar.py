@@ -14,6 +14,7 @@ class MenuBar(Base):
 
     def lazy_init(self):
         self.widget = self.viewer.ui.window.menuBar()
+        self.widget.clear()
         self.add_menu(items=self.viewer.config.ui.menubar.items, parent=self.widget)
 
     def add_menu(self, *, items, parent):

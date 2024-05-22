@@ -596,7 +596,7 @@ class Renderer(QOpenGLWidget, Base):
         viewworld = self.camera.viewworld()
         self.update_projection()
         # Object categorization
-        tag_objs, vector_objs, mesh_objs = self.sort_objects_from_category((obj for obj in self.viewer.scene.objects if obj.is_visible))
+        tag_objs, vector_objs, mesh_objs = self.sort_objects_from_category((obj for obj in self.viewer.scene.objects if obj.show))
 
         # Draw model objects in the scene
         self.shader_model.bind()

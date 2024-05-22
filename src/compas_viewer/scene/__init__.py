@@ -53,7 +53,8 @@ from .groupobject import Group
 from .groupobject import GroupObject
 from .collectionobject import Collection
 from .collectionobject import CollectionObject
-
+from .bufferobject import BufferGeometry
+from .bufferobject import BufferObject
 from .scene import ViewerScene
 
 
@@ -92,6 +93,7 @@ def register_scene_objects():
     register(Polyhedron, PolyhedronObject, context="Viewer")
     register(list, GroupObject, context="Viewer")
     register(Collection, CollectionObject, context="Viewer")
+    register(BufferGeometry, BufferObject, context="Viewer")
 
     try:
         from compas_occ.brep import OCCBrep
@@ -151,5 +153,7 @@ __all__ = [
     "GroupObject",
     "Collection",
     "CollectionObject",
+    "BufferGeometry",
+    "BufferObject",
     "ViewerScene",
 ]

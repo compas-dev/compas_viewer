@@ -6,6 +6,7 @@ from numpy import average
 from numpy import identity
 
 from compas.colors import Color
+from compas.colors import ColorDict
 from compas.geometry import Point
 from compas.geometry import Transformation
 from compas.geometry import transform_points_numpy
@@ -35,7 +36,7 @@ class ViewerSceneObject(SceneObject, Base):
         Whether the object is selected. Default is False.
     is_locked : bool, optional
         Whether the object is locked. Default is False.
-    is_visible : bool, optional
+    show : bool, optional
         Whether to show object. Default is True.
     show_points : bool, optional
         Whether to show points/vertices of the object. Default is the value of `show_points` in `viewer.config`.
@@ -59,7 +60,7 @@ class ViewerSceneObject(SceneObject, Base):
     is_locked : bool
         Whether the object is locked (selectable).
         The global grid is a typical object that is not selectable.
-    is_visible : bool
+    show : bool
         Whether to show object.
     show_points : bool
         Whether to show points/vertices of the object.
@@ -89,7 +90,7 @@ class ViewerSceneObject(SceneObject, Base):
         self,
         is_selected: bool = False,
         is_locked: bool = False,
-        is_visible: bool = True,
+        show: bool = True,
         show_points: Optional[bool] = None,
         show_lines: Optional[bool] = None,
         show_faces: Optional[bool] = None,
@@ -101,7 +102,7 @@ class ViewerSceneObject(SceneObject, Base):
     ):
         #  Basic
         super().__init__(**kwargs)
-        self.is_visible = is_visible
+        self.show = show
         self.show_points = show_points if show_points is not None else False
         self.show_lines = show_lines if show_lines is not None else True
         self.show_faces = show_faces if show_faces is not None else True
@@ -112,10 +113,6 @@ class ViewerSceneObject(SceneObject, Base):
         #  Selection
         self._is_locked = is_locked
         self.is_selected = not is_locked and is_selected
-        # TODO scene
-        self.instance_color = Color.from_rgb255(*next(self.viewer.scene._instance_colors_generator))
-        if not is_locked:
-            self.viewer.scene.instance_colors[self.instance_color.rgb255] = self
 
         #  Visual
         self.background: bool = False
@@ -288,6 +285,8 @@ class ViewerSceneObject(SceneObject, Base):
         self._backfaces_data = self._read_backfaces_data()
         self.make_buffers()
         self._update_matrix()
+        self.instance_color = Color.from_rgb255(*next(self.viewer.scene._instance_colors_generator))
+        self.scene.instance_colors[self.instance_color.rgb255] = self
 
     def update(self, update_positions: bool = True, update_colors: bool = True, update_elements: bool = True):
         """Update the object.
@@ -449,3 +448,40 @@ class ViewerSceneObject(SceneObject, Base):
             shader.uniform4x4("transform", identity(4).flatten())
         shader.uniform3f("instance_color", [0, 0, 0])
         shader.disable_attribute("position")
+
+    @property
+    def settings(self):
+        settings = {
+            "name": self.name,
+            "is_selected": self.is_selected,
+            "is_locked": self.is_locked,
+            "show": self.show,
+            "show_points": self.show_points,
+            "show_lines": self.show_lines,
+            "show_faces": self.show_faces,
+            "linewidth": self.linewidth,
+            "pointsize": self.pointsize,
+            "opacity": self.opacity,
+            "background": self.background,
+        }
+
+        # TODO: make ColorDict serializable in compas core.
+        if hasattr(self, "pointcolor"):
+            if isinstance(self.pointcolor, Color):
+                settings["pointcolor"] = self.pointcolor
+            elif isinstance(self.pointcolor, ColorDict):
+                settings["pointcolor"] = self.pointcolor.default
+
+        if hasattr(self, "linecolor"):
+            if isinstance(self.linecolor, Color):
+                settings["linecolor"] = self.linecolor
+            elif isinstance(self.linecolor, ColorDict):
+                settings["linecolor"] = self.linecolor.default
+
+        if hasattr(self, "facecolor"):
+            if isinstance(self.facecolor, Color):
+                settings["facecolor"] = self.facecolor
+            elif isinstance(self.facecolor, ColorDict):
+                settings["facecolor"] = self.facecolor.default
+
+        return settings
