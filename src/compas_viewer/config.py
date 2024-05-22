@@ -88,6 +88,12 @@ class ToolbarConfig(Base):
                     {"title": "Right", "value": "right"},
                 ],
             },
+            {
+                "tooltip": "Target and Position",
+                "type": "button",
+                "icon": "camera_info.svg",
+                "action": open_camera_settings_dialog,
+            }
         ]
     )
 
