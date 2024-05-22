@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Fixed `action` bug.
 * Changed `GridObject` to draw direcly in `Render`
+* update `slider` component
 
 ### Removed
 
