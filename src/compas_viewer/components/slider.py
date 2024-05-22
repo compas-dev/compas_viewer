@@ -13,11 +13,11 @@ class Slider(QWidget):
     def __init__(
         self,
         title: str = "Slider",
-        horizontal: Optional[bool] = True,
         min_val: int = 0,
         max_val: int = 100,
-        step: float = 0.5,
         action: Callable = None,
+        horizontal: Optional[bool] = True,
+        step: Optional[float] = 1,
         tick_interval: Optional[float] = None,
         starting_val: Optional[float] = None,
     ):
@@ -27,16 +27,18 @@ class Slider(QWidget):
 
         Parameters
         ----------
-        title : str, optional
+        title : str
             Label displayed above the slider, defaults to "Slider".
+        min_val : int
+            Minimum value of the slider, defaults to 0.
+        max_val : int
+            Maximum value of the slider, defaults to 100.
+        action : Callable
+            Function to execute on value change. Should accept a single integer argument.
         horizontal : bool, optional
             Orientation of the slider. True for horizontal, False for vertical. Defaults to True.
-        min_val : float, optional
-            Minimum value of the slider, defaults to 0.
-        max_val : float, optional
-            Maximum value of the slider, defaults to 100.
-        action : Callable, optional
-            Function to execute on value change. Should accept a single integer argument.
+        step : float, optional
+            Step size of the slider, defaults to 1.
         tick_interval : float, optional
             Interval between tick marks. No ticks if None. Defaults to None.
         starting_val : float, optional
@@ -44,48 +46,54 @@ class Slider(QWidget):
 
         Attributes
         ----------
-        min_label : QLabel
-            Label displaying the minimum value.
-        max_label : QLabel
-            Label displaying the maximum value.
-        value_label : QLabel
-            Label displaying the current value prefixed by the title.
+        title : str
+            Label displayed above the slider.
+        min_val : int
+            Minimum value of the slider.
+        max_val : int
+            Maximum value of the slider.
+        action : Callable
+            Function to execute on value change.
 
         Example
         -------
-        >>> slider = Slider("Brightness", min_val=0, max_val=255, tick_interval=5, starting_val=125)
+        >>> slider = Slider("Brightness", min_val=0, max_val=255, step=5)
         """
         super().__init__()
 
         self.title = title
         self.action = action
-        self.horizontal = horizontal
+        self._horizontal = horizontal
         self.min_val = min_val
         self.max_val = max_val
         self.step = step
-        self.tick_interval = tick_interval
-        self.starting_val = starting_val
+        self._tick_interval = tick_interval
+        self._starting_val = starting_val
 
-        if self.horizontal:
+        if self._horizontal:
             orientation = Qt.Horizontal
         else:
             orientation = Qt.Vertical
 
+        if self._tick_interval is None:
+            self._tick_interval = (self.max_val - self.min_val) / 10
+
+        if self._starting_val is None:
+            self._starting_val = self.min_val
+
+        print(self.step)
         self.layout = QVBoxLayout(self)
         self.h_layout = QHBoxLayout()
         self.slider = QSlider(orientation)
         self.slider.setMinimum(self.min_val)
         self.slider.setMaximum(self.max_val)
         self.slider.setSingleStep(self.step)
+        self.slider.setPageStep(self.step)
 
-        if tick_interval is not None:
-            self.slider.setTickInterval(self.tick_interval)
-            self.slider.setTickPosition(QSlider.TicksBelow)
+        self.slider.setTickInterval(self._tick_interval)
+        self.slider.setTickPosition(QSlider.TicksBelow)
 
-        if starting_val is not None:
-            self.slider.setValue(self.starting_val)
-        else:
-            self.slider.setValue(self.min_val)  # Default to minimum if not specified
+        self.slider.setValue(self._starting_val)
 
         # Labels for displaying the range and current value
         self.min_label = QLabel(str(self.min_val), alignment=Qt.AlignLeft)
