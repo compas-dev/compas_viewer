@@ -163,7 +163,7 @@ class UIConfig(Base):
 @dataclass
 class RendererConfig(Base):
     show_grid: bool = True
-    show_gridz: bool = True
+    show_gridz: bool = False
     gridsize: tuple[float, int, float, int] = field(default_factory=lambda: (10.0, 10, 10.0, 10))
     opacity: float = 1.0
     ghostopacity: float = 0.7
