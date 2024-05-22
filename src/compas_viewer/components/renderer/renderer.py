@@ -65,8 +65,7 @@ class Renderer(QOpenGLWidget, Base):
 
         self.camera = Camera()
         self.selector = Selector()
-        self.grid = GridObject(Frame.worldXY())
-        self.grid.init()
+ 
 
         self.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
         self.grabGesture(QtCore.Qt.PinchGesture)
@@ -414,6 +413,9 @@ class Renderer(QOpenGLWidget, Base):
         #     is_visible=self.config.show_grid,
         # )
         # self.grid.init()  # type: ignore
+
+        self.grid = GridObject(Frame.worldXY())
+        self.grid.init()
 
         # Init the buffers
         for obj in self.viewer.scene.objects:
