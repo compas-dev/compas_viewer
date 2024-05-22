@@ -344,7 +344,6 @@ class ViewerSceneObject(SceneObject, Base):
                 update_elements,
             )
 
-
     def _update_bounding_box(self, positions: Optional[list[Point]] = None):
         """Update the bounding box of the object"""
         if positions is None:
