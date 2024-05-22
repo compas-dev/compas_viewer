@@ -16,7 +16,6 @@ class Slider(QWidget):
         horizontal: Optional[bool] = True,
         min_val: int = 0,
         max_val: int = 100,
-        step: float = 0.5,
         action: Callable = None,
         tick_interval: Optional[float] = None,
         starting_val: Optional[float] = None,
@@ -31,9 +30,9 @@ class Slider(QWidget):
             Label displayed above the slider, defaults to "Slider".
         horizontal : bool, optional
             Orientation of the slider. True for horizontal, False for vertical. Defaults to True.
-        min_val : float, optional
+        min_val : int, optional
             Minimum value of the slider, defaults to 0.
-        max_val : float, optional
+        max_val : int, optional
             Maximum value of the slider, defaults to 100.
         action : Callable, optional
             Function to execute on value change. Should accept a single integer argument.
@@ -62,7 +61,6 @@ class Slider(QWidget):
         self.horizontal = horizontal
         self.min_val = min_val
         self.max_val = max_val
-        self.step = step
         self.tick_interval = tick_interval
         self.starting_val = starting_val
 
@@ -76,7 +74,6 @@ class Slider(QWidget):
         self.slider = QSlider(orientation)
         self.slider.setMinimum(self.min_val)
         self.slider.setMaximum(self.max_val)
-        self.slider.setSingleStep(self.step)
 
         if tick_interval is not None:
             self.slider.setTickInterval(self.tick_interval)
