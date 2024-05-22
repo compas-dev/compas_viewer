@@ -7,6 +7,7 @@ from PySide6.QtCore import QTimer
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication
 
+from compas.scene import Scene
 from compas_viewer import HERE
 from compas_viewer.config import Config
 from compas_viewer.controller import Controller
@@ -27,7 +28,6 @@ class Viewer(Singleton):
         self.timer = QTimer()
 
         self.config = config or Config()
-        self.scene = ViewerScene()
 
         # otherwise this results in a circular import
         # both of these should be removed from this __init__
@@ -37,6 +37,17 @@ class Viewer(Singleton):
         self.controller = Controller(self.config)
 
         self.ui = UI()
+        self._scene = None
+
+    @property
+    def scene(self) -> ViewerScene:
+        if self._scene is None:
+            self._scene = ViewerScene()
+        return self._scene
+
+    @scene.setter
+    def scene(self, scene: Scene):
+        self._scene = ViewerScene.__from_data__(scene.__data__)
 
     def show(self):
         # none of these lazy inits should be necessary

@@ -14,7 +14,9 @@ class ToolBar(Base):
         self.widget = None
 
     def lazy_init(self):
-        self.widget = self.viewer.ui.window.addToolBar("Tools")
+        if not self.widget:
+            self.widget = self.viewer.ui.window.addToolBar("Tools")
+        self.widget.clear()
         self.widget.setMovable(False)
         self.widget.setObjectName("Tools")
         self.widget.setHidden(not self.viewer.config.ui.toolbar.show)
