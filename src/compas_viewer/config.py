@@ -114,7 +114,7 @@ class MenubarConfig(Base):
                             {"title": "Perspective", "action": partial(change_viewmode, "perspective")},
                             {"title": "Top", "action": partial(change_viewmode, "top")},
                             {"title": "Front", "action": partial(change_viewmode, "front")},
-                            {"title": "Left", "action": partial(change_viewmode, "left")},
+                            {"title": "Right", "action": partial(change_viewmode, "right")},
                         ],
                     },
                 ],
