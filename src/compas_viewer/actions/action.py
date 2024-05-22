@@ -5,7 +5,6 @@ from PySide6.QtCore import Signal
 
 from compas_viewer.base import Base
 
-# from compas_viewer.configurations import ActionConfig
 from . import get_action_cls
 
 
