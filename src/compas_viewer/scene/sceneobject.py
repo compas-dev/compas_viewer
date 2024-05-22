@@ -282,13 +282,11 @@ class ViewerSceneObject(SceneObject, Base):
 
     def init(self):
         """Initialize the object"""
-        print(f"line_buffer start:{self._lines_buffer}")
         self._points_data = self._read_points_data()
         self._lines_data = self._read_lines_data()
         self._frontfaces_data = self._read_frontfaces_data()
         self._backfaces_data = self._read_backfaces_data()
         self.make_buffers()
-        print(f"line_buffer after:{self._lines_buffer}")
         self._update_matrix()
 
     def update(self, update_positions: bool = True, update_colors: bool = True, update_elements: bool = True):

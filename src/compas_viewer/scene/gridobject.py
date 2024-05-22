@@ -1,22 +1,19 @@
 from typing import Any
 from typing import Optional
-from numpy import identity
+
 from compas.colors import Color
 from compas.geometry import Frame
 from compas.geometry import Point
 from compas.geometry import Transformation
 from compas.itertools import flatten
-from compas_viewer.components.renderer.shaders import Shader
 from compas_viewer.gl import make_index_buffer
 from compas_viewer.gl import make_vertex_buffer
-
+from compas_viewer.renderer.shaders import Shader
 
 from .sceneobject import ShaderDataType
-from .sceneobject import ViewerSceneObject
-from .frameobject import FrameObject
 
 
-class GridObject():
+class GridObject:
     """
     The scene object of the world XY grid. It is a subclass of the FrameObject.
 
@@ -65,7 +62,6 @@ class GridObject():
         show_framez: Optional[bool] = None,
         **kwargs,
     ):
-        # super().__init__(frame=frame, framesize=framesize, linecolor=linecolor, show_framez=show_framez, **kwargs)
         self.is_locked = True
         self.frame = frame
         self.linecolor = linecolor if linecolor else Color.black()
@@ -73,13 +69,13 @@ class GridObject():
         self.nx = framesize[1] if framesize else int(10)
         self.dy = framesize[2] if framesize else float(1)
         self.ny = framesize[3] if framesize else int(10)
-        self.show_framez = show_framez if show_framez else True
+        self.show_framez = show_framez if show_framez else False
         if self.nx % 2 != 0 or self.ny % 2 != 0:
             raise ValueError("The number of grid cells in the X and Y directions must be even numbers.")
         self.show_lines = True
         self._matrix_buffer = None
         self._lines_data = None
-    
+
     def _read_lines_data(self) -> ShaderDataType:
         trans = Transformation.from_frame_to_frame(Frame.worldXY(), self.frame)
 
@@ -140,12 +136,11 @@ class GridObject():
             elements.append([(self.nx + 1) * 4 + (self.ny + 1) * 4, (self.nx + 1) * 4 + (self.ny + 1) * 4 + 1])
 
         return positions, colors, elements
-   
+
     def init(self):
         """Initialize the object"""
         self._lines_data = self._read_lines_data()
         self.make_buffers()
-        print(f"test{self._lines_buffer}")
 
     def make_buffers(self):
         """Create all buffers from object's data"""
@@ -167,7 +162,6 @@ class GridObject():
             A dict with created buffer indexes.
         """
         positions, colors, elements = data
-        print(f"grid_obj elements:{list(flatten(elements))}")
         flat_positions = list(flatten(positions))
         flat_colors = list(flatten([color.rgba for color in colors]))
         flat_elements = list(flatten(elements))
@@ -177,7 +171,7 @@ class GridObject():
             "elements": make_index_buffer(flat_elements),
             "n": len(flat_elements),
         }
-    
+
     def draw(self, shader: Shader):
         shader.enable_attribute("position")
         shader.enable_attribute("color")
