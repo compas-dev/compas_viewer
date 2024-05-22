@@ -192,8 +192,8 @@ class Renderer(QOpenGLWidget, Base):
         * https://doc.qt.io/qtforpython-6/PySide6/QtOpenGL/QOpenGLWindow.html#PySide6.QtOpenGL.PySide6.QtOpenGL.QOpenGLWindow.resizeGL
 
         """
-        self.viewer.config.window.width = w
-        self.viewer.config.window.height = h
+        w = self.viewer.config.window.width
+        h = self.viewer.config.window.height
         GL.glViewport(0, 0, w, h)
         self.resize(w, h)
 
