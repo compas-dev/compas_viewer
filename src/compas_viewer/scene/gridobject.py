@@ -183,6 +183,6 @@ class GridObject():
         shader.enable_attribute("color")
         shader.bind_attribute("position", self._lines_buffer["positions"])
         shader.bind_attribute("color", self._lines_buffer["colors"], step=4)
-        shader.draw_arrows(elements=self._lines_buffer["elements"], n=self._lines_buffer["n"], width=1, background=False)
+        shader.draw_lines(elements=self._lines_buffer["elements"], n=self._lines_buffer["n"], width=1, background=True)
         shader.disable_attribute("position")
         shader.disable_attribute("color")
