@@ -18,10 +18,6 @@ class UI(Base):
         self.sidedock = SideDock()
 
     def lazy_init(self):
-        width = self.viewer.config.window.width
-        height = self.viewer.config.window.height
-
-        self.resize(width, height)
         self.window.lazy_init()
         self.menubar.lazy_init()
         self.statusbar.lazy_init()
@@ -30,6 +26,7 @@ class UI(Base):
         self.sidedock.lazy_init()
 
     def show(self):
+        self.resize(self.viewer.config.window.width, self.viewer.config.window.height)
         self.window.show()
 
     def resize(self, w: int, h: int) -> None:

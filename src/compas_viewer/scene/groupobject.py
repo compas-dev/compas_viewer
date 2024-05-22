@@ -20,7 +20,7 @@ class GroupObject(SceneObject):
 
     def __init__(self, items, **kwargs):
         super().__init__(Group(items), **kwargs)
-        self.is_visible = True
+        self.show = True
         self.is_selected = False
         self.opacity = 1.0
         self.bounding_box = None

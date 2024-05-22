@@ -44,18 +44,17 @@ class CameraSettingsDialog(QDialog, Base):
 
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.setWindowTitle("Camera Settings")
 
-        # Create layout for spin boxes
         self.layout = QVBoxLayout(self)
         self.spin_boxes = {}
         current_camera = self.viewer.renderer.camera
-
+        # set None to infinity error
         coordinates = {
-            "Camera_Target": [("X", current_camera.target.x, 0, 10000), ("Y", current_camera.target.y, 0, 10000), ("Z", current_camera.target.z, 0, 10000)],
-            "Camera_Position": [("X", current_camera.position.x, 1, 10000), ("Y", current_camera.position.y, 1, 10000), ("Z", current_camera.position.z, 1, 10000)],
+            "Camera_Target": [("X", current_camera.target.x, None, None), ("Y", current_camera.target.y, None, None), ("Z", current_camera.target.z, None, None)],
+            "Camera_Position": [("X", current_camera.position.x, None, None), ("Y", current_camera.position.y, None, None), ("Z", current_camera.position.z, None, None)],
         }
 
         for coord in coordinates:
@@ -75,15 +74,15 @@ class CameraSettingsDialog(QDialog, Base):
         self.update_button.clicked.connect(self.updateCameraTarget)
         self.layout.addWidget(self.update_button)
 
-    def updateCameraTarget(self):
-        self.viewer.renderer.camera.target = [
+    def updateCameraTarget(self) -> None:
+        self.viewer.renderer.camera.target.set(
             self.spin_boxes["Camera_Target_X"].spinbox.value(),
             self.spin_boxes["Camera_Target_Y"].spinbox.value(),
             self.spin_boxes["Camera_Target_Z"].spinbox.value(),
-        ]
-        self.viewer.renderer.camera.position = [
+        )
+        self.viewer.renderer.camera.position.set(
             self.spin_boxes["Camera_Position_X"].spinbox.value(),
             self.spin_boxes["Camera_Position_Y"].spinbox.value(),
             self.spin_boxes["Camera_Position_Z"].spinbox.value(),
-        ]
+        )
         self.accept()  # Close the dialog

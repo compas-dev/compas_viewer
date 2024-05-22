@@ -14,7 +14,9 @@ class ToolBar(Base):
         self.widget = None
 
     def lazy_init(self):
-        self.widget = self.viewer.ui.window.addToolBar("Tools")
+        if not self.widget:
+            self.widget = self.viewer.ui.window.addToolBar("Tools")
+        self.widget.clear()
         self.widget.setMovable(False)
         self.widget.setObjectName("Tools")
         self.widget.setHidden(not self.viewer.config.ui.toolbar.show)
@@ -25,13 +27,15 @@ class ToolBar(Base):
 
         for item in items:
             text = item.get("title", None)
+            tooltip = item.get("tooltip", None)
             itemtype = item.get("type", None)
             action = item.get("action", None)
+            icon = item.get("icon", None)
 
             if itemtype == "separator":
                 raise NotImplementedError
             elif itemtype == "button":
-                self.add_action(text=text, action=action)
+                self.add_action(tooltip=tooltip, icon=icon, action=action)
             elif itemtype == "action":
                 self.add_action(text=text, action=action)
             elif itemtype == "select":
@@ -42,7 +46,8 @@ class ToolBar(Base):
     def add_action(
         self,
         *,
-        text: str,
+        tooltip: str,
+        text: Optional[str] = None,
         action: Callable,
         args: Optional[list[Any]] = None,
         kwargs: Optional[dict] = None,
@@ -50,7 +55,7 @@ class ToolBar(Base):
     ):
         args = args or []
         kwargs = kwargs or {}
-        return self.widget.addWidget(Button(text=text, icon_path=icon, action=partial(action, *args, **kwargs)))
+        return self.widget.addWidget(Button(text=text, tooltip=tooltip, icon_path=icon, action=partial(action, *args, **kwargs)))
 
     def add_combobox(self, items, action, title=None):
         combobox = QComboBox()

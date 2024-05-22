@@ -31,4 +31,4 @@ class Button(QtWidgets.QPushButton):
             self.setToolTip(tooltip)
         if action:
             self.clicked.connect(action)
-        self.setIconSize(QtCore.QSize(12, 12))
+        self.setIconSize(QtCore.QSize(17, 17))

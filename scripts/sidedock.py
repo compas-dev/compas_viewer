@@ -10,8 +10,8 @@ boxobj = viewer.scene.add(box)
 
 
 def toggle_box():
-    boxobj.is_visible = not boxobj.is_visible
-    boxobj.update()
+    boxobj.show = not boxobj.show
+    viewer.renderer.update()
 
 def slider_changed(value):
     print(f"Slider value changed to: {value}")
