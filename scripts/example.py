@@ -5,7 +5,7 @@ from compas.geometry import Box
 from compas.geometry import Frame
 from compas_viewer.viewer import Viewer
 
-viewer = Viewer()
+viewer = Viewer(show_grid=True)
 
 mesh = Mesh.from_off(compas.get("tubemesh.off"))
 obj = viewer.scene.add(mesh, show_points=True, facecolor=Color.blue(), linecolor=Color.red(), pointcolor=Color.green())
