@@ -8,12 +8,12 @@ from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication
 
 from compas_viewer import HERE
-from compas_viewer.components.renderer import Renderer
 from compas_viewer.config import Config
 from compas_viewer.controller import Controller
-from compas_viewer.scene.scene import ViewerScene
+from compas_viewer.renderer import Renderer
+from compas_viewer.scene import ViewerScene
 from compas_viewer.singleton import Singleton
-from compas_viewer.ui.ui import UI
+from compas_viewer.ui import UI
 
 
 # this should not be a singleton
