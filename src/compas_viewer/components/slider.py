@@ -2,176 +2,121 @@ from typing import Callable
 from typing import Optional
 
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QGridLayout
 from PySide6.QtWidgets import QHBoxLayout
 from PySide6.QtWidgets import QLabel
 from PySide6.QtWidgets import QSlider
+from PySide6.QtWidgets import QVBoxLayout
 from PySide6.QtWidgets import QWidget
 
-from compas.colors import Color
-from compas_viewer.base import Base
 
-
-class Slider(QWidget, Base):
-    """Class representing a horizontal slider wrapped in a grid layout with two rows.
-
-    Parameters
-    ----------
-    action : callable
-        The callback connected to the slide action.
-    value : int, optional
-        The initial value of the slider.
-        Defaults to 0.
-    min_value : int, optional
-        The minimum value of the sliding range.
-        Defaults to 0.
-    max_value : int, optional
-        The maximum value of the sliding range.
-        Defaults to 100.
-    step : int, optional
-        Size of value increments.
-        Defaults to 1.
-    title : str, optional
-        Title label.
-    annotation : str, optional
-        Value annotation label.
-    interval : int, optional
-        The tick interval size.
-        Defaults to 1.
-    bgcolor : :class:`compas.colors.Color`, optional
-        Background color of the box containing the slider.
-    stretch : int, optional
-        Stretch factor of the slider in the grid layout.
-        Defaults to 0.
-    kwargs : dict, optional
-        Additional keyword arguments for the action.
-
-    Attributes
-    ----------
-    action : callable
-        Action associated with the button click event.
-    slider : QtWidgets.QSlider
-        The actual slider widget.
-    value : float
-        The current value of the slider.
-    STYLE : str
-        Stylesheet for the visual appearance of the groove and handle of the slider.
-
-    See Also
-    --------
-    :class:`compas_viewer.layout.SidedockLayout`
-
-    References
-    ----------
-    :PySide6:`PySide6/QtWidgets/QSlider`
-
-    """
-
-    STYLE = """
-    QSlider::groove::horizontal {
-        border: 1px solid #cccccc;
-        background-color: #eeeeee;
-        height: 4px;
-    }
-    QSlider::handle:horizontal {
-        background-color: #ffffff;
-        border: 1px solid #cccccc;
-        border-radius: 6px;
-        height: 12px;
-        width: 12px;
-        margin: -6px 0;
-    }
-    """
-
+class Slider(QWidget):
     def __init__(
         self,
-        action: Callable,
-        value: int = 0,
-        min_value: int = 0,
-        max_value: int = 100,
-        step: int = 1,
-        title: Optional[str] = None,
-        annotation: Optional[str] = None,
-        interval: int = 1,
-        bgcolor: Optional[Color] = None,
-        stretch: int = 0,
-        **kwargs,
+        title: str = "Slider",
+        min_val: int = 0,
+        max_val: int = 100,
+        action: Callable = None,
+        horizontal: Optional[bool] = True,
+        starting_val: Optional[int] = None,
+        tick_interval: Optional[int] = None,
     ):
-        super().__init__()
-
-        if min_value > max_value or interval > max_value - min_value:
-            raise ValueError("Slider parameters are invalid. ")
-
-        self.kwargs = kwargs
-
-        self.slider = QSlider()
-        self._value = max(min(value, max_value), min_value)
-        self.action = action
-        self.stretch = stretch
-
-        # Row containing labels with horizontal box layout.
-        row1 = QWidget()
-        if bgcolor:
-            row1.setStyleSheet("background-color: {}".format(bgcolor.hex))
-        row1_layout = QHBoxLayout()
-        row1_layout.setContentsMargins(12, 6, 12, 0)
-        row1.setLayout(row1_layout)
-
-        # The title label if provided
-        if title:
-            row1_layout.addWidget(QLabel(title))
-
-        # The label containing the current value pushed to the right and potentially with an annotation.
-        value_label = QLabel(str(self._value))
-        row1_layout.addStretch(1)
-        row1_layout.addWidget(value_label)
-        if annotation:
-            row1_layout.addWidget(QLabel(annotation))
-
-        # Row containing slider
-        row2 = QWidget()
-        if bgcolor:
-            row2.setStyleSheet("background-color: {}".format(bgcolor.hex))
-        row2_layout = QHBoxLayout()
-        row2_layout.setContentsMargins(12, 0, 12, 6)
-        row2.setLayout(row2_layout)
-
-        # Slider
-        self.slider.setOrientation(Qt.Orientation.Horizontal)
-        self.slider.setMinimum(min_value)
-        self.slider.setMaximum(max_value)
-        self.slider.setValue(self._value)
-        self.slider.setTickInterval(interval)
-        self.slider.setSingleStep(step)
-        self.slider.setStyleSheet(Slider.STYLE)
-        row2_layout.addWidget(self.slider)
-
-        # Combine rows in grid
-        grid_layout = QGridLayout()
-        grid_layout.setSpacing(0)
-        grid_layout.addWidget(row1, 0, 0)
-        grid_layout.addWidget(row2, 1, 0)
-        grid_layout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(grid_layout)
-
-        # Connect slider to actions
-        self.slider.valueChanged.connect(lambda v: value_label.setText(str(v)))
-        self.slider.valueChanged.connect(self)
-
-    def __call__(self, v):
-        """Wrapper for the action associated with the slider.
-
-        Returns
-        -------
-        None
-
         """
-        return self.action(v, **self.kwargs)
+        A customizable slider widget for Qt applications, supporting both horizontal and vertical orientations. This
+        widget displays the current, minimum, and maximum values and allows for dynamic user interaction.
 
-    @property
-    def value(self):
-        return self.slider.value()
+        Parameters
+        ----------
+        title : str
+            Label displayed above the slider, defaults to "Slider".
+        min_val : int
+            Minimum value of the slider, defaults to 0.
+        max_val : int
+            Maximum value of the slider, defaults to 100.
+        action : Callable
+            Function to execute on value change. Should accept a single integer argument.
+        horizontal : bool, optional
+            Orientation of the slider. True for horizontal, False for vertical. Defaults to True.
+        starting_val : int, optional
+            Initial value of the slider, defaults to the minimum value.
+        tick_interval : float, optional
+            Interval between tick marks. No ticks if None. Defaults to None.
 
-    @value.setter
-    def value(self, value):
-        self.slider.setValue(value)
+        Attributes
+        ----------
+        title : str
+            Label displayed above the slider.
+        min_val : int
+            Minimum value of the slider.
+        max_val : int
+            Maximum value of the slider.
+        action : Callable
+            Function to execute on value change.
+        start_val : int
+            Initial value of the slider.
+        layout : QVBoxLayout
+            Layout of the widget.
+        slider : QSlider
+            Slider widget.
+        value_label : QLabel
+            Label displaying the current value of the slider.
+
+        Example
+        -------
+        >>> slider = Slider("Brightness", min_val=0, max_val=255, starting_val=100)
+        """
+        super().__init__()
+        # TODO(pitsai): add step method
+        self.title = title
+        self.action = action
+        self._horizontal = horizontal
+        self.min_val = min_val
+        self.max_val = max_val
+        self.starting_val = starting_val
+        self._tick_interval = tick_interval
+
+        if self._horizontal:
+            orientation = Qt.Horizontal
+        else:
+            orientation = Qt.Vertical
+
+        if self._tick_interval is None:
+            self._tick_interval = (self.max_val - self.min_val) / 10
+
+        if self.starting_val is None:
+            self.starting_val = self.min_val
+
+        self.layout = QVBoxLayout(self)
+        self._h_layout = QHBoxLayout()
+        self.slider = QSlider(orientation)
+        self.slider.setMinimum(self.min_val)
+        self.slider.setMaximum(self.max_val)
+
+        self.slider.setTickInterval(self._tick_interval)
+        self.slider.setTickPosition(QSlider.TicksBelow)
+
+        self.slider.setValue(self.starting_val)
+
+        # Labels for displaying the range and current value
+        self._min_label = QLabel(str(self.min_val), alignment=Qt.AlignLeft)
+        self._max_label = QLabel(str(self.max_val), alignment=Qt.AlignRight)
+        self.value_label = QLabel(f"{self.title}: {self.slider.value()}")
+
+        # Connect the slider movement to the callback
+        self.slider.valueChanged.connect(self.on_value_changed)
+        self.slider.valueChanged.connect(lambda value: self.action(value))
+        self.layout.addWidget(self.value_label)
+
+        # Add widgets to layout
+        if orientation == Qt.Horizontal:
+            self._h_layout.addWidget(self._min_label)
+            self._h_layout.addWidget(self._max_label)
+            self.layout.addWidget(self.slider)
+            self.layout.addLayout(self._h_layout)
+        else:
+            self.layout.addWidget(self.slider)
+
+    def on_value_changed(self, value):
+        """
+        Update the label based on the slider's current value.
+        """
+        self.value_label.setText(f"{self.title}: {value}")

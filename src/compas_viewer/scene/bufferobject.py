@@ -45,7 +45,6 @@ class AttributeBuffer:
     """
 
     def __init__(self, positions: Optional[NDArray] = None, colors: Optional[NDArray] = None, defaultcolor: Optional[Color] = None, dynamic: bool = True) -> None:
-
         positions = array([], dtype=float) if positions is None else positions.ravel()
         defaultcolor = defaultcolor or [0.8, 0.8, 0.8, 1.0]
         colors = np.full((positions.shape[0] // 3, 4), defaultcolor, dtype=float).ravel() if colors is None else colors.ravel()
