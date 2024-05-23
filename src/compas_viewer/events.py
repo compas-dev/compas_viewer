@@ -58,7 +58,7 @@ class KeyEvent(QObject):
 
     Examples
     --------
-    >>> event = KeyEvent(title='Zoom Selected', key='F')
+    >>> event = KeyEvent(title="Zoom Selected", key="F")
     >>> print(event)
     Zoom Selected: F
 
@@ -147,7 +147,7 @@ class MouseEvent(QObject):
 
     Examples
     --------
-    >>> event = MouseEvent(title='Pan View', button='RIGHT', modifier='SHIFT')
+    >>> event = MouseEvent(title="Pan View", button="RIGHT", modifier="SHIFT")
     >>> print(event)
     Pan View: RIGHT + SHIFT
 
@@ -223,7 +223,7 @@ class WheelEvent(QObject):
 
     Examples
     --------
-    >>> event = WheelEvent(title='Zoom View')
+    >>> event = WheelEvent(title="Zoom View")
     >>> print(event)
     Zoom View
 

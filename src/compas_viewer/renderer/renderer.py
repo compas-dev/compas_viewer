@@ -12,7 +12,6 @@ from PySide6.QtGui import QKeyEvent
 from PySide6.QtGui import QMouseEvent
 from PySide6.QtGui import QWheelEvent
 from PySide6.QtOpenGLWidgets import QOpenGLWidget
-from PySide6.QtWidgets import QGesture
 from PySide6.QtWidgets import QGestureEvent
 
 from compas.geometry import Frame
@@ -707,8 +706,8 @@ class Renderer(QOpenGLWidget, Base):
 
         pixels_x = width * r
         pixels_y = height * r
-        step_x = round(pixels_x/1000) + 1
-        step_y = round(pixels_y/1000) + 1
+        step_x = round(pixels_x / 1000) + 1
+        step_y = round(pixels_y / 1000) + 1
 
         # Repaint the canvas with instance color.
         self.viewer.renderer.makeCurrent()
