@@ -188,6 +188,8 @@ def select_window(viewer: "Viewer", event: QMouseEvent):
 
     elif etype == QEvent.Type.MouseMove:
         viewer.mouse.is_tracing_a_window = True  # this results in the drawing of the selection window
+        if not viewer.mouse.window_start_point:
+            viewer.mouse.window_start_point = event.pos()
 
     elif etype == QEvent.Type.MouseButtonRelease:
         viewer.mouse.is_tracing_a_window = False  # this stops the drawing of the selection window
