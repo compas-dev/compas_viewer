@@ -99,6 +99,9 @@ def pan_view(viewer: "Viewer", event: QMouseEvent):
         dy = viewer.mouse.dy()
         viewer.renderer.camera.pan(dx, dy)
 
+    elif etype == QEvent.Type.MouseButtonRelease:
+        QApplication.restoreOverrideCursor()
+
     viewer.renderer.update()
 
 
@@ -112,6 +115,9 @@ def rotate_view(viewer: "Viewer", event: QMouseEvent):
         dx = viewer.mouse.dx()
         dy = viewer.mouse.dy()
         viewer.renderer.camera.rotate(dx, dy)
+
+    elif etype == QEvent.Type.MouseButtonRelease:
+        QApplication.restoreOverrideCursor()
 
     viewer.renderer.update()
 
@@ -178,18 +184,17 @@ def select_window(viewer: "Viewer", event: QMouseEvent):
     etype = event.type()
 
     if etype == QEvent.Type.MouseButtonPress:
-        viewer.mouse.select_by_window_start_point = event.pos()
-        viewer.mouse.select_by_window_ongoing = True
+        viewer.mouse.window_start_point = event.pos()
 
     elif etype == QEvent.Type.MouseMove:
-        viewer.mouse.select_by_window_ongoing = True
+        viewer.mouse.is_tracing_a_window = True  # this results in the drawing of the selection window
 
     elif etype == QEvent.Type.MouseButtonRelease:
-        viewer.mouse.select_by_window_ongoing = False
-        viewer.mouse.select_by_window_end_point = event.pos()
+        viewer.mouse.is_tracing_a_window = False  # this stops the drawing of the selection window
+        viewer.mouse.window_end_point = event.pos()
 
-        start = viewer.mouse.select_by_window_start_point
-        end = viewer.mouse.select_by_window_end_point
+        start = viewer.mouse.window_start_point
+        end = viewer.mouse.window_end_point
 
         # ignore small windows
         if abs(start.x() - end.x()) * abs(start.y() - end.y()) <= 4:

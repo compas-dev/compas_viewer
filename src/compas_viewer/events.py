@@ -8,7 +8,6 @@ from PySide6.QtCore import Signal
 from PySide6.QtGui import QKeyEvent
 from PySide6.QtGui import QMouseEvent
 from PySide6.QtGui import QWheelEvent
-from PySide6.QtWidgets import QApplication
 from PySide6.QtWidgets import QGestureEvent
 
 if TYPE_CHECKING:
@@ -165,7 +164,7 @@ class MouseEvent(QObject):
         self.button = button
         self.modifier = modifier
         self.context = context
-        self.ongoing = False
+        self.is_active = False
 
     @property
     def button(self) -> str:
@@ -294,27 +293,27 @@ class EventManager:
     def delegate_keyrelease(self, event: QKeyEvent):
         pass
 
-    def delegate_mousemove(self, event: QMouseEvent):
-        self.viewer.mouse.pos = event.pos()
-        for mouseevent in self.mouse_events:
-            if mouseevent == event:
-                mouseevent.triggered.emit(event)
-                mouseevent.ongoing = True
-                break
-        self.viewer.mouse.last_pos = event.pos()
-
     def delegate_mousepress(self, event: QMouseEvent):
         self.viewer.mouse.last_pos = event.pos()
         for mouseevent in self.mouse_events:
             if mouseevent == event:
                 mouseevent.triggered.emit(event)
+                mouseevent.is_active = True
                 break
+
+    def delegate_mousemove(self, event: QMouseEvent):
+        self.viewer.mouse.pos = event.pos()
+        for mouseevent in self.mouse_events:
+            if mouseevent == event:
+                mouseevent.triggered.emit(event)
+                break
+        self.viewer.mouse.last_pos = event.pos()
 
     def delegate_mouserelease(self, event: QMouseEvent):
         for mouseevent in self.mouse_events:
-            if mouseevent.ongoing:
+            if mouseevent.is_active or mouseevent == event:
                 mouseevent.triggered.emit(event)
-                mouseevent.ongoing = False
+                mouseevent.is_active = False
                 break
         self.viewer.mouse.last_pos = event.pos()
 

@@ -16,9 +16,9 @@ class Mouse:
     def __init__(self):
         self.pos = QPoint()
         self.last_pos = QPoint()
-        self.select_by_window_start_point: QPoint = None
-        self.select_by_window_end_point: QPoint = None
-        self.select_by_window_ongoing = False
+        self.window_start_point: QPoint = None
+        self.window_end_point: QPoint = None
+        self.is_tracing_a_window: bool = False
 
     def dx(self):
         return self.pos.x() - self.last_pos.x()
