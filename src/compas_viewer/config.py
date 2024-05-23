@@ -69,27 +69,8 @@ class View3dConfig(ConfigBase):
 
 @dataclass
 class ToolbarConfig(ConfigBase):
-    show: bool = True
-    items: list[dict] = field(
-        default_factory=lambda: [
-            {
-                "type": "select",
-                "action": change_viewmode,
-                "items": [
-                    {"title": "Perspective", "value": "perspective"},
-                    {"title": "Top", "value": "top"},
-                    {"title": "Front", "value": "front"},
-                    {"title": "Right", "value": "right"},
-                ],
-            },
-            {
-                "type": "button",
-                "tooltip": "Target and Position",
-                "icon": "camera_info.svg",
-                "action": open_camera_settings_dialog,
-            },
-        ]
-    )
+    show: bool = False
+    items: list[dict] = field(default_factory=lambda: [])
 
 
 @dataclass
@@ -98,25 +79,75 @@ class MenubarConfig(ConfigBase):
     items: list[dict] = field(
         default_factory=lambda: [
             {
-                "title": "Test",
+                "title": "View",
                 "items": [
-                    {"title": "a", "action": lambda: print("a")},
-                    {"title": "b", "action": lambda: print("b")},
+                    {"title": "Shaded", "action": lambda: print("Shaded")},
+                    {"title": "Ghosted", "action": lambda: print("Ghosted")},
+                    {"title": "Lighted", "action": lambda: print("Lighted")},
+                    {"title": "Wireframe", "action": lambda: print("Wireframe")},
+                    {"type": "separator"},
+                    {"title": "Perspective", "action": partial(change_viewmode, "perspective")},
+                    {"title": "Top", "action": partial(change_viewmode, "top")},
+                    {"title": "Front", "action": partial(change_viewmode, "front")},
+                    {"title": "Right", "action": partial(change_viewmode, "right")},
+                    {"type": "separator"},
+                    {"title": "Camera Settings", "action": open_camera_settings_dialog},
+                    {"type": "separator"},
                 ],
             },
             {
-                "title": "Camera",
+                "title": "Display",
+                "items": [],
+            },
+            {
+                "title": "Scene",
                 "items": [
-                    {"title": "Target and Position", "action": open_camera_settings_dialog},
+                    {"title": "Clear Scene", "action": lambda: print("Clear scene")},
+                    {"type": "separator"},
+                    {"title": "Load Scene", "action": lambda: print("Load scene")},
+                    {"title": "Save Scene", "action": lambda: print("Save scene")},
+                ],
+            },
+            {
+                "title": "Data",
+                "items": [
+                    {"title": "From JSON", "action": lambda: print("From JSON")},
+                    {"type": "separator"},
                     {
-                        "title": "Viewmode",
+                        "title": "Geometry",
                         "items": [
-                            {"title": "Perspective", "action": partial(change_viewmode, "perspective")},
-                            {"title": "Top", "action": partial(change_viewmode, "top")},
-                            {"title": "Front", "action": partial(change_viewmode, "front")},
-                            {"title": "Right", "action": partial(change_viewmode, "right")},
+                            {"title": "Geometry From OBJ", "action": lambda: print("From OBJ")},
+                            {"title": "Geometry From OFF", "action": lambda: print("From OFF")},
+                            {"title": "Geometry From STP", "action": lambda: print("From STP")},
+                            {"title": "Geometry From STL", "action": lambda: print("From STL")},
                         ],
                     },
+                    {
+                        "title": "Pointcloud",
+                        "items": [],
+                    },
+                ],
+            },
+            {
+                "title": "Server",
+                "items": [
+                    {"title": "Start Server", "action": lambda: print("Start Server")},
+                    {"title": "Stop Server", "action": lambda: print("Stop Server")},
+                    {"type": "separator"},
+                    {"title": "Restart Server", "action": lambda: print("Restart Server")},
+                    {"title": "Ping Server", "action": lambda: print("Ping Server")},
+                ],
+            },
+            {
+                "title": "Help",
+                "items": [
+                    {"title": "Viewer Docs", "action": lambda: print("Viewer docs")},
+                    {"title": "Viewer Tutorials", "action": lambda: print("Viewer tutorials")},
+                    {"title": "Viewer Examples", "action": lambda: print("Viewer examples")},
+                    {"title": "Viewer Configs", "action": lambda: print("Viewer configs")},
+                    {"type": "separator"},
+                    {"title": "COMPAS Tutorials", "action": lambda: print("COMPAS Tutorials")},
+                    {"title": "COMPAS Reference", "action": lambda: print("COMPAS Reference")},
                 ],
             },
         ]

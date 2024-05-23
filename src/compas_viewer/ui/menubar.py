@@ -5,6 +5,7 @@ from typing import Callable
 from typing import Optional
 
 from PySide6.QtWidgets import QMenu
+from PySide6.QtWidgets import QMenuBar
 from PySide6.QtWidgets import QWidget
 
 if TYPE_CHECKING:
@@ -15,7 +16,7 @@ class MenuBar:
     def __init__(self, parent: "MainWindow", items: list[dict]) -> None:
         self.parent = parent
         self.items = items
-        self.widget = self.parent.widget.menuBar()
+        self.widget: QMenuBar = self.parent.widget.menuBar()
         self.widget.clear()
         self.add_menu(items=self.items, parent=self.widget)
 
@@ -46,7 +47,8 @@ class MenuBar:
                     else:
                         raise NotImplementedError
                 else:
-                    raise NotImplementedError
+                    menu = parent.addMenu(text)
+                    self.add_menu(items=[{"title": "PLACEHOLDER", "action": lambda: print("PLACEHOLDER")}], parent=menu)
 
     def add_action(
         self,

@@ -21,17 +21,20 @@ from compas_viewer.ui import UI
 class Viewer(Singleton):
     def __init__(self, config: Optional[Config] = None, **kwargs):
         self.app = QApplication(sys.argv)
+        self.app.setApplicationName("COMPAS Viewer")
+        self.app.setApplicationDisplayName("COMPAS Viewer")
         self.app.setWindowIcon(QIcon(os.path.join(HERE, "icons", "compas_icon_white.png")))
 
         self._scene = None
 
         self.config = config or Config()
-
         self.timer = QTimer()
         self.mouse = Mouse()
 
-        self.renderer = Renderer(self)
         self.eventmanager = EventManager(self)
+
+        # renderer should be part of UI
+        self.renderer = Renderer(self)
         self.ui = UI(self)
 
     @property
