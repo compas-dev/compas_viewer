@@ -1,11 +1,10 @@
-
 ********************************************************************************
-Tutorials
+Examples
 ********************************************************************************
 
 .. toctree::
-    :maxdepth: 1
-    :titlesonly:
-    :caption: Tutorials
+   :maxdepth: 1
+   :titlesonly:
+   :glob:
 
-    configurations
+   examples/*

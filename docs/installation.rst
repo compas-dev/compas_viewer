@@ -1,46 +1,44 @@
 ********************************************************************************
 Installation
 ********************************************************************************
-COMPAS Viewer can be easily installed on multiple platforms, using popular package managers such as conda or pip.
 
-If you don't have COMPAS installed
-===================================
-Check out the COMPAS installation instructions at https://compas.dev/compas/latest/userguide/installation.html
+Stable
+======
 
-Install from pip
-============================
-Activate your COMPAS environment and install COMPAS Viewer from `pip`.
+Stable releases are available on PyPI and can be installed with pip.
 
 .. code-block:: bash
 
     pip install compas_viewer
 
-Install from source
-===================
-Activate your COMPAS environment and install COMPAS Viewer from source.
+
+Latest
+======
+
+The latest version can be installed from local source.
 
 .. code-block:: bash
 
-    pip install git+https://github.com/compas-dev/compas_viewer
+    git clone https://github.com/compas-dev/compas_viewer.git
+    cd compas_viewer
+    pip install -e .
 
-Verify the installation
-=======================
-COMPAS Viewer can be simply lunched by the following command in your terminal:
 
-.. code-block:: bash
+Development
+===========
 
-    python -m compas_viewer
-
-Update with pip
-===============
-Update COMPAS Viewer to the latest version with pip.
+To install `compas_viewer` for development, install from local source with the "dev" requirements.
 
 .. code-block:: bash
 
-    pip install --upgrade compas_viewer
+    git clone https://github.com/compas-dev/compas_viewer.git
+    cd compas_viewer
+    pip install -e ".[dev]"
+
 
 Known issues
 ============
+
 For ubuntu users, following dependencies might be required depending on the system version:
 
 .. code-block:: bash

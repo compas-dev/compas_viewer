@@ -1,5 +1,5 @@
 *******************************************************************************
-compas_viewer.renderer
+compas_viewer.events
 *******************************************************************************
 
-.. currentmodule:: compas_viewer.renderer
+.. currentmodule:: compas_viewer.events

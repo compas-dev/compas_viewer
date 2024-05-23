@@ -4,19 +4,9 @@ compas_viewer.actions
 
 .. currentmodule:: compas_viewer.actions
 
-Classes
-=======
+Functions
+=========
 
 .. autosummary::
     :toctree: generated/
     :nosignatures:
-
-    Action
-    ZoomSelected
-    GLInfo
-    SelectAll
-    ViewRight
-    ViewFront
-    ViewTop
-    ViewPerspective
-    DeleteSelected

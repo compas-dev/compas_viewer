@@ -2,8 +2,19 @@
 compas_viewer.components
 *******************************************************************************
 
-.. toctree::
-    :maxdepth: 1
+.. currentmodule:: compas_viewer.components
 
-    components/renderer
+Classes
+=======
 
+.. autosummary::
+    :toctree: generated/
+    :nosignatures:
+
+    Button
+    ComboBox
+    CameraSettingsDialog
+    Renderer
+    Slider
+    Treeform
+    ViewModeAction

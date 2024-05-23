@@ -2,6 +2,4 @@
 License
 ********************************************************************************
 
-``compas_viewer`` is licensed under MIT.
-
 .. literalinclude:: ../LICENSE
