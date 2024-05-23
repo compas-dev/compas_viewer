@@ -9,6 +9,8 @@ from typing import Literal
 from compas.colors import Color
 from compas_viewer._actions import change_viewmode
 from compas_viewer._actions import open_camera_settings_dialog
+from compas_viewer._actions import select_all
+from compas_viewer._actions import zoom_selected
 
 
 class Base:
@@ -76,7 +78,7 @@ class View3dConfig(Base):
 @dataclass
 class ToolbarConfig(Base):
     show: bool = True
-    items: list[dict[str, str]] = field(
+    items: list[dict] = field(
         default_factory=lambda: [
             {
                 "type": "select",
@@ -101,7 +103,7 @@ class ToolbarConfig(Base):
 @dataclass
 class MenubarConfig(Base):
     show: bool = True
-    items: list[dict[str, str]] = field(
+    items: list[dict] = field(
         default_factory=lambda: [
             {
                 "title": "Test",
@@ -213,18 +215,31 @@ class KeyEvent:
     modifier: str = "no"
 
 
+# these are "keyboard shortcuts"
+# in VS Code, these are registered as:
+# Command | Binding | When (Context)
+# Zoom Selected | F | View3D
+# Select All | A + CTRL | View3D | event_handler
+# would add to this an event handler
 @dataclass
 class KeyEventConfig(Base):
     zoom_selected: KeyEvent = field(default_factory=lambda: KeyEvent(key="f"))
-    gl_info: KeyEvent = field(default_factory=lambda: KeyEvent(key="i"))
     select_all: KeyEvent = field(default_factory=lambda: KeyEvent(key="a", modifier="control"))
     view_top: KeyEvent = field(default_factory=lambda: KeyEvent(key="f3"))
     view_perspective: KeyEvent = field(default_factory=lambda: KeyEvent(key="f4"))
     view_front: KeyEvent = field(default_factory=lambda: KeyEvent(key="f5"))
     view_right: KeyEvent = field(default_factory=lambda: KeyEvent(key="f6"))
     delete_selected: KeyEvent = field(default_factory=lambda: KeyEvent(key="delete"))
-    camera_info: KeyEvent = field(default_factory=lambda: KeyEvent(key="c"))
-    selection_info: KeyEvent = field(default_factory=lambda: KeyEvent(key="s"))
+
+
+@dataclass
+class KeyboardShortcuts:
+    items: list[dict] = field(
+        default_factory=lambda: [
+            {"title": "Zoom Selected", "key": "F", "modifier": None, "action": zoom_selected},
+            {"title": "Select All", "key": "A", "modifier": "CTRL", "action": select_all},
+        ]
+    )
 
 
 @dataclass
@@ -236,6 +251,7 @@ class Config(Base):
     selector: SelectorConfig = field(default_factory=SelectorConfig)
     mouse_event: MouseEventConfig = field(default_factory=MouseEventConfig)
     key_event: KeyEventConfig = field(default_factory=KeyEventConfig)
+    keyboard_shortcuts: KeyboardShortcuts = field(default_factory=KeyboardShortcuts)
 
 
 if __name__ == "__main__":
