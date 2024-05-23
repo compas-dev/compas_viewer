@@ -1,5 +1,4 @@
 import json
-from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import field
 from dataclasses import is_dataclass
@@ -13,6 +12,7 @@ from compas_viewer.actions import pan_view
 from compas_viewer.actions import rotate_view
 from compas_viewer.actions import select_all
 from compas_viewer.actions import zoom_selected
+from compas_viewer.actions import zoom_view
 
 
 class Base:
@@ -216,6 +216,15 @@ class MouseEvents:
 
 
 @dataclass
+class WheelEvents:
+    items: list[dict] = field(
+        default_factory=lambda: [
+            {"title": "Zoom View", "action": zoom_view},
+        ]
+    )
+
+
+@dataclass
 class Config(Base):
     ui: UIConfig = field(default_factory=UIConfig)
     window: WindowConfig = field(default_factory=WindowConfig)
@@ -224,9 +233,4 @@ class Config(Base):
     selector: SelectorConfig = field(default_factory=SelectorConfig)
     keyboard_shortcuts: KeyboardShortcuts = field(default_factory=KeyboardShortcuts)
     mouse_events: MouseEvents = field(default_factory=MouseEvents)
-
-
-if __name__ == "__main__":
-    config = Config()
-
-    print(asdict(config.key_event).items())
+    wheel_events: WheelEvents = field(default_factory=WheelEvents)

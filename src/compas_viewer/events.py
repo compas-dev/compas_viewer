@@ -6,6 +6,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtCore import Signal
 from PySide6.QtGui import QKeyEvent
 from PySide6.QtGui import QMouseEvent
+from PySide6.QtGui import QWheelEvent
 from PySide6.QtWidgets import QApplication
 
 if TYPE_CHECKING:
@@ -27,8 +28,7 @@ modifier_constant = {
 
 
 class KeyboardShortcut(QObject):
-    pressed = Signal()
-    released = Signal()
+    triggered = Signal()
 
     def __init__(self, title, key, modifier, context=None):
         super().__init__()
@@ -58,7 +58,7 @@ class KeyboardShortcut(QObject):
         return self._modifier
 
     @modifier.setter
-    def modifier(self, name: str | None) -> None:
+    def modifier(self, name: str) -> None:
         self._modifier = name
         self._modifierconstant = None
         if not name:
@@ -120,14 +120,24 @@ class MouseEvent(QObject):
         return event.buttons() == self._buttonconstant and event.modifiers() == self._modifierconstant
 
 
+class WheelEvent(QObject):
+    triggered = Signal(QWheelEvent)
+
+    def __init__(self, title):
+        super().__init__()
+        self.title = title
+
+
 class EventManager:
 
     def __init__(self, viewer: "Viewer") -> None:
         self.viewer = viewer
         self.shortcuts: list[KeyboardShortcut] = []
         self.mouseevents: list[MouseEvent] = []
+        self.wheelevents: list[WheelEvent] = []
         self.register_keyboard_shortcuts()
         self.register_mouseevents()
+        self.register_wheelevents()
 
     def register_keyboard_shortcuts(self):
         for item in self.viewer.config.keyboard_shortcuts.items:
@@ -136,17 +146,8 @@ class EventManager:
             modifier = item["modifier"]
             slot = item["action"]
             shortcut = KeyboardShortcut(title=title, key=key, modifier=modifier)
-            shortcut.pressed.connect(slot)
+            shortcut.triggered.connect(slot)
             self.shortcuts.append(shortcut)
-
-    def delegate_keypress(self, event: QKeyEvent):
-        for shortcut in self.shortcuts:
-            if shortcut == event:
-                shortcut.pressed.emit()
-                break
-
-    def delegate_keyrelease(self, event: QKeyEvent):
-        print("NotImplementedError")
 
     def register_mouseevents(self):
         for item in self.viewer.config.mouse_events.items:
@@ -157,6 +158,21 @@ class EventManager:
             mouseevent = MouseEvent(title=title, button=button, modifier=modifier)
             mouseevent.triggered.connect(partial(slot, self.viewer))
             self.mouseevents.append(mouseevent)
+
+    def register_wheelevents(self):
+        for item in self.viewer.config.wheel_events.items:
+            wheelevent = WheelEvent(title=item["title"])
+            wheelevent.triggered.connect(partial(item["action"], self.viewer))
+            self.wheelevents.append(wheelevent)
+
+    def delegate_keypress(self, event: QKeyEvent):
+        for shortcut in self.shortcuts:
+            if shortcut == event:
+                shortcut.triggered.emit()
+                break
+
+    def delegate_keyrelease(self, event: QKeyEvent):
+        pass
 
     def delegate_mousemove(self, event: QMouseEvent):
         self.viewer.mouse.pos = event.pos()
@@ -180,3 +196,7 @@ class EventManager:
                 break
         self.viewer.mouse.last_pos = event.pos()
         QApplication.restoreOverrideCursor()
+
+    def delegate_wheel(self, event: QWheelEvent):
+        for wheelevent in self.wheelevents:
+            wheelevent.triggered.emit(event)

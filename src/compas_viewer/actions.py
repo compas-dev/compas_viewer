@@ -5,6 +5,7 @@ from numpy.linalg import norm
 from PySide6.QtCore import QEvent
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QMouseEvent
+from PySide6.QtGui import QWheelEvent
 from PySide6.QtWidgets import QApplication
 
 from compas_viewer.components import CameraSettingsDialog
@@ -109,4 +110,11 @@ def rotate_view(viewer: "Viewer", event: QMouseEvent):
         dy = viewer.mouse.dy()
         viewer.renderer.camera.rotate(dx, dy)
 
+    viewer.renderer.update()
+
+
+def zoom_view(viewer: "Viewer", event: QWheelEvent):
+    degrees = event.angleDelta().y() / 8
+    steps = degrees / 15
+    viewer.renderer.camera.zoom(steps)
     viewer.renderer.update()
