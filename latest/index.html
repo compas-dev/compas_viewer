@@ -34,7 +34,7 @@
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="_static/tabs.css" />
     <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
-    <link rel="stylesheet" type="text/css" href="_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.5ea377869091fd0449014c60fc090103.min.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
@@ -164,21 +164,21 @@
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="tutorials/index.html">
-                        Tutorials
+                      <a class="nav-link nav-internal" href="tutorial.html">
+                        Tutorial
                       </a>
                     </li>
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="examples/index.html">
+                      <a class="nav-link nav-internal" href="examples.html">
                         Examples
                       </a>
                     </li>
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="api/index.html">
+                      <a class="nav-link nav-internal" href="api.html">
                         API Reference
                       </a>
                     </li>
@@ -359,21 +359,21 @@ document.write(`
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="tutorials/index.html">
-                        Tutorials
+                      <a class="nav-link nav-internal" href="tutorial.html">
+                        Tutorial
                       </a>
                     </li>
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="examples/index.html">
+                      <a class="nav-link nav-internal" href="examples.html">
                         Examples
                       </a>
                     </li>
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="api/index.html">
+                      <a class="nav-link nav-internal" href="api.html">
                         API Reference
                       </a>
                     </li>
@@ -492,25 +492,15 @@ document.write(`
         <ul class="current nav bd-sidenav">
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="tutorials/index.html">Tutorials</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/configurations.html">File Structure</a></li>
-</ul>
-</li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="examples/index.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="examples/basics.html">Basic Examples</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/object.html">Object Examples</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/color.html">Color Examples</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/layout.html">Layout Examples</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/dynamic.html">Dynamic Examples</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/other.html">Other Examples</a></li>
-</ul>
-</li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="api/index.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="api/compas_viewer.viewer.html">compas_viewer.viewer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/compas_viewer.scene.html">compas_viewer.scene</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/compas_viewer.controller.html">compas_viewer.controller</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="api.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="api/compas_viewer.actions.html">compas_viewer.actions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/compas_viewer.components.html">compas_viewer.components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/compas_viewer.events.html">compas_viewer.events</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/compas_viewer.renderer.html">compas_viewer.renderer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/compas_viewer.scene.html">compas_viewer.scene</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/compas_viewer.ui.html">compas_viewer.ui</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
@@ -554,80 +544,28 @@ document.write(`
 <figure class="figure align-default">
 <img alt="_images/compas_viewer.png" class="figure-img img-fluid" src="_images/compas_viewer.png" />
 </figure>
-<p class="lead">Standalone viewer for COMPAS 2.0 with features:</p>
-<ul class="simple">
-<li><p><strong>Fully COMPAS Support</strong>: Fully support for all <a class="reference external" href="https://compas.dev/compas/latest/api/compas.geometry.html">compas.geometry</a>  (primitives, shapes, network, mesh, assembly, model, etc.) based on <a class="reference external" href="https://compas.dev/compas/latest/api/compas.scene.html">compas.scene</a> structure …</p></li>
-<li><p><strong>Universal Architecture</strong>: Compatible with Mac, Windows, and Linux with Python 3.9+. More various platforms are coming soon …</p></li>
-<li><p><strong>Friendly Installation</strong>: Depend only on <a class="reference external" href="https://compas.dev/compas/latest/">COMPAS</a>, <a class="reference external" href="https://pypi.org/project/PyOpenGL/">PyOpenGL</a> and <a class="reference external" href="https://pypi.org/project/PySide6/">PySide6</a>. Installation with pip is fast and easy …</p></li>
-<li><p><strong>Flexible Customization</strong>: Flexible customize your own UI layout with buttons, render display with colors, action with keyboard preferences …</p></li>
-<li><p><strong>Data-driven Visualization</strong>: Visualize your assembly data, mesh data, graph data, and more with <a class="reference external" href="https://compas.dev/compas/latest/api/compas.datastructures.html">compas.datastructures</a> …</p></li>
-<li><p><strong>Easy-to-use Interaction</strong>: Action-based interaction with mouse and keyboard, and easy-to-use API for your own interaction …</p></li>
-</ul>
-<p>COMPAS Viewer is the next generation of <a class="reference external" href="https://compas.dev/compas_view2">compas_view2</a> which is based on compas &lt;= 1.17.9.</p>
+<p class="lead">More info coming soon…</p>
 <section id="table-of-contents">
 <h2>Table of Contents</h2>
 <div class="toctree-wrapper compound">
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/index.html">Tutorials</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/configurations.html">File Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/compas_viewer.actions.html">compas_viewer.actions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/compas_viewer.components.html">compas_viewer.components</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/generated/compas_viewer.components.Button.html">Button</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/generated/compas_viewer.components.ComboBox.html">ComboBox</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/generated/compas_viewer.components.CameraSettingsDialog.html">CameraSettingsDialog</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/generated/compas_viewer.components.Slider.html">Slider</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/generated/compas_viewer.components.Treeform.html">Treeform</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/generated/compas_viewer.components.ViewModeAction.html">ViewModeAction</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="examples/index.html">Examples</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="examples/basics.html">Basic Examples</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="examples/basics/messages.html">Windows Messages</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="examples/object.html">Object Examples</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="examples/object/arrows.html">Arrows</a></li>
-<li class="toctree-l3"><a class="reference internal" href="examples/object/brep.html">Brep</a></li>
-<li class="toctree-l3"><a class="reference internal" href="examples/object/fonts.html">Fonts</a></li>
-<li class="toctree-l3"><a class="reference internal" href="examples/object/frames.html">Frames</a></li>
-<li class="toctree-l3"><a class="reference internal" href="examples/object/geometries.html">Geometries</a></li>
-<li class="toctree-l3"><a class="reference internal" href="examples/object/lines.html">Lines</a></li>
-<li class="toctree-l3"><a class="reference internal" href="examples/object/mesh_display.html">Mesh Display</a></li>
-<li class="toctree-l3"><a class="reference internal" href="examples/object/nurbs.html">Nurbs</a></li>
-<li class="toctree-l3"><a class="reference internal" href="examples/object/pointcloud.html">Point Cloud</a></li>
-<li class="toctree-l3"><a class="reference internal" href="examples/object/points.html">Points</a></li>
-<li class="toctree-l3"><a class="reference internal" href="examples/object/polyline.html">Polyline</a></li>
-<li class="toctree-l3"><a class="reference internal" href="examples/object/robot.html">Robot</a></li>
-<li class="toctree-l3"><a class="reference internal" href="examples/object/scale.html">Scale</a></li>
-<li class="toctree-l3"><a class="reference internal" href="examples/object/texts.html">Texts</a></li>
-<li class="toctree-l3"><a class="reference internal" href="examples/object/vector.html">Vector</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="examples/color.html">Color Examples</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="examples/color/blending.html">Blending</a></li>
-<li class="toctree-l3"><a class="reference internal" href="examples/color/colors.html">Colors</a></li>
-<li class="toctree-l3"><a class="reference internal" href="examples/color/face_vertext_color.html">Face Vertex Color</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="examples/layout.html">Layout Examples</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="examples/layout/property_form.html">Property Form</a></li>
-<li class="toctree-l3"><a class="reference internal" href="examples/layout/slider.html">Slider</a></li>
-<li class="toctree-l3"><a class="reference internal" href="examples/layout/tree.html">Tree</a></li>
-<li class="toctree-l3"><a class="reference internal" href="examples/layout/tree_view.html">Tree View</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="examples/dynamic.html">Dynamic Examples</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="examples/dynamic/dynamic.html">Dynamic</a></li>
-<li class="toctree-l3"><a class="reference internal" href="examples/dynamic/dynamic_mesh.html">Dynamic Mesh</a></li>
-<li class="toctree-l3"><a class="reference internal" href="examples/dynamic/orbiting.html">Orbit Around an Object</a></li>
-<li class="toctree-l3"><a class="reference internal" href="examples/dynamic/transform.html">Transform</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="examples/other.html">Other Examples</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="examples/other/other.html">Other</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="api/index.html">API Reference</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="api/compas_viewer.viewer.html">compas_viewer.viewer</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="api/generated/compas_viewer.viewer.Viewer.html">Viewer</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="api/compas_viewer.events.html">compas_viewer.events</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/compas_viewer.renderer.html">compas_viewer.renderer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/compas_viewer.scene.html">compas_viewer.scene</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="api/generated/compas_viewer.scene.ViewerSceneObject.html">ViewerSceneObject</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/generated/compas_viewer.scene.MeshObject.html">MeshObject</a></li>
@@ -650,24 +588,16 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="api/generated/compas_viewer.scene.CapsuleObject.html">CapsuleObject</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="api/compas_viewer.controller.html">compas_viewer.controller</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="api/generated/compas_viewer.controller.Controller.html">Controller</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/generated/compas_viewer.controller.Mouse.html">Mouse</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/compas_viewer.ui.html">compas_viewer.ui</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/generated/compas_viewer.ui.UI.html">UI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/generated/compas_viewer.ui.mainwindow.MainWindow.html">MainWindow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/generated/compas_viewer.ui.menubar.MenuBar.html">MenuBar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/generated/compas_viewer.ui.sidebar.SideBarRight.html">SideBarRight</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/generated/compas_viewer.ui.sidedock.SideDock.html">SideDock</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/generated/compas_viewer.ui.toolbar.ToolBar.html">ToolBar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/generated/compas_viewer.ui.viewport.ViewPort.html">ViewPort</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="api/compas_viewer.actions.html">compas_viewer.actions</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="api/generated/compas_viewer.actions.Action.html">Action</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/generated/compas_viewer.actions.ZoomSelected.html">ZoomSelected</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/generated/compas_viewer.actions.GLInfo.html">GLInfo</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/generated/compas_viewer.actions.SelectAll.html">SelectAll</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/generated/compas_viewer.actions.ViewRight.html">ViewRight</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/generated/compas_viewer.actions.ViewFront.html">ViewFront</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/generated/compas_viewer.actions.ViewTop.html">ViewTop</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/generated/compas_viewer.actions.ViewPerspective.html">ViewPerspective</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/generated/compas_viewer.actions.DeleteSelected.html">DeleteSelected</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="api/compas_viewer.components.html">compas_viewer.components</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>

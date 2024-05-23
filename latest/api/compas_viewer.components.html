@@ -34,7 +34,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../_static/tabs.css" />
     <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.5ea377869091fd0449014c60fc090103.min.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
@@ -59,8 +59,8 @@
         </script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="License" href="../license.html" />
-    <link rel="prev" title="DeleteSelected.tr" href="generated/compas_viewer.actions.DeleteSelected.tr.html" />
+    <link rel="next" title="Button" href="generated/compas_viewer.components.Button.html" />
+    <link rel="prev" title="compas_viewer.actions" href="compas_viewer.actions.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -165,21 +165,21 @@
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../tutorials/index.html">
-                        Tutorials
+                      <a class="nav-link nav-internal" href="../tutorial.html">
+                        Tutorial
                       </a>
                     </li>
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../examples/index.html">
+                      <a class="nav-link nav-internal" href="../examples.html">
                         Examples
                       </a>
                     </li>
                 
 
                     <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="index.html">
+                      <a class="nav-link nav-internal" href="../api.html">
                         API Reference
                       </a>
                     </li>
@@ -316,6 +316,10 @@ document.write(`
   
 
   
+    <label class="sidebar-toggle secondary-toggle" for="__secondary">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
 </div>
 
     </nav>
@@ -356,21 +360,21 @@ document.write(`
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../tutorials/index.html">
-                        Tutorials
+                      <a class="nav-link nav-internal" href="../tutorial.html">
+                        Tutorial
                       </a>
                     </li>
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../examples/index.html">
+                      <a class="nav-link nav-internal" href="../examples.html">
                         Examples
                       </a>
                     </li>
                 
 
                     <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="index.html">
+                      <a class="nav-link nav-internal" href="../api.html">
                         API Reference
                       </a>
                     </li>
@@ -489,25 +493,15 @@ document.write(`
         <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../index.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../tutorials/index.html">Tutorials</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/configurations.html">File Structure</a></li>
-</ul>
-</li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../examples/index.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../examples/basics.html">Basic Examples</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../examples/object.html">Object Examples</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../examples/color.html">Color Examples</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../examples/layout.html">Layout Examples</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../examples/dynamic.html">Dynamic Examples</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../examples/other.html">Other Examples</a></li>
-</ul>
-</li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.viewer.html">compas_viewer.viewer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.scene.html">compas_viewer.scene</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compas_viewer.controller.html">compas_viewer.controller</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../api.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="compas_viewer.actions.html">compas_viewer.actions</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">compas_viewer.components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compas_viewer.events.html">compas_viewer.events</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compas_viewer.renderer.html">compas_viewer.renderer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compas_viewer.scene.html">compas_viewer.scene</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compas_viewer.ui.html">compas_viewer.ui</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
@@ -556,7 +550,7 @@ document.write(`
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="index.html" class="nav-link">API Reference</a></li>
+    <li class="breadcrumb-item"><a href="../api.html" class="nav-link">API Reference</a></li>
     
     <li class="breadcrumb-item active" aria-current="page">compas_viewer.components</li>
   </ul>
@@ -577,8 +571,31 @@ document.write(`
                   
   <section id="compas-viewer-components">
 <h1>compas_viewer.components</h1>
-<div class="toctree-wrapper compound">
-</div>
+<section id="classes">
+<h2>Classes</h2>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_viewer.components.Button.html" title="compas_viewer.components.Button"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Button</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_viewer.components.ComboBox.html" title="compas_viewer.components.ComboBox"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ComboBox</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_viewer.components.CameraSettingsDialog.html" title="compas_viewer.components.CameraSettingsDialog"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CameraSettingsDialog</span></code></a></p></td>
+<td><p>Dialog for adjusting camera settings in a graphical user interface.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_viewer.components.Slider.html" title="compas_viewer.components.Slider"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Slider</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_viewer.components.Treeform.html" title="compas_viewer.components.Treeform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Treeform</span></code></a></p></td>
+<td><p>Class for displaying tree-like data.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_viewer.components.ViewModeAction.html" title="compas_viewer.components.ViewModeAction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ViewModeAction</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
 </section>
 
 
@@ -593,6 +610,20 @@ document.write(`
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#classes">Classes</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>
