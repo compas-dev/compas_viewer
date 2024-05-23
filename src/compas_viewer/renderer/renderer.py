@@ -3,13 +3,17 @@ from functools import lru_cache
 from typing import TYPE_CHECKING
 
 from numpy import float32
+from numpy import frombuffer
 from numpy import identity
+from numpy import uint8
 from OpenGL import GL
 from PySide6 import QtCore
 from PySide6.QtGui import QKeyEvent
 from PySide6.QtGui import QMouseEvent
 from PySide6.QtGui import QWheelEvent
 from PySide6.QtOpenGLWidgets import QOpenGLWidget
+from PySide6.QtWidgets import QGesture
+from PySide6.QtWidgets import QGestureEvent
 
 from compas.geometry import Frame
 from compas.geometry import transform_points_numpy
@@ -20,7 +24,6 @@ from compas_viewer.scene.gridobject import GridObject
 from compas_viewer.scene.vectorobject import VectorObject
 
 from .camera import Camera
-from .selector import Selector
 from .shaders import Shader
 
 if TYPE_CHECKING:
@@ -42,6 +45,12 @@ class Renderer(QOpenGLWidget, Base):
         The renderer configuration.
     """
 
+    # The anti-aliasing factor for the drag selection.
+    ANTI_ALIASING_FACTOR = 10
+
+    # Enhance pixel  width for selection.
+    PIXEL_SELECTION_INCREMENTAL = 2
+
     def __init__(self, config: Config):
         super().__init__()
 
@@ -61,10 +70,9 @@ class Renderer(QOpenGLWidget, Base):
         self.shader_grid: Shader
 
         self.camera = Camera()
-        self.selector = Selector()
 
         self.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
-        # self.grabGesture(QtCore.Qt.PinchGesture)
+        self.grabGesture(QtCore.Qt.GestureType.PinchGesture)
 
     @property
     def rendermode(self):
@@ -309,24 +317,21 @@ class Renderer(QOpenGLWidget, Base):
         if self.isActiveWindow() and self.underMouse():
             self.viewer.eventmanager.delegate_mouserelease(event)
 
-    # def gestureEvent(self, event):
-    #     """
-    #     Callback for the gesture event which passes the event to the controller.
+    def gestureEvent(self, event: QGestureEvent):
+        """
+        Callback for the gesture event which passes the event to the controller.
 
-    #     Parameters
-    #     ----------
-    #     event : :PySide6:`PySide6/QtCore/QEvent`
-    #         The Qt event.
+        Parameters
+        ----------
+        event : :PySide6:`PySide6/QtCore/QEvent`
+            The Qt event.
 
-    #     """
-    #     # Handle pinch gestures
-    #     pinch = event.gesture(QtCore.Qt.PinchGesture)
-    #     if pinch:
-    #         self.viewer.controller.pinch_action(pinch)
-    #         self.update()
-    #         return True
-    #     else:
-    #         return False
+        """
+        pinch = event.gesture(QtCore.Qt.GestureType.PinchGesture)
+        if pinch:
+            self.viewer.eventmanager.delegate_pinch(pinch)
+            return True
+        return False
 
     def wheelEvent(self, event: QWheelEvent):
         """
@@ -616,11 +621,11 @@ class Renderer(QOpenGLWidget, Base):
         self.shader_tag.release()
 
         # draw 2D box for multi-selection
-        if self.selector.on_drag_selection:
+        if self.viewer.mouse.select_by_window_ongoing:
             self.shader_model.draw_2d_box(
                 (
-                    self.selector.drag_start_pt.x(),
-                    self.selector.drag_start_pt.y(),
+                    self.viewer.mouse.select_by_window_start_point.x(),
+                    self.viewer.mouse.select_by_window_start_point.y(),
                     self.viewer.mouse.last_pos.x(),
                     self.viewer.mouse.last_pos.y(),
                 ),
@@ -657,3 +662,58 @@ class Renderer(QOpenGLWidget, Base):
 
         GL.glEnable(GL.GL_POINT_SMOOTH)
         GL.glEnable(GL.GL_LINE_SMOOTH)
+
+    def read_instance_color(self, box: tuple[int, int, int, int]):
+        """
+        Paint the instance map quickly, and then read the color of the specified area.
+
+        Parameters
+        ----------
+        box : tuple[int, int, int, int]
+            The box area [x1, y1, x2, y2] to be read. x1=x2 and y1=y2 means a single point.
+
+        Notes
+        -----
+        The instance map is used by the selector to identify selected objects.
+        The mechanism of a :class:`compas_viewer.components.renderer.selector.Selector`
+        is picking the color from instance map and then find the corresponding object.
+        Anti aliasing, which is always force opened in many machines,  can cause color picking inaccuracy.
+
+        The instance buffer created by the GL is based on the "device-independent pixels",
+        while "physical pixels" is the common unit. The method :func:`PySide6.QtGui.QPaintDevice.devicePixelRatio()`
+        plays a role in the conversion between the two units, which is different on different devices.
+        For example, Mac Retina display has a devicePixelRatio of 2.0.
+        This method contains an uniform-sampling-similar math operation,
+        which is not absolutely accurate but enough for the selection.
+
+        See Also
+        --------
+        :func:`compas_viewer.components.renderer.selector.Selector.ANTI_ALIASING_FACTOR`
+        :attr:`compas_viewer.components.renderer.rendermode`
+
+        References
+        ----------
+        * https://doc.qt.io/qt-6/qscreen.html#devicePixelRatio-prop
+        * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glReadPixels.xhtml
+        * https://doc.qt.io/qt-6/qopenglwidget.html#makeCurrent
+        """
+
+        # 0. Get the rectangle area.
+        x1, y1, x2, y2 = box
+        x, y = min(x1, x2), self.viewer.config.window.height - max(y1, y2)
+        width = max(self.PIXEL_SELECTION_INCREMENTAL, abs(x1 - x2))
+        height = max(self.PIXEL_SELECTION_INCREMENTAL, abs(y1 - y2))
+        r = self.viewer.renderer.devicePixelRatio()
+
+        # 1. Repaint the canvas with instance color.
+        self.viewer.renderer.makeCurrent()
+        self.viewer.renderer.paintGL(is_instance=True)
+
+        # 2. Read the instance buffer.
+        instance_buffer = GL.glReadPixels(x * r, y * r, width * r, height * r, GL.GL_RGB, GL.GL_UNSIGNED_BYTE)
+
+        # 3. Return the instance color.
+        #      From 1-3, the canvas goes through a quick repaint process, which should be not noticeable to the user.
+        instance_map = frombuffer(buffer=instance_buffer, dtype=uint8).reshape(-1, 3)
+
+        return instance_map

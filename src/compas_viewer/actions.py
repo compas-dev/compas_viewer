@@ -1,6 +1,9 @@
 from typing import TYPE_CHECKING
 
+from numpy import all
+from numpy import any
 from numpy import array
+from numpy import unique
 from numpy.linalg import norm
 from PySide6.QtCore import QEvent
 from PySide6.QtCore import Qt
@@ -118,3 +121,100 @@ def zoom_view(viewer: "Viewer", event: QWheelEvent):
     steps = degrees / 15
     viewer.renderer.camera.zoom(steps)
     viewer.renderer.update()
+
+
+def select_object(viewer: "Viewer", event: QMouseEvent):
+    etype = event.type()
+
+    if etype == QEvent.Type.MouseButtonPress:
+        for _, obj in viewer.scene.instance_colors.items():
+            obj.is_selected = False
+
+        x = viewer.mouse.last_pos.x()
+        y = viewer.mouse.last_pos.y()
+        instance_color = viewer.renderer.read_instance_color((x, y, x, y))
+        unique_color = unique(instance_color, axis=0, return_counts=False)
+
+        selected_obj = viewer.scene.instance_colors.get(tuple(unique_color[0]))  # type: ignore
+        if selected_obj:
+            selected_obj.is_selected = True
+
+    viewer.renderer.update()
+
+
+def deselect_object(viewer: "Viewer", event: QMouseEvent):
+    etype = event.type()
+
+    if etype == QEvent.Type.MouseButtonPress:
+        x = viewer.mouse.last_pos.x()
+        y = viewer.mouse.last_pos.y()
+        instance_color = viewer.renderer.read_instance_color((x, y, x, y))
+        unique_color = unique(instance_color, axis=0, return_counts=False)
+
+        selected_obj = viewer.scene.instance_colors.get(tuple(unique_color[0]))  # type: ignore
+        if selected_obj:
+            selected_obj.is_selected = False
+
+    viewer.renderer.update()
+
+
+def select_multiple(viewer: "Viewer", event: QMouseEvent):
+    etype = event.type()
+
+    if etype == QEvent.Type.MouseButtonPress:
+        x = viewer.mouse.last_pos.x()
+        y = viewer.mouse.last_pos.y()
+        instance_color = viewer.renderer.read_instance_color((x, y, x, y))
+        unique_color = unique(instance_color, axis=0, return_counts=False)
+
+        selected_obj = viewer.scene.instance_colors.get(tuple(unique_color[0]))  # type: ignore
+        if selected_obj:
+            selected_obj.is_selected = True
+
+    viewer.renderer.update()
+
+
+def select_window(viewer: "Viewer", event: QMouseEvent):
+    etype = event.type()
+
+    if etype == QEvent.Type.MouseButtonPress:
+        viewer.mouse.select_by_window_start_point = event.pos()
+        viewer.mouse.select_by_window_ongoing = True
+
+    elif etype == QEvent.Type.MouseMove:
+        viewer.mouse.select_by_window_ongoing = True
+
+    elif etype == QEvent.Type.MouseButtonRelease:
+        viewer.mouse.select_by_window_ongoing = False
+        viewer.mouse.select_by_window_end_point = event.pos()
+
+        start = viewer.mouse.select_by_window_start_point
+        end = viewer.mouse.select_by_window_end_point
+
+        # ignore small windows
+        if abs(start.x() - end.x()) * abs(start.y() - end.y()) <= 4:
+            return
+
+        # Deselect all objects first
+        for _, obj in viewer.scene.instance_colors.items():
+            obj.is_selected = False
+
+        # Identify unique instance colors
+        instance_color = viewer.renderer.read_instance_color((start.x(), start.y(), end.x(), end.y()))
+        unique_colors = unique(instance_color, axis=0, return_counts=True)
+        unique_colors = array([unique_colors[0][i] for i, count in enumerate(unique_colors[1]) if count > viewer.renderer.ANTI_ALIASING_FACTOR])
+
+        if len(unique_colors) == 0:
+            return
+
+        # Select base don instance colors
+        for color, obj in viewer.scene.instance_colors.items():
+            if any(all(color == unique_colors, axis=1)):
+                obj.is_selected = True
+                continue
+
+    viewer.renderer.update()
+
+
+def deselect_window():
+    pass

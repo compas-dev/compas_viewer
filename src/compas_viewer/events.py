@@ -9,6 +9,7 @@ from PySide6.QtGui import QKeyEvent
 from PySide6.QtGui import QMouseEvent
 from PySide6.QtGui import QWheelEvent
 from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QGestureEvent
 
 if TYPE_CHECKING:
     from compas_viewer import Viewer
@@ -164,6 +165,7 @@ class MouseEvent(QObject):
         self.button = button
         self.modifier = modifier
         self.context = context
+        self.ongoing = False
 
     @property
     def button(self) -> str:
@@ -297,6 +299,7 @@ class EventManager:
         for mouseevent in self.mouse_events:
             if mouseevent == event:
                 mouseevent.triggered.emit(event)
+                mouseevent.ongoing = True
                 break
         self.viewer.mouse.last_pos = event.pos()
 
@@ -305,12 +308,14 @@ class EventManager:
         for mouseevent in self.mouse_events:
             if mouseevent == event:
                 mouseevent.triggered.emit(event)
+                mouseevent.ongoing = True
                 break
 
     def delegate_mouserelease(self, event: QMouseEvent):
         for mouseevent in self.mouse_events:
-            if mouseevent == event:
+            if mouseevent.ongoing or mouseevent == event:
                 mouseevent.triggered.emit(event)
+                mouseevent.ongoing = False
                 break
         self.viewer.mouse.last_pos = event.pos()
         QApplication.restoreOverrideCursor()
@@ -318,3 +323,6 @@ class EventManager:
     def delegate_wheel(self, event: QWheelEvent):
         for wheelevent in self.wheel_events:
             wheelevent.triggered.emit(event)
+
+    def delegate_pinch(self, event: QGestureEvent):
+        raise NotImplementedError

@@ -11,6 +11,8 @@ from compas_viewer.actions import open_camera_settings_dialog
 from compas_viewer.actions import pan_view
 from compas_viewer.actions import rotate_view
 from compas_viewer.actions import select_all
+from compas_viewer.actions import select_object
+from compas_viewer.actions import select_window
 from compas_viewer.actions import zoom_selected
 from compas_viewer.actions import zoom_view
 
@@ -48,16 +50,7 @@ class Base:
                 raise ValueError(f"Expected dataclass type for field '{field_name}' but got dict.")
 
 
-@dataclass
-class CameraConfig(Base):
-    position: list[float] = field(default_factory=lambda: [10, 10, 10])
-    target: list[float] = field(default_factory=lambda: [0, 0, 0])
-    up: list[float] = field(default_factory=lambda: [0, 0, 1])
-    near: float = 0.1
-    far: float = 1000
-    fov: float = 50
-
-
+# this should be part of View3D config
 @dataclass
 class DisplayConfig(Base):
     pointcolor: Color = field(default_factory=Color.black)
@@ -72,9 +65,6 @@ class DisplayConfig(Base):
 class View3dConfig(Base):
     viewport: Literal["top", "perspective"] = "perspective"
     background: Color = field(default_factory=lambda: Color.from_hex("#eeeeee"))
-    show_grid: bool = True
-    show_axes: bool = True
-    camera: CameraConfig = field(default_factory=CameraConfig)
 
 
 @dataclass
@@ -164,6 +154,7 @@ class UIConfig(Base):
     display: DisplayConfig = field(default_factory=DisplayConfig)
 
 
+# this should be part of View3D config
 @dataclass
 class RendererConfig(Base):
     show_grid: bool = True
@@ -176,6 +167,7 @@ class RendererConfig(Base):
     backgroundcolor: Color = field(default_factory=Color.white)
 
 
+# this should be part of View3D config
 @dataclass
 class CameraConfig(Base):
     fov: float = 45.0
@@ -189,6 +181,7 @@ class CameraConfig(Base):
     pan_delta: float = 0.05
 
 
+# this should not be exposed
 @dataclass
 class SelectorConfig(Base):
     enable: bool = True
@@ -211,6 +204,8 @@ class MouseEvents:
         default_factory=lambda: [
             {"title": "Pan View", "button": "RIGHT", "modifier": "SHIFT", "action": pan_view},
             {"title": "Rotate View", "button": "RIGHT", "modifier": None, "action": rotate_view},
+            {"title": "Select", "button": "LEFT", "modifier": None, "action": select_object},
+            {"title": "Select Window", "button": "LEFT", "modifier": "SHIFT", "action": select_window},
         ]
     )
 

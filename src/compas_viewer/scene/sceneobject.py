@@ -431,7 +431,7 @@ class ViewerSceneObject(SceneObject, Base):
         if self._lines_buffer is not None and (self.show_lines or wireframe):
             shader.bind_attribute("position", self._lines_buffer["positions"])
             shader.draw_lines(
-                width=self.linewidth + self.viewer.renderer.selector.PIXEL_SELECTION_INCREMENTAL,
+                width=self.linewidth + self.viewer.renderer.PIXEL_SELECTION_INCREMENTAL,
                 elements=self._lines_buffer["elements"],
                 n=self._lines_buffer["n"],
             )

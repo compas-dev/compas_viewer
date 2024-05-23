@@ -329,7 +329,7 @@ class BufferObject(SceneObject, Base):
         if self.show_lines or wireframe:
             shader.bind_attribute("position", self.linesbuffer.positions)
             shader.draw_lines(
-                width=self.linewidth + self.viewer.renderer.selector.PIXEL_SELECTION_INCREMENTAL,
+                width=self.linewidth + self.viewer.renderer.PIXEL_SELECTION_INCREMENTAL,
                 elements=self.linesbuffer.elements,
                 n=self.linesbuffer.n,
             )
