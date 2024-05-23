@@ -196,7 +196,7 @@ class SelectorConfig(Base):
 
 
 @dataclass
-class KeyboardShortcuts:
+class KeyEvents:
     items: list[dict] = field(
         default_factory=lambda: [
             {"title": "Zoom Selected", "key": "F", "modifier": None, "action": zoom_selected},
@@ -231,6 +231,6 @@ class Config(Base):
     renderer: RendererConfig = field(default_factory=RendererConfig)
     camera: CameraConfig = field(default_factory=CameraConfig)
     selector: SelectorConfig = field(default_factory=SelectorConfig)
-    keyboard_shortcuts: KeyboardShortcuts = field(default_factory=KeyboardShortcuts)
+    key_events: KeyEvents = field(default_factory=KeyEvents)
     mouse_events: MouseEvents = field(default_factory=MouseEvents)
     wheel_events: WheelEvents = field(default_factory=WheelEvents)
