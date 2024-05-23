@@ -201,8 +201,8 @@ def select_window(viewer: "Viewer", event: QMouseEvent):
 
         # Identify unique instance colors
         instance_color = viewer.renderer.read_instance_color((start.x(), start.y(), end.x(), end.y()))
-        unique_colors = unique(instance_color, axis=0, return_counts=True)
-        unique_colors = array([unique_colors[0][i] for i, count in enumerate(unique_colors[1]) if count > viewer.renderer.ANTI_ALIASING_FACTOR])
+        unique_colors_set = set(map(tuple, instance_color))
+        unique_colors = array(list(unique_colors_set))
 
         if len(unique_colors) == 0:
             return

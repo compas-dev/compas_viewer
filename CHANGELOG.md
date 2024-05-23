@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Changed `GridObject` to draw direcly in `Render`.
 * Fixed `CameraSettingsDialog` update current position bug.
 * update `slider` component.
+* Implemented downsampling for window selection to improve performance.
 
 ### Removed
 
