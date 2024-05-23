@@ -1,7 +1,9 @@
 from math import atan2
 from math import radians
 from math import tan
+from typing import TYPE_CHECKING
 from typing import Optional
+from typing import Sequence
 
 from numpy import array
 from numpy import asfortranarray
@@ -15,7 +17,9 @@ from compas.geometry import Rotation
 from compas.geometry import Transformation
 from compas.geometry import Translation
 from compas.geometry import Vector
-from compas_viewer.base import Base
+
+if TYPE_CHECKING:
+    from compas_viewer.renderer import Renderer
 
 
 class Position(Vector):
@@ -68,7 +72,7 @@ class RotationEuler(Position):
     pass
 
 
-class Camera(Base):
+class Camera:
     """Camera object for the default view.
 
     Parameters
@@ -112,31 +116,35 @@ class Camera(Base):
 
     def __init__(
         self,
-        fov: Optional[float] = 45.0,
-        near: Optional[float] = 0.1,
-        far: Optional[float] = 1000.0,
-        init_position: Optional[tuple] = [10.0, 10.0, 10.0],
-        init_target: Optional[tuple] = [0.0, 0.0, 0.0],
-        scale: Optional[float] = 1.0,
-        zoomdelta: Optional[float] = 0.05,
-        rotationdelta: Optional[float] = 0.01,
-        pan_delta: Optional[float] = 0.05,
+        renderer: "Renderer",
+        fov: float = 45.0,
+        near: float = 0.1,
+        far: float = 1000.0,
+        position: Sequence[float] = [0.0, -10.0, 10.0],
+        target: Sequence[float] = [0.0, 0.0, 0.0],
+        scale: float = 1.0,
+        zoomdelta: float = 0.05,
+        rotationdelta: float = 0.01,
+        pandelta: float = 0.05,
     ) -> None:
+
+        self.renderer = renderer
+
         self.fov = fov
         self.near = near
         self.far = far
         self.scale = scale
         self.zoomdelta = zoomdelta
         self.rotationdelta = rotationdelta
-        self.pan_delta = pan_delta
+        self.pandelta = pandelta
 
         self._position = Position([0, 0, 10 * scale], on_update=self._on_position_update)
         self._rotation = RotationEuler([0, 0, 0], on_update=self._on_rotation_update)
         self._target = Position([0, 0, 0], on_update=self._on_target_update)
 
         self.reset_position(viewmode="perspective")
-        self.target.set(*init_target)
-        self.position.set(*init_position)
+        self.target.set(*target)
+        self.position.set(*position)
 
     @property
     def position(self) -> Position:
@@ -301,7 +309,7 @@ class Camera(Base):
     def reset_position(self, viewmode: Optional[str] = None):
         """Reset the position of the camera based current view type."""
         self.target.set(0, 0, 0, False)
-        viewmode = viewmode or self.viewer.renderer.viewmode
+        viewmode = viewmode or self.renderer.viewmode
 
         if viewmode == "perspective":
             self.rotation.set(pi / 4, 0, -pi / 4, False)
@@ -330,7 +338,7 @@ class Camera(Base):
         is a perspective view (``camera.renderer.config.viewmode == "perspective"``).
 
         """
-        if self.viewer.renderer.viewmode == "perspective":
+        if self.renderer.viewmode == "perspective":
             self.rotation += [-self.rotationdelta * dy, 0, -self.rotationdelta * dx]
 
     def pan(self, dx: float, dy: float):
@@ -346,7 +354,7 @@ class Camera(Base):
             with each increment the size of :attr:`Camera.pan_delta`.
         """
         R = Rotation.from_euler_angles(self.rotation)
-        T = Translation.from_vector([-dx * self.pan_delta * self.scale, dy * self.pan_delta * self.scale, 0])
+        T = Translation.from_vector([-dx * self.pandelta * self.scale, dy * self.pandelta * self.scale, 0])
         M = (R * T).matrix
         vector = [M[i][3] for i in range(3)]
         self.target += vector
@@ -384,7 +392,8 @@ class Camera(Base):
 
         """
         aspect = width / height
-        if self.viewer.renderer.viewmode == "perspective":
+
+        if self.renderer.viewmode == "perspective":
             P = self.perspective(self.fov, aspect, self.near * self.scale, self.far * self.scale)
         else:
             left = -self.distance
@@ -392,7 +401,8 @@ class Camera(Base):
             bottom = -self.distance / aspect
             top = self.distance / aspect
             P = self.ortho(left, right, bottom, top, self.near * self.scale, self.far * self.scale)
-        return list(asfortranarray(P, dtype=float32))
+
+        return asfortranarray(P, dtype=float32)
 
     def viewworld(self) -> list[list[float]]:
         """Compute the view-world matrix corresponding to the current camera settings.
@@ -410,4 +420,5 @@ class Camera(Base):
         T = Translation.from_vector(self.position)
         R = Rotation.from_euler_angles(self.rotation)
         W = T * R
-        return list(asfortranarray(W.inverted(), dtype=float32))
+
+        return asfortranarray(W.inverted(), dtype=float32)
