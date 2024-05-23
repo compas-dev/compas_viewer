@@ -17,8 +17,8 @@ class Slider(QWidget):
         max_val: int = 100,
         action: Callable = None,
         horizontal: Optional[bool] = True,
-        starting_val: Optional[float] = None,
-        tick_interval: Optional[float] = None,
+        starting_val: Optional[int] = None,
+        tick_interval: Optional[int] = None,
     ):
         """
         A customizable slider widget for Qt applications, supporting both horizontal and vertical orientations. This
@@ -36,7 +36,7 @@ class Slider(QWidget):
             Function to execute on value change. Should accept a single integer argument.
         horizontal : bool, optional
             Orientation of the slider. True for horizontal, False for vertical. Defaults to True.
-        starting_val : float, optional
+        starting_val : int, optional
             Initial value of the slider, defaults to the minimum value.
         tick_interval : float, optional
             Interval between tick marks. No ticks if None. Defaults to None.
@@ -62,7 +62,7 @@ class Slider(QWidget):
 
         Example
         -------
-        >>> slider = Slider("Brightness", min_val=0, max_val=255, step=5)
+        >>> slider = Slider("Brightness", min_val=0, max_val=255, starting_val=100)
         """
         super().__init__()
         # TODO(pitsai): add step method
