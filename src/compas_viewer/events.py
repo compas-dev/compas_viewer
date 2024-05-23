@@ -103,7 +103,7 @@ class MouseEvent(QObject):
         return self._modifier
 
     @modifier.setter
-    def modifier(self, name: str | None) -> None:
+    def modifier(self, name: str) -> None:
         self._modifier = name
         self._modifierconstant = None
         if not name:

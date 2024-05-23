@@ -38,7 +38,4 @@ __all_plugins__ = [
     "compas_viewer.scene",
 ]
 
-# Putting imports here to avoid circular imports
 from .viewer import Viewer  # noqa: F401, E402
-from .controller import Controller  # noqa: F401, E402
-from .scene import Tag  # noqa: F401, E402
