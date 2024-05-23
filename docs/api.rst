@@ -17,6 +17,8 @@ API Reference
 Classes
 =======
 
+.. currentmodule:: compas_viewer
+
 .. autosummary::
     :toctree: generated/
     :nosignatures:
