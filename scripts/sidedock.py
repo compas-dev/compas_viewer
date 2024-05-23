@@ -13,8 +13,10 @@ def toggle_box():
     boxobj.show = not boxobj.show
     viewer.renderer.update()
 
+
 def slider_changed(value):
     print(f"Slider value changed to: {value}")
+
 
 viewer.ui.sidedock.show = True
 viewer.ui.sidedock.add(Button(text="Toggle Box", action=toggle_box))
