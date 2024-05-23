@@ -308,17 +308,15 @@ class EventManager:
         for mouseevent in self.mouse_events:
             if mouseevent == event:
                 mouseevent.triggered.emit(event)
-                mouseevent.ongoing = True
                 break
 
     def delegate_mouserelease(self, event: QMouseEvent):
         for mouseevent in self.mouse_events:
-            if mouseevent.ongoing or mouseevent == event:
+            if mouseevent.ongoing:
                 mouseevent.triggered.emit(event)
                 mouseevent.ongoing = False
                 break
         self.viewer.mouse.last_pos = event.pos()
-        QApplication.restoreOverrideCursor()
 
     def delegate_wheel(self, event: QWheelEvent):
         for wheelevent in self.wheel_events:
