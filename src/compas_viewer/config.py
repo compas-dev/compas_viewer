@@ -17,7 +17,7 @@ from compas_viewer.actions import zoom_selected
 from compas_viewer.actions import zoom_view
 
 
-class Base:
+class ConfigBase:
     @classmethod
     def from_json(cls, filepath):
         with open(filepath) as fp:
@@ -52,7 +52,7 @@ class Base:
 
 # this should be part of View3D config
 @dataclass
-class DisplayConfig(Base):
+class DisplayConfig(ConfigBase):
     pointcolor: Color = field(default_factory=Color.black)
     linecolor: Color = field(default_factory=Color.black)
     surfacecolor: Color = field(default_factory=Color.grey)
@@ -62,13 +62,13 @@ class DisplayConfig(Base):
 
 
 @dataclass
-class View3dConfig(Base):
+class View3dConfig(ConfigBase):
     viewport: Literal["top", "perspective"] = "perspective"
     background: Color = field(default_factory=lambda: Color.from_hex("#eeeeee"))
 
 
 @dataclass
-class ToolbarConfig(Base):
+class ToolbarConfig(ConfigBase):
     show: bool = True
     items: list[dict] = field(
         default_factory=lambda: [
@@ -93,7 +93,7 @@ class ToolbarConfig(Base):
 
 
 @dataclass
-class MenubarConfig(Base):
+class MenubarConfig(ConfigBase):
     show: bool = True
     items: list[dict] = field(
         default_factory=lambda: [
@@ -124,19 +124,19 @@ class MenubarConfig(Base):
 
 
 @dataclass
-class StatusbarConfig(Base):
+class StatusbarConfig(ConfigBase):
     show: bool = True
     items: list[dict[str, str]] = None
 
 
 @dataclass
-class SidebarConfig(Base):
+class SidebarConfig(ConfigBase):
     show: bool = True
     items: list[dict[str, str]] = None
 
 
 @dataclass
-class WindowConfig(Base):
+class WindowConfig(ConfigBase):
     title: str = "COMPAS Viewer"
     width: int = 1280
     height: int = 720
@@ -145,7 +145,7 @@ class WindowConfig(Base):
 
 
 @dataclass
-class UIConfig(Base):
+class UIConfig(ConfigBase):
     menubar: MenubarConfig = field(default_factory=MenubarConfig)
     toolbar: ToolbarConfig = field(default_factory=ToolbarConfig)
     statusbar: StatusbarConfig = field(default_factory=StatusbarConfig)
@@ -156,7 +156,7 @@ class UIConfig(Base):
 
 # this should be part of View3D config
 @dataclass
-class RendererConfig(Base):
+class RendererConfig(ConfigBase):
     show_grid: bool = True
     show_gridz: bool = False
     gridsize: tuple[float, int, float, int] = field(default_factory=lambda: (10.0, 10, 10.0, 10))
@@ -169,21 +169,21 @@ class RendererConfig(Base):
 
 # this should be part of View3D config
 @dataclass
-class CameraConfig(Base):
+class CameraConfig(ConfigBase):
     fov: float = 45.0
     near: float = 0.1
     far: float = 1000.0
-    position: list[float] = field(default_factory=lambda: [10.0, 10.0, 10.0])
+    position: list[float] = field(default_factory=lambda: [0.0, -10.0, 10.0])
     target: list[float] = field(default_factory=lambda: [0.0, 0.0, 0.0])
     scale: float = 1.0
     zoomdelta: float = 0.05
     rotationdelta: float = 0.01
-    pan_delta: float = 0.05
+    pandelta: float = 0.05
 
 
 # this should not be exposed
 @dataclass
-class SelectorConfig(Base):
+class SelectorConfig(ConfigBase):
     enable: bool = True
     selectioncolor: Color = field(default_factory=lambda: Color(1.0, 1.0, 0.0, 1.0))
 
@@ -220,7 +220,7 @@ class WheelEvents:
 
 
 @dataclass
-class Config(Base):
+class Config(ConfigBase):
     ui: UIConfig = field(default_factory=UIConfig)
     window: WindowConfig = field(default_factory=WindowConfig)
     renderer: RendererConfig = field(default_factory=RendererConfig)
