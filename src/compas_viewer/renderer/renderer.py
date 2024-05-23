@@ -698,22 +698,30 @@ class Renderer(QOpenGLWidget, Base):
         * https://doc.qt.io/qt-6/qopenglwidget.html#makeCurrent
         """
 
-        # 0. Get the rectangle area.
+        # Get the rectangle area.
         x1, y1, x2, y2 = box
         x, y = min(x1, x2), self.viewer.config.window.height - max(y1, y2)
         width = max(self.PIXEL_SELECTION_INCREMENTAL, abs(x1 - x2))
         height = max(self.PIXEL_SELECTION_INCREMENTAL, abs(y1 - y2))
         r = self.viewer.renderer.devicePixelRatio()
 
-        # 1. Repaint the canvas with instance color.
+        pixels_x = width * r
+        pixels_y = height * r
+        step_x = round(pixels_x/1000) + 1
+        step_y = round(pixels_y/1000) + 1
+
+        # Repaint the canvas with instance color.
         self.viewer.renderer.makeCurrent()
         self.viewer.renderer.paintGL(is_instance=True)
 
-        # 2. Read the instance buffer.
-        instance_buffer = GL.glReadPixels(x * r, y * r, width * r, height * r, GL.GL_RGB, GL.GL_UNSIGNED_BYTE)
+        # Adjust width and height based on the step
+        width_adjusted = (width // step_x) * step_x
+        height_adjusted = (height // step_y) * step_y
 
-        # 3. Return the instance color.
-        #      From 1-3, the canvas goes through a quick repaint process, which should be not noticeable to the user.
-        instance_map = frombuffer(buffer=instance_buffer, dtype=uint8).reshape(-1, 3)
+        # Read the pixel data with downsampling
+        instance_buffer = GL.glReadPixels(int(x * r), int(y * r), int(width_adjusted * r), int(height_adjusted * r), GL.GL_RGB, GL.GL_UNSIGNED_BYTE)
+        instance_map = frombuffer(instance_buffer, dtype=uint8).reshape(int(height_adjusted * r), int(width_adjusted * r), 3)
 
+        # Downsample the data
+        instance_map = instance_map[::step_y, ::step_x, :].reshape(-1, 3)
         return instance_map
