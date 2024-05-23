@@ -2,15 +2,15 @@ from PySide6 import QtCore
 from PySide6 import QtWidgets
 from PySide6.QtWidgets import QDockWidget
 
-from compas_viewer.base import Base
 
+class SideDock:
+    locations = {
+        "left": QtCore.Qt.DockWidgetArea.LeftDockWidgetArea,
+        "right": QtCore.Qt.DockWidgetArea.RightDockWidgetArea,
+    }
 
-class SideDock(Base):
     def __init__(self) -> None:
         self.widget = None
-        self.location = "left"
-        self.show = False
-
         self.widget = QDockWidget()
         self.widget.setMinimumWidth(200)
         self.scroll = QtWidgets.QScrollArea()
@@ -21,18 +21,15 @@ class SideDock(Base):
         self.scroll.setWidgetResizable(True)
         self.layout = QtWidgets.QVBoxLayout(content)
         self.layout.setAlignment(QtCore.Qt.AlignTop)
+        self.widget.setVisible(False)
 
-    def lazy_init(self):
-        self.widget.setVisible(self.show)
+    @property
+    def show(self):
+        return self.widget.isVisible()
 
-        locations = {
-            "left": QtCore.Qt.LeftDockWidgetArea,
-            "right": QtCore.Qt.RightDockWidgetArea,
-            "top": QtCore.Qt.TopDockWidgetArea,
-            "bottom": QtCore.Qt.BottomDockWidgetArea,
-        }
-
-        self.viewer.ui.window.addDockWidget(locations[self.location], self.widget)
+    @show.setter
+    def show(self, value: bool):
+        self.widget.setVisible(value)
 
     def add(self, widget):
         self.layout.addWidget(widget)

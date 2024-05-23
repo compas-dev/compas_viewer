@@ -18,29 +18,21 @@ from compas_viewer.singleton import Singleton
 from compas_viewer.ui import UI
 
 
-# this should not be a singleton
-# because it might be created somewhere else too early
-# without the custom configuration
 class Viewer(Singleton):
-    def __init__(self, config: Config = None, show_grid: bool = True, **kwargs):
+    def __init__(self, config: Optional[Config] = None, **kwargs):
         self.app = QApplication(sys.argv)
         self.app.setWindowIcon(QIcon(os.path.join(HERE, "icons", "compas_icon_white.png")))
 
-        self.timer = QTimer()
+        self._scene = None
 
         self.config = config or Config()
-        self.config.renderer.show_grid = show_grid
 
-        # otherwise this results in a circular import
-        # both of these should be removed from this __init__
-        # renderer needs to go to view3d
-        # controller needs to be refactored to eventmanager
-        self.renderer = Renderer(self.config)
-        self.eventmanager = EventManager(self)
+        self.timer = QTimer()
         self.mouse = Mouse()
 
-        self.ui = UI()
-        self._scene = None
+        self.renderer = Renderer(self)
+        self.eventmanager = EventManager(self)
+        self.ui = UI(self)
 
     @property
     def scene(self) -> ViewerScene:
@@ -53,10 +45,7 @@ class Viewer(Singleton):
         self._scene = ViewerScene.__from_data__(scene.__data__)
 
     def show(self):
-        # none of these lazy inits should be necessary
-        # it just covers up for a design flaw
-        self.ui.lazy_init()
-        self.ui.show()
+        self.ui.init()
         self.app.exec()
 
     def on(self, interval: int, frames: Optional[int] = None) -> Callable:

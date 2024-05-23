@@ -1,31 +1,33 @@
 from functools import partial
+from typing import TYPE_CHECKING
 from typing import Any
 from typing import Callable
 from typing import Optional
 
 from PySide6.QtWidgets import QComboBox
 
-from compas_viewer.base import Base
 from compas_viewer.components import Button
 
+if TYPE_CHECKING:
+    from .mainwindow import MainWindow
 
-class ToolBar(Base):
-    def __init__(self) -> None:
-        self.widget = None
 
-    def lazy_init(self):
-        if not self.widget:
-            self.widget = self.viewer.ui.window.addToolBar("Tools")
+class ToolBar:
+    def __init__(self, parent: "MainWindow", items: list[dict], show: bool = True) -> None:
+        self.parent = parent
+        self.items = items
+        self.show = show
+
+        self.widget = self.parent.widget.addToolBar("Tools")
         self.widget.clear()
         self.widget.setMovable(False)
         self.widget.setObjectName("Tools")
-        self.widget.setHidden(not self.viewer.config.ui.toolbar.show)
+        self.widget.setHidden(not self.show)
 
-        items = self.viewer.config.ui.toolbar.items
-        if not items:
+        if not self.items:
             return
 
-        for item in items:
+        for item in self.items:
             text = item.get("title", None)
             tooltip = item.get("tooltip", None)
             itemtype = item.get("type", None)

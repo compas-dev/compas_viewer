@@ -1,15 +1,16 @@
-from compas_viewer.base import Base
+from typing import TYPE_CHECKING
+
 from compas_viewer.components.widget_tools import LabelWidget
 
+if TYPE_CHECKING:
+    from .mainwindow import MainWindow
 
-class SatusBar(Base):
-    def __init__(self) -> None:
-        self.label = None
-        self.widget = None
 
-    def lazy_init(self):
-        self.widget = self.viewer.ui.window.statusBar()
-        self.widget.setHidden(not self.viewer.config.ui.statusbar.show)
-        if not self.label:
-            self.label = LabelWidget()
-            self.widget.addWidget(self.label(text="Ready..."))
+class SatusBar:
+    def __init__(self, parent: "MainWindow", show: bool = True) -> None:
+        self.parent = parent
+        self.show = show
+        self.widget = self.parent.widget.statusBar()
+        self.widget.setHidden(not self.show)
+        self.label = LabelWidget()
+        self.widget.addWidget(self.label(text="Ready..."))

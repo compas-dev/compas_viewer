@@ -1,23 +1,25 @@
 from functools import partial
+from typing import TYPE_CHECKING
 from typing import Any
 from typing import Callable
 from typing import Optional
 
+from PySide6.QtWidgets import QMenu
 from PySide6.QtWidgets import QWidget
 
-from compas_viewer.base import Base
+if TYPE_CHECKING:
+    from .mainwindow import MainWindow
 
 
-class MenuBar(Base):
-    def __init__(self) -> None:
-        self.widget = None
-
-    def lazy_init(self):
-        self.widget = self.viewer.ui.window.menuBar()
+class MenuBar:
+    def __init__(self, parent: "MainWindow", items: list[dict]) -> None:
+        self.parent = parent
+        self.items = items
+        self.widget = self.parent.widget.menuBar()
         self.widget.clear()
-        self.add_menu(items=self.viewer.config.ui.menubar.items, parent=self.widget)
+        self.add_menu(items=self.items, parent=self.widget)
 
-    def add_menu(self, *, items, parent):
+    def add_menu(self, *, items, parent: QMenu):
         if not items:
             return
 
