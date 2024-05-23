@@ -16,8 +16,6 @@ from PySide6.QtWidgets import QGestureEvent
 
 from compas.geometry import Frame
 from compas.geometry import transform_points_numpy
-from compas_viewer.base import Base
-from compas_viewer.config import Config
 from compas_viewer.scene import TagObject
 from compas_viewer.scene.gridobject import GridObject
 from compas_viewer.scene.vectorobject import VectorObject
@@ -26,11 +24,12 @@ from .camera import Camera
 from .shaders import Shader
 
 if TYPE_CHECKING:
+    from compas_viewer import Viewer
     from compas_viewer.scene.gridobject import GridObject
     from compas_viewer.scene.meshobject import MeshObject
 
 
-class Renderer(QOpenGLWidget, Base):
+class Renderer(QOpenGLWidget):
     """
     Renderer class for 3D rendering of COMPAS geometry.
     We constantly use OpenGL version 2.1 and GLSL 120 with a Compatibility Profile at the moment.
@@ -50,25 +49,38 @@ class Renderer(QOpenGLWidget, Base):
     # Enhance pixel  width for selection.
     PIXEL_SELECTION_INCREMENTAL = 2
 
-    def __init__(self, config: Config):
+    def __init__(self, viewer: "Viewer"):
         super().__init__()
 
-        self.grid = None
-        self.config = config
-        self._viewmode = self.config.renderer.viewmode
-        self._rendermode = self.config.renderer.rendermode
-        self._opacity = self.config.renderer.ghostopacity if self.rendermode == "ghosted" else 1.0
+        self.viewer = viewer
+
+        self._viewmode = self.viewer.config.renderer.viewmode
+        self._rendermode = self.viewer.config.renderer.rendermode
+        self._opacity = self.viewer.config.renderer.ghostopacity if self.rendermode == "ghosted" else 1.0
 
         self._frames = 0
         self._now = time.time()
 
-        self.shader_model: Shader
-        self.shader_tag: Shader
-        self.shader_arrow: Shader
-        self.shader_instance: Shader
-        self.shader_grid: Shader
+        self.grid = None
 
-        self.camera = Camera()
+        self.shader_model: Shader = None
+        self.shader_tag: Shader = None
+        self.shader_arrow: Shader = None
+        self.shader_instance: Shader = None
+        self.shader_grid: Shader = None
+
+        self.camera = Camera(
+            self,
+            fov=self.viewer.config.camera.fov,
+            near=self.viewer.config.camera.near,
+            far=self.viewer.config.camera.far,
+            position=self.viewer.config.camera.position,
+            target=self.viewer.config.camera.target,
+            scale=self.viewer.config.camera.scale,
+            zoomdelta=self.viewer.config.camera.zoomdelta,
+            rotationdelta=self.viewer.config.camera.rotationdelta,
+            pandelta=self.viewer.config.camera.pandelta,
+        )
 
         self.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
         self.grabGesture(QtCore.Qt.GestureType.PinchGesture)
@@ -87,9 +99,9 @@ class Renderer(QOpenGLWidget, Base):
     @rendermode.setter
     def rendermode(self, rendermode):
         self._rendermode = rendermode
-        self.config.renderer.rendermode = rendermode
+        self.viewer.config.renderer.rendermode = rendermode
         if rendermode == "ghosted":
-            self._opacity = self.config.renderer.ghostopacity
+            self._opacity = self.viewer.config.renderer.ghostopacity
         else:
             self._opacity = 1.0
         if self.shader_model:
@@ -112,12 +124,8 @@ class Renderer(QOpenGLWidget, Base):
     @viewmode.setter
     def viewmode(self, viewmode):
         self._viewmode = viewmode
-        self.config.renderer.viewmode = viewmode
         self.shader_model.bind()
-        self.shader_model.uniform4x4(
-            "projection",
-            self.camera.projection(self.viewer.config.window.width, self.viewer.config.window.height),
-        )
+        self.shader_model.uniform4x4("projection", self.camera.projection(self.width(), self.height()))
         self.shader_model.release()
         self.camera.reset_position()
         self.update_projection()
@@ -163,7 +171,7 @@ class Renderer(QOpenGLWidget, Base):
         * https://doc.qt.io/qtforpython-6/PySide6/QtOpenGL/QOpenGLWindow.html#PySide6.QtOpenGL.PySide6.QtOpenGL.QOpenGLWindow.initializeGL
 
         """
-        GL.glClearColor(*self.config.renderer.backgroundcolor.rgba)
+        GL.glClearColor(*self.viewer.config.renderer.backgroundcolor.rgba)
         GL.glPolygonOffset(1.0, 1.0)
         GL.glEnable(GL.GL_POLYGON_OFFSET_FILL)
         GL.glEnable(GL.GL_CULL_FACE)
@@ -197,8 +205,6 @@ class Renderer(QOpenGLWidget, Base):
         * https://doc.qt.io/qtforpython-6/PySide6/QtOpenGL/QOpenGLWindow.html#PySide6.QtOpenGL.PySide6.QtOpenGL.QOpenGLWindow.resizeGL
 
         """
-        self.viewer.config.window.width = w
-        self.viewer.config.window.height = h
         GL.glViewport(0, 0, w, h)
         self.resize(w, h)
 
@@ -230,7 +236,6 @@ class Renderer(QOpenGLWidget, Base):
         self._frames += 1
         if time.time() - self._now > 1:
             self._now = time.time()
-            # self.viewer.layout.fps(self._frames)
             self._frames = 0
 
     # ==========================================================================
@@ -254,21 +259,11 @@ class Renderer(QOpenGLWidget, Base):
     def mouseMoveEvent(self, event: QMouseEvent):
         """
         Callback for the mouse move event which passes the event to the controller.
-        Inherited from :PySide6:`PySide6/QtOpenGLWidgets/QOpenGLWidget`.
-
 
         Parameters
         ----------
         event : :PySide6:`PySide6/QtGui/QMouseEvent`
             The Qt event.
-
-        See Also
-        --------
-        :func:`compas_viewer.controller.Controller.mouse_move_action`
-
-        References
-        ----------
-        * https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QWidget.html#PySide6.QtWidgets.PySide6.QtWidgets.QWidget.mouseMoveEvent
 
         """
         if self.isActiveWindow() and self.underMouse():
@@ -283,14 +278,6 @@ class Renderer(QOpenGLWidget, Base):
         event : :PySide6:`PySide6/QtGui/QMouseEvent`
             The Qt event.
 
-        See Also
-        --------
-        :func:`compas_viewer.controller.Controller.mouse_press_action`
-
-        References
-        ----------
-        * https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QWidget.html#PySide6.QtWidgets.PySide6.QtWidgets.QWidget.mousePressEvent
-
         """
         if self.isActiveWindow() and self.underMouse():
             self.viewer.eventmanager.delegate_mousepress(event)
@@ -303,14 +290,6 @@ class Renderer(QOpenGLWidget, Base):
         ----------
         event : :PySide6:`PySide6/QtGui/QMouseEvent`
             The Qt event.
-
-        See Also
-        --------
-        :func:`compas_viewer.controller.Controller.mouse_release_action`
-
-        References
-        ----------
-        * https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QWidget.html#PySide6.QtWidgets.PySide6.QtWidgets.QWidget.mouseReleaseEvent
 
         """
         if self.isActiveWindow() and self.underMouse():
@@ -401,12 +380,12 @@ class Renderer(QOpenGLWidget, Base):
         """Initialize the renderer."""
 
         # Init the grid
-        if self.config.renderer.show_grid:
+        if self.viewer.config.renderer.show_grid:
             self.grid = GridObject(
                 Frame.worldXY(),
-                framesize=self.config.renderer.gridsize,
-                show_framez=self.config.renderer.show_gridz,
-                show=self.config.renderer.show_grid,
+                framesize=self.viewer.config.renderer.gridsize,
+                show_framez=self.viewer.config.renderer.show_gridz,
+                show=self.viewer.config.renderer.show_grid,
             )
             self.grid.init()
 
@@ -426,7 +405,7 @@ class Renderer(QOpenGLWidget, Base):
         self.shader_model.uniform4x4("transform", transform)
         self.shader_model.uniform1i("is_selected", 0)
         self.shader_model.uniform1f("opacity", self.opacity)
-        self.shader_model.uniform3f("selection_color", self.config.selector.selectioncolor.rgb)
+        self.shader_model.uniform3f("selection_color", self.viewer.config.selector.selectioncolor.rgb)
         self.shader_model.release()
 
         self.shader_tag = Shader(name="tag")
@@ -443,7 +422,7 @@ class Renderer(QOpenGLWidget, Base):
         self.shader_arrow.uniform4x4("viewworld", viewworld)
         self.shader_arrow.uniform4x4("transform", transform)
         self.shader_arrow.uniform1f("opacity", self.opacity)
-        self.shader_arrow.uniform1f("aspect", self.viewer.config.window.width / self.viewer.config.window.height)
+        self.shader_arrow.uniform1f("aspect", self.width() / self.height())
         self.shader_arrow.release()
 
         self.shader_instance = Shader(name="instance")
@@ -471,8 +450,8 @@ class Renderer(QOpenGLWidget, Base):
         h : int, optional
             The height of the renderer, by default None.
         """
-        w = w or self.viewer.config.window.width
-        h = h or self.viewer.config.window.height
+        w = w or self.width()
+        h = h or self.height()
 
         projection = self.camera.projection(w, h)
         self.shader_model.bind()
@@ -628,8 +607,8 @@ class Renderer(QOpenGLWidget, Base):
                     self.viewer.mouse.last_pos.x(),
                     self.viewer.mouse.last_pos.y(),
                 ),
-                self.viewer.config.window.width,
-                self.viewer.config.window.height,
+                self.width(),
+                self.height(),
             )
 
     def paint_instance(self):
@@ -699,7 +678,7 @@ class Renderer(QOpenGLWidget, Base):
 
         # Get the rectangle area.
         x1, y1, x2, y2 = box
-        x, y = min(x1, x2), self.viewer.config.window.height - max(y1, y2)
+        x, y = min(x1, x2), self.height() - max(y1, y2)
         width = max(self.PIXEL_SELECTION_INCREMENTAL, abs(x1 - x2))
         height = max(self.PIXEL_SELECTION_INCREMENTAL, abs(y1 - y2))
         r = self.viewer.renderer.devicePixelRatio()
