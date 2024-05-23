@@ -66,7 +66,7 @@ class Renderer(QOpenGLWidget, Base):
         self.selector = Selector()
 
         self.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
-        self.grabGesture(QtCore.Qt.PinchGesture)
+        # self.grabGesture(QtCore.Qt.PinchGesture)
 
     @property
     def rendermode(self):
@@ -232,19 +232,19 @@ class Renderer(QOpenGLWidget, Base):
     # Event
     # ==========================================================================
 
-    def event(self, event):
-        """
-        Event handler for the renderer. Customised to capture multi-touch gestures.
+    # def event(self, event: QtCore.QEvent):
+    #     """
+    #     Event handler for the renderer. Customised to capture multi-touch gestures.
 
-        Parameters
-        ----------
-        event : :PySide6:`PySide6/QtCore/QEvent`
-            The Qt event.
+    #     Parameters
+    #     ----------
+    #     event : :PySide6:`PySide6/QtCore/QEvent`
+    #         The Qt event.
 
-        """
-        if event.type() == QtCore.QEvent.Gesture:
-            return self.gestureEvent(event)
-        return super().event(event)
+    #     """
+    #     if event.type() == QtCore.QEvent.Type.Gesture:
+    #         return self.gestureEvent(event)
+    #     return super().event(event)
 
     def mouseMoveEvent(self, event: QMouseEvent):
         """
@@ -267,8 +267,7 @@ class Renderer(QOpenGLWidget, Base):
 
         """
         if self.isActiveWindow() and self.underMouse():
-            self.viewer.controller.mouse_move_action(event)
-            self.update()
+            self.viewer.eventmanager.delegate_mousemove(event)
 
     def mousePressEvent(self, event: QMouseEvent):
         """
@@ -289,8 +288,7 @@ class Renderer(QOpenGLWidget, Base):
 
         """
         if self.isActiveWindow() and self.underMouse():
-            self.viewer.controller.mouse_press_action(event)
-            self.update()
+            self.viewer.eventmanager.delegate_mousepress(event)
 
     def mouseReleaseEvent(self, event: QMouseEvent):
         """
@@ -311,49 +309,48 @@ class Renderer(QOpenGLWidget, Base):
 
         """
         if self.isActiveWindow() and self.underMouse():
-            self.viewer.controller.mouse_release_action(event)
-            self.update()
+            self.viewer.eventmanager.delegate_mouserelease(event)
 
-    def gestureEvent(self, event):
-        """
-        Callback for the gesture event which passes the event to the controller.
+    # def gestureEvent(self, event):
+    #     """
+    #     Callback for the gesture event which passes the event to the controller.
 
-        Parameters
-        ----------
-        event : :PySide6:`PySide6/QtCore/QEvent`
-            The Qt event.
+    #     Parameters
+    #     ----------
+    #     event : :PySide6:`PySide6/QtCore/QEvent`
+    #         The Qt event.
 
-        """
-        # Handle pinch gestures
-        pinch = event.gesture(QtCore.Qt.PinchGesture)
-        if pinch:
-            self.viewer.controller.pinch_action(pinch)
-            self.update()
-            return True
-        else:
-            return False
+    #     """
+    #     # Handle pinch gestures
+    #     pinch = event.gesture(QtCore.Qt.PinchGesture)
+    #     if pinch:
+    #         self.viewer.controller.pinch_action(pinch)
+    #         self.update()
+    #         return True
+    #     else:
+    #         return False
 
-    def wheelEvent(self, event: QWheelEvent):
-        """
-        Callback for the mouse wheel event which passes the event to the controller.
+    # def wheelEvent(self, event: QWheelEvent):
+    #     """
+    #     Callback for the mouse wheel event which passes the event to the controller.
 
-        Parameters
-        ----------
-        event : :PySide6:`PySide6/QtGui/QWheelEvent`
-            The Qt event.
+    #     Parameters
+    #     ----------
+    #     event : :PySide6:`PySide6/QtGui/QWheelEvent`
+    #         The Qt event.
 
-        See Also
-        --------
-        :func:`compas_viewer.controller.Controller.wheel_action`
+    #     See Also
+    #     --------
+    #     :func:`compas_viewer.controller.Controller.wheel_action`
 
-        References
-        ----------
-        * https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QWidget.html#PySide6.QtWidgets.PySide6.QtWidgets.QWidget.wheelEvent
+    #     References
+    #     ----------
+    #     * https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QWidget.html#PySide6.QtWidgets.PySide6.QtWidgets.QWidget.wheelEvent
 
-        """
-        if self.isActiveWindow() and self.underMouse():
-            self.viewer.controller.wheel_action(event)
-            self.update()
+    #     """
+    #     if self.isActiveWindow() and self.underMouse():
+    #         self.viewer.controller.wheel_action(event)
+    #         self.update()
 
     def keyPressEvent(self, event: QKeyEvent):
         """
@@ -629,8 +626,8 @@ class Renderer(QOpenGLWidget, Base):
                 (
                     self.selector.drag_start_pt.x(),
                     self.selector.drag_start_pt.y(),
-                    self.viewer.controller.mouse.last_pos.x(),
-                    self.viewer.controller.mouse.last_pos.y(),
+                    self.viewer.mouse.last_pos.x(),
+                    self.viewer.mouse.last_pos.y(),
                 ),
                 self.viewer.config.window.width,
                 self.viewer.config.window.height,

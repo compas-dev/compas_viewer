@@ -1,19 +1,28 @@
+from functools import partial
 from typing import TYPE_CHECKING
 
 from PySide6.QtCore import QObject
 from PySide6.QtCore import Qt
 from PySide6.QtCore import Signal
 from PySide6.QtGui import QKeyEvent
-
-# from PySide6.QtGui import QMouseEvent
+from PySide6.QtGui import QMouseEvent
+from PySide6.QtWidgets import QApplication
 
 if TYPE_CHECKING:
     from compas_viewer import Viewer
 
 
-modifier_code = {
+mousebutton_constant = {
+    "LEFT": Qt.MouseButton.LeftButton,
+    "RIGHT": Qt.MouseButton.RightButton,
+    "MIDDLE": Qt.MouseButton.MiddleButton,
+}
+
+
+modifier_constant = {
     "CTRL": Qt.KeyboardModifier.ControlModifier,
     "SHIFT": Qt.KeyboardModifier.ShiftModifier,
+    "ALT": Qt.KeyboardModifier.AltModifier,
 }
 
 
@@ -26,7 +35,7 @@ class KeyboardShortcut(QObject):
         self._key = None
         self._keycode = None
         self._modifier = None
-        self._modifiercode = None
+        self._modifierconstant = None
         self.title = title
         self.key = key
         self.modifier = modifier
@@ -51,11 +60,11 @@ class KeyboardShortcut(QObject):
     @modifier.setter
     def modifier(self, name: str | None) -> None:
         self._modifier = name
-        self._modifiercode = None
+        self._modifierconstant = None
         if not name:
-            self._modifiercode = Qt.KeyboardModifier.NoModifier
+            self._modifierconstant = Qt.KeyboardModifier.NoModifier
         else:
-            self._modifiercode = modifier_code[name]
+            self._modifierconstant = modifier_constant[name]
 
     def __str__(self):
         if self.modifier:
@@ -63,15 +72,62 @@ class KeyboardShortcut(QObject):
         return f"{self.title}: {self.key}"
 
     def __eq__(self, event: QKeyEvent) -> bool:
-        return event.key() == self._keycode and event.modifiers() == self._modifiercode
+        return event.key() == self._keycode and event.modifiers() == self._modifierconstant
+
+
+class MouseEvent(QObject):
+    triggered = Signal(QMouseEvent)
+
+    def __init__(self, title, button, modifier, context=None):
+        super().__init__()
+        self._button = None
+        self._buttonconstant = None
+        self._modifier = None
+        self._modifierconstant = None
+        self.title = title
+        self.button = button
+        self.modifier = modifier
+        self.context = context
+
+    @property
+    def button(self) -> str:
+        return self._button
+
+    @button.setter
+    def button(self, name: str) -> None:
+        self._button = name
+        self._buttonconstant = mousebutton_constant[name]
+
+    @property
+    def modifier(self) -> str:
+        return self._modifier
+
+    @modifier.setter
+    def modifier(self, name: str | None) -> None:
+        self._modifier = name
+        self._modifierconstant = None
+        if not name:
+            self._modifierconstant = Qt.KeyboardModifier.NoModifier
+        else:
+            self._modifierconstant = modifier_constant[name]
+
+    def __str__(self):
+        if self.modifier:
+            return f"{self.title}: {self.button} + {self.modifier}"
+        return f"{self.title}: {self.button}"
+
+    def __eq__(self, event: QMouseEvent) -> bool:
+        return event.buttons() == self._buttonconstant and event.modifiers() == self._modifierconstant
 
 
 class EventManager:
 
     def __init__(self, viewer: "Viewer") -> None:
         self.viewer = viewer
-        self.keyboard_shortcuts: list[KeyboardShortcut] = []
+        self.shortcuts: list[KeyboardShortcut] = []
+        self.mouseevents: list[MouseEvent] = []
         self.register_keyboard_shortcuts()
+        self.register_mouseevents()
 
     def register_keyboard_shortcuts(self):
         for item in self.viewer.config.keyboard_shortcuts.items:
@@ -81,21 +137,46 @@ class EventManager:
             slot = item["action"]
             shortcut = KeyboardShortcut(title=title, key=key, modifier=modifier)
             shortcut.pressed.connect(slot)
-            self.keyboard_shortcuts.append(shortcut)
+            self.shortcuts.append(shortcut)
 
     def delegate_keypress(self, event: QKeyEvent):
-        for shortcut in self.keyboard_shortcuts:
+        for shortcut in self.shortcuts:
             if shortcut == event:
                 shortcut.pressed.emit()
+                break
 
     def delegate_keyrelease(self, event: QKeyEvent):
         print("NotImplementedError")
 
-    # def delegate_mousemove(self, event: QMouseEvent):
-    #     pass
+    def register_mouseevents(self):
+        for item in self.viewer.config.mouse_events.items:
+            title = item["title"]
+            button = item["button"]
+            modifier = item["modifier"]
+            slot = item["action"]
+            mouseevent = MouseEvent(title=title, button=button, modifier=modifier)
+            mouseevent.triggered.connect(partial(slot, self.viewer))
+            self.mouseevents.append(mouseevent)
 
-    # def delegate_mousepress(self, event: QMouseEvent):
-    #     pass
+    def delegate_mousemove(self, event: QMouseEvent):
+        self.viewer.mouse.pos = event.pos()
+        for mouseevent in self.mouseevents:
+            if mouseevent == event:
+                mouseevent.triggered.emit(event)
+                break
+        self.viewer.mouse.last_pos = event.pos()
 
-    # def delegate_mouserelease(self, event: QMouseEvent):
-    #     pass
+    def delegate_mousepress(self, event: QMouseEvent):
+        self.viewer.mouse.last_pos = event.pos()
+        for mouseevent in self.mouseevents:
+            if mouseevent == event:
+                mouseevent.triggered.emit(event)
+                break
+
+    def delegate_mouserelease(self, event: QMouseEvent):
+        for mouseevent in self.mouseevents:
+            if mouseevent == event:
+                mouseevent.triggered.emit(event)
+                break
+        self.viewer.mouse.last_pos = event.pos()
+        QApplication.restoreOverrideCursor()

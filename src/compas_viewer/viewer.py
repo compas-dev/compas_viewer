@@ -10,8 +10,8 @@ from PySide6.QtWidgets import QApplication
 from compas.scene import Scene
 from compas_viewer import HERE
 from compas_viewer.config import Config
-from compas_viewer.controller import Controller
 from compas_viewer.events import EventManager
+from compas_viewer.mouse import Mouse
 from compas_viewer.renderer import Renderer
 from compas_viewer.scene import ViewerScene
 from compas_viewer.singleton import Singleton
@@ -36,8 +36,8 @@ class Viewer(Singleton):
         # renderer needs to go to view3d
         # controller needs to be refactored to eventmanager
         self.renderer = Renderer(self.config)
-        self.controller = Controller(self.config)
         self.eventmanager = EventManager(self)
+        self.mouse = Mouse()
 
         self.ui = UI()
         self._scene = None

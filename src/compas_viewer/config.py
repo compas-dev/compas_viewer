@@ -7,10 +7,12 @@ from functools import partial
 from typing import Literal
 
 from compas.colors import Color
-from compas_viewer._actions import change_viewmode
-from compas_viewer._actions import open_camera_settings_dialog
-from compas_viewer._actions import select_all
-from compas_viewer._actions import zoom_selected
+from compas_viewer.actions import change_viewmode
+from compas_viewer.actions import open_camera_settings_dialog
+from compas_viewer.actions import pan_view
+from compas_viewer.actions import rotate_view
+from compas_viewer.actions import select_all
+from compas_viewer.actions import zoom_selected
 
 
 class Base:
@@ -194,50 +196,21 @@ class SelectorConfig(Base):
 
 
 @dataclass
-class MouseEvent:
-    mouse: str
-    modifier: str = "no"
-
-
-@dataclass
-class MouseEventConfig(Base):
-    pan: MouseEvent = field(default_factory=lambda: MouseEvent(mouse="right", modifier="shift"))
-    rotate: MouseEvent = field(default_factory=lambda: MouseEvent(mouse="right"))
-    drag_selection: MouseEvent = field(default_factory=lambda: MouseEvent(mouse="left"))
-    drag_deselection: MouseEvent = field(default_factory=lambda: MouseEvent(mouse="left", modifier="control"))
-    multiselect: MouseEvent = field(default_factory=lambda: MouseEvent(mouse="left", modifier="shift"))
-    deselect: MouseEvent = field(default_factory=lambda: MouseEvent(mouse="left", modifier="control"))
-
-
-@dataclass
-class KeyEvent:
-    key: str
-    modifier: str = "no"
-
-
-# these are "keyboard shortcuts"
-# in VS Code, these are registered as:
-# Command | Binding | When (Context)
-# Zoom Selected | F | View3D
-# Select All | A + CTRL | View3D | event_handler
-# would add to this an event handler
-@dataclass
-class KeyEventConfig(Base):
-    zoom_selected: KeyEvent = field(default_factory=lambda: KeyEvent(key="f"))
-    select_all: KeyEvent = field(default_factory=lambda: KeyEvent(key="a", modifier="control"))
-    view_top: KeyEvent = field(default_factory=lambda: KeyEvent(key="f3"))
-    view_perspective: KeyEvent = field(default_factory=lambda: KeyEvent(key="f4"))
-    view_front: KeyEvent = field(default_factory=lambda: KeyEvent(key="f5"))
-    view_right: KeyEvent = field(default_factory=lambda: KeyEvent(key="f6"))
-    delete_selected: KeyEvent = field(default_factory=lambda: KeyEvent(key="delete"))
-
-
-@dataclass
 class KeyboardShortcuts:
     items: list[dict] = field(
         default_factory=lambda: [
             {"title": "Zoom Selected", "key": "F", "modifier": None, "action": zoom_selected},
             {"title": "Select All", "key": "A", "modifier": "CTRL", "action": select_all},
+        ]
+    )
+
+
+@dataclass
+class MouseEvents:
+    items: list[dict] = field(
+        default_factory=lambda: [
+            {"title": "Pan View", "button": "RIGHT", "modifier": "SHIFT", "action": pan_view},
+            {"title": "Rotate View", "button": "RIGHT", "modifier": None, "action": rotate_view},
         ]
     )
 
@@ -249,9 +222,8 @@ class Config(Base):
     renderer: RendererConfig = field(default_factory=RendererConfig)
     camera: CameraConfig = field(default_factory=CameraConfig)
     selector: SelectorConfig = field(default_factory=SelectorConfig)
-    mouse_event: MouseEventConfig = field(default_factory=MouseEventConfig)
-    key_event: KeyEventConfig = field(default_factory=KeyEventConfig)
     keyboard_shortcuts: KeyboardShortcuts = field(default_factory=KeyboardShortcuts)
+    mouse_events: MouseEvents = field(default_factory=MouseEvents)
 
 
 if __name__ == "__main__":

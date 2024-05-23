@@ -1,7 +1,16 @@
+from typing import TYPE_CHECKING
+
 from numpy import array
 from numpy.linalg import norm
+from PySide6.QtCore import QEvent
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QMouseEvent
+from PySide6.QtWidgets import QApplication
 
 from compas_viewer.components import CameraSettingsDialog
+
+if TYPE_CHECKING:
+    from compas_viewer import Viewer
 
 
 def delete_selected():
@@ -59,6 +68,7 @@ def zoom_selected():
     viewer.renderer.camera.target = center
     vec = (viewer.renderer.camera.target - viewer.renderer.camera.position) / norm(viewer.renderer.camera.target - viewer.renderer.camera.position)
     viewer.renderer.camera.position = viewer.renderer.camera.target - vec * distance
+
     viewer.renderer.update()
 
 
@@ -70,4 +80,33 @@ def select_all():
     for obj in viewer.scene.objects:
         if obj.show and not obj.is_locked:
             obj.is_selected = True
+
+    viewer.renderer.update()
+
+
+def pan_view(viewer: "Viewer", event: QMouseEvent):
+    etype = event.type()
+
+    if etype == QEvent.Type.MouseButtonPress:
+        QApplication.setOverrideCursor(Qt.CursorShape.OpenHandCursor)
+
+    elif etype == QEvent.Type.MouseMove:
+        dx = viewer.mouse.dx()
+        dy = viewer.mouse.dy()
+        viewer.renderer.camera.pan(dx, dy)
+
+    viewer.renderer.update()
+
+
+def rotate_view(viewer: "Viewer", event: QMouseEvent):
+    etype = event.type()
+
+    if etype == QEvent.Type.MouseButtonPress:
+        QApplication.setOverrideCursor(Qt.CursorShape.SizeAllCursor)
+
+    elif etype == QEvent.Type.MouseMove:
+        dx = viewer.mouse.dx()
+        dy = viewer.mouse.dy()
+        viewer.renderer.camera.rotate(dx, dy)
+
     viewer.renderer.update()
