@@ -20,6 +20,10 @@ from compas_viewer.actions import save_scene_cmd
 from compas_viewer.actions import select_all_cmd
 from compas_viewer.actions import select_object
 from compas_viewer.actions import select_window
+from compas_viewer.actions import toggle_sidebar_cmd
+from compas_viewer.actions import toggle_sidedock_cmd
+from compas_viewer.actions import toggle_statusbar_cmd
+from compas_viewer.actions import toggle_toolbar_cmd
 from compas_viewer.actions import zoom_selected
 from compas_viewer.actions import zoom_view
 
@@ -107,23 +111,51 @@ class MenubarConfig(ConfigBase):
             {
                 "title": "View",
                 "items": [
-                    {"title": "Shaded", "action": change_rendermode_cmd, "kwargs": {"mode": "shaded"}},
-                    {"title": "Ghosted", "action": change_rendermode_cmd, "kwargs": {"mode": "ghosted"}},
-                    {"title": "Lighted", "action": change_rendermode_cmd, "kwargs": {"mode": "lighted"}},
-                    {"title": "Wireframe", "action": change_rendermode_cmd, "kwargs": {"mode": "wireframe"}},
+                    {"title": toggle_toolbar_cmd.title, "type": "checkbox", "checked": lambda viewer: viewer.config.ui.toolbar.show, "action": toggle_toolbar_cmd},
+                    {"title": toggle_sidebar_cmd.title, "type": "checkbox", "checked": lambda viewer: viewer.config.ui.sidebar.show, "action": toggle_sidebar_cmd},
+                    {"title": toggle_sidedock_cmd.title, "type": "checkbox", "checked": lambda viewer: viewer.config.ui.sidedock.show, "action": toggle_sidedock_cmd},
+                    {"title": toggle_statusbar_cmd.title, "type": "checkbox", "checked": lambda viewer: viewer.config.ui.statusbar.show, "action": toggle_statusbar_cmd},
                     {"type": "separator"},
-                    {"title": "Perspective", "action": change_view_cmd, "kwargs": {"mode": "perspective"}},
-                    {"title": "Top", "action": change_view_cmd, "kwargs": {"mode": "top"}},
-                    {"title": "Front", "action": change_view_cmd, "kwargs": {"mode": "front"}},
-                    {"title": "Right", "action": change_view_cmd, "kwargs": {"mode": "right"}},
+                    {
+                        "title": "Set Render Mode",
+                        "type": "group",
+                        "exclusive": True,
+                        "selected": 0,
+                        "items": [
+                            {"title": "Shaded", "action": change_rendermode_cmd, "kwargs": {"mode": "shaded"}},
+                            {"title": "Ghosted", "action": change_rendermode_cmd, "kwargs": {"mode": "ghosted"}},
+                            {"title": "Lighted", "action": change_rendermode_cmd, "kwargs": {"mode": "lighted"}},
+                            {"title": "Wireframe", "action": change_rendermode_cmd, "kwargs": {"mode": "wireframe"}},
+                        ],
+                    },
+                    {
+                        "title": "Set Current View",
+                        "type": "group",
+                        "exclusive": True,
+                        "checked": 0,
+                        "items": [
+                            {"title": "Perspective", "action": change_view_cmd, "kwargs": {"mode": "perspective"}},
+                            {"title": "Top", "action": change_view_cmd, "kwargs": {"mode": "top"}},
+                            {"title": "Front", "action": change_view_cmd, "kwargs": {"mode": "front"}},
+                            {"title": "Right", "action": change_view_cmd, "kwargs": {"mode": "right"}},
+                        ],
+                    },
                     {"type": "separator"},
                     {"title": camera_settings_cmd.title, "action": camera_settings_cmd},
+                    {"title": "Display Settings", "items": []},
                     {"type": "separator"},
                 ],
             },
             {
-                "title": "Display",
+                "title": "Edit",
                 "items": [],
+            },
+            {
+                "title": "Select",
+                "items": [
+                    {"title": select_all_cmd.title, "action": select_all_cmd},
+                    {"title": deselect_all_cmd.title, "action": deselect_all_cmd},
+                ],
             },
             {
                 "title": "Scene",
@@ -155,21 +187,8 @@ class MenubarConfig(ConfigBase):
                 ],
             },
             {
-                "title": "Selection",
-                "items": [
-                    {"title": select_all_cmd.title, "action": select_all_cmd},
-                    {"title": deselect_all_cmd.title, "action": deselect_all_cmd},
-                ],
-            },
-            {
-                "title": "Server",
-                "items": [
-                    {"title": "Start Server", "action": lambda: print("Start Server")},
-                    {"title": "Stop Server", "action": lambda: print("Stop Server")},
-                    {"type": "separator"},
-                    {"title": "Restart Server", "action": lambda: print("Restart Server")},
-                    {"title": "Ping Server", "action": lambda: print("Ping Server")},
-                ],
+                "title": "Server/Session",
+                "items": [],
             },
             {
                 "title": "Help",
@@ -212,6 +231,21 @@ class StatusbarConfig(ConfigBase):
 
 @dataclass
 class SidebarConfig(ConfigBase):
+    show: bool = True
+    items: list[dict[str, str]] = None
+
+
+# =============================================================================
+# =============================================================================
+# =============================================================================
+# SideDock
+# =============================================================================
+# =============================================================================
+# =============================================================================
+
+
+@dataclass
+class SidedockConfig(ConfigBase):
     show: bool = True
     items: list[dict[str, str]] = None
 
@@ -285,6 +319,7 @@ class UIConfig(ConfigBase):
     toolbar: ToolbarConfig = field(default_factory=ToolbarConfig)
     statusbar: StatusbarConfig = field(default_factory=StatusbarConfig)
     sidebar: SidebarConfig = field(default_factory=SidebarConfig)
+    sidedock: SidedockConfig = field(default_factory=SidedockConfig)
     view3d: View3dConfig = field(default_factory=View3dConfig)
     display: DisplayConfig = field(default_factory=DisplayConfig)
 

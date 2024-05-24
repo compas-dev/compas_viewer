@@ -67,11 +67,32 @@ class Command:
 # =============================================================================
 
 
-def camera_settings(viewer: "Viewer"):
-    CameraSettingsDialog().exec()
+def toggle_toolbar(viewer: "Viewer"):
+    viewer.ui.toolbar.widget.setVisible(not viewer.ui.toolbar.widget.isVisible())
 
 
-camera_settings_cmd = Command(title="Camera Settings", callback=camera_settings)
+toggle_toolbar_cmd = Command(title="Toolbar", callback=toggle_toolbar)
+
+
+def toggle_sidebar(viewer: "Viewer"):
+    viewer.ui.sidebar.widget.setVisible(not viewer.ui.sidebar.widget.isVisible())
+
+
+toggle_sidebar_cmd = Command(title="Sidebar", callback=toggle_sidebar)
+
+
+def toggle_sidedock(viewer: "Viewer"):
+    viewer.ui.sidedock.widget.setVisible(not viewer.ui.sidedock.widget.isVisible())
+
+
+toggle_sidedock_cmd = Command(title="Side Dock", callback=toggle_sidedock)
+
+
+def toggle_statusbar(viewer: "Viewer"):
+    viewer.ui.statusbar.widget.setVisible(not viewer.ui.statusbar.widget.isVisible())
+
+
+toggle_statusbar_cmd = Command(title="Statusbar", callback=toggle_statusbar)
 
 
 def change_rendermode(viewer: "Viewer", mode: Literal["Shaded", "Ghosted", "Lighted", "Wireframe"]):
@@ -79,7 +100,7 @@ def change_rendermode(viewer: "Viewer", mode: Literal["Shaded", "Ghosted", "Ligh
     viewer.renderer.update()
 
 
-change_rendermode_cmd = Command(title="Change View3D Render Mode", callback=change_rendermode)
+change_rendermode_cmd = Command(title="Set View3D Render Mode", callback=change_rendermode)
 
 
 def change_view(viewer: "Viewer", mode: Literal["Perspective", "Top", "Front", "Right"]):
@@ -87,7 +108,19 @@ def change_view(viewer: "Viewer", mode: Literal["Perspective", "Top", "Front", "
     viewer.renderer.update()
 
 
-change_view_cmd = Command(title="Change View3D View", callback=change_view)
+change_view_cmd = Command(title="Set View3D View", callback=change_view)
+
+
+def camera_settings(viewer: "Viewer"):
+    CameraSettingsDialog().exec()
+
+
+camera_settings_cmd = Command(title="Camera Settings", callback=camera_settings)
+
+
+# -----------------------------------------------------------------------------
+# Events (Temp)
+# -----------------------------------------------------------------------------
 
 
 def pan_view(viewer: "Viewer", event: QMouseEvent):
@@ -195,6 +228,11 @@ def deselect_all(viewer: "Viewer"):
 
 
 deselect_all_cmd = Command(title="DeSelect All", callback=deselect_all)
+
+
+# -----------------------------------------------------------------------------
+# Events (Temp)
+# -----------------------------------------------------------------------------
 
 
 def select_object(viewer: "Viewer", event: QMouseEvent):
@@ -350,6 +388,7 @@ def load_scene(viewer: "Viewer"):
         print("No scene found in this file.")
 
     clear_scene(viewer)
+
     viewer.scene = scene
     viewer.renderer.update()
 
@@ -379,3 +418,6 @@ save_scene_cmd = Command(title="Save Scene", callback=save_scene)
 
 def load_data():
     pass
+
+
+load_data_cmd = Command(title="Load Data", callback=lambda: print("load data"))
