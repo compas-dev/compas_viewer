@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added `compas_viewer.components.combo_box` component.
 * Added `ViewComboBox` component handle viewmode change.
 * Added `compas_viewer.objects.BufferGeometry` and `compas_viewer.objects.BufferObject`.
+* Added `clear_scene` action.
 
 ### Changed
 
@@ -23,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fixed `CameraSettingsDialog` update current position bug.
 * update `slider` component.
 * Implemented downsampling for window selection to improve performance.
+* Made `TreeForm` interactive.
 
 ### Removed
 

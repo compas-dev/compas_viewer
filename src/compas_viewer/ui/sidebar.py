@@ -8,3 +8,8 @@ class SideBarRight:
         self.widget = QtWidgets.QSplitter(QtCore.Qt.Orientation.Vertical)
         self.widget.setChildrenCollapsible(True)
         self.widget.setHidden(not self.show)
+
+    def update(self):
+        self.widget.update()
+        for widget in self.widget.children():
+            widget.update()

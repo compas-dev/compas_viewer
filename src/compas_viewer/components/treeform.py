@@ -88,6 +88,8 @@ class Treeform(QTreeWidget):
         self.tree = tree
         self._tree = tree
 
+        self.itemClicked.connect(self.on_item_clickded)
+
     @property
     def tree(self) -> Tree:
         return self._tree
@@ -109,9 +111,21 @@ class Treeform(QTreeWidget):
                     strings,  # type: ignore
                 )
 
+            node.attributes["widget_item"].node = node
+            node.attributes["widget_item"].setSelected(node.is_selected)
+
             if self._backgrounds:
                 for col, background in self._backgrounds.items():
                     node.attributes["widget_item"].setBackground(list(self.columns.keys()).index(col), QColor(*background(node).rgb255))
 
     def update(self):
         self.tree = self._tree
+
+    def on_item_clickded(self):
+        selected_nodes = [item.node for item in self.selectedItems()]
+        for node in self.tree.nodes:
+            node.is_selected = node in selected_nodes
+
+        from compas_viewer import Viewer
+
+        Viewer().renderer.update()

@@ -127,7 +127,6 @@ class Camera:
         rotationdelta: float = 0.01,
         pandelta: float = 0.05,
     ) -> None:
-
         self.renderer = renderer
 
         self.fov = fov
