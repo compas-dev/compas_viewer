@@ -4,8 +4,6 @@ from typing import Any
 from typing import Callable
 from typing import Optional
 
-from PySide6.QtWidgets import QComboBox
-
 from compas_viewer.components import Button
 
 if TYPE_CHECKING:

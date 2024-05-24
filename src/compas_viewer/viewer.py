@@ -37,6 +37,8 @@ class Viewer(Singleton):
         self.renderer = Renderer(self)
         self.ui = UI(self)
 
+        self.running = False
+
     @property
     def scene(self) -> ViewerScene:
         if self._scene is None:
@@ -46,8 +48,13 @@ class Viewer(Singleton):
     @scene.setter
     def scene(self, scene: Scene):
         self._scene = ViewerScene.__from_data__(scene.__data__)
+        if self.running:
+            for obj in self._scene.objects:
+                obj.init()
+            self.ui.sidebar.update()
 
     def show(self):
+        self.running = True
         self.ui.init()
         self.app.exec()
 
