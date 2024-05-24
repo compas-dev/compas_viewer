@@ -20,22 +20,28 @@ class UI:
         self.window = MainWindow(title=self.viewer.config.window.title)
 
         self.menubar = MenuBar(
-            parent=self.window,
+            parent=self,
             items=self.viewer.config.ui.menubar.items,
         )
         self.statusbar = SatusBar(
-            parent=self.window,
+            parent=self,
             show=self.viewer.config.ui.statusbar.show,
         )
         self.toolbar = ToolBar(
-            parent=self.window,
+            parent=self,
             items=self.viewer.config.ui.toolbar.items,
             show=self.viewer.config.ui.toolbar.show,
         )
-
-        self.sidebar = SideBarRight(show=self.viewer.config.ui.sidebar.show)
-        self.viewport = ViewPort(self.viewer.renderer, self.sidebar)
-        self.sidedock = SideDock()
+        self.sidebar = SideBarRight(
+            show=self.viewer.config.ui.sidebar.show,
+        )
+        self.viewport = ViewPort(
+            self.viewer.renderer,
+            self.sidebar,
+        )
+        self.sidedock = SideDock(
+            show=self.viewer.config.ui.sidedock.show,
+        )
 
         self.window.widget.setCentralWidget(self.viewport.widget)
         self.window.widget.addDockWidget(SideDock.locations["left"], self.sidedock.widget)

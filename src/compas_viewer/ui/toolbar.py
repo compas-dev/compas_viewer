@@ -7,20 +7,19 @@ from typing import Optional
 from compas_viewer.components import Button
 
 if TYPE_CHECKING:
-    from .mainwindow import MainWindow
+    from .ui import UI
 
 
 class ToolBar:
-    def __init__(self, parent: "MainWindow", items: list[dict], show: bool = True) -> None:
+    def __init__(self, parent: "UI", items: list[dict], show: bool = True) -> None:
         self.parent = parent
         self.items = items
-        self.show = show
 
-        self.widget = self.parent.widget.addToolBar("Tools")
+        self.widget = self.parent.window.widget.addToolBar("Tools")
         self.widget.clear()
         self.widget.setMovable(False)
         self.widget.setObjectName("Tools")
-        self.widget.setHidden(not self.show)
+        self.widget.setVisible(show)
 
         if not self.items:
             return
@@ -65,3 +64,11 @@ class ToolBar:
     #         combobox.addItem(item["title"], item.get("value", item["title"]))
     #     combobox.currentIndexChanged.connect(lambda index: action(combobox.itemData(index)))
     #     self.widget.addWidget(combobox)
+
+    @property
+    def show(self):
+        return self.widget.isVisible()
+
+    @show.setter
+    def show(self, value: bool):
+        self.widget.setVisible(value)
