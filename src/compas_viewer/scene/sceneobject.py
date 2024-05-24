@@ -134,6 +134,8 @@ class ViewerSceneObject(SceneObject, Base):
         self._frontfaces_buffer: [dict[str, Any]] = None  # type: ignore
         self._backfaces_buffer: [dict[str, Any]] = None  # type: ignore
 
+        self._inited = False
+
     @property
     def is_locked(self):
         return self._is_locked

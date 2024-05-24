@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * update `slider` component.
 * Implemented downsampling for window selection to improve performance.
 * Made `TreeForm` interactive.
+* Fixed `load_scene` action bug.
 
 ### Removed
 
