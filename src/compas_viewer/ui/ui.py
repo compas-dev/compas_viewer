@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 
-from compas_viewer.components import Treeform
+from compas_viewer.components import Sceneform
 
 from .mainwindow import MainWindow
 from .menubar import MenuBar
@@ -50,7 +50,8 @@ class UI:
         # this is a bit of a hack
         # it should not matter when the scene is populated
         # it should also be possible for the user the change the default config of the sidebar
-        self.sidebar.widget.addWidget(Treeform(self.viewer.scene, {"Name": (lambda o: o.name), "Object": (lambda o: o)}))
+        if self.viewer.config.ui.sidebar.sceneform:
+            self.sidebar.widget.addWidget(Sceneform(self.viewer.scene, {"Name": (lambda o: o.name), "Object": (lambda o: o)}))
         # ----
         self.resize(self.viewer.config.window.width, self.viewer.config.window.height)
         self.window.widget.show()
