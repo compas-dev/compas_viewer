@@ -17,6 +17,18 @@ if TYPE_CHECKING:
     from compas_viewer import Viewer
 
 
+def clear_scene():
+    from compas_viewer import Viewer
+
+    viewer = Viewer()
+
+    for obj in viewer.scene.objects:
+        viewer.scene.remove(obj)
+        del obj
+
+    viewer.renderer.update()
+
+
 def delete_selected():
     from compas_viewer import Viewer
 
@@ -145,6 +157,7 @@ def select_object(viewer: "Viewer", event: QMouseEvent):
         if selected_obj:
             selected_obj.is_selected = True
 
+    viewer.ui.sidebar.update()
     viewer.renderer.update()
 
 
@@ -161,6 +174,7 @@ def deselect_object(viewer: "Viewer", event: QMouseEvent):
         if selected_obj:
             selected_obj.is_selected = False
 
+    viewer.ui.sidebar.update()
     viewer.renderer.update()
 
 
@@ -177,6 +191,7 @@ def select_multiple(viewer: "Viewer", event: QMouseEvent):
         if selected_obj:
             selected_obj.is_selected = True
 
+    viewer.ui.sidebar.update()
     viewer.renderer.update()
 
 
@@ -220,6 +235,7 @@ def select_window(viewer: "Viewer", event: QMouseEvent):
                 obj.is_selected = True
                 continue
 
+    viewer.ui.sidebar.update()
     viewer.renderer.update()
 
 
