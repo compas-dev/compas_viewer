@@ -16,13 +16,16 @@ from PySide6.QtGui import QWheelEvent
 from PySide6.QtWidgets import QApplication
 from PySide6.QtWidgets import QFileDialog
 
+import compas
+from compas.scene import Scene
 from compas_viewer.components import CameraSettingsDialog
 
 if TYPE_CHECKING:
     from compas_viewer import Viewer
 
 
-class Action:
+class Command:
+    # we should rename the module to "commands.py"
 
     @property
     def viewer(self):
@@ -34,6 +37,7 @@ class Action:
         self,
         *,
         title: str,
+        callback: Callable,
         description: Optional[str] = None,
         icon: Optional[str] = None,
         keybinding: Optional[str] = None,
@@ -42,6 +46,7 @@ class Action:
         gesturebinding: Optional[str] = None,
     ):
         self.title = title
+        self.callback = callback
         self.description = description
         self.icon = icon
         self.keybinding = keybinding
@@ -49,34 +54,40 @@ class Action:
         self.wheelbinding = wheelbinding
         self.gesturebinding = gesturebinding
 
-    def __call__(self, *args: Any, **kwargs: Any) -> Any:
-        raise NotImplementedError
+    def __call__(self, *args: Any, **kwargs: Any) -> Callable:
+        return self.callback(self.viewer, *args, **kwargs)
 
 
+# =============================================================================
+# =============================================================================
 # =============================================================================
 # View
 # =============================================================================
+# =============================================================================
+# =============================================================================
 
 
-def open_camera_settings_dialog():
-    dialog = CameraSettingsDialog()
-    dialog.exec()
+def camera_settings(viewer: "Viewer"):
+    CameraSettingsDialog().exec()
 
 
-def change_rendermode(mode: Literal["Shaded", "Ghosted", "Lighted", "Wireframe"]):
-    from compas_viewer import Viewer
+camera_settings_cmd = Command(title="Camera Settings", callback=camera_settings)
 
-    viewer = Viewer()
+
+def change_rendermode(viewer: "Viewer", mode: Literal["Shaded", "Ghosted", "Lighted", "Wireframe"]):
     viewer.renderer.rendermode = mode.lower()
     viewer.renderer.update()
 
 
-def change_viewmode(mode: Literal["Perspective", "Top", "Front", "Right"]):
-    from compas_viewer import Viewer
+change_rendermode_cmd = Command(title="Change View3D Render Mode", callback=change_rendermode)
 
-    viewer = Viewer()
-    viewer.renderer.viewmode = mode.lower()
+
+def change_view(viewer: "Viewer", mode: Literal["Perspective", "Top", "Front", "Right"]):
+    viewer.renderer.view = mode.lower()
     viewer.renderer.update()
+
+
+change_view_cmd = Command(title="Change View3D View", callback=change_view)
 
 
 def pan_view(viewer: "Viewer", event: QMouseEvent):
@@ -155,20 +166,33 @@ def zoom_selected():
 
 
 # =============================================================================
+# =============================================================================
+# =============================================================================
 # Select
+# =============================================================================
+# =============================================================================
 # =============================================================================
 
 
-def select_all():
-    from compas_viewer import Viewer
-
-    viewer = Viewer()
-
+def select_all(viewer: "Viewer"):
     for obj in viewer.scene.objects:
         if obj.show and not obj.is_locked:
             obj.is_selected = True
 
     viewer.renderer.update()
+
+
+select_all_cmd = Command(title="Select All", callback=select_all)
+
+
+def deselect_all(viewer: "Viewer"):
+    for obj in viewer.scene.objects:
+        obj.is_selected = False
+
+    viewer.renderer.update()
+
+
+deselect_all_cmd = Command(title="DeSelect All", callback=deselect_all)
 
 
 def select_object(viewer: "Viewer", event: QMouseEvent):
@@ -273,7 +297,11 @@ def deselect_window():
 
 
 # =============================================================================
+# =============================================================================
+# =============================================================================
 # Selections
+# =============================================================================
+# =============================================================================
 # =============================================================================
 
 
@@ -290,35 +318,58 @@ def delete_selected():
 
 
 # =============================================================================
+# =============================================================================
+# =============================================================================
 # Scene
+# =============================================================================
+# =============================================================================
 # =============================================================================
 
 
-def clear_scene():
-    from compas_viewer import Viewer
-
-    viewer = Viewer()
+def clear_scene(viewer: "Viewer"):
     for obj in viewer.scene.objects:
         viewer.scene.remove(obj)
         del obj
     viewer.renderer.update()
 
 
-def load_scene():
-    from compas_viewer import Viewer
-
-    viewer = Viewer()
-
-    filename = QFileDialog.getOpenFileName(parent=viewer.ui.window.widget, filter="JSON files (*.json)")
-    print(filename)
+clear_scene_cmd = Command(title="Clear Scene", callback=clear_scene)
 
 
-def save_scene():
-    pass
+def load_scene(viewer: "Viewer"):
+    result = QFileDialog.getOpenFileName(parent=viewer.ui.window.widget, filter="JSON files (*.json)")
+    if not result:
+        return
+
+    scene = compas.json_load(result[0])
+    if not isinstance(scene, Scene):
+        print("No scene found in this file.")
+
+    clear_scene(viewer)
+    viewer.scene = scene
+    viewer.renderer.update()
+
+
+load_scene_cmd = Command(title="Load Scene", callback=load_scene)
+
+
+def save_scene(viewer: "Viewer"):
+    result = QFileDialog.getSaveFileName(parent=viewer.ui.window.widget, filter="JSON files (*.json)")
+    if not result:
+        return
+
+    compas.json_dump(viewer.scene, result[0])
+
+
+save_scene_cmd = Command(title="Save Scene", callback=save_scene)
 
 
 # =============================================================================
+# =============================================================================
+# =============================================================================
 # Data
+# =============================================================================
+# =============================================================================
 # =============================================================================
 
 

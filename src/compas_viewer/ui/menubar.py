@@ -28,15 +28,17 @@ class MenuBar:
             text = item.get("title", None)
             itemtype = item.get("type", None)
             action = item.get("action", None)
+            args = item.get("args") or []
+            kwargs = item.get("kwargs") or {}
 
             if itemtype == "separator":
                 parent.addSeparator()
             elif itemtype == "button":
-                self.add_action(text=text, action=action, parent=parent)
+                self.add_action(text=text, action=action, parent=parent, args=args, kwargs=kwargs)
             elif itemtype == "action":
-                self.add_action(text=text, action=action, parent=parent)
+                self.add_action(text=text, action=action, parent=parent, args=args, kwargs=kwargs)
             elif action:
-                self.add_action(text=text, action=action, parent=parent)
+                self.add_action(text=text, action=action, parent=parent, args=args, kwargs=kwargs)
             else:
                 if items := item.get("items"):
                     if not itemtype or itemtype == "menu" or itemtype == "select":
