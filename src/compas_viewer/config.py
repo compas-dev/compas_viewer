@@ -8,6 +8,7 @@ from typing import Literal
 from compas.colors import Color
 from compas_viewer.actions import change_viewmode
 from compas_viewer.actions import clear_scene
+from compas_viewer.actions import load_scene
 from compas_viewer.actions import open_camera_settings_dialog
 from compas_viewer.actions import pan_view
 from compas_viewer.actions import rotate_view
@@ -105,7 +106,7 @@ class MenubarConfig(ConfigBase):
                 "items": [
                     {"title": "Clear Scene", "action": clear_scene},
                     {"type": "separator"},
-                    {"title": "Load Scene", "action": lambda: print("Load scene")},
+                    {"title": "Load Scene", "action": load_scene},
                     {"title": "Save Scene", "action": lambda: print("Save scene")},
                 ],
             },
