@@ -259,6 +259,10 @@ class EventManager:
 
     def __init__(self, viewer: "Viewer") -> None:
         self.viewer = viewer
+        # use "binding" instead of "event"
+        # these bindings are registered by processing the list of available commands
+        # commands with a "keybinding", "mousebinding", "wheelbinding", or "gesturebinding"
+        # will be registered here
         self.key_events: list[KeyEvent] = []
         self.mouse_events: list[MouseEvent] = []
         self.wheel_events: list[WheelEvent] = []
