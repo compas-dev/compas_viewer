@@ -331,6 +331,8 @@ def deselect_object(viewer: "Viewer", event: QMouseEvent):
         if selected_obj:
             selected_obj.is_selected = False
 
+        viewer.ui.sidebar.update()
+
     viewer.renderer.update()
 
 
@@ -372,6 +374,8 @@ def clear_scene(viewer: "Viewer"):
     for obj in viewer.scene.objects:
         viewer.scene.remove(obj)
         del obj
+
+    viewer.ui.sidebar.update()
     viewer.renderer.update()
 
 

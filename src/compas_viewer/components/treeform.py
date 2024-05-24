@@ -118,6 +118,8 @@ class Treeform(QTreeWidget):
                 for col, background in self._backgrounds.items():
                     node.attributes["widget_item"].setBackground(list(self.columns.keys()).index(col), QColor(*background(node).rgb255))
 
+        self._tree = tree
+
     def update(self):
         from compas_viewer import Viewer
 
