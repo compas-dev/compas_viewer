@@ -141,7 +141,7 @@ class Camera:
         self._rotation = RotationEuler([0, 0, 0], on_update=self._on_rotation_update)
         self._target = Position([0, 0, 0], on_update=self._on_target_update)
 
-        self.reset_position(viewmode="perspective")
+        self.reset_position(view="perspective")
         self.target.set(*target)
         self.position.set(*position)
 
@@ -305,18 +305,18 @@ class Camera:
         self.target.set(*target, pause_update=True)
         self.position.set(*position, pause_update=True)
 
-    def reset_position(self, viewmode: Optional[str] = None):
+    def reset_position(self, view: Optional[str] = None):
         """Reset the position of the camera based current view type."""
         self.target.set(0, 0, 0, False)
-        viewmode = viewmode or self.renderer.viewmode
+        view = view or self.renderer.view
 
-        if viewmode == "perspective":
+        if view == "perspective":
             self.rotation.set(pi / 4, 0, -pi / 4, False)
-        if viewmode == "top":
+        if view == "top":
             self.rotation.set(0, 0, 0, False)
-        if viewmode == "front":
+        if view == "front":
             self.rotation.set(pi / 2, 0, 0, False)
-        if viewmode == "right":
+        if view == "right":
             self.rotation.set(pi / 2, 0, pi / 2, False)
 
     def rotate(self, dx: float, dy: float):
@@ -334,10 +334,10 @@ class Camera:
         Notes
         -----
         Camera rotations are only available if the current view mode
-        is a perspective view (``camera.renderer.config.viewmode == "perspective"``).
+        is a perspective view (``camera.renderer.config.view == "perspective"``).
 
         """
-        if self.renderer.viewmode == "perspective":
+        if self.renderer.view == "perspective":
             self.rotation += [-self.rotationdelta * dy, 0, -self.rotationdelta * dx]
 
     def pan(self, dx: float, dy: float):
@@ -392,7 +392,7 @@ class Camera:
         """
         aspect = width / height
 
-        if self.renderer.viewmode == "perspective":
+        if self.renderer.view == "perspective":
             P = self.perspective(self.fov, aspect, self.near * self.scale, self.far * self.scale)
         else:
             left = -self.distance

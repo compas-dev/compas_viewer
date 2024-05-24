@@ -33,4 +33,4 @@ class ViewModeAction(QWidget, Base):
         return self
 
     def change_view(self, mode):
-        self.viewer.renderer.viewmode = mode
+        self.viewer.renderer.view = mode

@@ -54,7 +54,7 @@ class Renderer(QOpenGLWidget):
 
         self.viewer = viewer
 
-        self._viewmode = self.viewer.config.renderer.viewmode
+        self._view = self.viewer.config.renderer.view
         self._rendermode = self.viewer.config.renderer.rendermode
         self._opacity = self.viewer.config.renderer.ghostopacity if self.rendermode == "ghosted" else 1.0
 
@@ -111,7 +111,7 @@ class Renderer(QOpenGLWidget):
             self.update()
 
     @property
-    def viewmode(self):
+    def view(self):
         """
         The view mode of the view.
 
@@ -119,11 +119,11 @@ class Renderer(QOpenGLWidget):
         -------
             The view mode of the view.
         """
-        return self._viewmode
+        return self._view
 
-    @viewmode.setter
-    def viewmode(self, viewmode):
-        self._viewmode = viewmode
+    @view.setter
+    def view(self, view):
+        self._view = view
         self.shader_model.bind()
         self.shader_model.uniform4x4("projection", self.camera.projection(self.width(), self.height()))
         self.shader_model.release()
@@ -405,7 +405,7 @@ class Renderer(QOpenGLWidget):
         self.shader_model.uniform4x4("transform", transform)
         self.shader_model.uniform1i("is_selected", 0)
         self.shader_model.uniform1f("opacity", self.opacity)
-        self.shader_model.uniform3f("selection_color", self.viewer.config.selector.selectioncolor.rgb)
+        self.shader_model.uniform3f("selection_color", self.viewer.config.renderer.selectioncolor.rgb)
         self.shader_model.release()
 
         self.shader_tag = Shader(name="tag")
