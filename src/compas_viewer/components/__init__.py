@@ -4,6 +4,7 @@ from .combobox import ViewModeAction
 from .dialog import CameraSettingsDialog
 from .slider import Slider
 from .treeform import Treeform
+from .sceneform import Sceneform
 
 __all__ = [
     "Button",
@@ -12,5 +13,6 @@ __all__ = [
     "Renderer",
     "Slider",
     "Treeform",
+    "Sceneform",
     "ViewModeAction",
 ]
