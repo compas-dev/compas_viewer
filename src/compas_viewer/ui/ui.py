@@ -46,13 +46,23 @@ class UI:
             show=self.viewer.config.ui.sidedock.show,
         )
 
+        if self.viewer.config.ui.sidebar.sceneform:
+            self.sidebar.widget.addWidget(
+                Sceneform(
+                    self.viewer.scene,
+                    {
+                        "Name": (lambda o: o.name),
+                        "Visible": (lambda o: o.show),
+                        "Locked": (lambda o: o.is_locked),
+                    },
+                )
+            )
+
         self.window.widget.setCentralWidget(self.viewport.widget)
         self.window.widget.addDockWidget(SideDock.locations["left"], self.sidedock.widget)
 
     def init(self):
-        if self.viewer.config.ui.sidebar.sceneform:
-            self.sidebar.widget.addWidget(Sceneform(self.viewer.scene, {"Name": (lambda o: o.name), "Object": (lambda o: o)}))
-
+        self.sidebar.update()
         self.resize(self.viewer.config.window.width, self.viewer.config.window.height)
         self.window.widget.show()
 
