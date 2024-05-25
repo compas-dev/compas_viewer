@@ -1,7 +1,5 @@
 from typing import TYPE_CHECKING
 
-from compas_viewer.components import Treeform
-
 from .mainwindow import MainWindow
 from .menubar import MenuBar
 from .sidebar import SideBarRight
@@ -20,26 +18,29 @@ class UI:
         self.window = MainWindow(title=self.viewer.config.window.title)
 
         self.menubar = MenuBar(
-            parent=self,
+            self,
             items=self.viewer.config.ui.menubar.items,
         )
         self.statusbar = SatusBar(
-            parent=self,
+            self,
             show=self.viewer.config.ui.statusbar.show,
         )
         self.toolbar = ToolBar(
-            parent=self,
+            self,
             items=self.viewer.config.ui.toolbar.items,
             show=self.viewer.config.ui.toolbar.show,
         )
         self.sidebar = SideBarRight(
+            self,
             show=self.viewer.config.ui.sidebar.show,
         )
         self.viewport = ViewPort(
+            self,
             self.viewer.renderer,
             self.sidebar,
         )
         self.sidedock = SideDock(
+            self,
             show=self.viewer.config.ui.sidedock.show,
         )
 
@@ -47,11 +48,6 @@ class UI:
         self.window.widget.addDockWidget(SideDock.locations["left"], self.sidedock.widget)
 
     def init(self):
-        # this is a bit of a hack
-        # it should not matter when the scene is populated
-        # it should also be possible for the user the change the default config of the sidebar
-        self.sidebar.widget.addWidget(Treeform(self.viewer.scene, {"Name": (lambda o: o.name), "Object": (lambda o: o)}))
-        # ----
         self.resize(self.viewer.config.window.width, self.viewer.config.window.height)
         self.window.widget.show()
 

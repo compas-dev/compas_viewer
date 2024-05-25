@@ -15,10 +15,10 @@ if TYPE_CHECKING:
 
 
 class MenuBar:
-    def __init__(self, parent: "UI", items: list[dict]) -> None:
-        self.parent = parent
+    def __init__(self, ui: "UI", items: list[dict]) -> None:
+        self.ui = ui
         self.items = items
-        self.widget: QMenuBar = self.parent.window.widget.menuBar()
+        self.widget: QMenuBar = self.ui.window.widget.menuBar()
         self.widget.clear()
         self.add_menu(items=self.items, parent=self.widget)
 
@@ -44,7 +44,7 @@ class MenuBar:
                 if itemtype == "checkbox":
                     state = item.get("checked", False)
                     a.setCheckable(True)
-                    a.setChecked(state if not callable(state) else state(self.parent.viewer))
+                    a.setChecked(state if not callable(state) else state(self.ui.viewer))
 
             else:
                 if items := item.get("items"):

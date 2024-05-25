@@ -7,9 +7,9 @@ if TYPE_CHECKING:
 
 
 class SatusBar:
-    def __init__(self, parent: "UI", show: bool = True) -> None:
-        self.parent = parent
-        self.widget = self.parent.window.widget.statusBar()
+    def __init__(self, ui: "UI", show: bool = True) -> None:
+        self.ui = ui
+        self.widget = self.ui.window.widget.statusBar()
         self.widget.setVisible(show)
         self.label = LabelWidget()
         self.widget.addWidget(self.label(text="Ready..."))

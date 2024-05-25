@@ -1,4 +1,3 @@
-from functools import partial
 from typing import TYPE_CHECKING
 from typing import Literal
 
@@ -259,34 +258,38 @@ class EventManager:
 
     def __init__(self, viewer: "Viewer") -> None:
         self.viewer = viewer
-        # use "binding" instead of "event"
-        # these bindings are registered by processing the list of available commands
-        # commands with a "keybinding", "mousebinding", "wheelbinding", or "gesturebinding"
-        # will be registered here
         self.key_events: list[KeyEvent] = []
         self.mouse_events: list[MouseEvent] = []
         self.wheel_events: list[WheelEvent] = []
-        self.register_keyevents()
-        self.register_mouseevents()
-        self.register_wheelevents()
+        self.register_bindings()
 
-    def register_keyevents(self):
-        for item in self.viewer.config.key_events.items:
-            keyevent = KeyEvent(title=item["title"], key=item["key"], modifier=item.get("modifier"))
-            keyevent.triggered.connect(item["action"])
-            self.key_events.append(keyevent)
+    def register_bindings(self):
+        for cmd in self.viewer.config.commands:
+            if cmd.mousebinding is not None:
+                binding = cmd.mousebinding.split("+")
+                button = binding[0].strip()
+                modifier = None
+                if len(binding) > 1:
+                    modifier = binding[1].strip()
+                mouseevent = MouseEvent(title=cmd.title, button=button, modifier=modifier)
+                mouseevent.triggered.connect(cmd)
+                self.mouse_events.append(mouseevent)
 
-    def register_mouseevents(self):
-        for item in self.viewer.config.mouse_events.items:
-            mouseevent = MouseEvent(title=item["title"], button=item["button"], modifier=item.get("modifier"))
-            mouseevent.triggered.connect(partial(item["action"], self.viewer))
-            self.mouse_events.append(mouseevent)
+            if cmd.keybinding is not None:
+                binding = cmd.keybinding.split("+")
+                key = binding[0].strip()
+                modifier = None
+                if len(binding) > 1:
+                    modifier = binding[1].strip()
+                keyevent = KeyEvent(title=cmd.title, key=key, modifier=modifier)
+                keyevent.triggered.connect(cmd)
+                self.key_events.append(keyevent)
 
-    def register_wheelevents(self):
-        for item in self.viewer.config.wheel_events.items:
-            wheelevent = WheelEvent(title=item["title"])
-            wheelevent.triggered.connect(partial(item["action"], self.viewer))
-            self.wheel_events.append(wheelevent)
+            if cmd.wheelbinding is not None:
+                binding = cmd.wheelbinding.split("+")
+                wheelevent = WheelEvent(title=cmd.title)
+                wheelevent.triggered.connect(cmd)
+                self.wheel_events.append(wheelevent)
 
     def delegate_keypress(self, event: QKeyEvent):
         for keyevent in self.key_events:

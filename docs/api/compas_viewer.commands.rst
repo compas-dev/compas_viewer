@@ -1,8 +1,8 @@
 *******************************************************************************
-compas_viewer.actions
+compas_viewer.commands
 *******************************************************************************
 
-.. currentmodule:: compas_viewer.actions
+.. currentmodule:: compas_viewer.commands
 
 Functions
 =========

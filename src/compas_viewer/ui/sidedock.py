@@ -1,6 +1,11 @@
+from typing import TYPE_CHECKING
+
 from PySide6 import QtCore
 from PySide6 import QtWidgets
 from PySide6.QtWidgets import QDockWidget
+
+if TYPE_CHECKING:
+    from .ui import UI
 
 
 class SideDock:
@@ -9,8 +14,8 @@ class SideDock:
         "right": QtCore.Qt.DockWidgetArea.RightDockWidgetArea,
     }
 
-    def __init__(self, show: bool = False) -> None:
-        self.widget = None
+    def __init__(self, ui: "UI", show: bool = False) -> None:
+        self.ui = ui
         self.widget = QDockWidget()
         self.widget.setMinimumWidth(200)
         self.scroll = QtWidgets.QScrollArea()

@@ -8,24 +8,25 @@ from PySide6.QtCore import QUrl
 from PySide6.QtGui import QDesktopServices
 
 from compas.colors import Color
-from compas_viewer.actions import camera_settings_cmd
-from compas_viewer.actions import change_rendermode_cmd
-from compas_viewer.actions import change_view_cmd
-from compas_viewer.actions import clear_scene_cmd
-from compas_viewer.actions import deselect_all_cmd
-from compas_viewer.actions import load_scene_cmd
-from compas_viewer.actions import pan_view
-from compas_viewer.actions import rotate_view
-from compas_viewer.actions import save_scene_cmd
-from compas_viewer.actions import select_all_cmd
-from compas_viewer.actions import select_object
-from compas_viewer.actions import select_window
-from compas_viewer.actions import toggle_sidebar_cmd
-from compas_viewer.actions import toggle_sidedock_cmd
-from compas_viewer.actions import toggle_statusbar_cmd
-from compas_viewer.actions import toggle_toolbar_cmd
-from compas_viewer.actions import zoom_selected
-from compas_viewer.actions import zoom_view
+from compas_viewer.commands import Command
+from compas_viewer.commands import camera_settings_cmd
+from compas_viewer.commands import change_rendermode_cmd
+from compas_viewer.commands import change_view_cmd
+from compas_viewer.commands import clear_scene_cmd
+from compas_viewer.commands import deselect_all_cmd
+from compas_viewer.commands import load_scene_cmd
+from compas_viewer.commands import pan_view_cmd
+from compas_viewer.commands import rotate_view_cmd
+from compas_viewer.commands import save_scene_cmd
+from compas_viewer.commands import select_all_cmd
+from compas_viewer.commands import select_object_cmd
+from compas_viewer.commands import select_window_cmd
+from compas_viewer.commands import toggle_sidebar_cmd
+from compas_viewer.commands import toggle_sidedock_cmd
+from compas_viewer.commands import toggle_statusbar_cmd
+from compas_viewer.commands import toggle_toolbar_cmd
+from compas_viewer.commands import zoom_selected_cmd
+from compas_viewer.commands import zoom_view_cmd
 
 
 class ConfigBase:
@@ -154,6 +155,8 @@ class MenubarConfig(ConfigBase):
                 "title": "Select",
                 "items": [
                     {"title": select_all_cmd.title, "action": select_all_cmd},
+                    {"title": "Invert Selection", "action": lambda: print("invert selection")},
+                    {"type": "separator"},
                     {"title": deselect_all_cmd.title, "action": deselect_all_cmd},
                 ],
             },
@@ -332,38 +335,6 @@ class UIConfig(ConfigBase):
 # =============================================================================
 # =============================================================================
 
-
-@dataclass
-class KeyEvents:
-    items: list[dict] = field(
-        default_factory=lambda: [
-            {"title": "Zoom Selected", "key": "F", "modifier": None, "action": zoom_selected},
-            {"title": select_all_cmd.title, "key": "A", "modifier": "CTRL", "action": select_all_cmd},
-        ]
-    )
-
-
-@dataclass
-class MouseEvents:
-    items: list[dict] = field(
-        default_factory=lambda: [
-            {"title": "Pan View", "button": "RIGHT", "modifier": "SHIFT", "action": pan_view},
-            {"title": "Rotate View", "button": "RIGHT", "modifier": None, "action": rotate_view},
-            {"title": "Select", "button": "LEFT", "modifier": None, "action": select_object},
-            {"title": "Select Window", "button": "LEFT", "modifier": "SHIFT", "action": select_window},
-        ]
-    )
-
-
-@dataclass
-class WheelEvents:
-    items: list[dict] = field(
-        default_factory=lambda: [
-            {"title": "Zoom View", "action": zoom_view},
-        ]
-    )
-
-
 # =============================================================================
 # =============================================================================
 # =============================================================================
@@ -379,6 +350,25 @@ class Config(ConfigBase):
     window: WindowConfig = field(default_factory=WindowConfig)
     renderer: RendererConfig = field(default_factory=RendererConfig)
     camera: CameraConfig = field(default_factory=CameraConfig)
-    key_events: KeyEvents = field(default_factory=KeyEvents)
-    mouse_events: MouseEvents = field(default_factory=MouseEvents)
-    wheel_events: WheelEvents = field(default_factory=WheelEvents)
+    commands: list[Command] = field(
+        default_factory=lambda: [
+            camera_settings_cmd,
+            change_rendermode_cmd,
+            change_view_cmd,
+            clear_scene_cmd,
+            deselect_all_cmd,
+            load_scene_cmd,
+            pan_view_cmd,
+            rotate_view_cmd,
+            save_scene_cmd,
+            select_all_cmd,
+            select_object_cmd,
+            select_window_cmd,
+            toggle_sidebar_cmd,
+            toggle_sidedock_cmd,
+            toggle_statusbar_cmd,
+            toggle_toolbar_cmd,
+            zoom_selected_cmd,
+            zoom_view_cmd,
+        ]
+    )

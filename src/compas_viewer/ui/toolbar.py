@@ -11,11 +11,11 @@ if TYPE_CHECKING:
 
 
 class ToolBar:
-    def __init__(self, parent: "UI", items: list[dict], show: bool = True) -> None:
-        self.parent = parent
+    def __init__(self, ui: "UI", items: list[dict], show: bool = True) -> None:
+        self.ui = ui
         self.items = items
 
-        self.widget = self.parent.window.widget.addToolBar("Tools")
+        self.widget = self.ui.window.widget.addToolBar("Tools")
         self.widget.clear()
         self.widget.setMovable(False)
         self.widget.setObjectName("Tools")

@@ -140,6 +140,9 @@ def pan_view(viewer: "Viewer", event: QMouseEvent):
     viewer.renderer.update()
 
 
+pan_view_cmd = Command(title="Pan View", callback=pan_view, mousebinding="RIGHT + SHIFT")
+
+
 def rotate_view(viewer: "Viewer", event: QMouseEvent):
     etype = event.type()
 
@@ -157,18 +160,10 @@ def rotate_view(viewer: "Viewer", event: QMouseEvent):
     viewer.renderer.update()
 
 
-def zoom_view(viewer: "Viewer", event: QWheelEvent):
-    degrees = event.angleDelta().y() / 8
-    steps = degrees / 15
-    viewer.renderer.camera.zoom(steps)
-    viewer.renderer.update()
+rotate_view_cmd = Command(title="Rotate View", callback=rotate_view, mousebinding="RIGHT")
 
 
-def zoom_selected():
-    from compas_viewer import Viewer
-
-    viewer = Viewer()
-
+def zoom_selected(viewer: "Viewer"):
     selected_objs = [obj for obj in viewer.scene.objects if obj.is_selected]
     if len(selected_objs) == 0:
         selected_objs = viewer.scene.objects
@@ -196,6 +191,19 @@ def zoom_selected():
     viewer.renderer.camera.position = viewer.renderer.camera.target - vec * distance
 
     viewer.renderer.update()
+
+
+zoom_selected_cmd = Command(title="Zoom Selected", callback=zoom_selected, keybinding="F")
+
+
+def zoom_view(viewer: "Viewer", event: QWheelEvent):
+    degrees = event.angleDelta().y() / 8
+    steps = degrees / 15
+    viewer.renderer.camera.zoom(steps)
+    viewer.renderer.update()
+
+
+zoom_view_cmd = Command(title="Zoom View", callback=zoom_view, wheelbinding="")
 
 
 # =============================================================================
@@ -256,6 +264,9 @@ def select_object(viewer: "Viewer", event: QMouseEvent):
     viewer.renderer.update()
 
 
+select_object_cmd = Command(title="Select Object", callback=select_object, mousebinding="LEFT")
+
+
 def select_multiple(viewer: "Viewer", event: QMouseEvent):
     etype = event.type()
 
@@ -271,6 +282,9 @@ def select_multiple(viewer: "Viewer", event: QMouseEvent):
             viewer.ui.sidebar.update()
 
     viewer.renderer.update()
+
+
+select_multiple_cmd = Command(title="Select Multiple", callback=select_multiple, mousebinding="LEFT")
 
 
 def select_window(viewer: "Viewer", event: QMouseEvent):
@@ -318,6 +332,9 @@ def select_window(viewer: "Viewer", event: QMouseEvent):
     viewer.renderer.update()
 
 
+select_window_cmd = Command(title="Select Box", callback=select_window, mousebinding="LEFT + SHIFT")
+
+
 def deselect_object(viewer: "Viewer", event: QMouseEvent):
     etype = event.type()
 
@@ -334,6 +351,9 @@ def deselect_object(viewer: "Viewer", event: QMouseEvent):
         viewer.ui.sidebar.update()
 
     viewer.renderer.update()
+
+
+deselect_object_cmd = Command(title="Deselect Object", callback=deselect_object, mousebinding="LEFT")
 
 
 def deselect_window():
