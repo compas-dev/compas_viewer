@@ -10,6 +10,8 @@ from PySide6.QtWidgets import QMenu
 from PySide6.QtWidgets import QMenuBar
 from PySide6.QtWidgets import QWidget
 
+from compas_viewer.commands import Command
+
 if TYPE_CHECKING:
     from .ui import UI
 
@@ -41,10 +43,17 @@ class MenuBar:
             elif action:
                 a = self.add_action(text=text, action=action, parent=parent, args=args, kwargs=kwargs)
                 actions.append(a)
+
                 if itemtype == "checkbox":
                     state = item.get("checked", False)
                     a.setCheckable(True)
                     a.setChecked(state if not callable(state) else state(self.ui.viewer))
+
+                if isinstance(action, Command):
+                    print(f"here: {action.keybinding}")
+                    if action.keybinding is not None:
+                        a.setShortcut(action.keybinding)
+                        print(a.shortcut())
 
             else:
                 if items := item.get("items"):
