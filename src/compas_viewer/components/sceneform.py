@@ -104,19 +104,19 @@ class Sceneform(QTreeWidget):
             strings = [str(c(node)) for _, c in self.columns.items()]
 
             if node.parent.is_root:  # type: ignore
-                node.attributes["widget_item"] = QTreeWidgetItem(self, strings)  # type: ignore
+                node.attributes["widget"] = QTreeWidgetItem(self, strings)  # type: ignore
             else:
-                node.attributes["widget_item"] = QTreeWidgetItem(
-                    node.parent.attributes["widget_item"],
+                node.attributes["widget"] = QTreeWidgetItem(
+                    node.parent.attributes["widget"],
                     strings,  # type: ignore
                 )
 
-            node.attributes["widget_item"].node = node
-            node.attributes["widget_item"].setSelected(node.is_selected)
+            node.attributes["widget"].node = node
+            node.attributes["widget"].setSelected(node.is_selected)
 
             if self._backgrounds:
                 for col, background in self._backgrounds.items():
-                    node.attributes["widget_item"].setBackground(list(self.columns.keys()).index(col), QColor(*background(node).rgb255))
+                    node.attributes["widget"].setBackground(list(self.columns.keys()).index(col), QColor(*background(node).rgb255))
 
         self._scene = scene
 
