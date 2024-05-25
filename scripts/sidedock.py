@@ -14,8 +14,19 @@ def toggle_box():
     viewer.renderer.update()
 
 
-def slider_changed(value):
-    print(f"Slider value changed to: {value}")
+def slider_changed(slider: Slider, value: int):
+    global viewer
+    global boxobj
+
+    vmin = slider.min_val
+    vmax = slider.max_val
+
+    v = (value - vmin) / (vmax - vmin)
+
+    boxobj.item.frame.point.x = v * 10
+
+    boxobj.update()
+    viewer.renderer.update()
 
 
 viewer.ui.sidedock.show = True
