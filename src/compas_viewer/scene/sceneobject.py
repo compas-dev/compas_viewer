@@ -55,7 +55,7 @@ class ViewerSceneObject(SceneObject, Base):
 
     Attributes
     ----------
-    is_selected : boolA
+    is_selected : bool
         Whether the object is selected.
     is_locked : bool
         Whether the object is locked (selectable).
