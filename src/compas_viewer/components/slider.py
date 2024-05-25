@@ -103,7 +103,7 @@ class Slider(QWidget):
 
         # Connect the slider movement to the callback
         self.slider.valueChanged.connect(self.on_value_changed)
-        self.slider.valueChanged.connect(lambda value: self.action(value))
+        self.slider.valueChanged.connect(lambda value: self.action(self, value))
         self.layout.addWidget(self.value_label)
 
         # Add widgets to layout
