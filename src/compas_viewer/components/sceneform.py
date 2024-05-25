@@ -5,17 +5,16 @@ from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QTreeWidget
 from PySide6.QtWidgets import QTreeWidgetItem
 
-from compas.datastructures import Tree
+from compas.scene import Scene
 
 
-class Treeform(QTreeWidget):
+class Sceneform(QTreeWidget):
     """
-    Class for displaying tree-like data.
-    Treeform is an abstract class that could be placed in either the viewport or the sidedock.
+    Class for displaying the SceneTree.
 
     Parameters
     ----------
-    tree : :class:`compas.datastructures.Tree`
+    scene : :class:`compas.scene.Scene`
         The tree to be displayed. An typical example is the scene
         object tree: :attr:`compas_viewer.viewer.Viewer._tree`.
     columns : dict[str, callable]
@@ -69,7 +68,7 @@ class Treeform(QTreeWidget):
 
     def __init__(
         self,
-        tree: Tree,
+        scene: Scene,
         columns: dict[str, Callable],
         column_editable: list[bool] = [False],
         show_headers: bool = True,
@@ -86,20 +85,19 @@ class Treeform(QTreeWidget):
         self.stretch = stretch
         self._backgrounds = backgrounds
 
-        self.tree = tree
-        self._tree = tree
-
+        self.scene = scene
         self.callback = callback
+        self.itemClicked.connect(self.on_item_clickded)
         self.itemSelectionChanged.connect(self.on_item_selection_changed)
 
     @property
-    def tree(self) -> Tree:
-        return self._tree
+    def scene(self) -> Scene:
+        return self._scene
 
-    @tree.setter
-    def tree(self, tree: Tree):
+    @scene.setter
+    def scene(self, scene: Scene):
         self.clear()
-        for node in tree.traverse("breadthfirst"):
+        for node in scene.traverse("breadthfirst"):
             if node.is_root:
                 continue
 
@@ -114,15 +112,29 @@ class Treeform(QTreeWidget):
                 )
 
             node.attributes["widget_item"].node = node
+            node.attributes["widget_item"].setSelected(node.is_selected)
 
             if self._backgrounds:
                 for col, background in self._backgrounds.items():
                     node.attributes["widget_item"].setBackground(list(self.columns.keys()).index(col), QColor(*background(node).rgb255))
 
-        self._tree = tree
+        self._scene = scene
 
     def update(self):
-        self.tree = self._tree
+        from compas_viewer import Viewer
+
+        self.scene = Viewer().scene
+
+    def on_item_clickded(self):
+        selected_nodes = [item.node for item in self.selectedItems()]
+        for node in self.scene.objects:
+            node.is_selected = node in selected_nodes
+            if self.callback and node.is_selected:
+                self.callback(node)
+
+        from compas_viewer import Viewer
+
+        Viewer().renderer.update()
 
     def on_item_selection_changed(self):
         for item in self.selectedItems():
