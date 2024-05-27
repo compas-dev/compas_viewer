@@ -1,6 +1,7 @@
 from typing import Callable
 from typing import Optional
 
+from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QTreeWidget
 from PySide6.QtWidgets import QTreeWidgetItem
@@ -87,7 +88,10 @@ class Sceneform(QTreeWidget):
 
         self.scene = scene
         self.callback = callback
-        self.itemClicked.connect(self.on_item_clickded)
+        self._selected_items = None
+        # TODO(pitsai): enable multiple selection
+        # self.setSelectionMode(QTreeWidget.ExtendedSelection)
+        self.itemClicked.connect(self.on_item_clicked)
         self.itemSelectionChanged.connect(self.on_item_selection_changed)
 
     @property
@@ -101,23 +105,42 @@ class Sceneform(QTreeWidget):
             if node.is_root:
                 continue
 
-            strings = [str(c(node)) for _, c in self.columns.items()]
+            strings = []
+            self.show_idx = None
+            self.locked_idx = None
+            for i, (name, c) in enumerate(self.columns.items()):
+                if name == "Show":
+                    self.show_idx = i
+                    string = None
+                elif name == "Locked":
+                    self.locked_idx = i
+                    string = None
+                else:
+                    string = str(c(node))
+                strings.append(string)
 
             if node.parent.is_root:  # type: ignore
-                node.attributes["widget"] = QTreeWidgetItem(self, strings)  # type: ignore
+                widget = QTreeWidgetItem(self, strings)  # type: ignore
             else:
-                node.attributes["widget"] = QTreeWidgetItem(
+                widget = QTreeWidgetItem(
                     node.parent.attributes["widget"],
                     strings,  # type: ignore
                 )
+            widget.node = node
+            widget.setSelected(node.is_selected)
+            widget.setFlags(widget.flags() | Qt.ItemIsUserCheckable | Qt.ItemIsSelectable | Qt.ItemIsEnabled)  # Allow checkbox
 
-            node.attributes["widget"].node = node
-            node.attributes["widget"].setSelected(node.is_selected)
+            if self.show_idx is not None:
+                widget.setCheckState(self.show_idx, Qt.Checked if node.show else Qt.Unchecked)
+            if self.locked_idx is not None:
+                widget.setCheckState(self.locked_idx, Qt.Checked if node.is_locked else Qt.Unchecked)
 
             if self._backgrounds:
                 for col, background in self._backgrounds.items():
-                    node.attributes["widget"].setBackground(list(self.columns.keys()).index(col), QColor(*background(node).rgb255))
+                    widget.setBackground(list(self.columns.keys()).index(col), QColor(*background(node).rgb255))
+            node.attributes["widget"] = widget
 
+        self.adjust_column_widths()
         self._scene = scene
 
     def update(self):
@@ -125,12 +148,22 @@ class Sceneform(QTreeWidget):
 
         self.scene = Viewer().scene
 
-    def on_item_clickded(self):
-        selected_nodes = [item.node for item in self.selectedItems()]
-        for node in self.scene.objects:
-            node.is_selected = node in selected_nodes
-            if self.callback and node.is_selected:
-                self.callback(node)
+    def on_item_clicked(self, item, column):
+        if column == self.show_idx:
+            is_visible = item.checkState(self.show_idx) == Qt.Checked
+            item.node.show = is_visible
+
+        if column == self.locked_idx:
+            is_locked = item.checkState(self.locked_idx) == Qt.Checked
+            item.node.is_locked = is_locked
+
+        if self.selectedItems():
+            self._selected_items = self.selectedItems()
+            selected_nodes = {item.node for item in self.selectedItems()}
+            for node in self.scene.objects:
+                node.is_selected = node in selected_nodes
+                if self.callback and node.is_selected:
+                    self.callback(node)
 
         from compas_viewer import Viewer
 
@@ -140,3 +173,7 @@ class Sceneform(QTreeWidget):
         for item in self.selectedItems():
             if self.callback:
                 self.callback(item.node)
+
+    def adjust_column_widths(self, item=None, column=None):
+        for i in range(self.columnCount()):
+            self.resizeColumnToContents(i)

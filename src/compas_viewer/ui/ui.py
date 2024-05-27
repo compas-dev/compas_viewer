@@ -52,8 +52,8 @@ class UI:
                     self.viewer.scene,
                     {
                         "Name": (lambda o: o.name),
-                        "Visible": (lambda o: o.show),
-                        "Locked": (lambda o: o.is_locked),
+                        "Locked": (lambda o: None),
+                        "Show": (lambda o: None),
                     },
                 )
             )
