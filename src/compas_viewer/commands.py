@@ -459,7 +459,7 @@ load_data_cmd = Command(title="Load Data", callback=lambda: print("load data"))
 
 
 def object_info(viewer: "Viewer"):
-    def custom_wrap(text, width=80, indent=0):
+    def custom_wrap(text, width=40, indent=0):
         """
         Wrap text with a given width, adding indentation for wrapped lines.
 
@@ -488,9 +488,8 @@ def object_info(viewer: "Viewer"):
 
         info = f"{obj.name}:\n"
         for attr, value in attributes:
-            line = f"-- {attr}: {value}"
-            # Wrap and indent the line if it's longer than 40 characters
-            info += custom_wrap(line, width=40, indent=4) + "\n"
+            line = f"-- {attr}:  {value}"
+            info += custom_wrap(line, width=60, indent=4) + "\n"
 
         return info
 
@@ -502,7 +501,12 @@ def object_info(viewer: "Viewer"):
 
     if not info:
         info = "No object selected."
+    return info
+
+
+def object_info_qmsg(viewer: "Viewer"):
+    info = object_info(viewer)
     QMessageBox.information(viewer.ui.window.widget, "Info", info)
 
 
-object_info_cmd = Command(title="Display Info", callback=object_info)
+object_info_qmsg_cmd = Command(title="Display Info", callback=object_info_qmsg)
