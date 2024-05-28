@@ -62,7 +62,6 @@ class UI:
         self.window.widget.addDockWidget(SideDock.locations["left"], self.sidedock.widget)
 
     def init(self):
-        # self.sidebar.update()
         self.resize(self.viewer.config.window.width, self.viewer.config.window.height)
         self.window.widget.show()
 

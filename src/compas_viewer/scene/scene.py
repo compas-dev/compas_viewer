@@ -1,4 +1,3 @@
-from typing import TYPE_CHECKING
 from random import randint
 from random import seed
 from typing import Any
@@ -6,14 +5,14 @@ from typing import Generator
 from typing import Optional
 from typing import Union
 
+from PySide6.QtCore import QTimer
+
 from compas.colors import Color
 from compas.datastructures import Datastructure
 from compas.geometry import Geometry
 from compas.scene import Scene
 
 from .sceneobject import ViewerSceneObject
-if TYPE_CHECKING:
-    from compas_viewer import Viewer
 
 
 def instance_colors_generator(i: int = 0) -> Generator:
@@ -77,16 +76,23 @@ class ViewerScene(Scene):
         #  Selection
         self.instance_colors: dict[tuple[int, int, int], ViewerSceneObject] = {}
         self._instance_colors_generator = instance_colors_generator()
+        # Time Debounce
+        self._time = None
+        self.update_timer = QTimer()
+        self.update_timer.setSingleShot(True)
+        self.update_timer.timeout.connect(self.update_observers)
+        self.debounce_interval = 200
 
     @property
     def observers(self):
         from compas_viewer import Viewer
+
         self.viewer = Viewer()
         self._observers.extend(
             [
-             self.viewer.renderer,
-             self.viewer.ui.sidebar,
-             ]
+                self.viewer.renderer,
+                self.viewer.ui.sidebar,
+            ]
         )
         return self._observers
 
@@ -189,9 +195,8 @@ class ViewerScene(Scene):
             u=u,
             **kwargs,
         )
-        
-        for observer in self.observers:
-            observer.update()
+
+        self.request_update()
         return sceneobject
 
     def remove(self, item: ViewerSceneObject) -> None:
@@ -205,6 +210,12 @@ class ViewerScene(Scene):
         """
 
         super().remove(item)
+        self.request_update()
 
+    def request_update(self):
+        if not self.update_timer.isActive():
+            self.update_timer.start(self.debounce_interval)
+
+    def update_observers(self):
         for observer in self.observers:
             observer.update()
