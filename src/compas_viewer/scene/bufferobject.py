@@ -196,6 +196,7 @@ class BufferObject(SceneObject, Base):
         opacity: Optional[float] = None,
         doublesided: Optional[bool] = None,
         is_visiable: Optional[bool] = None,
+        is_locked: Optional[bool] = None,
         **kwargs,
     ):
         super().__init__(item=buffergeometry, **kwargs)
@@ -208,11 +209,26 @@ class BufferObject(SceneObject, Base):
         self.linewidth = 1.0 if linewidth is None else linewidth
         self.opacity = 1.0 if opacity is None else opacity
         self.doublesided = True if doublesided is None else doublesided
-        self.is_visible = True if is_visiable is None else is_visiable
+        self.show = True if is_visiable is None else is_visiable
+        self._is_locked = False if is_locked is None else is_locked
 
         self.is_selected = False
         self.background = False
         self._matrix_buffer = None
+
+    @property
+    def is_locked(self):
+        return self._is_locked
+
+    @is_locked.setter
+    def is_locked(self, value: bool):
+        self._is_locked = value
+        if value:
+            self.is_selected = False
+            # scene parent
+            self.scene.instance_colors.pop(self.instance_color.rgb255)
+        else:
+            self.scene.instance_colors[self.instance_color.rgb255] = self
 
     def init(self):
         """Initialize the object"""
