@@ -1,3 +1,4 @@
+from typing import TYPE_CHECKING
 from random import randint
 from random import seed
 from typing import Any
@@ -11,6 +12,8 @@ from compas.geometry import Geometry
 from compas.scene import Scene
 
 from .sceneobject import ViewerSceneObject
+if TYPE_CHECKING:
+    from compas_viewer import Viewer
 
 
 def instance_colors_generator(i: int = 0) -> Generator:
@@ -70,10 +73,22 @@ class ViewerScene(Scene):
 
         #  Primitive
         self.objects: list[ViewerSceneObject]
-
+        self._observers = []
         #  Selection
         self.instance_colors: dict[tuple[int, int, int], ViewerSceneObject] = {}
         self._instance_colors_generator = instance_colors_generator()
+
+    @property
+    def observers(self):
+        from compas_viewer import Viewer
+        self.viewer = Viewer()
+        self._observers.extend(
+            [
+             self.viewer.renderer,
+             self.viewer.ui.sidebar,
+             ]
+        )
+        return self._observers
 
     # TODO: These fixed kwargs could be moved to COMPAS core.
     def add(
@@ -174,5 +189,22 @@ class ViewerScene(Scene):
             u=u,
             **kwargs,
         )
-
+        
+        for observer in self.observers:
+            observer.update()
         return sceneobject
+
+    def remove(self, item: ViewerSceneObject) -> None:
+        """
+        Remove an item from the scene.
+
+        Parameters
+        ----------
+        item : :class:`compas_viewer.scene.ViewerSceneObject`
+            The item to remove.
+        """
+
+        super().remove(item)
+
+        for observer in self.observers:
+            observer.update()
