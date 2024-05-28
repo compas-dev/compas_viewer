@@ -28,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Implemented downsampling for window selection to improve performance.
 * Made `TreeForm` interactive.
 * Fixed `load_scene` action bug.
+* Fixed `compas_viewer.components.slider` step attribute.
 
 ### Removed
 

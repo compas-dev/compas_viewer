@@ -15,6 +15,7 @@ class Slider(QWidget):
         title: str = "Slider",
         min_val: int = 0,
         max_val: int = 100,
+        step: Optional[float] = 1,
         action: Callable = None,
         horizontal: Optional[bool] = True,
         starting_val: Optional[int] = None,
@@ -32,6 +33,8 @@ class Slider(QWidget):
             Minimum value of the slider, defaults to 0.
         max_val : int
             Maximum value of the slider, defaults to 100.
+        step : float, optional
+            Step size of the slider. Defaults to 1.
         action : Callable
             Function to execute on value change. Should accept a single integer argument.
         horizontal : bool, optional
@@ -49,6 +52,8 @@ class Slider(QWidget):
             Minimum value of the slider.
         max_val : int
             Maximum value of the slider.
+        step : float
+            Step size of the slider.
         action : Callable
             Function to execute on value change.
         start_val : int
@@ -71,6 +76,7 @@ class Slider(QWidget):
         self._horizontal = horizontal
         self.min_val = min_val
         self.max_val = max_val
+        self.step = step
         self.starting_val = starting_val
         self._tick_interval = tick_interval
 
@@ -78,6 +84,13 @@ class Slider(QWidget):
             orientation = Qt.Horizontal
         else:
             orientation = Qt.Vertical
+
+        if self.step:
+            self.min_val /= step  # -100
+            self.max_val /= step  # 100
+            self._adjust_val = step
+        else:
+            self._adjust_val = 1
 
         if self._tick_interval is None:
             self._tick_interval = (self.max_val - self.min_val) / 10
@@ -97,9 +110,9 @@ class Slider(QWidget):
         self.slider.setValue(self.starting_val)
 
         # Labels for displaying the range and current value
-        self._min_label = QLabel(str(self.min_val), alignment=Qt.AlignLeft)
-        self._max_label = QLabel(str(self.max_val), alignment=Qt.AlignRight)
-        self.value_label = QLabel(f"{self.title}: {self.slider.value()}")
+        self._min_label = QLabel(str(self.min_val * self._adjust_val), alignment=Qt.AlignLeft)
+        self._max_label = QLabel(str(self.max_val * self._adjust_val), alignment=Qt.AlignRight)
+        self.value_label = QLabel(f"{self.title}:")
 
         # Connect the slider movement to the callback
         self.slider.valueChanged.connect(self.on_value_changed)
@@ -119,4 +132,4 @@ class Slider(QWidget):
         """
         Update the label based on the slider's current value.
         """
-        self.value_label.setText(f"{self.title}: {value}")
+        self.value_label.setText(f"{self.title}: {value*self._adjust_val}")
