@@ -51,7 +51,6 @@ class Viewer(Singleton):
         if self.running:
             for obj in self._scene.objects:
                 obj.init()
-            # self.ui.sidebar.update()
 
     def show(self):
         self.running = True

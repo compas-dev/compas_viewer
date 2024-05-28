@@ -88,11 +88,18 @@ class Sceneform(QTreeWidget):
 
         self.scene = scene
         self.callback = callback
-        self._selected_items = None
         # TODO(pitsai): enable multiple selection
         # self.setSelectionMode(QTreeWidget.ExtendedSelection)
+        self.show_idx = self.find_column_index("Show")
+        self.locked_idx = self.find_column_index("Locked")
         self.itemClicked.connect(self.on_item_clicked)
         self.itemSelectionChanged.connect(self.on_item_selection_changed)
+
+    @property
+    def viewer(self):
+        from compas_viewer import Viewer
+
+        return Viewer()
 
     @property
     def scene(self) -> Scene:
@@ -105,19 +112,7 @@ class Sceneform(QTreeWidget):
             if node.is_root:
                 continue
 
-            strings = []
-            self.show_idx = None
-            self.locked_idx = None
-            for i, (name, c) in enumerate(self.columns.items()):
-                if name == "Show":
-                    self.show_idx = i
-                    string = None
-                elif name == "Locked":
-                    self.locked_idx = i
-                    string = None
-                else:
-                    string = str(c(node))
-                strings.append(string)
+            strings = ["" if name in ["Show", "Locked"] else str(func(node)) for name, func in self.columns.items()]
 
             if node.parent.is_root:  # type: ignore
                 widget = QTreeWidgetItem(self, strings)  # type: ignore
@@ -144,9 +139,7 @@ class Sceneform(QTreeWidget):
         self._scene = scene
 
     def update(self):
-        from compas_viewer import Viewer
-
-        self.scene = Viewer().scene
+        self.scene = self.viewer.scene
 
     def on_item_clicked(self, item, column):
         if column == self.show_idx:
@@ -165,9 +158,7 @@ class Sceneform(QTreeWidget):
                 if self.callback and node.is_selected:
                     self.callback(node)
 
-        from compas_viewer import Viewer
-
-        Viewer().renderer.update()
+        self.viewer.renderer.update()
 
     def on_item_selection_changed(self):
         for item in self.selectedItems():
@@ -177,3 +168,7 @@ class Sceneform(QTreeWidget):
     def adjust_column_widths(self, item=None, column=None):
         for i in range(self.columnCount()):
             self.resizeColumnToContents(i)
+
+    def find_column_index(self, column_name):
+        """Utility to find the index of a specific column by name."""
+        return next((i for i, name in enumerate(self.columns) if name == column_name), None)
