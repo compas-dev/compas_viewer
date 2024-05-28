@@ -235,8 +235,18 @@ class StatusbarConfig(ConfigBase):
 @dataclass
 class SidebarConfig(ConfigBase):
     show: bool = True
-    sceneform: bool = True
-    items: list[dict[str, str]] = None
+    items: list[dict[str, str]] = field(
+        default_factory=lambda: [
+            {
+                "type": "Sceneform",
+                "action": {
+                    "Name": (lambda o: o.name),
+                    "Visible": (lambda o: o.show),
+                    "Locked": (lambda o: o.is_locked),
+                },
+            },
+        ]
+    )
 
 
 # =============================================================================

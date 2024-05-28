@@ -1,7 +1,5 @@
 from typing import TYPE_CHECKING
 
-from compas_viewer.components import Sceneform
-
 from .mainwindow import MainWindow
 from .menubar import MenuBar
 from .sidebar import SideBarRight
@@ -35,6 +33,7 @@ class UI:
         self.sidebar = SideBarRight(
             self,
             show=self.viewer.config.ui.sidebar.show,
+            items=self.viewer.config.ui.sidebar.items,
         )
         self.viewport = ViewPort(
             self,
@@ -45,18 +44,6 @@ class UI:
             self,
             show=self.viewer.config.ui.sidedock.show,
         )
-
-        if self.viewer.config.ui.sidebar.sceneform:
-            self.sidebar.widget.addWidget(
-                Sceneform(
-                    self.viewer.scene,
-                    {
-                        "Name": (lambda o: o.name),
-                        "Visible": (lambda o: o.show),
-                        "Locked": (lambda o: o.is_locked),
-                    },
-                )
-            )
 
         self.window.widget.setCentralWidget(self.viewport.widget)
         self.window.widget.addDockWidget(SideDock.locations["left"], self.sidedock.widget)
