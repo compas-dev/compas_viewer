@@ -1,3 +1,4 @@
+import textwrap
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import Callable
@@ -15,6 +16,7 @@ from PySide6.QtGui import QMouseEvent
 from PySide6.QtGui import QWheelEvent
 from PySide6.QtWidgets import QApplication
 from PySide6.QtWidgets import QFileDialog
+from PySide6.QtWidgets import QMessageBox
 
 import compas
 from compas.scene import Scene
@@ -445,3 +447,62 @@ def load_data():
 
 
 load_data_cmd = Command(title="Load Data", callback=lambda: print("load data"))
+
+
+# =============================================================================
+# =============================================================================
+# =============================================================================
+# Info
+# =============================================================================
+# =============================================================================
+# =============================================================================
+
+
+def object_info(viewer: "Viewer"):
+    def custom_wrap(text, width=80, indent=0):
+        """
+        Wrap text with a given width, adding indentation for wrapped lines.
+
+        :param text: The text to wrap.
+        :param width: The maximum width of the text, in characters.
+        :param indent: Number of spaces to indent wrapped lines.
+        :return: Wrapped text string.
+        """
+        indent_space = " " * indent
+        wrapper = textwrap.TextWrapper(width=width, subsequent_indent=indent_space)
+        return wrapper.fill(text)
+
+    def format_info(obj):
+        attributes = [
+            ("Type", str(type(obj))),
+            ("Parent", str(obj.parent)),
+            ("Locked", str(obj.is_locked)),
+            ("Show", str(obj.show)),
+            ("Point Color", str(obj.pointcolor)),
+            ("Line Color", str(obj.linecolor)),
+            ("Face Color", str(obj.facecolor)),
+            ("Line Width", str(obj.linewidth)),
+            ("Point Size", str(obj.pointsize)),
+            ("Opacity", str(obj.opacity)),
+        ]
+
+        info = f"{obj.name}:\n"
+        for attr, value in attributes:
+            line = f"-- {attr}: {value}"
+            # Wrap and indent the line if it's longer than 40 characters
+            info += custom_wrap(line, width=40, indent=4) + "\n"
+
+        return info
+
+    info: str = ""
+
+    for obj in viewer.scene.objects:
+        if obj.is_selected:
+            info += format_info(obj)
+
+    if not info:
+        info = "No object selected."
+    QMessageBox.information(viewer.ui.window.widget, "Info", info)
+
+
+object_info_cmd = Command(title="Display Info", callback=object_info)
