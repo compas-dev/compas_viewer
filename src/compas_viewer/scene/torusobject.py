@@ -1,15 +1,12 @@
-from typing import Optional
-
-from compas.datastructures import Mesh
-from compas.geometry import Line
-from compas.geometry import Point
+# from compas.datastructures import Mesh
+# from compas.geometry import Line
+# from compas.geometry import Point
 from compas.geometry import Torus
-from compas.scene import GeometryObject
 
-from .geometryobject import GeometryObject as ViewerGeometryObject
+from .shapeobject import ShapeObject
 
 
-class TorusObject(ViewerGeometryObject, GeometryObject):
+class TorusObject(ShapeObject):
     """Viewer scene object for displaying COMPAS Torus geometry.
 
     See Also
@@ -20,18 +17,16 @@ class TorusObject(ViewerGeometryObject, GeometryObject):
     def __init__(self, torus: Torus, **kwargs):
         super().__init__(geometry=torus, **kwargs)
         self.geometry: Torus
+        # self.polyhedron = self.geometry.to_polyhedron(u=self.u, v=self.v, triangulated=False)
 
-    @property
-    def points(self) -> Optional[list[Point]]:
-        """The points to be shown in the viewer."""
-        return [self.geometry.plane.point]
+    # @property
+    # def points(self) -> list[Point]:
+    #     return self.polyhedron.vertices
 
-    @property
-    def lines(self) -> Optional[list[Line]]:
-        """The lines to be shown in the viewer."""
-        return None
+    # @property
+    # def lines(self) -> list[Line]:
+    #     return self.polyhedron.lines
 
-    @property
-    def viewmesh(self):
-        """The mesh volume to be shown in the viewer."""
-        return Mesh.from_shape(self.geometry, u=self.u, v=self.v, triangulated=True)
+    # @property
+    # def viewmesh(self):
+    #     return Mesh.from_shape(self.geometry, u=self.u, v=self.v, triangulated=True)

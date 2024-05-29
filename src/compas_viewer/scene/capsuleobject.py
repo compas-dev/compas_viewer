@@ -1,15 +1,12 @@
-from typing import Optional
-
-from compas.datastructures import Mesh
+# from compas.datastructures import Mesh
 from compas.geometry import Capsule
-from compas.geometry import Line
-from compas.geometry import Point
-from compas.scene import GeometryObject
 
-from .geometryobject import GeometryObject as ViewerGeometryObject
+# from compas.geometry import Line
+# from compas.geometry import Point
+from .shapeobject import ShapeObject
 
 
-class CapsuleObject(ViewerGeometryObject, GeometryObject):
+class CapsuleObject(ShapeObject):
     """Viewer scene object for displaying COMPAS Capsule geometry.
 
     See Also
@@ -21,16 +18,14 @@ class CapsuleObject(ViewerGeometryObject, GeometryObject):
         super().__init__(geometry=capsule, **kwargs)
         self.geometry: Capsule
 
-    @property
-    def points(self) -> Optional[list[Point]]:
-        """The points to be shown in the viewer."""
-        return None
+    # @property
+    # def points(self) -> list[Point]:
+    #     return self.polyhedron.vertices
 
-    @property
-    def lines(self) -> Optional[list[Line]]:
-        return None
+    # @property
+    # def lines(self) -> list[Line]:
+    #     return self.polyhedron.lines
 
-    @property
-    def viewmesh(self):
-        """The mesh volume to be shown in the viewer."""
-        return Mesh.from_shape(self.geometry, u=self.u, v=self.v, triangulated=True)
+    # @property
+    # def viewmesh(self):
+    #     return Mesh.from_shape(self.geometry, u=self.u, v=self.v, triangulated=True)
