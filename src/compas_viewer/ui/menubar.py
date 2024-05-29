@@ -50,7 +50,7 @@ class MenuBar:
                     a.setChecked(state if not callable(state) else state(self.ui.viewer))
 
                 if isinstance(action, Command):
-                    print(f"here: {action.keybinding}")
+                    # print(f"here: {action.keybinding}")
                     if action.keybinding is not None:
                         a.setShortcut(action.keybinding)
                         print(a.shortcut())
