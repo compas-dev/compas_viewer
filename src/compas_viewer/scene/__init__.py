@@ -49,6 +49,7 @@ from .coneobject import ConeObject
 from .capsuleobject import CapsuleObject
 from .polyhedronobject import PolyhedronObject
 from .geometryobject import GeometryObject
+from .shapeobject import ShapeObject
 from .groupobject import Group
 from .groupobject import GroupObject
 from .collectionobject import Collection
@@ -149,6 +150,7 @@ __all__ = [
     "NurbsSurface",
     "NurbsSurfaceObject",
     "GeometryObject",
+    "ShapeObject",
     "Group",
     "GroupObject",
     "Collection",

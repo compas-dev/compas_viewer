@@ -5,6 +5,7 @@ from compas.datastructures import Mesh
 from compas.geometry import Geometry
 from compas.geometry import Line
 from compas.geometry import Point
+from compas.itertools import flatten
 from compas.scene import GeometryObject as BaseGeometryObject
 
 from .sceneobject import ShaderDataType
@@ -103,12 +104,10 @@ class GeometryObject(ViewerSceneObject, BaseGeometryObject):
         if self.lines is None:
             return [], [], []
         positions = []
-        for line in self.lines:
-            positions.append(line.start)
-            positions.append(line.end)
+        elements = []
+        positions = list(flatten(self.lines))
         colors = [self.linecolor] * 2 * len(positions)
-        elements = [[2 * i, 2 * i + 1] for i in range(len(positions))]
-
+        elements = [[2 * i, 2 * i + 1] for i in range(len(self.lines))]
         return positions, colors, elements
 
     def _read_frontfaces_data(self) -> ShaderDataType:
