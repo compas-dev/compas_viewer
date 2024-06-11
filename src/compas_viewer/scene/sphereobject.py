@@ -1,6 +1,3 @@
-# from compas.datastructures import Mesh
-# from compas.geometry import Line
-# from compas.geometry import Point
 from compas.geometry import Sphere
 
 from .shapeobject import ShapeObject
