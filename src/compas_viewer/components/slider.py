@@ -19,7 +19,7 @@ class Slider(QWidget):
         action: Callable = None,
         horizontal: Optional[bool] = True,
         starting_val: Optional[int] = None,
-        tick_interval: Optional[int] = None,
+        tick_interval: Optional[float] = None,
     ):
         """
         A customizable slider widget for Qt applications, supporting both horizontal and vertical orientations. This
@@ -41,7 +41,7 @@ class Slider(QWidget):
             Orientation of the slider. True for horizontal, False for vertical. Defaults to True.
         starting_val : int, optional
             Initial value of the slider, defaults to the minimum value.
-        tick_interval : int, optional
+        tick_interval : float, optional
             Interval between tick marks. No ticks if None. Defaults to None.
 
         Attributes
@@ -89,7 +89,7 @@ class Slider(QWidget):
             self._adjust_val = 1
 
         if self._tick_interval is None:
-            self._tick_interval = (self.max_val - self.min_val) / 10
+            self._tick_interval: float = (self.max_val - self.min_val) / 10
 
         self.layout = QVBoxLayout(self)
         self._h_layout = QHBoxLayout()
@@ -107,7 +107,6 @@ class Slider(QWidget):
 
         # Connect the slider movement to the callback
         self.slider.valueChanged.connect(self.on_value_changed)
-        self.slider.valueChanged.connect(lambda value: self.action(self, value))
         self.layout.addWidget(self.value_label)
         self.layout.addWidget(self.slider)
 
@@ -125,4 +124,5 @@ class Slider(QWidget):
         """
         Update the label based on the slider's current value.
         """
-        self.value_label.setText(f"{self.title}: {value*self._adjust_val}")
+        self.value_label.setText(f"{self.title}: {round(value*self._adjust_val,2)}")
+        self.action(self, value * self._adjust_val)

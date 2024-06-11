@@ -31,5 +31,5 @@ def slider_changed(slider: Slider, value: int):
 
 viewer.ui.sidedock.show = True
 viewer.ui.sidedock.add(Button(text="Toggle Box", action=toggle_box))
-viewer.ui.sidedock.add(Slider(title="test", min_val=0, max_val=100, step=10, action=slider_changed))
+viewer.ui.sidedock.add(Slider(title="test", min_val=0, max_val=1, step=0.2, action=slider_changed))
 viewer.show()
