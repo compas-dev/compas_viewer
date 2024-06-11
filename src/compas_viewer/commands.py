@@ -461,4 +461,8 @@ def get_name(obj: "ViewerSceneObject"):
 
 
 def get_show_box(obj: "ViewerSceneObject"):
-    return "show_box", obj.show
+    """
+    'checkbox' to show(hide) the ViewerSceneObject.
+    'show' is a boolean attribute of ViewerSceneObject.
+    """
+    return "checkbox", "show"

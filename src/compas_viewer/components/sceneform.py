@@ -1,8 +1,8 @@
 from typing import Callable
+from typing import Dict
 from typing import Optional
 
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QTreeWidget
 from PySide6.QtWidgets import QTreeWidgetItem
 
@@ -16,81 +16,48 @@ class Sceneform(QTreeWidget):
     Parameters
     ----------
     scene : :class:`compas.scene.Scene`
-        The tree to be displayed. An typical example is the scene
-        object tree: :attr:`compas_viewer.viewer.Viewer._tree`.
-    columns : dict[str, callable]
+        The scene to be displayed.
+    columns : dict[str, Callable]
         A dictionary of column names and their corresponding attributes.
-        Example: ``{"Name": (lambda o: o.name), "Object": (lambda o: o)}``
-    column_editable : list, optional
-        A list of booleans indicating whether the corresponding column is editable.
-        Defaults to ``[False]``.
+        Example: {"Name": lambda o: o.name, "Object": lambda o: o}
+    column_editable : list[bool], optional
+        A list of booleans indicating whether the corresponding column is editable. Defaults to [False].
     show_headers : bool, optional
-        Show the header of the tree.
-        Defaults to ``True``.
-    stretch : int, optional
-        Stretch factor of the tree in the grid layout.
-        Defaults to ``2``.
-    backgrounds : dict[str, callable], optional
-        A dictionary of column names and their corresponding color.
-        Example: ``{"Object-Color": (lambda o: o.surfacecolor)}``
+        Show the header of the tree. Defaults to True.
+    callback : Callable, optional
+        Callback function to execute when an item is clicked or selected.
 
     Attributes
     ----------
-    tree : :class:`compas.datastructures.Tree`
-        The tree to be displayed.
-
-    See Also
-    --------
-    :class:`compas.datastructures.Tree`
-    :class:`compas.datastructures.tree.TreeNode`
-    :class:`compas_viewer.layout.SidedockLayout`
-
-    References
-    ----------
-    :PySide6:`PySide6/QtWidgets/QTreeWidget`
-
-    Examples
-    --------
-    .. code-block:: python
-
-        from compas_viewer import Viewer
-
-        viewer = Viewer()
-
-        for i in range(10):
-            for j in range(10):
-                sp = viewer.scene.add(Sphere(0.1, Frame([i, j, 0], [1, 0, 0], [0, 1, 0])), name=f"Sphere_{i}_{j}")
-
-        viewer.layout.sidedock.add_element(Treeform(viewer._tree, {"Name": (lambda o: o.object.name), "Object": (lambda o: o.object)}))
-
-        viewer.show()
-
+    scene : :class:`compas.scene.Scene`
+        The scene to be displayed.
+    columns : dict[str, Callable]
+        A dictionary of column names and their corresponding function.
+    checkbox_columns : dict[int, str]
+        A dictionary of column indices and their corresponding attributes.
     """
 
     def __init__(
         self,
         scene: Scene,
-        columns: dict[str, Callable],
-        column_editable: list[bool] = [False],
+        columns: Dict[str, Callable],
+        column_editable: Optional[list[bool]] = None,
         show_headers: bool = True,
-        stretch: int = 2,
-        backgrounds: Optional[dict[str, Callable]] = None,
         callback: Optional[Callable] = None,
     ):
         super().__init__()
         self.columns = columns
-        self.column_editable = column_editable + [False] * (len(columns) - len(column_editable))
+        self.checkbox_columns: dict[int, str] = {}
+        self.column_editable = (column_editable or [False]) + [False] * (len(columns) - len(column_editable or [False]))
         self.setColumnCount(len(columns))
         self.setHeaderLabels(list(self.columns.keys()))
         self.setHeaderHidden(not show_headers)
-        self.stretch = stretch
-        self._backgrounds = backgrounds
 
-        self.scene = scene
+        self._scene = scene
         self.callback = callback
-        # TODO(pitsai): enable multiple selection
-        # self.setSelectionMode(QTreeWidget.ExtendedSelection)
-        self.show_idx = None
+
+        self.populate_tree()
+
         self.itemClicked.connect(self.on_item_clicked)
         self.itemSelectionChanged.connect(self.on_item_selection_changed)
 
@@ -100,60 +67,49 @@ class Sceneform(QTreeWidget):
 
         return Viewer()
 
-    @property
-    def scene(self) -> Scene:
-        return self._scene
-
-    @scene.setter
-    def scene(self, scene: Scene):
+    def populate_tree(self):
         self.clear()
-        for node in scene.traverse("breadthfirst"):
+        for node in self._scene.traverse("breadthfirst"):
             if node.is_root:
                 continue
 
             strings = []
             for i, func in enumerate(self.columns.values()):
                 output = func(node)
-                if output[0] == "show_box":
-                    self.show_idx = i
-                    show_status = output[1]
-                    output = ""
+                if isinstance(output, tuple) and output[0] == "checkbox":
+                    if hasattr(node, output[1]):
+                        self.checkbox_columns[i] = output[1]
+                        output = ""
+                    else:
+                        raise TypeError(f"Attribute '{output[1]}' not found in node '{node}'")
                 strings.append(output)
 
-            if node.parent.is_root:  # type: ignore
-                widget = QTreeWidgetItem(self, strings)  # type: ignore
+            if node.parent.is_root:
+                widget = QTreeWidgetItem(self, strings)
             else:
-                widget = QTreeWidgetItem(
-                    node.parent.attributes["widget"],
-                    strings,  # type: ignore
-                )
+                widget = QTreeWidgetItem(node.parent.attributes["widget"], strings)
             widget.node = node
             widget.setSelected(node.is_selected)
-            widget.setFlags(widget.flags() | Qt.ItemIsUserCheckable | Qt.ItemIsSelectable | Qt.ItemIsEnabled)  # Allow checkbox
+            widget.setFlags(widget.flags() | Qt.ItemIsUserCheckable | Qt.ItemIsSelectable | Qt.ItemIsEnabled)
 
-            if self.show_idx is not None:
-                widget.setCheckState(self.show_idx, Qt.Checked if show_status else Qt.Unchecked)
-
-            if self._backgrounds:
-                for col, background in self._backgrounds.items():
-                    widget.setBackground(list(self.columns.keys()).index(col), QColor(*background(node).rgb255))
+            for col, attr in self.checkbox_columns.items():
+                widget.setCheckState(col, Qt.Checked if getattr(node, attr) else Qt.Unchecked)
 
             node.attributes["widget"] = widget
 
         self.adjust_column_widths()
-        self._scene = scene
 
     def update(self):
-        self.scene = self.viewer.scene
+        self.populate_tree()
 
     def on_item_clicked(self, item, column):
-        if column == self.show_idx:
-            item.node.show = item.checkState(self.show_idx) == Qt.Checked
+        if column in self.checkbox_columns:
+            attr = self.checkbox_columns[column]
+            setattr(item.node, attr, item.checkState(column) == Qt.Checked)
 
         if self.selectedItems():
-            self._selected_items = self.selectedItems()
             selected_nodes = {item.node for item in self.selectedItems()}
-            for node in self.scene.objects:
+            for node in self._scene.objects:
                 node.is_selected = node in selected_nodes
                 if self.callback and node.is_selected:
                     self.callback(node)
@@ -165,6 +121,7 @@ class Sceneform(QTreeWidget):
             if self.callback:
                 self.callback(item.node)
 
-    def adjust_column_widths(self, item=None, column=None):
+    def adjust_column_widths(self):
         for i in range(self.columnCount()):
-            self.resizeColumnToContents(i)
+            if i in self.checkbox_columns:
+                self.setColumnWidth(i, 50)
