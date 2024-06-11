@@ -32,7 +32,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Implemented downsampling for window selection to improve performance.
 * Made `TreeForm` interactive.
 * Fixed `load_scene` action bug.
-* changed base of shapes to `compas_viewer.scene.ShapeObject`.
+* Changed base of shapes to `compas_viewer.scene.ShapeObject`.
+* Changed `FrameObject` to something with just 3 axes.
 
 ### Removed
 
