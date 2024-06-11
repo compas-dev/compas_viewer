@@ -19,7 +19,7 @@ class ToolBar:
         self.widget.clear()
         self.widget.setMovable(False)
         self.widget.setObjectName("Tools")
-        self.widget.setVisible(show)
+        self.show = show
 
         if not self.items:
             return
@@ -71,4 +71,7 @@ class ToolBar:
 
     @show.setter
     def show(self, value: bool):
-        self.widget.setVisible(value)
+        if value:
+            self.widget.setVisible(True)
+        elif not value:
+            self.widget.setHidden(True)
