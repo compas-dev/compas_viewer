@@ -77,32 +77,22 @@ class Slider(QWidget):
         self.max_val = max_val
         self.step = step or 1
         self.starting_val = starting_val if starting_val is not None else self.min_val
-        self._tick_interval = tick_interval
+        self._tick_interval = tick_interval if tick_interval is not None else (self._scaled_max_val - self._scaled_min_val) / 10
 
         orientation = Qt.Horizontal if horizontal else Qt.Vertical
-
-        if self.step:
-            self.min_val /= step
-            self.max_val /= step
-            self._adjust_val = step
-        else:
-            self._adjust_val = 1
-
-        if self._tick_interval is None:
-            self._tick_interval: float = (self.max_val - self.min_val) / 10
 
         self.layout = QVBoxLayout(self)
         self._h_layout = QHBoxLayout()
         self.slider = QSlider(orientation)
-        self.slider.setMinimum(self.min_val)
-        self.slider.setMaximum(self.max_val)
+        self.slider.setMinimum(self._scaled_min_val)
+        self.slider.setMaximum(self._scaled_max_val)
         self.slider.setTickInterval(self._tick_interval)
         self.slider.setTickPosition(QSlider.TicksBelow)
         self.slider.setValue(self.starting_val)
 
         # Labels for displaying the range and current value
-        self._min_label = QLabel(str(self.min_val * self._adjust_val), alignment=Qt.AlignLeft)
-        self._max_label = QLabel(str(self.max_val * self._adjust_val), alignment=Qt.AlignRight)
+        self._min_label = QLabel(str(self.min_val), alignment=Qt.AlignLeft)
+        self._max_label = QLabel(str(self.max_val), alignment=Qt.AlignRight)
         self.value_label = QLabel(f"{self.title}:")
 
         # Connect the slider movement to the callback
@@ -120,9 +110,17 @@ class Slider(QWidget):
 
         self.layout.addLayout(self._h_layout)
 
+    @property
+    def _scaled_min_val(self):
+        return self.min_val / self.step
+
+    @property
+    def _scaled_max_val(self):
+        return self.max_val / self.step
+
     def on_value_changed(self, value):
         """
         Update the label based on the slider's current value.
         """
-        self.value_label.setText(f"{self.title}: {round(value*self._adjust_val,2)}")
-        self.action(self, value * self._adjust_val)
+        self.value_label.setText(f"{self.title}: {round(value * self.step, 2)}")
+        self.action(self, value * self.step)

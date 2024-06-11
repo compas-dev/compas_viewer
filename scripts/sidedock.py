@@ -23,13 +23,12 @@ def slider_changed(slider: Slider, value: int):
 
     v = (value - vmin) / (vmax - vmin)
 
-    boxobj.item.frame.point.x = v * 10
-
+    boxobj.item.frame.point.x = value
     boxobj.update()
     viewer.renderer.update()
 
 
 viewer.ui.sidedock.show = True
 viewer.ui.sidedock.add(Button(text="Toggle Box", action=toggle_box))
-viewer.ui.sidedock.add(Slider(title="test", min_val=0, max_val=1, step=0.2, action=slider_changed))
+viewer.ui.sidedock.add(Slider(title="test", min_val=0, max_val=2, step=0.2, action=slider_changed))
 viewer.show()
