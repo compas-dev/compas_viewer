@@ -13,12 +13,12 @@ class Slider(QWidget):
     def __init__(
         self,
         title: str = "Slider",
-        min_val: int = 0,
-        max_val: int = 100,
+        min_val: float = 0,
+        max_val: float = 100,
         step: Optional[float] = 1,
         action: Callable = None,
         horizontal: Optional[bool] = True,
-        starting_val: Optional[int] = None,
+        starting_val: Optional[float] = None,
         tick_interval: Optional[float] = None,
     ):
         """
@@ -29,9 +29,9 @@ class Slider(QWidget):
         ----------
         title : str
             Label displayed above the slider, defaults to "Slider".
-        min_val : int
+        min_val : float
             Minimum value of the slider, defaults to 0.
-        max_val : int
+        max_val : float
             Maximum value of the slider, defaults to 100.
         step : float, optional
             Step size of the slider. Defaults to 1.
@@ -39,7 +39,7 @@ class Slider(QWidget):
             Function to execute on value change. Should accept a single integer argument.
         horizontal : bool, optional
             Orientation of the slider. True for horizontal, False for vertical. Defaults to True.
-        starting_val : int, optional
+        starting_val : float, optional
             Initial value of the slider, defaults to the minimum value.
         tick_interval : float, optional
             Interval between tick marks. No ticks if None. Defaults to None.
@@ -48,15 +48,15 @@ class Slider(QWidget):
         ----------
         title : str
             Label displayed above the slider.
-        min_val : int
+        min_val : float
             Minimum value of the slider.
-        max_val : int
+        max_val : float
             Maximum value of the slider.
         step : float
             Step size of the slider.
         action : Callable
             Function to execute on value change.
-        start_val : int
+        start_val : float
             Initial value of the slider.
         layout : QVBoxLayout
             Layout of the widget.
