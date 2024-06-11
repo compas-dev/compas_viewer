@@ -6,6 +6,7 @@ from compas.geometry import Frame
 from compas.geometry import Point
 from compas.geometry import Transformation
 from compas.itertools import flatten
+from compas_viewer.base import Base
 from compas_viewer.gl import make_index_buffer
 from compas_viewer.gl import make_vertex_buffer
 from compas_viewer.renderer.shaders import Shader
@@ -13,7 +14,7 @@ from compas_viewer.renderer.shaders import Shader
 from .sceneobject import ShaderDataType
 
 
-class GridObject:
+class GridObject(Base):
     """
     The scene object of the world XY grid. It is a subclass of the FrameObject.
 
@@ -64,11 +65,11 @@ class GridObject:
     ):
         self.is_locked = True
         self.frame = frame
-        self.linecolor = linecolor if linecolor else Color.black()
-        self.dx = framesize[0] if framesize else float(1)
-        self.nx = framesize[1] if framesize else int(10)
-        self.dy = framesize[2] if framesize else float(1)
-        self.ny = framesize[3] if framesize else int(10)
+        self.linecolor = linecolor if linecolor else self.viewer.config.renderer.gridcolor
+        self.dx = framesize[0] if framesize else 20.0
+        self.nx = framesize[1] if framesize else 20
+        self.dy = framesize[2] if framesize else 20.0
+        self.ny = framesize[3] if framesize else 20
         self.show_framez = show_framez if show_framez else False
         if self.nx % 2 != 0 or self.ny % 2 != 0:
             raise ValueError("The number of grid cells in the X and Y directions must be even numbers.")
