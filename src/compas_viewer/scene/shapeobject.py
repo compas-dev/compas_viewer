@@ -53,12 +53,10 @@ class ShapeObject(GeometryObject):
         geometry: Shape,
         u: Optional[int] = 16,
         v: Optional[int] = 16,
-        facecolor: Optional[Color] = None,
         **kwargs,
     ):
         super().__init__(geometry=geometry, **kwargs)
         self.geometry: Shape
-        self.facecolor = facecolor or Color(0.9, 0.9, 0.9)
         self.u = u
         self.v = v
 
@@ -80,7 +78,6 @@ class ShapeObject(GeometryObject):
 
     @property
     def facecolor(self) -> Color:
-        """The color of the faces."""
         return self.surfacecolor
 
     @facecolor.setter
