@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added `clear_scene` action.
 * Added `compas_viewer.components.SceneForm`.
 * Added `callback` for `compas_viewer.components.TreeForm`.
+* Added `compas_viewer.scene.ShapeObject`.
 
 ### Changed
 
@@ -28,9 +29,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Implemented downsampling for window selection to improve performance.
 * Made `TreeForm` interactive.
 * Fixed `load_scene` action bug.
+* changed base of shapes to `compas_viewer.scene.ShapeObject`.
 
 ### Removed
-
 
 ## [1.1.5] 2024-05-15
 
