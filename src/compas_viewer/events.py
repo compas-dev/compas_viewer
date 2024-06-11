@@ -329,4 +329,4 @@ class EventManager:
             wheelevent.triggered.emit(event)
 
     def delegate_pinch(self, event: QGestureEvent):
-        raise NotImplementedError
+        pass
