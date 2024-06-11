@@ -10,6 +10,7 @@ from PySide6.QtGui import QDesktopServices
 from compas.colors import Color
 from compas_viewer.commands import Command
 from compas_viewer.commands import camera_settings_cmd
+from compas_viewer.commands import capture_view_cmd
 from compas_viewer.commands import change_rendermode_cmd
 from compas_viewer.commands import change_view_cmd
 from compas_viewer.commands import clear_scene_cmd
@@ -143,7 +144,8 @@ class MenubarConfig(ConfigBase):
                     },
                     {"type": "separator"},
                     {"title": camera_settings_cmd.title, "action": camera_settings_cmd},
-                    {"title": "Display Settings", "items": []},
+                    {"title": "Display Settings", "action": lambda: print("Display Settings")},
+                    {"title": capture_view_cmd.title, "action": capture_view_cmd},
                     {"type": "separator"},
                 ],
             },
@@ -250,7 +252,7 @@ class SidebarConfig(ConfigBase):
 
 @dataclass
 class SidedockConfig(ConfigBase):
-    show: bool = True
+    show: bool = False
     items: list[dict[str, str]] = None
 
 
@@ -279,7 +281,8 @@ class DisplayConfig(ConfigBase):
 class RendererConfig(ConfigBase):
     show_grid: bool = True
     show_gridz: bool = False
-    gridsize: tuple[float, int, float, int] = field(default_factory=lambda: (10.0, 10, 10.0, 10))
+    gridsize: tuple[float, int, float, int] = field(default_factory=lambda: (20.0, 20, 20.0, 20))
+    gridcolor: Color = field(default_factory=lambda: Color(0.7, 0.7, 0.7))
     opacity: float = 1.0
     ghostopacity: float = 0.7
     rendermode: Literal["ghosted", "shaded", "lighted", "wireframe"] = "shaded"
@@ -347,6 +350,7 @@ class UIConfig(ConfigBase):
 
 @dataclass
 class Config(ConfigBase):
+    vectorsize: float = 0.1
     ui: UIConfig = field(default_factory=UIConfig)
     window: WindowConfig = field(default_factory=WindowConfig)
     renderer: RendererConfig = field(default_factory=RendererConfig)

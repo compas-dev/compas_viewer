@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added `compas_viewer.components.SceneForm`.
 * Added `callback` for `compas_viewer.components.TreeForm`.
 * Added `compas_viewer.scene.ShapeObject`.
+* Added `compas_viewer.commands.capture_view` and corresponding command.
 
 ### Changed
 

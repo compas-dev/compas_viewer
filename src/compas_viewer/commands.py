@@ -9,6 +9,7 @@ from numpy import any
 from numpy import array
 from numpy import unique
 from numpy.linalg import norm
+import pathlib
 from PySide6.QtCore import QEvent
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QMouseEvent
@@ -116,6 +117,20 @@ def camera_settings(viewer: "Viewer"):
 
 
 camera_settings_cmd = Command(title="Camera Settings", callback=camera_settings)
+
+
+def capture_view(viewer: "Viewer"):
+    result = QFileDialog.getSaveFileName(parent=viewer.ui.window.widget, caption="Save Image", filter="Images (*.png *.jpg)")
+    if not result:
+        return
+
+    filepath = pathlib.Path(result[0])
+
+    qimage = viewer.renderer.grabFramebuffer()
+    qimage.save(str(filepath), filepath.suffix[1:])
+
+
+capture_view_cmd = Command(title="Capture View", callback=capture_view)
 
 
 # -----------------------------------------------------------------------------
