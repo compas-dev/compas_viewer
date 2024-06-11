@@ -90,8 +90,7 @@ class Sceneform(QTreeWidget):
         self.callback = callback
         # TODO(pitsai): enable multiple selection
         # self.setSelectionMode(QTreeWidget.ExtendedSelection)
-        self.show_idx = self.find_column_index("Show")
-        self.locked_idx = self.find_column_index("Locked")
+        self.show_idx = None
         self.itemClicked.connect(self.on_item_clicked)
         self.itemSelectionChanged.connect(self.on_item_selection_changed)
 
@@ -112,7 +111,14 @@ class Sceneform(QTreeWidget):
             if node.is_root:
                 continue
 
-            strings = ["" if name in ["Show", "Locked"] else str(func(node)) for name, func in self.columns.items()]
+            strings = []
+            for i, func in enumerate(self.columns.values()):
+                output = func(node)
+                if output[0] == "check_box":
+                    self.show_idx = i
+                    show_status = output[1]
+                    output = ""
+                strings.append(output)
 
             if node.parent.is_root:  # type: ignore
                 widget = QTreeWidgetItem(self, strings)  # type: ignore
@@ -126,13 +132,12 @@ class Sceneform(QTreeWidget):
             widget.setFlags(widget.flags() | Qt.ItemIsUserCheckable | Qt.ItemIsSelectable | Qt.ItemIsEnabled)  # Allow checkbox
 
             if self.show_idx is not None:
-                widget.setCheckState(self.show_idx, Qt.Checked if node.show else Qt.Unchecked)
-            if self.locked_idx is not None:
-                widget.setCheckState(self.locked_idx, Qt.Checked if node.is_locked else Qt.Unchecked)
+                widget.setCheckState(self.show_idx, Qt.Checked if show_status else Qt.Unchecked)
 
             if self._backgrounds:
                 for col, background in self._backgrounds.items():
                     widget.setBackground(list(self.columns.keys()).index(col), QColor(*background(node).rgb255))
+
             node.attributes["widget"] = widget
 
         self.adjust_column_widths()
@@ -145,10 +150,6 @@ class Sceneform(QTreeWidget):
         if column == self.show_idx:
             is_visible = item.checkState(self.show_idx) == Qt.Checked
             item.node.show = is_visible
-
-        if column == self.locked_idx:
-            is_locked = item.checkState(self.locked_idx) == Qt.Checked
-            item.node.is_locked = is_locked
 
         if self.selectedItems():
             self._selected_items = self.selectedItems()
@@ -168,7 +169,3 @@ class Sceneform(QTreeWidget):
     def adjust_column_widths(self, item=None, column=None):
         for i in range(self.columnCount()):
             self.resizeColumnToContents(i)
-
-    def find_column_index(self, column_name):
-        """Utility to find the index of a specific column by name."""
-        return next((i for i, name in enumerate(self.columns) if name == column_name), None)
