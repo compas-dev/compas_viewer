@@ -24,12 +24,10 @@ class NurbsCurveObject(ViewerGeometryObject, GeometryObject):
 
     @property
     def points(self) -> Optional[list[Point]]:
-        """The points to be shown in the viewer."""
         return self.geometry.points
 
     @property
     def lines(self) -> Optional[list[Line]]:
-        """The lines to be shown in the viewer."""
         lines = []
         polyline = self.geometry.to_polyline()
         for pair in pairwise(polyline.points):
@@ -39,5 +37,4 @@ class NurbsCurveObject(ViewerGeometryObject, GeometryObject):
 
     @property
     def viewmesh(self) -> Optional[Mesh]:
-        """The mesh volume to be shown in the viewer."""
         pass
