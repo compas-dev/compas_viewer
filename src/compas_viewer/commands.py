@@ -24,6 +24,7 @@ if TYPE_CHECKING:
     from compas_viewer import Viewer
     from compas_viewer.scene.sceneobject import ViewerSceneObject
 
+
 class Command:
     # we should rename the module to "commands.py"
 

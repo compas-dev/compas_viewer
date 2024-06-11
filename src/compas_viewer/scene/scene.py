@@ -69,8 +69,8 @@ class ViewerScene(Scene):
     update_timer : :class:`QTimer`
         Timer to manage update debouncing.
     debounce_interval : int
-        Interval in milliseconds for debouncing updates.  
-        
+        Interval in milliseconds for debouncing updates.
+
     See Also
     --------
     :class:`compas.scene.Scene`
@@ -92,7 +92,6 @@ class ViewerScene(Scene):
         self.update_timer.timeout.connect(self.update_observers)
         self.debounce_interval = 200
 
-
     @property
     def viewer(self):
         from compas_viewer import Viewer
@@ -105,11 +104,11 @@ class ViewerScene(Scene):
             self.viewer.renderer,
             self.viewer.ui.sidebar,
         ]
-        
+
         for observer in new_observers:
-            self._observers.add(observer)  
-        
-        return list(self._observers) 
+            self._observers.add(observer)
+
+        return list(self._observers)
 
     # TODO: These fixed kwargs could be moved to COMPAS core.
     def add(

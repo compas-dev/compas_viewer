@@ -1,5 +1,5 @@
-from typing import Callable
 from typing import TYPE_CHECKING
+from typing import Callable
 
 from PySide6 import QtCore
 from PySide6.QtWidgets import QSplitter
