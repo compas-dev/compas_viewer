@@ -22,7 +22,7 @@ from compas_viewer.components import CameraSettingsDialog
 
 if TYPE_CHECKING:
     from compas_viewer import Viewer
-
+    from compas_viewer.scene.sceneobject import ViewerSceneObject
 
 class Command:
     # we should rename the module to "commands.py"
@@ -455,9 +455,9 @@ load_data_cmd = Command(title="Load Data", callback=lambda: print("load data"))
 # =============================================================================
 
 
-def get_name(obj):
+def get_name(obj: "ViewerSceneObject"):
     return str(obj.name)
 
 
-def get_show_box(obj):
-    return "check_box", obj.show
+def get_show_box(obj: "ViewerSceneObject"):
+    return "show_box", obj.show

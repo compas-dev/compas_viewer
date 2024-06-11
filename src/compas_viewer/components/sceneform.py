@@ -114,7 +114,7 @@ class Sceneform(QTreeWidget):
             strings = []
             for i, func in enumerate(self.columns.values()):
                 output = func(node)
-                if output[0] == "check_box":
+                if output[0] == "show_box":
                     self.show_idx = i
                     show_status = output[1]
                     output = ""
@@ -148,8 +148,7 @@ class Sceneform(QTreeWidget):
 
     def on_item_clicked(self, item, column):
         if column == self.show_idx:
-            is_visible = item.checkState(self.show_idx) == Qt.Checked
-            item.node.show = is_visible
+            item.node.show = item.checkState(self.show_idx) == Qt.Checked
 
         if self.selectedItems():
             self._selected_items = self.selectedItems()

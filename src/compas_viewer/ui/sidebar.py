@@ -1,3 +1,4 @@
+from typing import Callable
 from typing import TYPE_CHECKING
 
 from PySide6 import QtCore
@@ -10,14 +11,14 @@ if TYPE_CHECKING:
 
 
 class SideBarRight:
-    def __init__(self, ui: "UI", show: bool, items: list[dict]) -> None:
+    def __init__(self, ui: "UI", show: bool, items: list[dict[str, Callable]]) -> None:
         self.ui = ui
         self.widget = QSplitter(QtCore.Qt.Orientation.Vertical)
         self.widget.setChildrenCollapsible(True)
         self.widget.setVisible(show)
         self.add_sidebar(items, self.widget)
 
-    def add_sidebar(self, items: list[dict], parent: QSplitter) -> None:
+    def add_sidebar(self, items: list[dict[str, Callable]], parent: QSplitter) -> None:
         if not items:
             return
 

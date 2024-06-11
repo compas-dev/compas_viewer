@@ -62,6 +62,15 @@ class ViewerScene(Scene):
     context : str, optional
         The context of the scene.
 
+    Attributes
+    ----------
+    observers : set
+        Set of unique observer objects.
+    update_timer : :class:`QTimer`
+        Timer to manage update debouncing.
+    debounce_interval : int
+        Interval in milliseconds for debouncing updates.  
+        
     See Also
     --------
     :class:`compas.scene.Scene`
@@ -72,7 +81,7 @@ class ViewerScene(Scene):
 
         #  Primitive
         self.objects: list[ViewerSceneObject]
-        self._observers = []
+        self._observers = set()
         #  Selection
         self.instance_colors: dict[tuple[int, int, int], ViewerSceneObject] = {}
         self._instance_colors_generator = instance_colors_generator()
@@ -83,18 +92,24 @@ class ViewerScene(Scene):
         self.update_timer.timeout.connect(self.update_observers)
         self.debounce_interval = 200
 
+
     @property
-    def observers(self):
+    def viewer(self):
         from compas_viewer import Viewer
 
-        self.viewer = Viewer()
-        self._observers.extend(
-            [
-                self.viewer.renderer,
-                self.viewer.ui.sidebar,
-            ]
-        )
-        return self._observers
+        return Viewer()
+
+    @property
+    def observers(self):
+        new_observers = [
+            self.viewer.renderer,
+            self.viewer.ui.sidebar,
+        ]
+        
+        for observer in new_observers:
+            self._observers.add(observer)  
+        
+        return list(self._observers) 
 
     # TODO: These fixed kwargs could be moved to COMPAS core.
     def add(

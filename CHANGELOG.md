@@ -16,9 +16,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added `clear_scene` action.
 * Added `compas_viewer.components.SceneForm`.
 * Added `callback` for `compas_viewer.components.TreeForm`.
-* Added click-boxes of `show` and `locked` for `compas_viewer.components.SceneForm`.
-* Added observer pattern to of `show` and `locked` for `compas_viewer.Scene.scene`.
-* Added Time Debounce pattern to of `show` and `locked` for `compas_viewer.Scene.scene`.
+* Added click-boxes of `show` for `compas_viewer.components.SceneForm`.
+* Added observer pattern to of `show` for `compas_viewer.Scene.scene`.
+* Added Time Debounce pattern to of `show` for `compas_viewer.Scene.scene`.
 
 ### Changed
 
