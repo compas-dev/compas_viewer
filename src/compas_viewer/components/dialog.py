@@ -93,10 +93,11 @@ class ObjectInfoDialog(QDialog, Base):
                 obj.linewidth = self.spin_boxes["Line_Width_"].spinbox.value()
                 obj.pointsize = self.spin_boxes["Point_Size_"].spinbox.value()
                 obj.opacity = self.spin_boxes["Opacity_"].spinbox.value()
-                obj.color = Color(
+                obj.pointcolor = Color(
                     self.spin_boxes["Color_R"].spinbox.value(),
                     self.spin_boxes["Color_G"].spinbox.value(),
                     self.spin_boxes["Color_B"].spinbox.value(),
                 )
+                obj.update()
 
         self.accept()  # Close the dialog
