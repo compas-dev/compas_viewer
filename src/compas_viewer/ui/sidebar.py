@@ -12,7 +12,7 @@ class SideBarRight:
         self.ui = ui
         self.widget = QtWidgets.QSplitter(QtCore.Qt.Orientation.Vertical)
         self.widget.setChildrenCollapsible(True)
-        self.widget.setVisible(show)
+        self.show = show
 
     def update(self):
         self.widget.update()
@@ -25,4 +25,7 @@ class SideBarRight:
 
     @show.setter
     def show(self, value: bool):
-        self.widget.setVisible(value)
+        if value:
+            self.widget.setVisible(True)
+        elif not value:
+            self.widget.setHidden(True)

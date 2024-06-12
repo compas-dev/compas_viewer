@@ -22,15 +22,12 @@ class LineObject(ViewerGeometryObject, GeometryObject):
 
     @property
     def points(self) -> Optional[list[Point]]:
-        """The points to be shown in the viewer."""
         return [self.geometry.start, self.geometry.end]
 
     @property
     def lines(self) -> Optional[list[Line]]:
-        """The lines to be shown in the viewer."""
         return [self.geometry]
 
     @property
     def viewmesh(self):
-        """The mesh volume to be shown in the viewer."""
         return None

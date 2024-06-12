@@ -6,7 +6,6 @@ from numpy import average
 from numpy import identity
 
 from compas.colors import Color
-from compas.colors import ColorDict
 from compas.geometry import Point
 from compas.geometry import Transformation
 from compas.geometry import transform_points_numpy
@@ -467,23 +466,13 @@ class ViewerSceneObject(SceneObject, Base):
             "background": self.background,
         }
 
-        # TODO: make ColorDict serializable in compas core.
         if hasattr(self, "pointcolor"):
-            if isinstance(self.pointcolor, Color):
-                settings["pointcolor"] = self.pointcolor
-            elif isinstance(self.pointcolor, ColorDict):
-                settings["pointcolor"] = self.pointcolor.default
+            settings["pointcolor"] = self.pointcolor
 
         if hasattr(self, "linecolor"):
-            if isinstance(self.linecolor, Color):
-                settings["linecolor"] = self.linecolor
-            elif isinstance(self.linecolor, ColorDict):
-                settings["linecolor"] = self.linecolor.default
+            settings["linecolor"] = self.linecolor
 
         if hasattr(self, "facecolor"):
-            if isinstance(self.facecolor, Color):
-                settings["facecolor"] = self.facecolor
-            elif isinstance(self.facecolor, ColorDict):
-                settings["facecolor"] = self.facecolor.default
+            settings["facecolor"] = self.facecolor
 
         return settings
