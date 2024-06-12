@@ -16,6 +16,7 @@ from compas_viewer.commands import change_view_cmd
 from compas_viewer.commands import clear_scene_cmd
 from compas_viewer.commands import deselect_all_cmd
 from compas_viewer.commands import load_scene_cmd
+from compas_viewer.commands import obj_settings_cmd
 from compas_viewer.commands import object_info_qmsg_cmd
 from compas_viewer.commands import pan_view_cmd
 from compas_viewer.commands import rotate_view_cmd
@@ -195,7 +196,7 @@ class MenubarConfig(ConfigBase):
             {
                 "title": "Info",
                 "items": [
-                    {"title": "Selected obj info", "action": object_info_qmsg_cmd},
+                    {"title": "Selected obj info", "action": obj_settings_cmd},
                 ],
             },
             {
@@ -383,5 +384,6 @@ class Config(ConfigBase):
             zoom_selected_cmd,
             zoom_view_cmd,
             object_info_qmsg_cmd,
+            obj_settings_cmd,
         ]
     )

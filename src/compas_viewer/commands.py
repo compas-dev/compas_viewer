@@ -1,3 +1,4 @@
+import pathlib
 import textwrap
 from typing import TYPE_CHECKING
 from typing import Any
@@ -10,7 +11,6 @@ from numpy import any
 from numpy import array
 from numpy import unique
 from numpy.linalg import norm
-import pathlib
 from PySide6.QtCore import QEvent
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QMouseEvent
@@ -21,7 +21,8 @@ from PySide6.QtWidgets import QMessageBox
 
 import compas
 from compas.scene import Scene
-from compas_viewer.components import CameraSettingsDialog
+from compas_viewer.components.dialog import CameraSettingsDialog
+from compas_viewer.components.dialog import ObjectInfoDialog
 
 if TYPE_CHECKING:
     from compas_viewer import Viewer
@@ -525,3 +526,10 @@ def object_info_qmsg(viewer: "Viewer"):
 
 
 object_info_qmsg_cmd = Command(title="Display Info", callback=object_info_qmsg)
+
+
+def obj_settings(viewer: "Viewer"):
+    ObjectInfoDialog().exec()
+
+
+obj_settings_cmd = Command(title="Object Settings", callback=obj_settings)

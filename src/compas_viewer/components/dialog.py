@@ -1,11 +1,11 @@
 from PySide6.QtWidgets import QDialog
-from PySide6.QtWidgets import QHBoxLayout
-from PySide6.QtWidgets import QLabel
 from PySide6.QtWidgets import QPushButton
 from PySide6.QtWidgets import QVBoxLayout
 
+from compas.colors import Color
 from compas_viewer.base import Base
-from compas_viewer.components.double_edit import DoubleEdit
+from compas_viewer.components.layout import create_camera_setting_layout
+from compas_viewer.components.layout import create_object_info_layout
 
 
 class CameraSettingsDialog(QDialog, Base):
@@ -49,32 +49,16 @@ class CameraSettingsDialog(QDialog, Base):
         self.setWindowTitle("Camera Settings")
 
         self.layout = QVBoxLayout(self)
-        self.spin_boxes = {}
-        current_camera = self.viewer.renderer.camera
-        # set None to infinity error
-        coordinates = {
-            "Camera_Target": [("X", current_camera.target.x, None, None), ("Y", current_camera.target.y, None, None), ("Z", current_camera.target.z, None, None)],
-            "Camera_Position": [("X", current_camera.position.x, None, None), ("Y", current_camera.position.y, None, None), ("Z", current_camera.position.z, None, None)],
-        }
 
-        for coord in coordinates:
-            spin_box_layout = QHBoxLayout()
-            label = QLabel(f"{coord}:", self)
-            spin_box_layout.addWidget(label)
-
-            for setting in coordinates[coord]:
-                widget = DoubleEdit(*setting)
-                spin_box_layout.addWidget(widget)
-                self.spin_boxes[coord + "_" + setting[0]] = widget
-
-            self.layout.addLayout(spin_box_layout)
+        camera_setting_layout, self.spin_boxes = create_camera_setting_layout(self.viewer)
+        self.layout.addLayout(camera_setting_layout)
 
         # Update button
         self.update_button = QPushButton("Update Camera", self)
-        self.update_button.clicked.connect(self.updateCameraTarget)
+        self.update_button.clicked.connect(self.update)
         self.layout.addWidget(self.update_button)
 
-    def updateCameraTarget(self) -> None:
+    def update(self) -> None:
         self.viewer.renderer.camera.target.set(
             self.spin_boxes["Camera_Target_X"].spinbox.value(),
             self.spin_boxes["Camera_Target_Y"].spinbox.value(),
@@ -85,4 +69,34 @@ class CameraSettingsDialog(QDialog, Base):
             self.spin_boxes["Camera_Position_Y"].spinbox.value(),
             self.spin_boxes["Camera_Position_Z"].spinbox.value(),
         )
+        self.accept()  # Close the dialog
+
+
+class ObjectInfoDialog(QDialog, Base):
+    def __init__(self) -> None:
+        super().__init__()
+
+        self.setWindowTitle("Object Settings")
+        self.layout = QVBoxLayout(self)
+
+        object_info_layout, self.spin_boxes = create_object_info_layout(self.viewer)
+        self.layout.addLayout(object_info_layout)
+
+        # Update button
+        self.update_button = QPushButton("Update Object", self)
+        self.update_button.clicked.connect(self.update)
+        self.layout.addWidget(self.update_button)
+
+    def update(self) -> None:
+        for obj in self.viewer.scene.objects:
+            if obj.is_selected:
+                obj.linewidth = self.spin_boxes["Line_Width_"].spinbox.value()
+                obj.pointsize = self.spin_boxes["Point_Size_"].spinbox.value()
+                obj.opacity = self.spin_boxes["Opacity_"].spinbox.value()
+                obj.color = Color(
+                    self.spin_boxes["Color_R"].spinbox.value(),
+                    self.spin_boxes["Color_G"].spinbox.value(),
+                    self.spin_boxes["Color_B"].spinbox.value(),
+                )
+
         self.accept()  # Close the dialog
