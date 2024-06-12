@@ -53,7 +53,6 @@ class UI:
                     {
                         "Name": (lambda o: o.name),
                         "Visible": (lambda o: o.show),
-                        "Locked": (lambda o: o.is_locked),
                     },
                 )
             )

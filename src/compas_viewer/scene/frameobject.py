@@ -49,22 +49,12 @@ class FrameObject(ViewerSceneObject):
     def __init__(
         self,
         frame: Frame,
-        framesize: Optional[tuple[float, int, float, int]] = None,
-        linecolor: Optional[Color] = None,
-        show_framez: Optional[bool] = None,
+        size: Optional[float] = 1,
         **kwargs,
     ):
         super().__init__(item=frame, **kwargs)
         self.frame = frame
-        self.linecolor = linecolor if linecolor else Color(0.5, 0.5, 0.5)
-        self.dx = framesize[0] if framesize else float(0.1)
-        self.nx = framesize[1] if framesize else int(10)
-        self.dy = framesize[2] if framesize else float(0.1)
-        self.ny = framesize[3] if framesize else int(10)
-        self.show_framez = show_framez if show_framez else True
-        if self.nx % 2 != 0 or self.ny % 2 != 0:
-            raise ValueError("The number of grid cells in the X and Y directions must be even numbers.")
-        self.show_lines = True
+        self.size = size
 
     def _read_lines_data(self) -> ShaderDataType:
         trans = Transformation.from_frame_to_frame(Frame.worldXY(), self.frame)
@@ -72,69 +62,35 @@ class FrameObject(ViewerSceneObject):
         positions = []
         colors = []
         elements = []
-        i = 0
 
         # X direction
-        for i in range(self.nx + 1):
-            x = -self.dx / 2 + self.dx / self.nx * i
-            # Color Y axis positive green.
-            if x == 0:
-                colors.extend([self.linecolor, self.linecolor, Color.green(), Color.green()])
-            else:
-                colors.extend([self.linecolor] * 4)
-            positions.extend(
-                [
-                    Point(x, -self.dy / 2, 0).transformed(trans),
-                    Point(x, 0, 0).transformed(trans),
-                    Point(x, 0, 0).transformed(trans),
-                    Point(x, self.dy / 2, 0).transformed(trans),
-                ]
-            )
-            elements.append([i * 4, i * 4 + 1, i * 4 + 2, i * 4 + 3])
+        colors.append(Color.red())
+        colors.append(Color.red())
+        positions.append(Point(0, 0, 0).transformed(trans))
+        positions.append(Point(self.size, 0, 0).transformed(trans))
+        elements.append([0, 1])
 
         # Y direction
-        for i in range(self.ny + 1):
-            y = -self.dy / 2 + self.dy / self.ny * i
-            # Color X axis positive red.
-            if y == 0:
-                colors.extend([self.linecolor, self.linecolor, Color.red(), Color.red()])
-            else:
-                colors.extend([self.linecolor] * 4)
-            positions.extend(
-                [
-                    Point(-self.dx / 2, y, 0).transformed(trans),
-                    Point(0, y, 0).transformed(trans),
-                    Point(0, y, 0).transformed(trans),
-                    Point(self.dx / 2, y, 0).transformed(trans),
-                ]
-            )
-            elements.append(
-                [
-                    (self.nx + 1) * 4 + i * 4,
-                    (self.nx + 1) * 4 + i * 4 + 1,
-                    (self.nx + 1) * 4 + i * 4 + 2,
-                    (self.nx + 1) * 4 + i * 4 + 3,
-                ]
-            )
+        colors.append(Color.green())
+        colors.append(Color.green())
+        positions.append(Point(0, 0, 0).transformed(trans))
+        positions.append(Point(0, self.size, 0).transformed(trans))
+        elements.append([2, 3])
 
         # Z direction
-        if self.show_framez:
-            colors.append(Color.blue())
-            colors.append(Color.blue())
-            positions.append(Point(0, 0, 0).transformed(trans))
-            positions.append(Point(0, 0, self.dx / 2).transformed(trans))
-            elements.append([(self.nx + 1) * 4 + (self.ny + 1) * 4, (self.nx + 1) * 4 + (self.ny + 1) * 4 + 1])
+        colors.append(Color.blue())
+        colors.append(Color.blue())
+        positions.append(Point(0, 0, 0).transformed(trans))
+        positions.append(Point(0, 0, self.size).transformed(trans))
+        elements.append([4, 5])
 
         return positions, colors, elements
 
     def _read_points_data(self) -> Optional[ShaderDataType]:
-        """Read points data from the object."""
         return None
 
     def _read_frontfaces_data(self) -> Optional[ShaderDataType]:
-        """Read frontfaces data from the object."""
         return None
 
     def _read_backfaces_data(self) -> Optional[ShaderDataType]:
-        """Read backfaces data from the object."""
         return None

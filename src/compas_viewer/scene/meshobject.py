@@ -9,6 +9,7 @@ from compas.geometry import centroid_points
 from compas.geometry import is_coplanar
 from compas.itertools import pairwise
 from compas.scene import MeshObject as BaseMeshObject
+from compas.scene.descriptors.colordict import ColorDictAttribute
 
 from .sceneobject import ShaderDataType
 from .sceneobject import ViewerSceneObject
@@ -50,14 +51,15 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
     :class:`compas.datastructures.Mesh`
     """
 
+    vertexcolor = ColorDictAttribute(default=Color(0.2, 0.2, 0.2))
+    edgecolor = ColorDictAttribute(default=Color(0.2, 0.2, 0.2))
+    facecolor = ColorDictAttribute(default=Color(0.9, 0.9, 0.9))
+
     def __init__(
         self,
         mesh: Mesh,
         show_points: Optional[bool] = None,
         show_lines: Optional[bool] = None,
-        pointcolor: Optional[Color] = None,
-        linecolor: Optional[Color] = None,
-        facecolor: Optional[Color] = None,
         pointsize: Optional[float] = None,
         linewidth: Optional[int] = None,
         hide_coplanaredges: Optional[bool] = None,
@@ -70,10 +72,6 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
 
         self.show_points = show_points if show_points is not None else False
         self.show_lines = show_lines if show_lines is not None else True
-
-        self.pointcolor = pointcolor
-        self.linecolor = linecolor
-        self.facecolor = facecolor or Color(0.9, 0.9, 0.9)
 
         self.pointsize = pointsize if pointsize is not None else 6.0
         self.linewidth = linewidth if linewidth is not None else 1.0
@@ -137,7 +135,7 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
 
         for vertex in self.mesh.vertices():
             positions.append(self.mesh.vertex_coordinates(vertex))
-            colors.append(self.vertexcolor[vertex] or self.vertexcolor.default)  # type: ignore
+            colors.append(self.vertexcolor[vertex])
             elements.append([i])
             i += 1
         return positions, colors, elements
@@ -149,7 +147,7 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
         i = 0
 
         for u, v in self.mesh.edges():
-            color = self.edgecolor[(u, v)] or self.edgecolor.default  # type: ignore
+            color = self.edgecolor[(u, v)]
             if self.hide_coplanaredges:
                 # hide the edge if neighbor faces are coplanar
                 fkeys = self.mesh.edge_faces((u, v))
@@ -177,16 +175,16 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
 
         for face in self.mesh.faces():
             vertices = self.mesh.face_vertices(face)
-            color = self.facecolor[face] or self.facecolor.default  # type: ignore
+            color = self.facecolor[face]
             if len(vertices) == 3:
                 a, b, c = vertices
                 positions.append(self.mesh.vertex_coordinates(a))
                 positions.append(self.mesh.vertex_coordinates(b))
                 positions.append(self.mesh.vertex_coordinates(c))
                 if self.use_vertexcolors:
-                    colors.append(self.vertexcolor[a] or self.vertexcolor.default)  # type: ignore
-                    colors.append(self.vertexcolor[b] or self.vertexcolor.default)  # type: ignore
-                    colors.append(self.vertexcolor[c] or self.vertexcolor.default)  # type: ignore
+                    colors.append(self.vertexcolor[a])
+                    colors.append(self.vertexcolor[b])
+                    colors.append(self.vertexcolor[c])
                 else:
                     colors.append(color)
                     colors.append(color)
@@ -202,12 +200,12 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
                 positions.append(self.mesh.vertex_coordinates(c))
                 positions.append(self.mesh.vertex_coordinates(d))
                 if self.use_vertexcolors:
-                    colors.append(self.vertexcolor[a] or self.vertexcolor.default)  # type: ignore
-                    colors.append(self.vertexcolor[b] or self.vertexcolor.default)  # type: ignore
-                    colors.append(self.vertexcolor[c] or self.vertexcolor.default)  # type: ignore
-                    colors.append(self.vertexcolor[a] or self.vertexcolor.default)  # type: ignore
-                    colors.append(self.vertexcolor[c] or self.vertexcolor.default)  # type: ignore
-                    colors.append(self.vertexcolor[d] or self.vertexcolor.default)  # type: ignore
+                    colors.append(self.vertexcolor[a])
+                    colors.append(self.vertexcolor[b])
+                    colors.append(self.vertexcolor[c])
+                    colors.append(self.vertexcolor[a])
+                    colors.append(self.vertexcolor[c])
+                    colors.append(self.vertexcolor[d])
                 else:
                     colors.append(color)
                     colors.append(color)
@@ -226,9 +224,9 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
                     positions.append(b)
                     positions.append(c)
                     if self.use_vertexcolors:
-                        colors.append(self.vertexcolor[vertices[0]] or self.vertexcolor.default)  # type: ignore
-                        colors.append(self.vertexcolor[vertices[1]] or self.vertexcolor.default)  # type: ignore
-                        colors.append(self.vertexcolor[vertices[2]] or self.vertexcolor.default)  # type: ignore
+                        colors.append(self.vertexcolor[vertices[0]])
+                        colors.append(self.vertexcolor[vertices[1]])
+                        colors.append(self.vertexcolor[vertices[2]])
                     else:
                         colors.append(color)
                         colors.append(color)
@@ -246,16 +244,16 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
 
         for face in self.mesh.faces():
             vertices = self.mesh.face_vertices(face)[::-1]
-            color = self.facecolor[face] or self.facecolor.default  # type: ignore
+            color = self.facecolor[face]
             if len(vertices) == 3:
                 a, b, c = vertices
                 positions.append(self.mesh.vertex_coordinates(a))
                 positions.append(self.mesh.vertex_coordinates(b))
                 positions.append(self.mesh.vertex_coordinates(c))
                 if self.use_vertexcolors:
-                    colors.append(self.vertexcolor[a] or self.vertexcolor.default)  # type: ignore
-                    colors.append(self.vertexcolor[b] or self.vertexcolor.default)  # type: ignore
-                    colors.append(self.vertexcolor[c] or self.vertexcolor.default)  # type: ignore
+                    colors.append(self.vertexcolor[a])
+                    colors.append(self.vertexcolor[b])
+                    colors.append(self.vertexcolor[c])
                 else:
                     colors.append(color)
                     colors.append(color)
@@ -271,12 +269,12 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
                 positions.append(self.mesh.vertex_coordinates(c))
                 positions.append(self.mesh.vertex_coordinates(d))
                 if self.use_vertexcolors:
-                    colors.append(self.vertexcolor[a] or self.vertexcolor.default)  # type: ignore
-                    colors.append(self.vertexcolor[b] or self.vertexcolor.default)  # type: ignore
-                    colors.append(self.vertexcolor[c] or self.vertexcolor.default)  # type: ignore
-                    colors.append(self.vertexcolor[a] or self.vertexcolor.default)  # type: ignore
-                    colors.append(self.vertexcolor[c] or self.vertexcolor.default)  # type: ignore
-                    colors.append(self.vertexcolor[d] or self.vertexcolor.default)  # type: ignore
+                    colors.append(self.vertexcolor[a])
+                    colors.append(self.vertexcolor[b])
+                    colors.append(self.vertexcolor[c])
+                    colors.append(self.vertexcolor[a])
+                    colors.append(self.vertexcolor[c])
+                    colors.append(self.vertexcolor[d])
                 else:
                     colors.append(color)
                     colors.append(color)
@@ -295,9 +293,9 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
                     positions.append(b)
                     positions.append(c)
                     if self.use_vertexcolors:
-                        colors.append(self.vertexcolor[vertices[0]] or self.vertexcolor.default)  # type: ignore
-                        colors.append(self.vertexcolor[vertices[1]] or self.vertexcolor.default)  # type: ignore
-                        colors.append(self.vertexcolor[vertices[2]] or self.vertexcolor.default)  # type: ignore
+                        colors.append(self.vertexcolor[vertices[0]])
+                        colors.append(self.vertexcolor[vertices[1]])
+                        colors.append(self.vertexcolor[vertices[2]])
                     else:
                         colors.append(color)
                         colors.append(color)

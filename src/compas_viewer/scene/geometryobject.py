@@ -5,7 +5,9 @@ from compas.datastructures import Mesh
 from compas.geometry import Geometry
 from compas.geometry import Line
 from compas.geometry import Point
+from compas.itertools import flatten
 from compas.scene import GeometryObject as BaseGeometryObject
+from compas.scene.descriptors.color import ColorAttribute
 
 from .sceneobject import ShaderDataType
 from .sceneobject import ViewerSceneObject
@@ -52,24 +54,24 @@ class GeometryObject(ViewerSceneObject, BaseGeometryObject):
     :class:`compas.geometry.Geometry`
     """
 
+    pointcolor = ColorAttribute(default=Color(0.2, 0.2, 0.2))
+    linecolor = ColorAttribute(default=Color(0.2, 0.2, 0.2))
+    surfacecolor = ColorAttribute(default=Color(0.9, 0.9, 0.9))
+
     def __init__(
         self,
         geometry: Geometry,
         u: Optional[int] = 16,
         v: Optional[int] = 16,
-        facecolor: Optional[Color] = None,
         **kwargs,
     ):
         super().__init__(geometry=geometry, **kwargs)
         self.geometry: Geometry
-
         self.u = u
         self.v = v
-        self.facecolor = facecolor or Color(0.9, 0.9, 0.9)
 
     @property
     def facecolor(self) -> Color:
-        """The color of the faces."""
         return self.surfacecolor
 
     @facecolor.setter
@@ -78,17 +80,14 @@ class GeometryObject(ViewerSceneObject, BaseGeometryObject):
 
     @property
     def points(self) -> Optional[list[Point]]:
-        """The points to be shown in the viewer."""
         raise NotImplementedError
 
     @property
     def lines(self) -> Optional[list[Line]]:
-        """The lines to be shown in the viewer."""
         raise NotImplementedError
 
     @property
     def viewmesh(self) -> Mesh:
-        """The mesh volume to be shown in the viewer."""
         raise NotImplementedError
 
     def _read_points_data(self) -> ShaderDataType:
@@ -103,12 +102,10 @@ class GeometryObject(ViewerSceneObject, BaseGeometryObject):
         if self.lines is None:
             return [], [], []
         positions = []
-        for line in self.lines:
-            positions.append(line.start)
-            positions.append(line.end)
+        elements = []
+        positions = list(flatten(self.lines))
         colors = [self.linecolor] * 2 * len(positions)
-        elements = [[2 * i, 2 * i + 1] for i in range(len(positions))]
-
+        elements = [[2 * i, 2 * i + 1] for i in range(len(self.lines))]
         return positions, colors, elements
 
     def _read_frontfaces_data(self) -> ShaderDataType:

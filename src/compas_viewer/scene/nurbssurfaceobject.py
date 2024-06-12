@@ -29,12 +29,10 @@ class NurbsSurfaceObject(ViewerGeometryObject, GeometryObject):
 
     @property
     def points(self) -> Optional[list[Point]]:
-        """The points to be shown in the viewer."""
         return self._brep.points
 
     @property
     def lines(self) -> Optional[list[Line]]:
-        """The lines to be shown in the viewer."""
         lines = []
         for polyline in self._boundaries:
             for pair in pairwise(polyline.points):
@@ -44,5 +42,4 @@ class NurbsSurfaceObject(ViewerGeometryObject, GeometryObject):
 
     @property
     def viewmesh(self) -> Mesh:
-        """The mesh volume to be shown in the viewer."""
         return self._viewmesh

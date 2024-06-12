@@ -1,11 +1,6 @@
-from math import cos
-from math import pi
-from math import sin
-from math import sqrt
 from typing import Optional
 
 from compas.geometry import Ellipse
-from compas.geometry import Frame
 from compas.geometry import Line
 from compas.geometry import Point
 from compas.scene import GeometryObject
@@ -36,29 +31,12 @@ class EllipseObject(ViewerGeometryObject, GeometryObject):
 
     @property
     def points(self) -> Optional[list[Point]]:
-        """The points to be shown in the viewer."""
         return [self.geometry.plane.point]
 
     @property
     def lines(self) -> Optional[list[Line]]:
-        """The lines to be shown in the viewer."""
-        frame = Frame.from_plane(self.geometry.plane)
-        line_points = [
-            frame.to_world_coordinates(
-                Point(
-                    cos(i * pi * 2 / self.u) * self.geometry.major,
-                    sin(i * pi * 2 / self.u) * self.geometry.minor,
-                    0,
-                )
-            )
-            for i in range(self.u)
-        ]
-        return [Line(line_points[i - 1], line_points[i]) for i in range(0, self.u)]
+        return self.geometry.to_polyline(n=self.u).lines
 
     @property
     def viewmesh(self):
-        """The mesh volume to be shown in the viewer."""
         return None
-
-    def _proximate_circumference(self):
-        return 2 * pi * sqrt((self.geometry.major**2 + self.geometry.minor**2) / 2)

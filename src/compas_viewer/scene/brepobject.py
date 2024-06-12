@@ -5,7 +5,6 @@ from compas_occ.brep import OCCBrep
 from compas.datastructures import Mesh
 from compas.geometry import Line
 from compas.geometry import Point
-from compas.itertools import pairwise
 from compas.scene import GeometryObject
 from compas.tolerance import TOL
 
@@ -34,20 +33,15 @@ class BRepObject(ViewerGeometryObject, GeometryObject):
 
     @property
     def points(self) -> Optional[list[Point]]:
-        """The points to be shown in the viewer."""
         return self.geometry.points
 
     @property
     def lines(self) -> Optional[list[Line]]:
-        """The lines to be shown in the viewer."""
         lines = []
         for polyline in self._boundaries:
-            for pair in pairwise(polyline.points):
-                lines.append(Line(*pair))
-
+            lines += polyline.lines
         return lines
 
     @property
     def viewmesh(self) -> Mesh:
-        """The mesh volume to be shown in the viewer."""
         return self._viewmesh
