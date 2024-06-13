@@ -4,7 +4,13 @@ from PySide6 import QtWidgets
 
 
 class DoubleEdit(QtWidgets.QWidget):
-    def __init__(self, name: str = None, default: float = None, min_val: float = None, max_val: float = None):
+    def __init__(
+        self,
+        name: str = None,
+        default: float = None,
+        min_val: float = None,
+        max_val: float = None,
+    ):
         super().__init__()
 
         if min_val is None:
@@ -24,7 +30,11 @@ class DoubleEdit(QtWidgets.QWidget):
 
 
 class DoubleEditGroup(QtWidgets.QWidget):
-    def __init__(self, title: str, settings: list[tuple[str, float, float, float]]):
+    def __init__(
+        self,
+        title: str,
+        settings: list[tuple[str, float, float, float]],
+    ):
         super().__init__()
         self.layout = QtWidgets.QVBoxLayout(self)
 
