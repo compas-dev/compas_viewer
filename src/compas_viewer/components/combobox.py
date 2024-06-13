@@ -175,6 +175,7 @@ class ColorComboBox(QWidget, Base):
         self.color_options = [
             QColor(255, 255, 255),  # White
             QColor(211, 211, 211),  # LightGray
+            QColor(190, 190, 190),  # Gray
             QColor(0, 0, 0),  # Black
             QColor(255, 0, 0),  # Red
             QColor(0, 255, 0),  # Green

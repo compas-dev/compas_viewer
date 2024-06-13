@@ -4,7 +4,7 @@ from PySide6.QtWidgets import QVBoxLayout
 
 from compas_viewer.components.combobox import ColorComboBox
 from compas_viewer.components.double_edit import DoubleEdit
-from compas_viewer.components.widget_tools import LabelWidget
+from compas_viewer.components.label import LabelWidget
 
 
 def base_layout(coordinates: dict) -> tuple[QVBoxLayout, dict]:
@@ -46,8 +46,7 @@ def base_layout(coordinates: dict) -> tuple[QVBoxLayout, dict]:
                 right_layout.addWidget(widget)
                 spin_boxes[f"{coord}_{setting[1]}"] = widget
             elif setting[0] == "label":
-                label_widget = LabelWidget()
-                widget = label_widget(setting[1])
+                widget = LabelWidget(text=setting[1], alignment="right")
                 right_layout.addWidget(widget)
             elif setting[0] == "color_combobox":
                 widget = ColorComboBox(*setting[1:])
