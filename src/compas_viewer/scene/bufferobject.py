@@ -211,7 +211,7 @@ class BufferObject(SceneObject, Base):
         self.is_selected = False
         self.background = False
         self._matrix_buffer = None
-    
+
     @property
     def buffergeometry(self) -> BufferGeometry:
         return self.item
