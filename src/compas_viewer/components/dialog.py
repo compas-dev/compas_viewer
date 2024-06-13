@@ -3,8 +3,7 @@ from PySide6.QtWidgets import QPushButton
 from PySide6.QtWidgets import QVBoxLayout
 
 from compas_viewer.base import Base
-from compas_viewer.components.layout import create_camera_setting_layout
-from compas_viewer.components.layout import create_object_info_layout
+from compas_viewer.components.layout import base_layout
 
 
 class CameraSettingsDialog(QDialog, Base):
@@ -39,7 +38,21 @@ class CameraSettingsDialog(QDialog, Base):
 
         self.layout = QVBoxLayout(self)
 
-        camera_setting_layout, self.spin_boxes = create_camera_setting_layout(self.viewer)
+        coordinates = {
+            "Camera_Target": [
+                ("double_edit", "X", self.viewer.renderer.camera.target.x, None, None),
+                ("double_edit", "Y", self.viewer.renderer.camera.target.y, None, None),
+                ("double_edit", "Z", self.viewer.renderer.camera.target.z, None, None),
+            ],
+            "Camera_Position": [
+                ("double_edit", "X", self.viewer.renderer.camera.position.x, None, None),
+                ("double_edit", "Y", self.viewer.renderer.camera.position.y, None, None),
+                ("double_edit", "Z", self.viewer.renderer.camera.position.z, None, None),
+            ],
+        }
+
+        camera_setting_layout, self.spin_boxes = base_layout(coordinates)
+
         self.layout.addLayout(camera_setting_layout)
 
         self.update_button = QPushButton("Update Camera", self)
@@ -92,7 +105,38 @@ class ObjectInfoDialog(QDialog, Base):
         self.setWindowTitle("Object Settings")
         self.layout = QVBoxLayout(self)
 
-        object_info_layout, self.spin_boxes = create_object_info_layout(self.viewer)
+        coordinates = {}
+        for obj in self.viewer.scene.objects:
+            if obj.is_selected:
+                new_coordinates = {
+                    "Name": [
+                        ("label", str(obj.name)),
+                    ],
+                    "Parent": [
+                        ("label", str(obj.parent)),
+                    ],
+                    "Show": [
+                        ("buttom", obj.show),
+                    ],
+                    # TODO: check _color attr
+                    "Point_Color": [
+                        ("color_combobox", obj, "pointcolor"),
+                    ],
+                    "Line_Color": [
+                        ("color_combobox", obj, "linecolor"),
+                        # ("double_edit", "G", obj.linecolor[0].g, 0, 1),
+                    ],
+                    "Face_Color": [
+                        ("color_combobox", obj, "facecolor"),
+                    ],
+                    "Line_Width": [("double_edit", "", obj.linewidth, 0.0, 10.0)],
+                    "Point_Size": [("double_edit", "", obj.pointsize, 0.0, 10.0)],
+                    "Opacity": [("double_edit", "", obj.opacity, 0.0, 1.0)],
+                }
+                coordinates.update(new_coordinates)
+
+        object_info_layout, self.spin_boxes = base_layout(coordinates)
+
         self.layout.addLayout(object_info_layout)
 
         self.update_button = QPushButton("Update Object", self)

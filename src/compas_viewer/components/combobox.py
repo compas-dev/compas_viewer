@@ -66,11 +66,6 @@ class ComboBox(QComboBox):
         self.currentIndexChanged.connect(lambda index: change_callback(self.itemData(index)))
 
     def populate(self, items: list) -> None:
-        """
-        Populate the combo box with items.
-
-        :param items: List of tuples, each containing the display text and user data
-        """
         for item in items:
             if self.paint:
                 self.addItem("", item)
