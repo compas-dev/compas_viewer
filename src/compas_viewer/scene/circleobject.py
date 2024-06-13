@@ -16,8 +16,8 @@ class CircleObject(ViewerGeometryObject, GeometryObject):
     :class:`compas.geometry.Circle`
     """
 
-    def __init__(self, circle: Circle, **kwargs):
-        super().__init__(geometry=circle, **kwargs)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.geometry: Circle
         self.show_lines = True
 

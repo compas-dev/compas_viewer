@@ -18,8 +18,10 @@ class Group(Data):
 class GroupObject(SceneObject):
     """A group of scene objects."""
 
-    def __init__(self, items, **kwargs):
-        super().__init__(Group(items), **kwargs)
+    def __init__(self, **kwargs):
+        items = kwargs.pop("item", [])
+        group = Group(items)
+        super().__init__(item=group, **kwargs)
         self.show = True
         self.is_selected = False
         self.is_locked = False

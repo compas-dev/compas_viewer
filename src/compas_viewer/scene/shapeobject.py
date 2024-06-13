@@ -1,7 +1,6 @@
 from typing import Optional
 
 from compas.colors import Color
-from compas.geometry import Shape
 
 from .geometryobject import GeometryObject
 from .sceneobject import ShaderDataType
@@ -50,13 +49,11 @@ class ShapeObject(GeometryObject):
 
     def __init__(
         self,
-        geometry: Shape,
         u: Optional[int] = 16,
         v: Optional[int] = 16,
         **kwargs,
     ):
-        super().__init__(geometry=geometry, **kwargs)
-        self.geometry: Shape
+        super().__init__(**kwargs)
         self.u = u
         self.v = v
 

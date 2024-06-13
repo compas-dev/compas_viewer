@@ -4,7 +4,6 @@ from typing import Optional
 from typing import Union
 
 from compas.colors import Color
-from compas.datastructures import Mesh
 from compas.geometry import centroid_points
 from compas.geometry import is_coplanar
 from compas.itertools import pairwise
@@ -57,7 +56,6 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
 
     def __init__(
         self,
-        mesh: Mesh,
         show_points: Optional[bool] = None,
         show_lines: Optional[bool] = None,
         pointsize: Optional[float] = None,
@@ -66,9 +64,7 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
         use_vertexcolors: Optional[bool] = None,
         **kwargs,
     ):
-        super().__init__(mesh=mesh, **kwargs)
-
-        self.mesh: Mesh
+        super().__init__(**kwargs)
 
         self.show_points = show_points if show_points is not None else False
         self.show_lines = show_lines if show_lines is not None else True

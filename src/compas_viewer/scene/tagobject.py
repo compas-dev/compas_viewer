@@ -118,8 +118,9 @@ class TagObject(ViewerSceneObject, GeometryObject):
     :class:`compas_viewer.scene.Tag`
     """
 
-    def __init__(self, tag: Tag, **kwargs):
-        super().__init__(geometry=tag, **kwargs)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.geometry: Tag
 
     def make_buffers(self):
         self._text_buffer = {

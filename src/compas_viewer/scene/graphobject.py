@@ -1,4 +1,3 @@
-from compas.datastructures import Graph
 from compas.scene import GraphObject as BaseGraphObject
 
 from .sceneobject import ShaderDataType
@@ -6,25 +5,7 @@ from .sceneobject import ViewerSceneObject
 
 
 class GraphObject(ViewerSceneObject, BaseGraphObject):
-    """Viewer scene object for displaying COMPAS Graph data.
-
-
-    Parameters
-    ----------
-    graph : :class:`compas.datastructures.Graph`
-        The graph data structure.
-    **kwargs : dict, optional
-        Additional options for the :class:`compas_viewer.scene.ViewerSceneObject`.
-
-    See Also
-    --------
-    :class:`compas.datastructures.Graph`
-
-    """
-
-    def __init__(self, graph: Graph, **kwargs):
-        super(GraphObject, self).__init__(graph=graph, **kwargs)
-        self.graph: Graph
+    """Viewer scene object for displaying COMPAS Graph data."""
 
     def _read_points_data(self) -> ShaderDataType:
         positions = []

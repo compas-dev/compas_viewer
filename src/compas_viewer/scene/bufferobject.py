@@ -187,7 +187,6 @@ class BufferObject(SceneObject, Base):
 
     def __init__(
         self,
-        buffergeometry: BufferGeometry,
         show_points: Optional[bool] = None,
         show_lines: Optional[bool] = None,
         show_faces: Optional[bool] = None,
@@ -198,8 +197,7 @@ class BufferObject(SceneObject, Base):
         is_visiable: Optional[bool] = None,
         **kwargs,
     ):
-        super().__init__(item=buffergeometry, **kwargs)
-        self.buffergeometry = buffergeometry
+        super().__init__(**kwargs)
 
         self.show_points = True if show_points is None else show_points
         self.show_lines = True if show_lines is None else show_lines
@@ -213,6 +211,10 @@ class BufferObject(SceneObject, Base):
         self.is_selected = False
         self.background = False
         self._matrix_buffer = None
+    
+    @property
+    def buffergeometry(self) -> BufferGeometry:
+        return self.item
 
     def init(self):
         """Initialize the object"""

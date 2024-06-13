@@ -38,9 +38,10 @@ class VectorObject(ViewerSceneObject, GeometryObject):
     # Fixed indices for the arrow faces:
     ARROW_FACE_INDICES = [[6, 2, 3], [6, 3, 4], [6, 4, 5], [6, 5, 2], [2, 4, 3], [2, 5, 4]]
 
-    def __init__(self, vector: Vector, anchor: Point = Point(0, 0, 0), **kwargs):
+    def __init__(self, anchor: Point = Point(0, 0, 0), **kwargs):
         self._anchor = anchor
-        super().__init__(geometry=vector, **kwargs)
+        super().__init__(**kwargs)
+        self.geometry: Vector
         self.arrow_buffer: dict[str, Any]
         self._lines_buffer: dict[str, Any]
 

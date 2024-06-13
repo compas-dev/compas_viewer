@@ -37,16 +37,10 @@ from .vectorobject import VectorObject
 from .tagobject import TagObject, Tag
 from .frameobject import FrameObject
 from .circleobject import CircleObject
-from .boxobject import BoxObject
-from .torusobject import TorusObject
 from .polylineobject import PolylineObject
 from .polygonobject import PolygonObject
-from .sphereobject import SphereObject
 from .planeobject import PlaneObject
-from .cylinderobject import CylinderObject
 from .ellipseobject import EllipseObject
-from .coneobject import ConeObject
-from .capsuleobject import CapsuleObject
 from .polyhedronobject import PolyhedronObject
 from .geometryobject import GeometryObject
 from .shapeobject import ShapeObject
@@ -81,16 +75,16 @@ def register_scene_objects():
     register(Frame, FrameObject, context="Viewer")
     register(Vector, VectorObject, context="Viewer")
     register(Circle, CircleObject, context="Viewer")
-    register(Box, BoxObject, context="Viewer")
+    register(Box, ShapeObject, context="Viewer")
     register(Polyline, PolylineObject, context="Viewer")
-    register(Torus, TorusObject, context="Viewer")
+    register(Torus, ShapeObject, context="Viewer")
     register(Polygon, PolygonObject, context="Viewer")
-    register(Sphere, SphereObject, context="Viewer")
+    register(Sphere, ShapeObject, context="Viewer")
     register(Plane, PlaneObject, context="Viewer")
-    register(Cylinder, CylinderObject, context="Viewer")
+    register(Cylinder, ShapeObject, context="Viewer")
     register(Ellipse, EllipseObject, context="Viewer")
-    register(Cone, ConeObject, context="Viewer")
-    register(Capsule, CapsuleObject, context="Viewer")
+    register(Cone, ShapeObject, context="Viewer")
+    register(Capsule, ShapeObject, context="Viewer")
     register(Polyhedron, PolyhedronObject, context="Viewer")
     register(list, GroupObject, context="Viewer")
     register(Collection, CollectionObject, context="Viewer")
@@ -130,23 +124,17 @@ __all__ = [
     "Polyline",
     "PolylineObject",
     "Box",
-    "BoxObject",
     "Torus",
-    "TorusObject",
     "Polygon",
     "PolygonObject",
     "Sphere",
-    "SphereObject",
     "Plane",
     "PlaneObject",
     "Cylinder",
-    "CylinderObject",
     "Ellipse",
     "EllipseObject",
     "Cone",
-    "ConeObject",
     "Capsule",
-    "CapsuleObject",
     "NurbsSurface",
     "NurbsSurfaceObject",
     "GeometryObject",

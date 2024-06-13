@@ -15,8 +15,8 @@ class LineObject(ViewerGeometryObject, GeometryObject):
     :class:`compas.geometry.Line`
     """
 
-    def __init__(self, line: Line, **kwargs):
-        super().__init__(geometry=line, **kwargs)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.geometry: Line
         self.show_lines = True
 

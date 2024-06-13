@@ -11,15 +11,10 @@ from .geometryobject import GeometryObject as ViewerGeometryObject
 
 
 class PolygonObject(ViewerGeometryObject, GeometryObject):
-    """Viewer scene object for displaying COMPAS Polygon geometry.
+    """Viewer scene object for displaying COMPAS Polygon geometry."""
 
-    See Also
-    --------
-    :class:`compas.geometry.Polygon`
-    """
-
-    def __init__(self, polygon: Polygon, **kwargs):
-        super().__init__(geometry=polygon, **kwargs)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.geometry: Polygon
 
     @property

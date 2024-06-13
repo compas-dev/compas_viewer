@@ -1,3 +1,4 @@
+import pathlib
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import Callable
@@ -9,7 +10,6 @@ from numpy import any
 from numpy import array
 from numpy import unique
 from numpy.linalg import norm
-import pathlib
 from PySide6.QtCore import QEvent
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QMouseEvent

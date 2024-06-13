@@ -21,8 +21,8 @@ class NurbsSurfaceObject(ViewerGeometryObject, GeometryObject):
     :class:`compas.geometry.NurbsSurface`
     """
 
-    def __init__(self, surface: NurbsSurface, **kwargs):
-        super().__init__(geometry=surface, **kwargs)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.geometry: NurbsSurface
         self._brep: OCCBrep = OCCBrep.from_surface(self.geometry)
         self._viewmesh, self._boundaries = self._brep.to_tesselation(TOL.lineardeflection)
