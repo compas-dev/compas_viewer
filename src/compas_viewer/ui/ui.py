@@ -52,7 +52,6 @@ class UI:
                     self.viewer.scene,
                     {
                         "Name": (lambda o: o.name),
-                        "Visible": (lambda o: o.show),
                     },
                 )
             )
