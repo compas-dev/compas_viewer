@@ -109,26 +109,12 @@ class ObjectInfoDialog(QDialog, Base):
         for obj in self.viewer.scene.objects:
             if obj.is_selected:
                 new_coordinates = {
-                    "Name": [
-                        ("label", str(obj.name)),
-                    ],
-                    "Parent": [
-                        ("label", str(obj.parent)),
-                    ],
-                    "Show": [
-                        ("buttom", obj.show),
-                    ],
-                    # TODO: check _color attr
-                    "Point_Color": [
-                        ("color_combobox", obj, "pointcolor"),
-                    ],
-                    "Line_Color": [
-                        ("color_combobox", obj, "linecolor"),
-                        # ("double_edit", "G", obj.linecolor[0].g, 0, 1),
-                    ],
-                    "Face_Color": [
-                        ("color_combobox", obj, "facecolor"),
-                    ],
+                    "Name": [("label", str(obj.name))],
+                    "Parent": [("label", str(obj.parent))],
+                    # TODO: check _color attr ("double_edit", "G", obj.linecolor[0].g, 0, 1),
+                    "Point_Color": [("color_combobox", obj, "pointcolor")],
+                    "Line_Color": [("color_combobox", obj, "linecolor")],
+                    "Face_Color": [("color_combobox", obj, "facecolor")],
                     "Line_Width": [("double_edit", "", obj.linewidth, 0.0, 10.0)],
                     "Point_Size": [("double_edit", "", obj.pointsize, 0.0, 10.0)],
                     "Opacity": [("double_edit", "", obj.opacity, 0.0, 1.0)],
