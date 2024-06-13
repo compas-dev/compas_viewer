@@ -39,7 +39,7 @@ class LabelWidget(QtWidgets.QWidget):
     >>> label_widget.show()
     """
 
-    def __init__(self, text: str, alignment: Literal["right", "left", "center"] = "center", font_size: Optional[int] = 8) -> None:
+    def __init__(self, text: str, alignment: Literal["right", "left", "center"] = "center", font_size: Optional[int] = 8):
         super().__init__()
 
         self.label = QtWidgets.QLabel(self)
