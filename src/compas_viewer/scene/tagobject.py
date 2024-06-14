@@ -105,22 +105,9 @@ class TagObject(ViewerSceneObject, GeometryObject):
     """
     The scene object of the viewer tag geometry.
     Unlike :class:`compas_viewer.scene.TextObject`, tag object is a sprite always facing the camera.
-
-    Parameters
-    ----------
-    tag : :class:`compas_viewer.scene.Tag`
-        The tag geometry.
-    **kwargs : dict, optional
-        Additional options for the :class:`compas_viewer.scene.ViewerSceneObject`.
-
-    See Also
-    --------
-    :class:`compas_viewer.scene.Tag`
     """
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.geometry: Tag
+    geometry: Tag
 
     def make_buffers(self):
         self._text_buffer = {

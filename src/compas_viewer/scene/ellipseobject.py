@@ -11,9 +11,10 @@ from .geometryobject import GeometryObject as ViewerGeometryObject
 class EllipseObject(ViewerGeometryObject, GeometryObject):
     """Viewer scene object for displaying COMPAS Ellipse geometry."""
 
+    geometry: Ellipse
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.geometry: Ellipse
         self.show_lines = True
 
     @property

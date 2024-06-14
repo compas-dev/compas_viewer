@@ -11,9 +11,10 @@ from .geometryobject import GeometryObject as ViewerGeometryObject
 class PolylineObject(ViewerGeometryObject, GeometryObject):
     """Viewer scene object for displaying COMPAS Polyline geometry."""
 
+    geometry: Polyline
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.geometry: Polyline
         self.show_lines = True
 
     @property

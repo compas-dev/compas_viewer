@@ -18,17 +18,15 @@ class Group(Data):
 class GroupObject(SceneObject):
     """A group of scene objects."""
 
-    def __init__(self, **kwargs):
-        items = kwargs.pop("item", [])
-        group = Group(items)
-        super().__init__(item=group, **kwargs)
+    def __init__(self, item=None, **kwargs):
+        super().__init__(item=Group(item), **kwargs)
         self.show = True
         self.is_selected = False
         self.is_locked = False
         self.opacity = 1.0
         self.bounding_box = None
 
-        for item in items:
+        for item in self.items:
             if isinstance(item, (Data, list)):
                 self.add(item, **kwargs)
             elif isinstance(item, tuple) and len(item) == 2 and isinstance(item[0], (Data, list)):
@@ -38,6 +36,10 @@ class GroupObject(SceneObject):
             else:
                 print(item)
                 raise TypeError("Group items must be of type `Data` or a tuple of (`Data`, kwargs).")
+
+    @property
+    def items(self):
+        return self.item.items
 
     def init(self, *args, **kwargs):
         pass

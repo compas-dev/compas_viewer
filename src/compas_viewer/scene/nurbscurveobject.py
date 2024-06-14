@@ -13,9 +13,7 @@ from .geometryobject import GeometryObject as ViewerGeometryObject
 class NurbsCurveObject(ViewerGeometryObject, GeometryObject):
     """Viewer scene object for displaying COMPAS NurbsCurve geometry."""
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.geometry: NurbsCurve
+    geometry: NurbsCurve
 
     @property
     def points(self) -> Optional[list[Point]]:

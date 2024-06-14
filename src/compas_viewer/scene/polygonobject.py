@@ -13,9 +13,7 @@ from .geometryobject import GeometryObject as ViewerGeometryObject
 class PolygonObject(ViewerGeometryObject, GeometryObject):
     """Viewer scene object for displaying COMPAS Polygon geometry."""
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.geometry: Polygon
+    geometry: Polygon
 
     @property
     def points(self) -> Optional[list[Point]]:
