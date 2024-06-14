@@ -34,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fixed `load_scene` action bug.
 * Changed base of shapes to `compas_viewer.scene.ShapeObject`.
 * Changed `FrameObject` to something with just 3 axes.
+* Fixed `compas_viewer.components.slider` step attribute.
 
 ### Removed
 
