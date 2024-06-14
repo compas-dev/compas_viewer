@@ -9,16 +9,12 @@ from .geometryobject import GeometryObject as ViewerGeometryObject
 
 
 class CircleObject(ViewerGeometryObject, GeometryObject):
-    """Viewer scene object for displaying COMPAS Circle geometry.
+    """Viewer scene object for displaying COMPAS Circle geometry."""
 
-    See Also
-    --------
-    :class:`compas.geometry.Circle`
-    """
+    geometry: Circle
 
-    def __init__(self, circle: Circle, **kwargs):
-        super().__init__(geometry=circle, **kwargs)
-        self.geometry: Circle
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.show_lines = True
 
     @property

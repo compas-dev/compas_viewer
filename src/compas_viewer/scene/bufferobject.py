@@ -187,7 +187,6 @@ class BufferObject(SceneObject, Base):
 
     def __init__(
         self,
-        buffergeometry: BufferGeometry,
         show_points: Optional[bool] = None,
         show_lines: Optional[bool] = None,
         show_faces: Optional[bool] = None,
@@ -199,8 +198,7 @@ class BufferObject(SceneObject, Base):
         is_locked: Optional[bool] = None,
         **kwargs,
     ):
-        super().__init__(item=buffergeometry, **kwargs)
-        self.buffergeometry = buffergeometry
+        super().__init__(**kwargs)
 
         self.show_points = True if show_points is None else show_points
         self.show_lines = True if show_lines is None else show_lines
@@ -217,18 +215,8 @@ class BufferObject(SceneObject, Base):
         self._matrix_buffer = None
 
     @property
-    def is_locked(self):
-        return self._is_locked
-
-    @is_locked.setter
-    def is_locked(self, value: bool):
-        self._is_locked = value
-        if value:
-            self.is_selected = False
-            # scene parent
-            self.scene.instance_colors.pop(self.instance_color.rgb255)
-        else:
-            self.scene.instance_colors[self.instance_color.rgb255] = self
+    def buffergeometry(self) -> BufferGeometry:
+        return self.item
 
     def init(self):
         """Initialize the object"""

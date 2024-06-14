@@ -11,16 +11,9 @@ from .geometryobject import GeometryObject as ViewerGeometryObject
 
 
 class NurbsCurveObject(ViewerGeometryObject, GeometryObject):
-    """Viewer scene object for displaying COMPAS NurbsCurve geometry.
+    """Viewer scene object for displaying COMPAS NurbsCurve geometry."""
 
-    See Also
-    --------
-    :class:`compas.geometry.NurbsCurve`
-    """
-
-    def __init__(self, curve: NurbsCurve, **kwargs):
-        super().__init__(geometry=curve, **kwargs)
-        self.geometry: NurbsCurve
+    geometry: NurbsCurve
 
     @property
     def points(self) -> Optional[list[Point]]:

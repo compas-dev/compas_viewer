@@ -27,10 +27,14 @@ class Collection(Data):
 class CollectionObject(ViewerSceneObject, GeometryObject):
     """Viewer scene object for displaying a collection of COMPAS geometries."""
 
-    def __init__(self, collection: Collection, **kwargs):
-        self.collection = collection
-        super().__init__(geometry=self.collection, **kwargs)
-        self.objects = [ViewerSceneObject(item, **kwargs) for item in self.collection.items]
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        kwargs.pop("item")
+        self.objects = [ViewerSceneObject(item=item, **kwargs) for item in self.collection.items]
+
+    @property
+    def collection(self) -> Collection:
+        return self.item
 
     def _read_points_data(self) -> ShaderDataType:
         positions = []
