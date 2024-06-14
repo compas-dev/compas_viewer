@@ -10,16 +10,9 @@ from .geometryobject import GeometryObject as ViewerGeometryObject
 
 
 class PolyhedronObject(ViewerGeometryObject, GeometryObject):
-    """Viewer scene object for displaying COMPAS Polyhedron geometry.
+    """Viewer scene object for displaying COMPAS Polyhedron geometry."""
 
-    See Also
-    --------
-    :class:`compas.geometry.Polyhedron`
-    """
-
-    def __init__(self, polyhedron: Polyhedron, **kwargs):
-        super().__init__(geometry=polyhedron, **kwargs)
-        self.geometry: Polyhedron
+    geometry: Polyhedron
 
     @property
     def points(self) -> Optional[list[Point]]:

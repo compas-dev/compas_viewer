@@ -8,16 +8,12 @@ from .geometryobject import GeometryObject as ViewerGeometryObject
 
 
 class LineObject(ViewerGeometryObject, GeometryObject):
-    """Viewer scene object for displaying COMPAS Line geometry.
+    """Viewer scene object for displaying COMPAS Line geometry."""
 
-    See Also
-    --------
-    :class:`compas.geometry.Line`
-    """
+    geometry: Line
 
-    def __init__(self, line: Line, **kwargs):
-        super().__init__(geometry=line, **kwargs)
-        self.geometry: Line
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.show_lines = True
 
     @property

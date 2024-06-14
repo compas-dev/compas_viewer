@@ -14,16 +14,12 @@ from .geometryobject import GeometryObject as ViewerGeometryObject
 
 
 class NurbsSurfaceObject(ViewerGeometryObject, GeometryObject):
-    """Viewer scene object for displaying COMPAS NurbsSurface geometry.
+    """Viewer scene object for displaying COMPAS NurbsSurface geometry."""
 
-    See Also
-    --------
-    :class:`compas.geometry.NurbsSurface`
-    """
+    geometry: NurbsSurface
 
-    def __init__(self, surface: NurbsSurface, **kwargs):
-        super().__init__(geometry=surface, **kwargs)
-        self.geometry: NurbsSurface
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self._brep: OCCBrep = OCCBrep.from_surface(self.geometry)
         self._viewmesh, self._boundaries = self._brep.to_tesselation(TOL.lineardeflection)
 

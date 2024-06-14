@@ -16,8 +16,6 @@ class PlaneObject(ViewerGeometryObject, GeometryObject):
 
     Parameters
     ----------
-    plane : :class:`compas.geometry.Plane`
-        The plane geometry.
     planesize : float
         The size of the plane.
         Default is 1.
@@ -27,9 +25,9 @@ class PlaneObject(ViewerGeometryObject, GeometryObject):
     :class:`compas.geometry.Plane`
     """
 
-    def __init__(self, plane: Plane, planesize: float = 1, **kwargs):
-        super().__init__(geometry=plane, **kwargs)
-        self.frame: Frame = Frame.from_plane(plane)
+    def __init__(self, planesize: float = 1, **kwargs):
+        super().__init__(**kwargs)
+        self.frame: Frame = Frame.from_plane(self.plane)
         self.planesize = planesize
 
         self.vertices = [
@@ -38,6 +36,10 @@ class PlaneObject(ViewerGeometryObject, GeometryObject):
             Point(*self.frame.to_world_coordinates([self.planesize, self.planesize, 0])),
             Point(*self.frame.to_world_coordinates([-self.planesize, self.planesize, 0])),
         ]
+
+    @property
+    def plane(self) -> Plane:
+        return self.item
 
     @property
     def points(self) -> Optional[list[Point]]:
