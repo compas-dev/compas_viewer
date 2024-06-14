@@ -4,6 +4,7 @@ from typing import Optional
 from typing import Union
 
 from compas.colors import Color
+from compas.datastructures import Mesh
 from compas.geometry import centroid_points
 from compas.geometry import is_coplanar
 from compas.itertools import pairwise
@@ -49,6 +50,8 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
     --------
     :class:`compas.datastructures.Mesh`
     """
+
+    mesh: Mesh
 
     vertexcolor = ColorDictAttribute(default=Color(0.2, 0.2, 0.2))
     edgecolor = ColorDictAttribute(default=Color(0.2, 0.2, 0.2))
