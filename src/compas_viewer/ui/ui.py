@@ -44,7 +44,8 @@ class UI:
             self,
             show=self.viewer.config.ui.sidedock.show,
         )
-
+        # TODO: find better solution to transient window
+        self.sidebar.add_items()
         self.window.widget.setCentralWidget(self.viewport.widget)
         self.window.widget.addDockWidget(SideDock.locations["left"], self.sidedock.widget)
 

@@ -18,20 +18,18 @@ class SideBarRight:
         self.show = show
         self.items = items
 
-    def add_items(self, items: list[dict[str, Callable]], parent: QSplitter) -> None:
-        if not items:
+    def add_items(self) -> None:
+        if not self.items:
             return
 
-        for item in items:
+        for item in self.items:
             itemtype = item.get("type", None)
             action = item.get("action", None)
 
             if itemtype == "Sceneform":
-                parent.addWidget(Sceneform(self.ui.viewer.scene, action))
+                self.widget.addWidget(Sceneform(self.ui.viewer.scene, action))
 
     def update(self):
-        # TODO: find better solution for transient window
-        self.add_items(self.items, self.widget)
         self.widget.update()
         for widget in self.widget.children():
             widget.update()
