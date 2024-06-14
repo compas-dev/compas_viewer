@@ -1,5 +1,4 @@
 from typing import Callable
-from typing import Dict
 from typing import Optional
 
 from PySide6.QtCore import Qt
@@ -17,7 +16,7 @@ class Sceneform(QTreeWidget):
     ----------
     scene : :class:`compas.scene.Scene`
         The scene to be displayed.
-    columns : dict[str, Callable]
+    columns : list[dict]
         A dictionary of column names and their corresponding attributes.
         Example: {"Name": lambda o: o.name, "Object": lambda o: o}
     column_editable : list[bool], optional
@@ -31,7 +30,7 @@ class Sceneform(QTreeWidget):
     ----------
     scene : :class:`compas.scene.Scene`
         The scene to be displayed.
-    columns : dict[str, Callable]
+    columns : list[dict]
         A dictionary of column names and their corresponding function.
     checkbox_columns : dict[int, str]
         A dictionary of column indices and their corresponding attributes.
@@ -40,7 +39,7 @@ class Sceneform(QTreeWidget):
     def __init__(
         self,
         scene: Scene,
-        columns: Dict[str, Callable],
+        columns: list[dict],
         column_editable: Optional[list[bool]] = None,
         show_headers: bool = True,
         callback: Optional[Callable] = None,
@@ -50,7 +49,7 @@ class Sceneform(QTreeWidget):
         self.checkbox_columns: dict[int, str] = {}
         self.column_editable = (column_editable or [False]) + [False] * (len(columns) - len(column_editable or [False]))
         self.setColumnCount(len(columns))
-        self.setHeaderLabels(list(self.columns.keys()))
+        self.setHeaderLabels(col["title"] for col in self.columns)
         self.setHeaderHidden(not show_headers)
 
         self._scene = scene
@@ -74,14 +73,20 @@ class Sceneform(QTreeWidget):
                 continue
 
             strings = []
-            for i, func in enumerate(self.columns.values()):
-                output = func(node)
-                if isinstance(output, tuple) and output[0] == "checkbox":
-                    if hasattr(node, output[1]):
-                        self.checkbox_columns[i] = output[1]
+            for i, column in enumerate(self.columns):
+                itemtype = column.get("type", None)
+                action = column.get("action", None)
+                kwargs = column.get("kwargs") or {}
+
+                if action:
+                    output = action(node, **kwargs)
+
+                if itemtype == "checkbox":
+                    if hasattr(node, kwargs["attr"]):
+                        self.checkbox_columns[i] = kwargs["attr"]
                         output = ""
                     else:
-                        raise TypeError(f"Attribute '{output[1]}' not found in node '{node}'")
+                        raise TypeError(f"Attribute '{kwargs["attr"]}' not found in node '{node}'")
                 strings.append(output)
 
             if node.parent.is_root:

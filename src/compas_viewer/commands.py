@@ -465,19 +465,17 @@ load_data_cmd = Command(title="Load Data", callback=lambda: print("load data"))
 # =============================================================================
 # =============================================================================
 # =============================================================================
-# Scene Form
+# Object
 # =============================================================================
 # =============================================================================
 # =============================================================================
 
 
-def get_name(obj: "ViewerSceneObject"):
-    return str(obj.name)
+def get_obj_attr(viewer: "Viewer", obj: "ViewerSceneObject", attr: Literal["name", "show"]):
+    if hasattr(obj, attr):
+        return getattr(obj, attr)
+    else:
+        raise AttributeError(f"Attribute '{attr}' not found in object '{obj}'")
 
 
-def get_show_box(obj: "ViewerSceneObject"):
-    """
-    'checkbox' to show(hide) the ViewerSceneObject.
-    'show' is a boolean attribute of ViewerSceneObject.
-    """
-    return "checkbox", "show"
+get_obj_attr_cmd = Command(title="", callback=get_obj_attr)

@@ -15,8 +15,7 @@ from compas_viewer.commands import change_rendermode_cmd
 from compas_viewer.commands import change_view_cmd
 from compas_viewer.commands import clear_scene_cmd
 from compas_viewer.commands import deselect_all_cmd
-from compas_viewer.commands import get_name
-from compas_viewer.commands import get_show_box
+from compas_viewer.commands import get_obj_attr_cmd
 from compas_viewer.commands import load_scene_cmd
 from compas_viewer.commands import pan_view_cmd
 from compas_viewer.commands import rotate_view_cmd
@@ -240,14 +239,14 @@ class StatusbarConfig(ConfigBase):
 class SidebarConfig(ConfigBase):
     show: bool = True
     sceneform: bool = True
-    items: list[dict[str, str]] = field(
+    items: list[dict] = field(
         default_factory=lambda: [
             {
                 "type": "Sceneform",
-                "action": {
-                    "Name": get_name,
-                    "Show": get_show_box,
-                },
+                "action": [
+                    {"title": "Name", "action": get_obj_attr_cmd, "kwargs": {"attr": "name"}},
+                    {"title": "Show", "type": "checkbox", "action": get_obj_attr_cmd, "kwargs": {"attr": "show"}},
+                ],
             },
         ]
     )
@@ -374,6 +373,7 @@ class Config(ConfigBase):
             change_view_cmd,
             clear_scene_cmd,
             deselect_all_cmd,
+            get_obj_attr_cmd,
             load_scene_cmd,
             pan_view_cmd,
             rotate_view_cmd,
