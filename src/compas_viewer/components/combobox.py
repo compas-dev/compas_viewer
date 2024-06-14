@@ -196,6 +196,7 @@ class ColorComboBox(QWidget, Base):
     def change_color(self, color):
         rgb = remap_rgb(color.getRgb())[:-1]  # rgba to rgb(0-1)
         setattr(self.obj, self.attr, Color(*rgb))
+        self.obj.update()
 
 
 class ViewModeAction(QWidget, Base):

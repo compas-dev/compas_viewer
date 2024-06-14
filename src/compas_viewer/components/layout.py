@@ -56,4 +56,4 @@ def base_layout(coordinates: dict) -> tuple[QVBoxLayout, dict]:
         sub_layout.addLayout(right_layout)
 
         layout.addLayout(sub_layout)
-    return layout, spin_boxes
+    return (layout, spin_boxes)
