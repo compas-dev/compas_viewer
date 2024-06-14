@@ -86,7 +86,7 @@ class Sceneform(QTreeWidget):
                         self.checkbox_columns[i] = kwargs["attr"]
                         output = ""
                     else:
-                        raise TypeError(f"Attribute '{kwargs["attr"]}' not found in node '{node}'")
+                        raise TypeError(f"Attribute '{kwargs['attr']}' not found in node '{node}'")
                 strings.append(output)
 
             if node.parent.is_root:
