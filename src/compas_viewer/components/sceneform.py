@@ -55,8 +55,6 @@ class Sceneform(QTreeWidget):
         self._scene = scene
         self.callback = callback
 
-        self.populate_tree()
-
         self.itemClicked.connect(self.on_item_clicked)
         self.itemSelectionChanged.connect(self.on_item_selection_changed)
 

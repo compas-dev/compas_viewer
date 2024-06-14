@@ -16,7 +16,7 @@ class SideBarRight:
         self.widget = QSplitter(QtCore.Qt.Orientation.Vertical)
         self.widget.setChildrenCollapsible(True)
         self.show = show
-        self.add_items(items, self.widget)
+        self.items = items
 
     def add_items(self, items: list[dict[str, Callable]], parent: QSplitter) -> None:
         if not items:
@@ -30,6 +30,8 @@ class SideBarRight:
                 parent.addWidget(Sceneform(self.ui.viewer.scene, action))
 
     def update(self):
+        # TODO: find better solution for transient window
+        self.add_items(self.items, self.widget)
         self.widget.update()
         for widget in self.widget.children():
             widget.update()
