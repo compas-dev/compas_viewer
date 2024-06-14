@@ -24,7 +24,6 @@ class PolygonObject(ViewerGeometryObject, GeometryObject):
 
     @property
     def points(self) -> Optional[list[Point]]:
-        """The points to be shown in the viewer."""
         return self.geometry.points
 
     @property
@@ -33,7 +32,7 @@ class PolygonObject(ViewerGeometryObject, GeometryObject):
 
     @property
     def viewmesh(self):
-        """The mesh volume to be shown in the viewer."""
         vertices = self.geometry.points
+        faces = [list(range(len(vertices)))]
         faces = earclip_polygon(self.geometry)
         return Mesh.from_vertices_and_faces(vertices, faces)

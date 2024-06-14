@@ -10,9 +10,9 @@ class SatusBar:
     def __init__(self, ui: "UI", show: bool = True) -> None:
         self.ui = ui
         self.widget = self.ui.window.widget.statusBar()
-        self.widget.setVisible(show)
         self.label = LabelWidget()
         self.widget.addWidget(self.label(text="Ready..."))
+        self.show = show
 
     @property
     def show(self):
@@ -20,4 +20,7 @@ class SatusBar:
 
     @show.setter
     def show(self, value: bool):
-        self.widget.setVisible(value)
+        if value:
+            self.widget.setVisible(True)
+        elif not value:
+            self.widget.setHidden(True)

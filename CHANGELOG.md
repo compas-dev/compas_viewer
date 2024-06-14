@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added `clear_scene` action.
 * Added `compas_viewer.components.SceneForm`.
 * Added `callback` for `compas_viewer.components.TreeForm`.
+* Added `compas_viewer.scene.ShapeObject`.
+* Added `compas_viewer.commands.capture_view` and corresponding command.
+* Added default colors to `MeshObject`.
+* Added default colors to `GeometryObject`.
 
 ### Changed
 
@@ -28,10 +32,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Implemented downsampling for window selection to improve performance.
 * Made `TreeForm` interactive.
 * Fixed `load_scene` action bug.
+* Changed base of shapes to `compas_viewer.scene.ShapeObject`.
+* Changed `FrameObject` to something with just 3 axes.
 * Fixed `compas_viewer.components.slider` step attribute.
 
 ### Removed
-
 
 ## [1.1.5] 2024-05-15
 

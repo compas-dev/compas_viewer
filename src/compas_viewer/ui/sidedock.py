@@ -26,9 +26,9 @@ class SideDock:
         self.scroll.setWidgetResizable(True)
         self.layout = QtWidgets.QVBoxLayout(content)
         self.layout.setAlignment(QtCore.Qt.AlignTop)
-        self.widget.setVisible(show)
         self.widget.setAllowedAreas(QtCore.Qt.DockWidgetArea.LeftDockWidgetArea | QtCore.Qt.DockWidgetArea.RightDockWidgetArea)
         self.widget.setFeatures(QDockWidget.DockWidgetFeature.DockWidgetFloatable | QDockWidget.DockWidgetFeature.DockWidgetMovable)
+        self.show = show
 
     @property
     def show(self):
@@ -36,7 +36,10 @@ class SideDock:
 
     @show.setter
     def show(self, value: bool):
-        self.widget.setVisible(value)
+        if value:
+            self.widget.setVisible(True)
+        elif not value:
+            self.widget.setHidden(True)
 
     def add(self, widget):
         self.layout.addWidget(widget)

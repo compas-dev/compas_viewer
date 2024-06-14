@@ -1,11 +1,13 @@
 from compas.geometry import Box
+from compas.geometry import Translation
 from compas_viewer import Viewer
 from compas_viewer.components import Button
 from compas_viewer.components import Slider
 
+box = Box(1)
+
 viewer = Viewer()
 
-box = Box(1, 1, 1)
 boxobj = viewer.scene.add(box)
 
 
@@ -23,7 +25,7 @@ def slider_changed(slider: Slider, value: int):
 
     v = (value - vmin) / (vmax - vmin)
 
-    boxobj.item.frame.point.x = value
+    boxobj.transformation = Translation.from_vector([10 * v, 0, 0])
     boxobj.update()
     viewer.renderer.update()
 

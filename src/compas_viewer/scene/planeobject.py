@@ -41,7 +41,6 @@ class PlaneObject(ViewerGeometryObject, GeometryObject):
 
     @property
     def points(self) -> Optional[list[Point]]:
-        """The points to be shown in the viewer."""
         return None
 
     @property
@@ -55,5 +54,4 @@ class PlaneObject(ViewerGeometryObject, GeometryObject):
 
     @property
     def viewmesh(self) -> Mesh:
-        """The mesh volume to be shown in the viewer."""
         return Mesh.from_vertices_and_faces(self.vertices, [[0, 1, 2], [0, 2, 3]])
