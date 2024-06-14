@@ -11,6 +11,7 @@ from compas.geometry import Geometry
 from compas.scene import Scene
 
 from .sceneobject import ViewerSceneObject
+from .scenebuffer import SceneBuffer
 
 
 def instance_colors_generator(i: int = 0) -> Generator:
@@ -74,6 +75,8 @@ class ViewerScene(Scene):
         #  Selection
         self.instance_colors: dict[tuple[int, int, int], ViewerSceneObject] = {}
         self._instance_colors_generator = instance_colors_generator()
+
+        self.scenebuffer = SceneBuffer()
 
     # TODO: These fixed kwargs could be moved to COMPAS core.
     def add(

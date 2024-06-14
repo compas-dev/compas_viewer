@@ -49,7 +49,6 @@ class AttributeBuffer:
     def __init__(self, positions: Optional[NDArray] = None, colors: Optional[NDArray] = None, elements: Optional[NDArray] = None, defaultcolor: Optional[Color] = None, dynamic: bool = True) -> None:
 
         key = id(positions)
-        print("positions", key)
         self.positions = self.BUFFERS.get(key)
         if self.positions is None:
             positions = array([], dtype=float) if positions is None else array(positions).ravel()
@@ -65,7 +64,6 @@ class AttributeBuffer:
             self.BUFFERS[key] = self.colors
 
         key = id(elements)
-        print("elements", key)
         self.elements = self.BUFFERS.get(key)
         self.elements_reversed = self.BUFFERS.get(str(key) + "_reversed")
         self.n = self.BUFFERS.get(str(key) + "_n")
@@ -287,10 +285,15 @@ class BufferObject(SceneObject, Base):
         self.instance_color = Color.from_rgb255(*next(self.scene._instance_colors_generator))
         self.scene.instance_colors[self.instance_color.rgb255] = self
         self.buffergeometry.make_buffers()
+        self.update_matrix()
 
     def update(self):
         """Update the object"""
         self.buffergeometry.update_buffers()
+        self.update_matrix()
+
+    def update_matrix(self):
+        self._matrix_buffer = list(array(self.worldtransformation.matrix).flatten())
 
     def draw(self, shader: Shader, wireframe: bool, is_lighted: bool):
         """Draw the object from its buffers"""
@@ -344,7 +347,7 @@ class BufferObject(SceneObject, Base):
         shader.uniform1i("is_selected", 0)
         shader.uniform1f("object_opacity", 1)
         if self._matrix_buffer is not None:
-            shader.uniform4x4("transform", list(identity(4).flatten()))
+            shader.uniform4x4("transform", self._matrix_buffer)
         shader.disable_attribute("position")
         shader.disable_attribute("color")
 

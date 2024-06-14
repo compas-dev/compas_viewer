@@ -27,6 +27,20 @@ class Shader:
         location = GL.glGetUniformLocation(self.program, name)
         GL.glUniformMatrix4fv(location, 1, True, _value)
 
+    def uniform4x4xN(self, name: str, value: list[list[list[float]]]):
+        """Store a list of uniform 4x4 transformation matrices in the shader program at a named location.
+
+        Parameters
+        ----------
+        name : str
+            The name of the location in the shader program.
+        value : list[list[list[float]]]
+            A list of 4x4 transformation matrices.
+        """
+        _value = array(value)
+        location = GL.glGetUniformLocation(self.program, name)
+        GL.glUniformMatrix4fv(location, len(value), True, _value)
+
     def uniform1i(self, name: str, value: int):
         """Store a uniform integer in the shader program at a named location.
 
@@ -117,6 +131,22 @@ class Shader:
         location = self.locations[name]
         GL.glBindBuffer(GL.GL_ARRAY_BUFFER, value)
         GL.glVertexAttribPointer(location, step, GL.GL_FLOAT, False, 0, None)
+    
+    def bind_int_attribute(self, name: str, value: Any, step: int = 3):
+        """Bind a named attribute to a buffer.
+
+        Parameters
+        ----------
+        name : str
+            The name of the attribute.
+        value : Any
+            The buffer to bind to the attribute.
+        step : int, optional
+            The step size of the attribute.
+        """
+        location = self.locations[name]
+        GL.glBindBuffer(GL.GL_ARRAY_BUFFER, value)
+        GL.glVertexAttribIPointer(location, step, GL.GL_INT, 0, None)
 
     def disable_attribute(self, name: str):
         GL.glDisableVertexAttribArray(self.locations[name])

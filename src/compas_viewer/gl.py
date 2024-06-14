@@ -63,6 +63,14 @@ def make_vertex_buffer(data, dynamic=False):
     GL.glBindBuffer(GL.GL_ARRAY_BUFFER, 0)
     return vbo
 
+def make_storage_buffer(data, dynamic=False):
+
+    access = GL.GL_DYNAMIC_DRAW if dynamic else GL.GL_STATIC_DRAW
+    ssbo = GL.glGenBuffers(1)
+    GL.glBindBuffer(GL.GL_SHADER_STORAGE_BUFFER, ssbo)
+    GL.glBufferData(GL.GL_SHADER_STORAGE_BUFFER, data.nbytes, data, access)
+    GL.glBindBufferBase(GL.GL_SHADER_STORAGE_BUFFER, 0, ssbo)  # Binding point 0 corresponds to the shader layout
+
 
 def make_index_buffer(data, dynamic=False):
     """Make an element buffer from the given data.

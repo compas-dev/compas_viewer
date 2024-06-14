@@ -439,6 +439,9 @@ class Renderer(QOpenGLWidget):
         self.shader_grid.uniform4x4("transform", transform)
         self.shader_grid.release()
 
+
+        self.viewer.scene.scenebuffer.init()
+
     def update_projection(self, w=None, h=None):
         """
         Update the projection matrix.
@@ -610,6 +613,10 @@ class Renderer(QOpenGLWidget):
                 self.width(),
                 self.height(),
             )
+
+
+        projection = self.camera.projection(self.width(), self.height())
+        self.viewer.scene.scenebuffer.draw(projection, viewworld)
 
     def paint_instance(self):
         """
