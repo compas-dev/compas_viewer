@@ -51,13 +51,14 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
     :class:`compas.datastructures.Mesh`
     """
 
+    mesh: Mesh
+
     vertexcolor = ColorDictAttribute(default=Color(0.2, 0.2, 0.2))
     edgecolor = ColorDictAttribute(default=Color(0.2, 0.2, 0.2))
     facecolor = ColorDictAttribute(default=Color(0.9, 0.9, 0.9))
 
     def __init__(
         self,
-        mesh: Mesh,
         show_points: Optional[bool] = None,
         show_lines: Optional[bool] = None,
         pointsize: Optional[float] = None,
@@ -66,9 +67,7 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
         use_vertexcolors: Optional[bool] = None,
         **kwargs,
     ):
-        super().__init__(mesh=mesh, **kwargs)
-
-        self.mesh: Mesh
+        super().__init__(**kwargs)
 
         self.show_points = show_points if show_points is not None else False
         self.show_lines = show_lines if show_lines is not None else True

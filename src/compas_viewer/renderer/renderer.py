@@ -581,7 +581,7 @@ class Renderer(QOpenGLWidget):
         if self.grid is not None:
             self.grid.draw(self.shader_model)
         for obj in self.sort_objects_from_viewworld(mesh_objs, viewworld):
-            obj.draw(self.shader_model, self.rendermode == "wireframe", self.rendermode == "lightened")
+            obj.draw(self.shader_model, self.rendermode == "wireframe", self.rendermode == "lighted")
         self.shader_model.release()
 
         # Draw vector arrows

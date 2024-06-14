@@ -48,12 +48,10 @@ class FrameObject(ViewerSceneObject):
 
     def __init__(
         self,
-        frame: Frame,
         size: Optional[float] = 1,
         **kwargs,
     ):
-        super().__init__(item=frame, **kwargs)
-        self.frame = frame
+        super().__init__(**kwargs)
         self.size = size
 
     def _read_lines_data(self) -> ShaderDataType:
