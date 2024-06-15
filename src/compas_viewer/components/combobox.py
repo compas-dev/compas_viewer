@@ -12,6 +12,7 @@ from PySide6.QtWidgets import QVBoxLayout
 from PySide6.QtWidgets import QWidget
 
 from compas.colors import Color
+from compas.colors.colordict import ColorDict
 from compas_viewer.base import Base
 
 if TYPE_CHECKING:
@@ -226,9 +227,16 @@ class ColorComboBox(QWidget, Base):
             QColor(0, 255, 255),  # Cyan
             QColor(255, 0, 255),  # Magenta
         ]
-        # TODO: check _color attr ("double_edit", "G", obj.linecolor[0].g, 0, 1),
+
         default_color = getattr(self.obj, self.attr)
-        default_color = QColor(*remap_rgb(default_color[0].rgb, to_range_one=False))
+
+        if isinstance(default_color, Color):
+            default_color = default_color.rgb
+        elif isinstance(default_color, ColorDict):
+            default_color = default_color.default
+        else:
+            raise ValueError("Invalid color type.")
+        default_color = QColor(*remap_rgb(default_color, to_range_one=False))
 
         self.layout = QVBoxLayout(self)
         self.color_selector = ComboBox(self.color_options, self.change_color, paint=True)
