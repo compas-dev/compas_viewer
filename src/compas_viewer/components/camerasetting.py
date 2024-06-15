@@ -9,8 +9,8 @@ from compas_viewer.components.layout import base_layout
 class CameraSettingsDialog(QDialog, Base):
     """
     A dialog for displaying and updating camera settings in Qt applications.
-    This dialog allows users to modify the camera's target and position,
-    and applies these changes dynamically.
+    This dialog allows users to modify the camera's target and position and
+    applies these changes dynamically.
 
     Attributes
     ----------
@@ -20,6 +20,8 @@ class CameraSettingsDialog(QDialog, Base):
         Dictionary containing spin boxes for adjusting camera settings.
     update_button : QPushButton
         Button to apply changes to the camera settings.
+    camera : Camera
+        The camera object from the viewer's renderer.
 
     Methods
     -------
@@ -37,21 +39,27 @@ class CameraSettingsDialog(QDialog, Base):
         self.setWindowTitle("Camera Settings")
 
         self.layout = QVBoxLayout(self)
+        self.camera = self.viewer.renderer.camera
+        items = [
+            {
+                "title": "Camera_Target",
+                "items": [
+                    {"type": "double_edit", "title": "X", "value": self.camera.target.x, "min_val": None, "max_val": None},
+                    {"type": "double_edit", "title": "Y", "value": self.camera.target.y, "min_val": None, "max_val": None},
+                    {"type": "double_edit", "title": "Z", "value": self.camera.target.z, "min_val": None, "max_val": None},
+                ],
+            },
+            {
+                "title": "Camera_Position",
+                "items": [
+                    {"type": "double_edit", "title": "X", "value": self.camera.position.x, "min_val": None, "max_val": None},
+                    {"type": "double_edit", "title": "Y", "value": self.camera.position.y, "min_val": None, "max_val": None},
+                    {"type": "double_edit", "title": "Z", "value": self.camera.position.z, "min_val": None, "max_val": None},
+                ],
+            },
+        ]
 
-        coordinates = {
-            "Camera_Target": [
-                ("double_edit", "X", self.viewer.renderer.camera.target.x, None, None),
-                ("double_edit", "Y", self.viewer.renderer.camera.target.y, None, None),
-                ("double_edit", "Z", self.viewer.renderer.camera.target.z, None, None),
-            ],
-            "Camera_Position": [
-                ("double_edit", "X", self.viewer.renderer.camera.position.x, None, None),
-                ("double_edit", "Y", self.viewer.renderer.camera.position.y, None, None),
-                ("double_edit", "Z", self.viewer.renderer.camera.position.z, None, None),
-            ],
-        }
-
-        camera_setting_layout, self.spin_boxes = base_layout(coordinates)
+        camera_setting_layout, self.spin_boxes = base_layout(items)
 
         self.layout.addLayout(camera_setting_layout)
 

@@ -15,44 +15,43 @@ if TYPE_CHECKING:
 
 def object_setting_layout(viewer: "Viewer"):
     """
-    Generates a layout for displaying object information based on the provided object.
+    Generates a layout for displaying and editing object information based on the selected objects in the viewer.
 
     Parameters
     ----------
-    obj : object
-        The object for which to display information.
+    viewer : Viewer
+        The viewer instance containing the scene and objects.
 
     Returns
     -------
     QVBoxLayout
-        The layout for displaying object information.
+        The layout for displaying object information, or None if no objects are selected.
 
     Example
     -------
-    >>> layout = object_info_layout(obj)
+    >>> layout = object_setting_layout(viewer)
     """
     status = False
-    coordinates = {}
+    items = []
     for obj in viewer.scene.objects:
         if obj.is_selected:
             status = True
-            new_coordinates = {
-                "Name": [("label", str(obj.name))],
-                "Parent": [("label", str(obj.parent))],
-                # TODO: check _color attr ("double_edit", "G", obj.linecolor[0].g, 0, 1),
-                "Point_Color": [("color_combobox", obj, "pointcolor")],
-                "Line_Color": [("color_combobox", obj, "linecolor")],
-                "Face_Color": [("color_combobox", obj, "facecolor")],
-                "Line_Width": [("double_edit", "", obj.linewidth, 0.0, 10.0)],
-                "Point_Size": [("double_edit", "", obj.pointsize, 0.0, 10.0)],
-                "Opacity": [("double_edit", "", obj.opacity, 0.0, 1.0)],
-            }
-            coordinates.update(new_coordinates)
+            new_items = [
+                {"title": "Name", "items": [{"type": "label", "text": str(obj.name)}]},
+                {"title": "Parent", "items": [{"type": "label", "text": str(obj.parent)}]},
+                {"title": "Point_Color", "items": [{"type": "color_combobox", "obj": obj, "attr": "pointcolor"}]},
+                {"title": "Line_Color", "items": [{"type": "color_combobox", "obj": obj, "attr": "linecolor"}]},
+                {"title": "Face_Color", "items": [{"type": "color_combobox", "obj": obj, "attr": "facecolor"}]},
+                {"title": "Line_Width", "items": [{"type": "double_edit", "title": "", "value": obj.linewidth, "min_val": 0.0, "max_val": 10.0}]},
+                {"title": "Point_Size", "items": [{"type": "double_edit", "title": "", "value": obj.pointsize, "min_val": 0.0, "max_val": 10.0}]},
+                {"title": "Opacity", "items": [{"type": "double_edit", "title": "", "value": obj.opacity, "min_val": 0.0, "max_val": 1.0}]},
+            ]
+            items.extend(new_items)
 
     if not status:
         return None
 
-    return base_layout(coordinates)
+    return base_layout(items)
 
 
 class ObjectSetting(QWidget):

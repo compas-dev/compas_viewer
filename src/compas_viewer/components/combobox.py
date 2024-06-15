@@ -1,3 +1,4 @@
+from typing import TYPE_CHECKING
 from typing import Callable
 from typing import Optional
 
@@ -12,6 +13,9 @@ from PySide6.QtWidgets import QWidget
 
 from compas.colors import Color
 from compas_viewer.base import Base
+
+if TYPE_CHECKING:
+    from compas_viewer.scene import ViewerSceneObject
 
 
 def remap_rgb(value, to_range_one=True):
@@ -167,7 +171,45 @@ class ComboBox(QComboBox):
 
 
 class ColorComboBox(QWidget, Base):
-    def __init__(self, obj, attr):
+    """
+    A custom QWidget for selecting colors from a predefined list and applying the selected color to an object's attribute.
+
+    Parameters
+    ----------
+    obj : ViewerSceneObject, optional
+        The object to which the selected color will be applied. Defaults to None.
+    attr : str, optional
+        The attribute of the object to which the selected color will be applied. Defaults to None.
+
+    Attributes
+    ----------
+    obj : ViewerSceneObject
+        The object to which the selected color will be applied.
+    attr : str
+        The attribute of the object to which the selected color will be applied.
+    color_options : list of QColor
+        A list of predefined QColor objects representing available colors.
+    layout : QVBoxLayout
+        The layout of the widget.
+    color_selector : ComboBox
+        A combo box for selecting colors.
+
+    Methods
+    -------
+    change_color(color: QColor) -> None
+        Changes the color of the object's attribute to the selected color.
+
+    Example
+    -------
+    >>> color_combobox = ColorComboBox(obj=some_obj, attr="linecolor")
+    >>> color_combobox.show()
+    """
+
+    def __init__(
+        self,
+        obj: "ViewerSceneObject" = None,
+        attr: str = None,
+    ):
         super().__init__()
         self.obj = obj
         self.attr = attr
