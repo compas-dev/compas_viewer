@@ -24,6 +24,8 @@ class BRepObject(ViewerGeometryObject, GeometryObject):
     :class:`compas_occ.brep.Brep`
     """
 
+    geometry: OCCBrep
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self._viewmesh, self._boundaries = self.geometry.to_tesselation(TOL.lineardeflection)

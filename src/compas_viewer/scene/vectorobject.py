@@ -48,7 +48,7 @@ class VectorObject(ViewerSceneObject, GeometryObject):
 
     def _read_lines_data(self) -> ShaderDataType:
         arrow_end = self._anchor + self.geometry * (1 - self.viewer.config.vectorsize)
-        arrow_width = self.viewer.config.vectorsize * self.viewer.config.vectorsize * self.geometry.length
+        arrow_width = 5 * self.viewer.config.vectorsize * self.viewer.config.vectorsize * self.geometry.length
         positions = [
             self._anchor,  # Arrow start
             arrow_end,  # Arrow body end

@@ -46,11 +46,7 @@ class FrameObject(ViewerSceneObject):
     :class:`compas.geometry.Frame`
     """
 
-    def __init__(
-        self,
-        size: Optional[float] = 1,
-        **kwargs,
-    ):
+    def __init__(self, size: Optional[float] = 1, **kwargs):
         super().__init__(**kwargs)
         self.size = size
 

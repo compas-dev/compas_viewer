@@ -25,7 +25,6 @@ class NurbsCurveObject(ViewerGeometryObject, GeometryObject):
         polyline = self.geometry.to_polyline()
         for pair in pairwise(polyline.points):
             lines.append(Line(*pair))
-
         return lines
 
     @property

@@ -47,12 +47,9 @@ class ShapeObject(GeometryObject):
     :class:`compas.geometry.Geometry`
     """
 
-    def __init__(
-        self,
-        u: Optional[int] = 16,
-        v: Optional[int] = 16,
-        **kwargs,
-    ):
+    geometry: Shape
+
+    def __init__(self, u: Optional[int] = 16, v: Optional[int] = 16, **kwargs):
         super().__init__(**kwargs)
         self.u = u
         self.v = v
