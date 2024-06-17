@@ -1,5 +1,7 @@
 from typing import Optional
 
+from compas_occ.brep import OCCBrep
+
 from compas.datastructures import Mesh
 from compas.geometry import Line
 from compas.geometry import Point

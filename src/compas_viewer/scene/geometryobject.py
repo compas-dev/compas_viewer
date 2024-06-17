@@ -2,6 +2,7 @@ from typing import Optional
 
 from compas.colors import Color
 from compas.datastructures import Mesh
+from compas.geometry import Geometry
 from compas.geometry import Line
 from compas.geometry import Point
 from compas.itertools import flatten

@@ -1,6 +1,7 @@
 from typing import Optional
 
 from compas.colors import Color
+from compas.geometry import Shape
 
 from .geometryobject import GeometryObject
 from .sceneobject import ShaderDataType
