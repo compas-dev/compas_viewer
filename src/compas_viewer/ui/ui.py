@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING
 
 from compas_viewer.components import Sceneform
+from compas_viewer.components.objectsetting import ObjectSetting
 
 from .mainwindow import MainWindow
 from .menubar import MenuBar
@@ -55,6 +56,8 @@ class UI:
                     },
                 )
             )
+        # TODO: Add ObjectSetting widget to config
+        self.sidebar.widget.addWidget(ObjectSetting(self.viewer))
 
         self.window.widget.setCentralWidget(self.viewport.widget)
         self.window.widget.addDockWidget(SideDock.locations["left"], self.sidedock.widget)

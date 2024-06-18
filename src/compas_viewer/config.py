@@ -16,6 +16,7 @@ from compas_viewer.commands import change_view_cmd
 from compas_viewer.commands import clear_scene_cmd
 from compas_viewer.commands import deselect_all_cmd
 from compas_viewer.commands import load_scene_cmd
+from compas_viewer.commands import obj_settings_cmd
 from compas_viewer.commands import pan_view_cmd
 from compas_viewer.commands import rotate_view_cmd
 from compas_viewer.commands import save_scene_cmd
@@ -189,6 +190,12 @@ class MenubarConfig(ConfigBase):
                         "title": "Pointcloud",
                         "items": [],
                     },
+                ],
+            },
+            {
+                "title": "Info",
+                "items": [
+                    {"title": "Selected obj info", "action": obj_settings_cmd},
                 ],
             },
             {
@@ -376,5 +383,6 @@ class Config(ConfigBase):
             toggle_toolbar_cmd,
             zoom_selected_cmd,
             zoom_view_cmd,
+            obj_settings_cmd,
         ]
     )
