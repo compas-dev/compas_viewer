@@ -25,6 +25,8 @@ class GridObject(Base):
     framesize : tuple[float, int, float, int]
         The size of the grid in [dx, nx, dy, ny] format.
         Notice that the `nx` and `ny` must be even numbers.
+    gridmode : str
+        The mode of the grid. Options are "full" and "quadrant".
     linecolor : :class:`compas.colors.Color`
         The color of the grid lines.
     show_framez : bool
@@ -34,6 +36,10 @@ class GridObject(Base):
     ----------
     frame : :class:`compas.geometry.Frame`
         The transformation frame.
+    gridmode : str
+        The mode of the grid. Options are "full" and "quadrant".
+    linecolor : :class:`compas.colors.Color`
+        The color of the grid lines.
     dx : float
         The size of the grid in the X direction.
     nx : int
@@ -59,6 +65,7 @@ class GridObject(Base):
         self,
         frame: Frame = Frame.worldXY(),
         framesize: Optional[tuple[float, int, float, int]] = None,
+        gridmode: Optional[str] = "full",
         linecolor: Optional[Color] = None,
         show_framez: Optional[bool] = None,
         **kwargs,
@@ -66,10 +73,11 @@ class GridObject(Base):
         self.is_locked = True
         self.frame = frame
         self.linecolor = linecolor if linecolor else self.viewer.config.renderer.gridcolor
-        self.dx = framesize[0] if framesize else 20.0
-        self.nx = framesize[1] if framesize else 20
-        self.dy = framesize[2] if framesize else 20.0
-        self.ny = framesize[3] if framesize else 20
+        self.gridmode = gridmode
+        self.dx = framesize[0] if framesize else 10.0
+        self.nx = framesize[1] if framesize else 10
+        self.dy = framesize[2] if framesize else 10.0
+        self.ny = framesize[3] if framesize else 10
         self.show_framez = show_framez if show_framez else False
         if self.nx % 2 != 0 or self.ny % 2 != 0:
             raise ValueError("The number of grid cells in the X and Y directions must be even numbers.")
@@ -83,58 +91,58 @@ class GridObject(Base):
         positions = []
         colors = []
         elements = []
-        i = 0
+
+        # Determine grid mode settings
+        if self.gridmode == "full":
+            x_positions = [-self.dx + self.dx / self.nx * i for i in range(self.nx * 2 + 1)]
+            y_positions = [-self.dy + self.dy / self.ny * i for i in range(self.ny * 2 + 1)]
+            x_bound = (-self.dx, self.dx)
+            y_bound = (-self.dy, self.dy)
+            base_index = (self.nx * 2 + 1) * 4
+        elif self.gridmode == "quadrant":
+            x_positions = [self.dx / self.nx * i for i in range(self.nx + 1)]
+            y_positions = [self.dy / self.ny * i for i in range(self.ny + 1)]
+            x_bound = (0, self.dx)
+            y_bound = (0, self.dy)
+            base_index = (self.nx + 1) * 4
 
         # X direction
-        for i in range(self.nx + 1):
-            x = -self.dx / 2 + self.dx / self.nx * i
-            # Color Y axis positive green.
+        for i, x in enumerate(x_positions):
+            # Color Y axis positive green if x == 0.
             if x == 0:
                 colors.extend([self.linecolor, self.linecolor, Color.green(), Color.green()])
             else:
                 colors.extend([self.linecolor] * 4)
-            positions.extend(
-                [
-                    Point(x, -self.dy / 2, 0).transformed(trans),
-                    Point(x, 0, 0).transformed(trans),
-                    Point(x, 0, 0).transformed(trans),
-                    Point(x, self.dy / 2, 0).transformed(trans),
-                ]
-            )
-            elements.append([i * 4, i * 4 + 1, i * 4 + 2, i * 4 + 3])
+
+            p1 = Point(x, y_bound[0], 0).transformed(trans)
+            p2 = Point(x, 0, 0).transformed(trans)
+            p3 = Point(x, y_bound[1], 0).transformed(trans)
+            positions.extend([p1, p2, p2, p3])
+
+            elements.append([i * 4 + j for j in range(4)])
 
         # Y direction
-        for i in range(self.ny + 1):
-            y = -self.dy / 2 + self.dy / self.ny * i
-            # Color X axis positive red.
+        for i, y in enumerate(y_positions):
+            # Color X axis positive red if y == 0.
             if y == 0:
                 colors.extend([self.linecolor, self.linecolor, Color.red(), Color.red()])
             else:
                 colors.extend([self.linecolor] * 4)
-            positions.extend(
-                [
-                    Point(-self.dx / 2, y, 0).transformed(trans),
-                    Point(0, y, 0).transformed(trans),
-                    Point(0, y, 0).transformed(trans),
-                    Point(self.dx / 2, y, 0).transformed(trans),
-                ]
-            )
-            elements.append(
-                [
-                    (self.nx + 1) * 4 + i * 4,
-                    (self.nx + 1) * 4 + i * 4 + 1,
-                    (self.nx + 1) * 4 + i * 4 + 2,
-                    (self.nx + 1) * 4 + i * 4 + 3,
-                ]
-            )
+
+            p1 = Point(x_bound[0], y, 0).transformed(trans)
+            p2 = Point(0, y, 0).transformed(trans)
+            p3 = Point(x_bound[1], y, 0).transformed(trans)
+            positions.extend([p1, p2, p2, p3])
+
+            elements.append([base_index + i * 4 + j for j in range(4)])
 
         # Z direction
         if self.show_framez:
-            colors.append(Color.blue())
-            colors.append(Color.blue())
-            positions.append(Point(0, 0, 0).transformed(trans))
-            positions.append(Point(0, 0, self.dx / 2).transformed(trans))
-            elements.append([(self.nx + 1) * 4 + (self.ny + 1) * 4, (self.nx + 1) * 4 + (self.ny + 1) * 4 + 1])
+            colors.extend([Color.blue(), Color.blue()])
+            p1 = Point(0, 0, 0).transformed(trans)
+            p2 = Point(0, 0, self.dx / 2).transformed(trans)
+            positions.extend([p1, p2])
+            elements.append([base_index + len(y_positions) * 4, base_index + len(y_positions) * 4 + 1])
 
         return positions, colors, elements
 

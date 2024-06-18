@@ -288,7 +288,8 @@ class DisplayConfig(ConfigBase):
 class RendererConfig(ConfigBase):
     show_grid: bool = True
     show_gridz: bool = False
-    gridsize: tuple[float, int, float, int] = field(default_factory=lambda: (20.0, 20, 20.0, 20))
+    gridmode: Literal["full", "quadrant"] = "full"
+    gridsize: tuple[float, int, float, int] = field(default_factory=lambda: (10.0, 10, 10.0, 10))
     gridcolor: Color = field(default_factory=lambda: Color(0.7, 0.7, 0.7))
     opacity: float = 1.0
     ghostopacity: float = 0.7

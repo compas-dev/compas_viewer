@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added default colors to `MeshObject`.
 * Added default colors to `GeometryObject`.
 * Added `object_info_cmd` for `compas_viewer.commends`.
+* Added `gridmode` to `GridObject`.
 
 ### Changed
 
