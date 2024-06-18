@@ -10,7 +10,7 @@ from compas_viewer.components import Sceneform
 config = Config()
 config.ui.sidebar.sceneform = False
 config.ui.sidedock.show = False
-config.renderer.view = "top"
+# config.renderer.view = "top"
 
 viewer = Viewer(config=config)
 
