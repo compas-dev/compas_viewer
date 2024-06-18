@@ -113,12 +113,9 @@ class ObjectSetting(QWidget):
             text = "Update Object"
             obj_setting_layout, self.spin_boxes = output
             self.layout.addLayout(obj_setting_layout)
-        else:
-            text = "No object selected."
-
-        self.update_button = QPushButton(text, self)
-        self.update_button.clicked.connect(self.obj_update)
-        self.layout.addWidget(self.update_button)
+            self.update_button = QPushButton(text, self)
+            self.update_button.clicked.connect(self.obj_update)
+            self.layout.addWidget(self.update_button)
 
     def obj_update(self):
         """Apply the settings from spin boxes to the selected objects."""
