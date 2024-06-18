@@ -383,6 +383,7 @@ class Renderer(QOpenGLWidget):
         if self.viewer.config.renderer.show_grid:
             self.grid = GridObject(
                 Frame.worldXY(),
+                gridmode=self.viewer.config.renderer.gridmode,
                 framesize=self.viewer.config.renderer.gridsize,
                 show_framez=self.viewer.config.renderer.show_gridz,
                 show=self.viewer.config.renderer.show_grid,
