@@ -1,5 +1,7 @@
 from typing import Optional
 
+from compas_occ.brep import OCCBrep
+
 from compas.datastructures import Mesh
 from compas.geometry import Line
 from compas.geometry import Point
@@ -23,6 +25,8 @@ class BRepObject(ViewerGeometryObject, GeometryObject):
     --------
     :class:`compas_occ.brep.Brep`
     """
+
+    geometry: OCCBrep
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

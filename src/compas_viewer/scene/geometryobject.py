@@ -2,6 +2,7 @@ from typing import Optional
 
 from compas.colors import Color
 from compas.datastructures import Mesh
+from compas.geometry import Geometry
 from compas.geometry import Line
 from compas.geometry import Point
 from compas.itertools import flatten
@@ -57,12 +58,9 @@ class GeometryObject(ViewerSceneObject, BaseGeometryObject):
     linecolor = ColorAttribute(default=Color(0.2, 0.2, 0.2))
     surfacecolor = ColorAttribute(default=Color(0.9, 0.9, 0.9))
 
-    def __init__(
-        self,
-        u: Optional[int] = 16,
-        v: Optional[int] = 16,
-        **kwargs,
-    ):
+    geometry: Geometry
+
+    def __init__(self, u: Optional[int] = 16, v: Optional[int] = 16, **kwargs):
         super().__init__(**kwargs)
         self.u = u
         self.v = v
