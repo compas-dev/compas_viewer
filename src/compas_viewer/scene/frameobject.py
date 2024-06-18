@@ -50,6 +50,10 @@ class FrameObject(ViewerSceneObject):
         super().__init__(**kwargs)
         self.size = size
 
+    @property
+    def frame(self):
+        return self.item
+
     def _read_lines_data(self) -> ShaderDataType:
         trans = Transformation.from_frame_to_frame(Frame.worldXY(), self.frame)
 
