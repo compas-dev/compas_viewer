@@ -109,57 +109,57 @@ class ShapeObject(GeometryObject):
     def update_matrix(self):
         self._update_matrix()
 
-    def update(self, update_positions: bool = True, update_colors: bool = True, update_elements: bool = True):
-        """Update the object.
+    # def update(self, update_positions: bool = True, update_colors: bool = True, update_elements: bool = True):
+    #     """Update the object.
 
-        Parameters
-        ----------
-        update_positions : bool, optional
-            Whether to update positions of the object.
-        update_colors : bool, optional
-            Whether to update colors of the object.
-        update_elements : bool, optional
-            Whether to update elements of the object.
-        """
+    #     Parameters
+    #     ----------
+    #     update_positions : bool, optional
+    #         Whether to update positions of the object.
+    #     update_colors : bool, optional
+    #         Whether to update colors of the object.
+    #     update_elements : bool, optional
+    #         Whether to update elements of the object.
+    #     """
 
-        # # Update the matrix from object's translation, rotation and scale.
-        # self._update_matrix()
+    # # Update the matrix from object's translation, rotation and scale.
+    # self._update_matrix()
 
-        # self._points_data = self._read_points_data()
-        # self._lines_data = self._read_lines_data()
-        # self._frontfaces_data = self._read_frontfaces_data()
-        # self._backfaces_data = self._read_backfaces_data()
+    # self._points_data = self._read_points_data()
+    # self._lines_data = self._read_lines_data()
+    # self._frontfaces_data = self._read_frontfaces_data()
+    # self._backfaces_data = self._read_backfaces_data()
 
-        # # Update all buffers from object's data.
-        # if self._points_data is not None:
-        #     self.update_buffer_from_data(
-        #         self._points_data,
-        #         self._points_buffer,
-        #         update_positions,
-        #         update_colors,
-        #         update_elements,
-        #     )
-        # if self._lines_data is not None:
-        #     self.update_buffer_from_data(
-        #         self._lines_data,
-        #         self._lines_buffer,
-        #         update_positions,
-        #         update_colors,
-        #         update_elements,
-        #     )
-        # if self._frontfaces_data is not None:
-        #     self.update_buffer_from_data(
-        #         self._frontfaces_data,
-        #         self._frontfaces_buffer,
-        #         update_positions,
-        #         update_colors,
-        #         update_elements,
-        #     )
-        # if self._backfaces_data is not None:
-        #     self.update_buffer_from_data(
-        #         self._backfaces_data,
-        #         self._backfaces_buffer,
-        #         update_positions,
-        #         update_colors,
-        #         update_elements,
-        #     )
+    # # Update all buffers from object's data.
+    # if self._points_data is not None:
+    #     self.update_buffer_from_data(
+    #         self._points_data,
+    #         self._points_buffer,
+    #         update_positions,
+    #         update_colors,
+    #         update_elements,
+    #     )
+    # if self._lines_data is not None:
+    #     self.update_buffer_from_data(
+    #         self._lines_data,
+    #         self._lines_buffer,
+    #         update_positions,
+    #         update_colors,
+    #         update_elements,
+    #     )
+    # if self._frontfaces_data is not None:
+    #     self.update_buffer_from_data(
+    #         self._frontfaces_data,
+    #         self._frontfaces_buffer,
+    #         update_positions,
+    #         update_colors,
+    #         update_elements,
+    #     )
+    # if self._backfaces_data is not None:
+    #     self.update_buffer_from_data(
+    #         self._backfaces_data,
+    #         self._backfaces_buffer,
+    #         update_positions,
+    #         update_colors,
+    #         update_elements,
+    #     )

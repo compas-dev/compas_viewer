@@ -8,7 +8,7 @@ from compas_viewer.viewer import Viewer
 viewer = Viewer(show_grid=True)
 
 mesh = Mesh.from_off(compas.get("tubemesh.off"))
-obj = viewer.scene.add(mesh, show_points=True, facecolor=Color.blue(), linecolor=Color.red(), pointcolor=Color.green())
+obj = viewer.scene.add(mesh, show_points=True)
 
 N = 10
 M = 10
