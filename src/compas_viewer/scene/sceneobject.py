@@ -103,7 +103,7 @@ class ViewerSceneObject(SceneObject, Base):
         #  Basic
         super().__init__(**kwargs)
 
-        self.observer = Observer()
+        self._observer = None
 
         self.show = show
         self.show_points = show_points if show_points is not None else False
@@ -138,6 +138,13 @@ class ViewerSceneObject(SceneObject, Base):
         self._backfaces_buffer: [dict[str, Any]] = None  # type: ignore
 
         self._inited = False
+
+    @property
+    def observer(self) -> bool:
+        """bool : Whether the scene is requested to be updated."""
+        if self._observer is None:
+            self._observer = Observer()
+        return self._observer
 
     @property
     def is_selected(self):

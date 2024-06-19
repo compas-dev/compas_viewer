@@ -12,11 +12,10 @@ class Observer(Base):
             )
         )
 
-        self._time = None
         self.update_timer = QTimer()
         self.update_timer.setSingleShot(True)
         self.update_timer.timeout.connect(self.update_observers)
-        self.debounce_interval = 100
+        self.debounce_interval = 200
 
     def add_observer(self, observer):
         if observer not in self._observers:

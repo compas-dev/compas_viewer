@@ -236,9 +236,6 @@ def select_all(viewer: "Viewer"):
         if obj.show and not obj.is_locked:
             obj.is_selected = True
 
-    viewer.ui.sidebar.update()
-    viewer.renderer.update()
-
 
 select_all_cmd = Command(title="Select All", callback=select_all)
 
@@ -246,9 +243,6 @@ select_all_cmd = Command(title="Select All", callback=select_all)
 def deselect_all(viewer: "Viewer"):
     for obj in viewer.scene.objects:
         obj.is_selected = False
-
-    viewer.ui.sidebar.update()
-    viewer.renderer.update()
 
 
 deselect_all_cmd = Command(title="DeSelect All", callback=deselect_all)
@@ -275,8 +269,6 @@ def select_object(viewer: "Viewer", event: QMouseEvent):
         if selected_obj:
             selected_obj.is_selected = True
 
-        viewer.ui.sidebar.update()
-
     viewer.renderer.update()
 
 
@@ -295,7 +287,6 @@ def select_multiple(viewer: "Viewer", event: QMouseEvent):
         selected_obj = viewer.scene.instance_colors.get(tuple(unique_color[0]))  # type: ignore
         if selected_obj:
             selected_obj.is_selected = True
-            viewer.ui.sidebar.update()
 
     viewer.renderer.update()
 
@@ -343,8 +334,6 @@ def select_window(viewer: "Viewer", event: QMouseEvent):
                 obj.is_selected = True
                 continue
 
-        viewer.ui.sidebar.update()
-
     viewer.renderer.update()
 
 
@@ -363,8 +352,6 @@ def deselect_object(viewer: "Viewer", event: QMouseEvent):
         selected_obj = viewer.scene.instance_colors.get(tuple(unique_color[0]))  # type: ignore
         if selected_obj:
             selected_obj.is_selected = False
-
-        viewer.ui.sidebar.update()
 
     viewer.renderer.update()
 
@@ -394,7 +381,6 @@ def delete_selected():
         if obj.is_selected:
             viewer.scene.remove(obj)
             del obj
-    viewer.renderer.update()
 
 
 # =============================================================================
@@ -410,9 +396,6 @@ def clear_scene(viewer: "Viewer"):
     for obj in viewer.scene.objects:
         viewer.scene.remove(obj)
         del obj
-
-    viewer.ui.sidebar.update()
-    viewer.renderer.update()
 
 
 clear_scene_cmd = Command(title="Clear Scene", callback=clear_scene)
