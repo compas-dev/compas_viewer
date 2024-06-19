@@ -59,7 +59,7 @@ class CameraSettingsDialog(QDialog, Base):
             },
         ]
 
-        camera_setting_layout, self.spin_boxes = base_layout(items)
+        camera_setting_layout, self.widgets = base_layout(items)
 
         self.layout.addLayout(camera_setting_layout)
 
@@ -69,13 +69,13 @@ class CameraSettingsDialog(QDialog, Base):
 
     def update(self) -> None:
         self.viewer.renderer.camera.target.set(
-            self.spin_boxes["Camera_Target_X"].spinbox.value(),
-            self.spin_boxes["Camera_Target_Y"].spinbox.value(),
-            self.spin_boxes["Camera_Target_Z"].spinbox.value(),
+            self.widgets["Camera_Target_X_double_edit"].spinbox.value(),
+            self.widgets["Camera_Target_Y_double_edit"].spinbox.value(),
+            self.widgets["Camera_Target_Z_double_edit"].spinbox.value(),
         )
         self.viewer.renderer.camera.position.set(
-            self.spin_boxes["Camera_Position_X"].spinbox.value(),
-            self.spin_boxes["Camera_Position_Y"].spinbox.value(),
-            self.spin_boxes["Camera_Position_Z"].spinbox.value(),
+            self.widgets["Camera_Position_X_double_edit"].spinbox.value(),
+            self.widgets["Camera_Position_Y_double_edit"].spinbox.value(),
+            self.widgets["Camera_Position_Z_double_edit"].spinbox.value(),
         )
         self.accept()

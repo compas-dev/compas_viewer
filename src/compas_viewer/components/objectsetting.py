@@ -37,14 +37,13 @@ def object_setting_layout(viewer: "Viewer"):
         if obj.is_selected:
             status = True
             new_items = [
-                {"title": "Name", "items": [{"type": "label", "text": str(obj.name)}]},
-                {"title": "Parent", "items": [{"type": "label", "text": str(obj.parent)}]},
+                {"title": "Name", "items": [{"type": "text_edit", "text": str(obj.name)}]},
                 {"title": "Point_Color", "items": [{"type": "color_combobox", "obj": obj, "attr": "pointcolor"}]},
                 {"title": "Line_Color", "items": [{"type": "color_combobox", "obj": obj, "attr": "linecolor"}]},
                 {"title": "Face_Color", "items": [{"type": "color_combobox", "obj": obj, "attr": "facecolor"}]},
-                {"title": "Line_Width", "items": [{"type": "double_edit", "title": "", "value": obj.linewidth, "min_val": 0.0, "max_val": 10.0}]},
-                {"title": "Point_Size", "items": [{"type": "double_edit", "title": "", "value": obj.pointsize, "min_val": 0.0, "max_val": 10.0}]},
-                {"title": "Opacity", "items": [{"type": "double_edit", "title": "", "value": obj.opacity, "min_val": 0.0, "max_val": 1.0}]},
+                {"title": "Line_Width", "items": [{"type": "double_edit", "value": obj.linewidth, "min_val": 0.0, "max_val": 10.0}]},
+                {"title": "Point_Size", "items": [{"type": "double_edit", "value": obj.pointsize, "min_val": 0.0, "max_val": 10.0}]},
+                {"title": "Opacity", "items": [{"type": "double_edit", "value": obj.opacity, "min_val": 0.0, "max_val": 1.0}]},
             ]
             items.extend(new_items)
 
@@ -111,7 +110,7 @@ class ObjectSetting(QWidget):
 
         if output is not None:
             text = "Update Object"
-            obj_setting_layout, self.spin_boxes = output
+            obj_setting_layout, self.widgets = output
             self.layout.addLayout(obj_setting_layout)
             self.update_button = QPushButton(text, self)
             self.update_button.clicked.connect(self.obj_update)
@@ -121,9 +120,9 @@ class ObjectSetting(QWidget):
         """Apply the settings from spin boxes to the selected objects."""
         for obj in self.viewer.scene.objects:
             if obj.is_selected:
-                obj.linewidth = self.spin_boxes["Line_Width_"].spinbox.value()
-                obj.pointsize = self.spin_boxes["Point_Size_"].spinbox.value()
-                obj.opacity = self.spin_boxes["Opacity_"].spinbox.value()
+                obj.linewidth = self.widgets["Line_Width_double_edit"].spinbox.value()
+                obj.pointsize = self.widgets["Point_Size_double_edit"].spinbox.value()
+                obj.opacity = self.widgets["Opacity_double_edit"].spinbox.value()
                 obj.update()
 
 
@@ -174,9 +173,9 @@ class ObjectSettingDialog(QDialog, Base):
     def obj_update(self) -> None:
         for obj in self.viewer.scene.objects:
             if obj.is_selected:
-                obj.linewidth = self.spin_boxes["Line_Width_"].spinbox.value()
-                obj.pointsize = self.spin_boxes["Point_Size_"].spinbox.value()
-                obj.opacity = self.spin_boxes["Opacity_"].spinbox.value()
+                obj.linewidth = self.spin_boxes["Line_Width_double_edit"].spinbox.value()
+                obj.pointsize = self.spin_boxes["Point_Size_double_edit"].spinbox.value()
+                obj.opacity = self.spin_boxes["Opacity_double_edit"].spinbox.value()
                 obj.update()
 
         self.accept()

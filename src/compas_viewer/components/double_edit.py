@@ -47,7 +47,8 @@ class DoubleEdit(QtWidgets.QWidget):
         if max_val is None:
             max_val = sys.float_info.max
 
-        self.layout = QtWidgets.QHBoxLayout()
+        self._default_layout = None
+        self.layout = self.default_layout
         self.label = QtWidgets.QLabel(title)
         self.spinbox = QtWidgets.QDoubleSpinBox()
         self.spinbox.setMinimum(min_val)
@@ -57,26 +58,10 @@ class DoubleEdit(QtWidgets.QWidget):
         self.layout.addWidget(self.spinbox)
         self.setLayout(self.layout)
 
+    @property
+    def default_layout(self):
+        if self._default_layout is None:
+            from compas_viewer.components.layout import DefaultLayout
 
-class DoubleEditGroup(QtWidgets.QWidget):
-    def __init__(
-        self,
-        title: str,
-        settings: list[tuple[str, float, float, float]],
-    ):
-        super().__init__()
-        self.layout = QtWidgets.QVBoxLayout(self)
-
-        self.group_box = QtWidgets.QGroupBox(title)
-        group_layout = QtWidgets.QVBoxLayout()
-
-        for setting in settings:
-            widget = DoubleEdit(*setting)
-            group_layout.addWidget(widget)
-
-        group_layout.setSpacing(4)
-        group_layout.setContentsMargins(4, 4, 4, 4)
-        self.group_box.setLayout(group_layout)
-
-        self.layout.addWidget(self.group_box)
-        self.setLayout(self.layout)
+            self._default_layout = DefaultLayout(QtWidgets.QHBoxLayout()).get_layout()
+        return self._default_layout
