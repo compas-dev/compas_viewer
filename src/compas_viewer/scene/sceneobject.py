@@ -16,6 +16,7 @@ from compas_viewer.gl import make_index_buffer
 from compas_viewer.gl import make_vertex_buffer
 from compas_viewer.gl import update_index_buffer
 from compas_viewer.gl import update_vertex_buffer
+from compas_viewer.observer import Observer
 from compas_viewer.renderer.shaders import Shader
 
 # Type template of point/line/face data for generating the buffers.
@@ -101,6 +102,9 @@ class ViewerSceneObject(SceneObject, Base):
     ):
         #  Basic
         super().__init__(**kwargs)
+
+        self.observer = Observer()
+
         self.show = show
         self.show_points = show_points if show_points is not None else False
         self.show_lines = show_lines if show_lines is not None else True
@@ -111,7 +115,7 @@ class ViewerSceneObject(SceneObject, Base):
 
         #  Selection
         self._is_locked = is_locked
-        self.is_selected = not is_locked and is_selected
+        self._is_selected = False
 
         #  Visual
         self.background: bool = False
@@ -134,6 +138,16 @@ class ViewerSceneObject(SceneObject, Base):
         self._backfaces_buffer: [dict[str, Any]] = None  # type: ignore
 
         self._inited = False
+
+    @property
+    def is_selected(self):
+        return self._is_selected
+
+    @is_selected.setter
+    def is_selected(self, value):
+        if self._is_selected != value:
+            self._is_selected = value
+            self.observer.request_update()
 
     @property
     def is_locked(self):
