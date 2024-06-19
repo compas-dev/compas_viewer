@@ -7,6 +7,7 @@ from PySide6.QtWidgets import QVBoxLayout
 from PySide6.QtWidgets import QWidget
 
 from compas_viewer.base import Base
+from compas_viewer.components.label import LabelWidget
 from compas_viewer.components.layout import base_layout
 
 if TYPE_CHECKING:
@@ -88,6 +89,7 @@ class ObjectSetting(QWidget):
     def __init__(self, viewer: "Viewer"):
         super().__init__()
         self.viewer = viewer
+        self.setFixedHeight(240)
         self.layout = QVBoxLayout(self)
         self.spin_boxes = {}
 
@@ -115,11 +117,14 @@ class ObjectSetting(QWidget):
             self.update_button = QPushButton(text, self)
             self.update_button.clicked.connect(self.obj_update)
             self.layout.addWidget(self.update_button)
+        else:
+            self.layout.addWidget(LabelWidget(text="No object Selected", alignment="center"))
 
     def obj_update(self):
         """Apply the settings from spin boxes to the selected objects."""
         for obj in self.viewer.scene.objects:
             if obj.is_selected:
+                obj.name = self.widgets["Name_text_edit"].text_edit.toPlainText()
                 obj.linewidth = self.widgets["Line_Width_double_edit"].spinbox.value()
                 obj.pointsize = self.widgets["Point_Size_double_edit"].spinbox.value()
                 obj.opacity = self.widgets["Opacity_double_edit"].spinbox.value()

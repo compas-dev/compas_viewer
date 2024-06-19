@@ -244,6 +244,7 @@ class StatusbarConfig(ConfigBase):
 @dataclass
 class SidebarConfig(ConfigBase):
     show: bool = True
+    show_widgets: bool = True
     sceneform: bool = True
     items: list[dict[str, str]] = None
 

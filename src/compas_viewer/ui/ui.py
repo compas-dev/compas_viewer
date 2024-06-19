@@ -36,6 +36,7 @@ class UI:
         self.sidebar = SideBarRight(
             self,
             show=self.viewer.config.ui.sidebar.show,
+            show_widget=self.viewer.config.ui.sidebar.show_widgets,
         )
         self.viewport = ViewPort(
             self,

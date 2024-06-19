@@ -10,21 +10,28 @@ if TYPE_CHECKING:
 
 
 def is_layout_empty(layout):
-    return layout.count() == 0
+    # one is the label widget
+    return layout.count() == 1
 
 
 class SideBarRight:
-    def __init__(self, ui: "UI", show: bool = True) -> None:
+    def __init__(
+        self,
+        ui: "UI",
+        show: bool = True,
+        show_widget: bool = True,
+    ) -> None:
         self.ui = ui
         self.widget = QtWidgets.QSplitter(QtCore.Qt.Orientation.Vertical)
         self.widget.setChildrenCollapsible(True)
         self.show = show
+        self.show_widget = show_widget
 
     def update(self):
         self.widget.update()
         for widget in self.widget.children():
             widget.update()
-            if isinstance(widget, ObjectSetting):
+            if not self.show_widget and isinstance(widget, ObjectSetting):
                 if is_layout_empty(widget.layout):
                     widget.hide()
                 else:
