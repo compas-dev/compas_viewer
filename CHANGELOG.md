@@ -22,6 +22,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added default colors to `GeometryObject`.
 * Added `object_info_cmd` for `compas_viewer.commends`.
 * Added `gridmode` to `GridObject`.
+* Added `Observer` to handle `is_selected` state update or more.
+* Added `TextEdit` to handle `name` change.
+* Added `DefaultLayout` to handle gerneral `layout` setting to minimal.
 
 ### Changed
 
