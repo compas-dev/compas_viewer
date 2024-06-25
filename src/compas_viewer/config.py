@@ -250,9 +250,9 @@ class SidebarConfig(ConfigBase):
         default_factory=lambda: [
             {
                 "type": "Sceneform",
-                "action": [
-                    {"title": "Name", "action": get_obj_attr_cmd, "kwargs": {"attr": "name"}},
-                    {"title": "Show", "type": "checkbox", "action": get_obj_attr_cmd, "kwargs": {"attr": "show"}},
+                "columns": [
+                    {"title": "Name", "type": "label", "text": lambda obj: obj.name},
+                    {"title": "Show", "type": "checkbox", "action": lambda obj: obj.show, "checked": lambda obj, checked: setattr(obj, "show", checked)},
                 ],
             },
         ]

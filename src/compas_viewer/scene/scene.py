@@ -98,6 +98,7 @@ class ViewerScene(Scene):
 
         return Viewer()
 
+    # TODO: This property will be updated from #181 PR.
     @property
     def observers(self):
         new_observers = [
