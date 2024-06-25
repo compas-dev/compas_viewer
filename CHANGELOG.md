@@ -39,7 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Restructured `SceneObjects` to accepct `item` as kwargs.
 * Fixed `compas_viewer.components.slider` step attribute.
 * Fixed `renderer.view` distorted init
-
+* Fixed in a `tabobject`
 ### Removed
 
 ## [1.1.5] 2024-05-15
