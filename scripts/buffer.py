@@ -1,7 +1,7 @@
-from compas_viewer.scene import BufferGeometry
-from compas_viewer import Viewer
 import numpy as np
 
+from compas_viewer import Viewer
+from compas_viewer.scene import BufferGeometry
 
 points = np.random.rand(1000, 3) * 10
 pointcolor = np.random.rand(1000, 4)

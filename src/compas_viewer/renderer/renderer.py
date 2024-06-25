@@ -54,7 +54,7 @@ class Renderer(QOpenGLWidget):
 
         self.viewer = viewer
 
-        self._view = self.viewer.config.renderer.view
+        self._view = None
         self._rendermode = self.viewer.config.renderer.rendermode
         self._opacity = self.viewer.config.renderer.ghostopacity if self.rendermode == "ghosted" else 1.0
 
@@ -383,6 +383,7 @@ class Renderer(QOpenGLWidget):
         if self.viewer.config.renderer.show_grid:
             self.grid = GridObject(
                 Frame.worldXY(),
+                gridmode=self.viewer.config.renderer.gridmode,
                 framesize=self.viewer.config.renderer.gridsize,
                 show_framez=self.viewer.config.renderer.show_gridz,
                 show=self.viewer.config.renderer.show_grid,
@@ -438,6 +439,8 @@ class Renderer(QOpenGLWidget):
         self.shader_grid.uniform4x4("viewworld", viewworld)
         self.shader_grid.uniform4x4("transform", transform)
         self.shader_grid.release()
+
+        self.view = self.viewer.config.renderer.view
 
     def update_projection(self, w=None, h=None):
         """

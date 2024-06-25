@@ -6,8 +6,14 @@ from PySide6.QtWidgets import QSplitter
 
 from compas_viewer.components import Sceneform
 
+from compas_viewer.components.objectsetting import ObjectSetting
+
 if TYPE_CHECKING:
     from .ui import UI
+
+
+def is_layout_empty(layout):
+    return layout.count() == 0
 
 
 class SideBarRight:
@@ -33,6 +39,11 @@ class SideBarRight:
         self.widget.update()
         for widget in self.widget.children():
             widget.update()
+            if isinstance(widget, ObjectSetting):
+                if is_layout_empty(widget.layout):
+                    widget.hide()
+                else:
+                    widget.show()
 
     @property
     def show(self):

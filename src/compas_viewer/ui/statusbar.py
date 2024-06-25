@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 
-from compas_viewer.components.widget_tools import LabelWidget
+from compas_viewer.components.label import LabelWidget
 
 if TYPE_CHECKING:
     from .ui import UI
@@ -10,8 +10,7 @@ class SatusBar:
     def __init__(self, ui: "UI", show: bool = True) -> None:
         self.ui = ui
         self.widget = self.ui.window.widget.statusBar()
-        self.label = LabelWidget()
-        self.widget.addWidget(self.label(text="Ready..."))
+        self.widget.addWidget(LabelWidget(text="Ready..."))
         self.show = show
 
     @property

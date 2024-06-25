@@ -57,6 +57,8 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
     edgecolor = ColorDictAttribute(default=Color(0.2, 0.2, 0.2))
     facecolor = ColorDictAttribute(default=Color(0.9, 0.9, 0.9))
 
+    mesh: Mesh
+
     def __init__(
         self,
         show_points: Optional[bool] = None,

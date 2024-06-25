@@ -17,6 +17,7 @@ from compas_viewer.commands import clear_scene_cmd
 from compas_viewer.commands import deselect_all_cmd
 from compas_viewer.commands import get_obj_attr_cmd
 from compas_viewer.commands import load_scene_cmd
+from compas_viewer.commands import obj_settings_cmd
 from compas_viewer.commands import pan_view_cmd
 from compas_viewer.commands import rotate_view_cmd
 from compas_viewer.commands import save_scene_cmd
@@ -193,6 +194,12 @@ class MenubarConfig(ConfigBase):
                 ],
             },
             {
+                "title": "Info",
+                "items": [
+                    {"title": "Selected obj info", "action": obj_settings_cmd},
+                ],
+            },
+            {
                 "title": "Server/Session",
                 "items": [],
             },
@@ -292,7 +299,8 @@ class DisplayConfig(ConfigBase):
 class RendererConfig(ConfigBase):
     show_grid: bool = True
     show_gridz: bool = False
-    gridsize: tuple[float, int, float, int] = field(default_factory=lambda: (20.0, 20, 20.0, 20))
+    gridmode: Literal["full", "quadrant"] = "full"
+    gridsize: tuple[float, int, float, int] = field(default_factory=lambda: (10.0, 10, 10.0, 10))
     gridcolor: Color = field(default_factory=lambda: Color(0.7, 0.7, 0.7))
     opacity: float = 1.0
     ghostopacity: float = 0.7
@@ -387,5 +395,6 @@ class Config(ConfigBase):
             toggle_toolbar_cmd,
             zoom_selected_cmd,
             zoom_view_cmd,
+            obj_settings_cmd,
         ]
     )

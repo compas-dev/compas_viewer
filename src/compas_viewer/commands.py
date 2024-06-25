@@ -19,7 +19,8 @@ from PySide6.QtWidgets import QFileDialog
 
 import compas
 from compas.scene import Scene
-from compas_viewer.components import CameraSettingsDialog
+from compas_viewer.components.camerasetting import CameraSettingsDialog
+from compas_viewer.components.objectsetting import ObjectSettingDialog
 
 if TYPE_CHECKING:
     from compas_viewer import Viewer
@@ -461,6 +462,22 @@ def load_data():
 
 
 load_data_cmd = Command(title="Load Data", callback=lambda: print("load data"))
+
+
+# =============================================================================
+# =============================================================================
+# =============================================================================
+# Info
+# =============================================================================
+# =============================================================================
+# =============================================================================
+
+
+def obj_settings(viewer: "Viewer"):
+    ObjectSettingDialog().exec()
+
+
+obj_settings_cmd = Command(title="Object Settings", callback=obj_settings)
 
 # =============================================================================
 # =============================================================================
