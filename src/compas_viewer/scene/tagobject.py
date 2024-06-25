@@ -118,6 +118,7 @@ class TagObject(ViewerSceneObject, GeometryObject):
         }
 
     def make_text_texture(self):
+        print(self.geometry.font)
         face = Face(self.geometry.font)
         # the size is specified in 1/64 pixel
         face.set_char_size(64 * 48)
