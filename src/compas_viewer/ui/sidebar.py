@@ -29,7 +29,6 @@ class SideBarRight:
 
         for item in self.items:
             itemtype = item.get("type", None)
-            action = item.get("action", None)
 
             if itemtype == "Sceneform":
                 columns = item.get("columns", None)

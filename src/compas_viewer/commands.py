@@ -24,7 +24,6 @@ from compas_viewer.components.objectsetting import ObjectSettingDialog
 
 if TYPE_CHECKING:
     from compas_viewer import Viewer
-    from compas_viewer.scene.sceneobject import ViewerSceneObject
 
 
 class Command:
@@ -478,21 +477,3 @@ def obj_settings(viewer: "Viewer"):
 
 
 obj_settings_cmd = Command(title="Object Settings", callback=obj_settings)
-
-# =============================================================================
-# =============================================================================
-# =============================================================================
-# Object
-# =============================================================================
-# =============================================================================
-# =============================================================================
-
-
-def get_obj_attr(viewer: "Viewer", obj: "ViewerSceneObject", attr: Literal["name", "show"]):
-    if hasattr(obj, attr):
-        return getattr(obj, attr)
-    else:
-        raise AttributeError(f"Attribute '{attr}' not found in object '{obj}'")
-
-
-get_obj_attr_cmd = Command(title="", callback=get_obj_attr)
