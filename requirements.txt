@@ -1,4 +1,4 @@
-compas >= 2.0.0
+compas >= 2.2.0
 freetype-py
 PyOpenGL
 PySide6
