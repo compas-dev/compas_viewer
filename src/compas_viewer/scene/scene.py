@@ -67,12 +67,18 @@ class ViewerScene(Scene):
 
     def __init__(self, name: str = "ViewerScene", context: str = "Viewer"):
         super().__init__(name=name, context=context)
-
-        #  Primitive
-        self.objects: list[ViewerSceneObject]
-        #  Selection
         self.instance_colors: dict[tuple[int, int, int], ViewerSceneObject] = {}
         self._instance_colors_generator = instance_colors_generator()
+
+    @property
+    def visiable_objects(self) -> list[ViewerSceneObject]:
+        def traverse(obj):
+            for child in obj.children:
+                if child.show:
+                    yield child
+                    yield from traverse(child)
+
+        return traverse(self.root)
 
     @property
     def viewer(self):
