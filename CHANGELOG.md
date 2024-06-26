@@ -23,7 +23,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added `object_info_cmd` for `compas_viewer.commends`.
 * Added `gridmode` to `GridObject`.
 * Added `checkbox` to `compas_viewer.components.SceneForm`.
-* Added `Observer` to handle `is_selected` state update or more.
 * Added `TextEdit` to handle `name` change.
 * Added `DefaultLayout` to handle gerneral `layout` setting to minimal.
 * Added `ColorButton` to manage and display a color of ViewerSceneObject.
