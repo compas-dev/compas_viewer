@@ -1,8 +1,5 @@
 from typing import TYPE_CHECKING
 
-from compas_viewer.components import Sceneform
-from compas_viewer.components.objectsetting import ObjectSetting
-
 from .mainwindow import MainWindow
 from .menubar import MenuBar
 from .sidebar import SideBarRight
@@ -36,6 +33,7 @@ class UI:
         self.sidebar = SideBarRight(
             self,
             show=self.viewer.config.ui.sidebar.show,
+            items=self.viewer.config.ui.sidebar.items,
         )
         self.viewport = ViewPort(
             self,
@@ -46,26 +44,15 @@ class UI:
             self,
             show=self.viewer.config.ui.sidedock.show,
         )
-
-        if self.viewer.config.ui.sidebar.sceneform:
-            self.sidebar.widget.addWidget(
-                Sceneform(
-                    self.viewer.scene,
-                    {
-                        "Name": (lambda o: o.name),
-                    },
-                )
-            )
-        # TODO: Add ObjectSetting widget to config
-        self.sidebar.widget.addWidget(ObjectSetting(self.viewer))
-
+        # TODO: find better solution to transient window
+        self.sidebar.add_items()
         self.window.widget.setCentralWidget(self.viewport.widget)
         self.window.widget.addDockWidget(SideDock.locations["left"], self.sidedock.widget)
 
     def init(self):
-        self.sidebar.update()
         self.resize(self.viewer.config.window.width, self.viewer.config.window.height)
         self.window.widget.show()
+        self.sidebar.update()
 
     def resize(self, w: int, h: int) -> None:
         self.window.widget.resize(w, h)
