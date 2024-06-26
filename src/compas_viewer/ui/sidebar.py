@@ -29,12 +29,14 @@ class SideBarRight:
 
             if itemtype == "Sceneform":
                 columns = item.get("columns", None)
-                if columns is not None:
-                    self.widget.addWidget(Sceneform(columns=columns))
-                else:
-                    raise ValueError("Columns not provided for Sceneform")
+                if columns is None:
+                    raise ValueError("Please setup config for Sceneform")
+                self.widget.addWidget(Sceneform(columns=columns))
+
             elif itemtype == "ObjectSetting":
                 items = item.get("items", None)
+                if items is None:
+                    raise ValueError("Please setup config for ObjectSetting")
                 self.widget.addWidget(ObjectSetting(viewer=self.ui.viewer, items=items))
 
     def update(self):

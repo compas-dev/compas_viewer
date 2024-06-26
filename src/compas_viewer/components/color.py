@@ -114,6 +114,52 @@ class ColorComboBox(QWidget, Base):
 
 
 class ColorButton(QWidget):
+    """
+    A custom QWidget that provides a QPushButton to open a QColorDialog for selecting colors.
+
+    This class is used to manage and display a color attribute of a ViewerSceneObject.
+    The button shows the current color and allows the user to change the color via a color dialog.
+
+    Parameters
+    ----------
+    obj : ViewerSceneObject, optional
+        The object whose color attribute is being managed.
+    attr : str, optional
+        The attribute name of the color in the object.
+
+    Attributes
+    ----------
+    obj : ViewerSceneObject
+        The object whose color attribute is being managed.
+    attr : str
+        The attribute name of the color in the object.
+    color_button : QPushButton
+        The button that displays the current color and opens the color dialog when clicked.
+    layout : QVBoxLayout
+        The layout of the widget, which contains the color button.
+    current_color : QColor
+        The currently selected color.
+
+    Methods
+    -------
+    open_color_dialog()
+        Opens a QColorDialog for the user to select a new color.
+    set_button_color(color: QColor)
+        Sets the button's background and text to the provided color.
+    change_color(color: QColor)
+        Changes the color attribute of the object to the provided color and updates the object.
+
+    Example
+    -------
+    >>> obj = ViewerSceneObject()  # Assume this is a valid object with a color attribute
+    >>> color_button = ColorButton(obj=obj, attr="linecolor")
+    >>> layout = QVBoxLayout()
+    >>> layout.addWidget(color_button)
+    >>> window = QWidget()
+    >>> window.setLayout(layout)
+    >>> window.show()
+    """
+
     def __init__(
         self,
         obj: "ViewerSceneObject" = None,

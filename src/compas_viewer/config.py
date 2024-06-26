@@ -337,6 +337,30 @@ class CameraConfig(ConfigBase):
 
 
 @dataclass
+class CameraDialogConfig(ConfigBase):
+    items: list[dict] = field(
+        default_factory=lambda: [
+            {
+                "title": "Camera_Target",
+                "items": [
+                    {"type": "double_edit", "title": "X", "action": lambda camera: camera.target.x, "min_val": None, "max_val": None},
+                    {"type": "double_edit", "title": "Y", "action": lambda camera: camera.target.y, "min_val": None, "max_val": None},
+                    {"type": "double_edit", "title": "Z", "action": lambda camera: camera.target.z, "min_val": None, "max_val": None},
+                ],
+            },
+            {
+                "title": "Camera_Position",
+                "items": [
+                    {"type": "double_edit", "title": "X", "action": lambda camera: camera.position.x, "min_val": None, "max_val": None},
+                    {"type": "double_edit", "title": "Y", "action": lambda camera: camera.position.y, "min_val": None, "max_val": None},
+                    {"type": "double_edit", "title": "Z", "action": lambda camera: camera.position.z, "min_val": None, "max_val": None},
+                ],
+            },
+        ]
+    )
+
+
+@dataclass
 class View3dConfig(ConfigBase):
     viewport: Literal["top", "perspective"] = "perspective"
     background: Color = field(default_factory=lambda: Color.from_hex("#eeeeee"))
@@ -386,6 +410,7 @@ class Config(ConfigBase):
     window: WindowConfig = field(default_factory=WindowConfig)
     renderer: RendererConfig = field(default_factory=RendererConfig)
     camera: CameraConfig = field(default_factory=CameraConfig)
+    cameradialog: CameraDialogConfig = field(default_factory=CameraDialogConfig)
     commands: list[Command] = field(
         default_factory=lambda: [
             camera_settings_cmd,

@@ -22,11 +22,15 @@ class ObjectSetting(QWidget):
     ----------
     viewer : Viewer
         The viewer instance containing the objects.
+    items : list
+        A list of dictionaries containing the settings for the object.
 
     Attributes
     ----------
     viewer : Viewer
         The viewer instance.
+    items : list
+        A list of dictionaries containing the settings for the object.
     layout : QVBoxLayout
         The main layout for the widget.
     update_button : QPushButton
@@ -46,11 +50,11 @@ class ObjectSetting(QWidget):
 
     update_requested = Signal()
 
-    def __init__(self, viewer: "Viewer", items: list):
+    def __init__(self, viewer: "Viewer", items: list[dict]):
         super().__init__()
         self.viewer = viewer
         self.items = items
-        self.setFixedHeight(240)
+        self.setFixedHeight(260)
         self.layout = QVBoxLayout(self)
         self.spin_boxes = {}
 
@@ -97,10 +101,17 @@ class ObjectSettingDialog(QDialog, Base):
     This dialog allows users to modify object properties such as line width, point size, and opacity,
     and applies these changes dynamically.
 
+    Parameters
+    ----------
+    items : list
+        A list of dictionaries containing the settings for the object.
+
     Attributes
     ----------
     layout : QVBoxLayout
         The layout of the dialog.
+    items : list
+        A list of dictionaries containing the settings for the object.
     spin_boxes : dict
         Dictionary containing spin boxes for adjusting object properties.
     update_button : QPushButton
@@ -117,7 +128,7 @@ class ObjectSettingDialog(QDialog, Base):
     >>> dialog.exec()
     """
 
-    def __init__(self, items: list) -> None:
+    def __init__(self, items: list[dict]) -> None:
         super().__init__()
         self.items = items
         self.setWindowTitle("Object Settings")

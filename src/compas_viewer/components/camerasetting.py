@@ -12,6 +12,11 @@ class CameraSettingsDialog(QDialog, Base):
     This dialog allows users to modify the camera's target and position and
     applies these changes dynamically.
 
+    Parameters
+    ----------
+    items : list
+        A list of dictionaries containing the settings for the camera.
+
     Attributes
     ----------
     layout : QVBoxLayout
@@ -30,33 +35,15 @@ class CameraSettingsDialog(QDialog, Base):
 
     Example
     -------
-    >>> dialog = CameraSettingsDialog()
+    >>> dialog = CameraSettingsDialog(items=items)
     >>> dialog.exec()
     """
 
-    def __init__(self) -> None:
+    def __init__(self, items: list[dict]) -> None:
         super().__init__()
         self.setWindowTitle("Camera Settings")
 
         self.layout = QVBoxLayout(self)
-        items = [
-            {
-                "title": "Camera_Target",
-                "items": [
-                    {"type": "double_edit", "title": "X", "action": lambda camera: camera.target.x, "min_val": None, "max_val": None},
-                    {"type": "double_edit", "title": "Y", "action": lambda camera: camera.target.y, "min_val": None, "max_val": None},
-                    {"type": "double_edit", "title": "Z", "action": lambda camera: camera.target.z, "min_val": None, "max_val": None},
-                ],
-            },
-            {
-                "title": "Camera_Position",
-                "items": [
-                    {"type": "double_edit", "title": "X", "action": lambda camera: camera.position.x, "min_val": None, "max_val": None},
-                    {"type": "double_edit", "title": "Y", "action": lambda camera: camera.position.y, "min_val": None, "max_val": None},
-                    {"type": "double_edit", "title": "Z", "action": lambda camera: camera.position.z, "min_val": None, "max_val": None},
-                ],
-            },
-        ]
         self.setting_layout = SettingLayout(viewer=self.viewer, items=items, type="camera_setting")
 
         self.layout.addLayout(self.setting_layout.layout)

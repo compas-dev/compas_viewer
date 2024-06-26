@@ -26,6 +26,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added `Observer` to handle `is_selected` state update or more.
 * Added `TextEdit` to handle `name` change.
 * Added `DefaultLayout` to handle gerneral `layout` setting to minimal.
+* Added `ColorButton` to manage and display a color of ViewerSceneObject.
+* Added `SettingLayout` to better manage complex layout with config input.
 
 ### Changed
 
@@ -44,6 +46,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fixed `compas_viewer.components.slider` step attribute.
 * Fixed `renderer.view` distorted init.
 * Fixed `tagobject` by adding back FreeSans.ttf.
+* Updated callback to `SceneTree`.
+* Updated `ObjectSetting` and `CameraSetting` to support setting from config.
 
 ### Removed
 
