@@ -3,7 +3,7 @@ from PySide6.QtWidgets import QPushButton
 from PySide6.QtWidgets import QVBoxLayout
 
 from compas_viewer.base import Base
-from compas_viewer.components.layout import base_layout
+from compas_viewer.components.layout import SettingLayout
 
 
 class CameraSettingsDialog(QDialog, Base):
@@ -39,29 +39,27 @@ class CameraSettingsDialog(QDialog, Base):
         self.setWindowTitle("Camera Settings")
 
         self.layout = QVBoxLayout(self)
-        self.camera = self.viewer.renderer.camera
         items = [
             {
                 "title": "Camera_Target",
                 "items": [
-                    {"type": "double_edit", "title": "X", "value": self.camera.target.x, "min_val": None, "max_val": None},
-                    {"type": "double_edit", "title": "Y", "value": self.camera.target.y, "min_val": None, "max_val": None},
-                    {"type": "double_edit", "title": "Z", "value": self.camera.target.z, "min_val": None, "max_val": None},
+                    {"type": "double_edit", "title": "X", "action": lambda camera: camera.target.x, "min_val": None, "max_val": None},
+                    {"type": "double_edit", "title": "Y", "action": lambda camera: camera.target.y, "min_val": None, "max_val": None},
+                    {"type": "double_edit", "title": "Z", "action": lambda camera: camera.target.z, "min_val": None, "max_val": None},
                 ],
             },
             {
                 "title": "Camera_Position",
                 "items": [
-                    {"type": "double_edit", "title": "X", "value": self.camera.position.x, "min_val": None, "max_val": None},
-                    {"type": "double_edit", "title": "Y", "value": self.camera.position.y, "min_val": None, "max_val": None},
-                    {"type": "double_edit", "title": "Z", "value": self.camera.position.z, "min_val": None, "max_val": None},
+                    {"type": "double_edit", "title": "X", "action": lambda camera: camera.position.x, "min_val": None, "max_val": None},
+                    {"type": "double_edit", "title": "Y", "action": lambda camera: camera.position.y, "min_val": None, "max_val": None},
+                    {"type": "double_edit", "title": "Z", "action": lambda camera: camera.position.z, "min_val": None, "max_val": None},
                 ],
             },
         ]
+        self.setting_layout = SettingLayout(viewer=self.viewer, items=items, type="camera_setting")
 
-        camera_setting_layout, self.widgets = base_layout(items)
-
-        self.layout.addLayout(camera_setting_layout)
+        self.layout.addLayout(self.setting_layout.layout)
 
         self.update_button = QPushButton("Update Camera", self)
         self.update_button.clicked.connect(self.update)
@@ -69,13 +67,13 @@ class CameraSettingsDialog(QDialog, Base):
 
     def update(self) -> None:
         self.viewer.renderer.camera.target.set(
-            self.widgets["Camera_Target_X_double_edit"].spinbox.value(),
-            self.widgets["Camera_Target_Y_double_edit"].spinbox.value(),
-            self.widgets["Camera_Target_Z_double_edit"].spinbox.value(),
+            self.setting_layout.widgets["Camera_Target_X_double_edit"].spinbox.value(),
+            self.setting_layout.widgets["Camera_Target_Y_double_edit"].spinbox.value(),
+            self.setting_layout.widgets["Camera_Target_Z_double_edit"].spinbox.value(),
         )
         self.viewer.renderer.camera.position.set(
-            self.widgets["Camera_Position_X_double_edit"].spinbox.value(),
-            self.widgets["Camera_Position_Y_double_edit"].spinbox.value(),
-            self.widgets["Camera_Position_Z_double_edit"].spinbox.value(),
+            self.setting_layout.widgets["Camera_Position_X_double_edit"].spinbox.value(),
+            self.setting_layout.widgets["Camera_Position_Y_double_edit"].spinbox.value(),
+            self.setting_layout.widgets["Camera_Position_Z_double_edit"].spinbox.value(),
         )
         self.accept()

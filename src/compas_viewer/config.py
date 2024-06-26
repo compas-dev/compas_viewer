@@ -255,6 +255,18 @@ class SidebarConfig(ConfigBase):
                     {"title": "Show", "type": "checkbox", "checked": lambda obj: obj.show, "action": lambda obj, checked: setattr(obj, "show", checked)},
                 ],
             },
+            {
+                "type": "ObjectSetting",
+                "items": [
+                    {"title": "Name", "items": [{"type": "text_edit", "action": lambda obj: obj.name}]},
+                    {"title": "Point_Color", "items": [{"type": "color_dialog", "attr": "pointcolor"}]},
+                    {"title": "Line_Color", "items": [{"type": "color_dialog", "attr": "linecolor"}]},
+                    {"title": "Face_Color", "items": [{"type": "color_dialog", "attr": "facecolor"}]},
+                    {"title": "Line_Width", "items": [{"type": "double_edit", "action": lambda obj: obj.linewidth, "min_val": 0.0, "max_val": 10.0}]},
+                    {"title": "Point_Size", "items": [{"type": "double_edit", "action": lambda obj: obj.pointsize, "min_val": 0.0, "max_val": 10.0}]},
+                    {"title": "Opacity", "items": [{"type": "double_edit", "action": lambda obj: obj.opacity, "min_val": 0.0, "max_val": 1.0}]},
+                ],
+            },
         ]
     )
 

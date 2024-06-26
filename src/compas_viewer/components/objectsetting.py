@@ -8,50 +8,10 @@ from PySide6.QtWidgets import QWidget
 
 from compas_viewer.base import Base
 from compas_viewer.components.label import LabelWidget
-from compas_viewer.components.layout import base_layout
+from compas_viewer.components.layout import SettingLayout
 
 if TYPE_CHECKING:
     from compas_viewer import Viewer
-
-
-def object_setting_layout(viewer: "Viewer"):
-    """
-    Generates a layout for displaying and editing object information based on the selected objects in the viewer.
-
-    Parameters
-    ----------
-    viewer : Viewer
-        The viewer instance containing the scene and objects.
-
-    Returns
-    -------
-    QVBoxLayout
-        The layout for displaying object information, or None if no objects are selected.
-
-    Example
-    -------
-    >>> layout = object_setting_layout(viewer)
-    """
-    status = False
-    items = []
-    for obj in viewer.scene.objects:
-        if obj.is_selected:
-            status = True
-            new_items = [
-                {"title": "Name", "items": [{"type": "text_edit", "text": str(obj.name)}]},
-                {"title": "Point_Color", "items": [{"type": "color_dialog", "obj": obj, "attr": "pointcolor"}]},
-                {"title": "Line_Color", "items": [{"type": "color_dialog", "obj": obj, "attr": "linecolor"}]},
-                {"title": "Face_Color", "items": [{"type": "color_dialog", "obj": obj, "attr": "facecolor"}]},
-                {"title": "Line_Width", "items": [{"type": "double_edit", "value": obj.linewidth, "min_val": 0.0, "max_val": 10.0}]},
-                {"title": "Point_Size", "items": [{"type": "double_edit", "value": obj.pointsize, "min_val": 0.0, "max_val": 10.0}]},
-                {"title": "Opacity", "items": [{"type": "double_edit", "value": obj.opacity, "min_val": 0.0, "max_val": 1.0}]},
-            ]
-            items.extend(new_items)
-
-    if not status:
-        return None
-
-    return base_layout(items)
 
 
 class ObjectSetting(QWidget):
@@ -86,9 +46,10 @@ class ObjectSetting(QWidget):
 
     update_requested = Signal()
 
-    def __init__(self, viewer: "Viewer"):
+    def __init__(self, viewer: "Viewer", items: list):
         super().__init__()
         self.viewer = viewer
+        self.items = items
         self.setFixedHeight(240)
         self.layout = QVBoxLayout(self)
         self.spin_boxes = {}
@@ -108,12 +69,11 @@ class ObjectSetting(QWidget):
     def update(self):
         """Update the layout with the latest object settings."""
         self.clear_layout(self.layout)
-        output = object_setting_layout(self.viewer)
+        self.setting_layout = SettingLayout(viewer=self.viewer, items=self.items, type="obj_setting")
 
-        if output is not None:
+        if self.setting_layout is not None:
             text = "Update Object"
-            obj_setting_layout, self.widgets = output
-            self.layout.addLayout(obj_setting_layout)
+            self.layout.addLayout(self.setting_layout.layout)
             self.update_button = QPushButton(text, self)
             self.update_button.clicked.connect(self.obj_update)
             self.layout.addWidget(self.update_button)
@@ -124,10 +84,10 @@ class ObjectSetting(QWidget):
         """Apply the settings from spin boxes to the selected objects."""
         for obj in self.viewer.scene.objects:
             if obj.is_selected:
-                obj.name = self.widgets["Name_text_edit"].text_edit.toPlainText()
-                obj.linewidth = self.widgets["Line_Width_double_edit"].spinbox.value()
-                obj.pointsize = self.widgets["Point_Size_double_edit"].spinbox.value()
-                obj.opacity = self.widgets["Opacity_double_edit"].spinbox.value()
+                obj.name = self.setting_layout.widgets["Name_text_edit"].text_edit.toPlainText()
+                obj.linewidth = self.setting_layout.widgets["Line_Width_double_edit"].spinbox.value()
+                obj.pointsize = self.setting_layout.widgets["Point_Size_double_edit"].spinbox.value()
+                obj.opacity = self.setting_layout.widgets["Opacity_double_edit"].spinbox.value()
                 obj.update()
 
 
@@ -157,17 +117,16 @@ class ObjectSettingDialog(QDialog, Base):
     >>> dialog.exec()
     """
 
-    def __init__(self) -> None:
+    def __init__(self, items: list) -> None:
         super().__init__()
-
+        self.items = items
         self.setWindowTitle("Object Settings")
         self.layout = QVBoxLayout(self)
-        output = object_setting_layout(self.viewer)
+        self.setting_layout = SettingLayout(viewer=self.viewer, items=self.items, type="obj_setting")
 
-        if output is not None:
+        if self.setting_layout is not None:
             text = "Update Object"
-            obj_setting_layout, self.spin_boxes = output
-            self.layout.addLayout(obj_setting_layout)
+            self.layout.addLayout(self.setting_layout.layout)
         else:
             text = "No object selected."
 
@@ -178,9 +137,9 @@ class ObjectSettingDialog(QDialog, Base):
     def obj_update(self) -> None:
         for obj in self.viewer.scene.objects:
             if obj.is_selected:
-                obj.linewidth = self.spin_boxes["Line_Width_double_edit"].spinbox.value()
-                obj.pointsize = self.spin_boxes["Point_Size_double_edit"].spinbox.value()
-                obj.opacity = self.spin_boxes["Opacity_double_edit"].spinbox.value()
+                obj.linewidth = self.setting_layout.widgets["Line_Width_double_edit"].spinbox.value()
+                obj.pointsize = self.setting_layout.widgets["Point_Size_double_edit"].spinbox.value()
+                obj.opacity = self.setting_layout.widgets["Opacity_double_edit"].spinbox.value()
                 obj.update()
 
         self.accept()

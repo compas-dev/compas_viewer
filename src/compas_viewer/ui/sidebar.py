@@ -11,17 +11,13 @@ if TYPE_CHECKING:
     from .ui import UI
 
 
-def is_layout_empty(layout):
-    # one is the label widget
-    return layout.count() == 1
-
-
 class SideBarRight:
     def __init__(self, ui: "UI", show: bool, items: list[dict[str, Callable]]) -> None:
         self.ui = ui
         self.widget = QSplitter(QtCore.Qt.Orientation.Vertical)
         self.widget.setChildrenCollapsible(True)
         self.show = show
+        self.show_widget = True
         self.items = items
 
     def add_items(self) -> None:
@@ -34,19 +30,17 @@ class SideBarRight:
             if itemtype == "Sceneform":
                 columns = item.get("columns", None)
                 if columns is not None:
-                    self.widget.addWidget(Sceneform(columns))
+                    self.widget.addWidget(Sceneform(columns=columns))
                 else:
                     raise ValueError("Columns not provided for Sceneform")
+            elif itemtype == "ObjectSetting":
+                items = item.get("items", None)
+                self.widget.addWidget(ObjectSetting(viewer=self.ui.viewer, items=items))
 
     def update(self):
         self.widget.update()
         for widget in self.widget.children():
             widget.update()
-            if not self.show_widget and isinstance(widget, ObjectSetting):
-                if is_layout_empty(widget.layout):
-                    widget.hide()
-                else:
-                    widget.show()
 
     @property
     def show(self):
