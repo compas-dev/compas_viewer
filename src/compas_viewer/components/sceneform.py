@@ -96,9 +96,10 @@ class Sceneform(QTreeWidget):
             if node.is_selected:
 
                 def expand(node):
-                    node.attributes["widget"].setExpanded(True)
-                    if node.parent and not node.parent.is_root:
-                        expand(node.parent)
+                    if node.attributes.get("widget"):
+                        node.attributes["widget"].setExpanded(True)
+                        if node.parent and not node.parent.is_root:
+                            expand(node.parent)
 
                 expand(node.parent)
 
