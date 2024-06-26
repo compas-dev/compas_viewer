@@ -39,9 +39,9 @@ def object_setting_layout(viewer: "Viewer"):
             status = True
             new_items = [
                 {"title": "Name", "items": [{"type": "text_edit", "text": str(obj.name)}]},
-                {"title": "Point_Color", "items": [{"type": "color_combobox", "obj": obj, "attr": "pointcolor"}]},
-                {"title": "Line_Color", "items": [{"type": "color_combobox", "obj": obj, "attr": "linecolor"}]},
-                {"title": "Face_Color", "items": [{"type": "color_combobox", "obj": obj, "attr": "facecolor"}]},
+                {"title": "Point_Color", "items": [{"type": "color_dialog", "obj": obj, "attr": "pointcolor"}]},
+                {"title": "Line_Color", "items": [{"type": "color_dialog", "obj": obj, "attr": "linecolor"}]},
+                {"title": "Face_Color", "items": [{"type": "color_dialog", "obj": obj, "attr": "facecolor"}]},
                 {"title": "Line_Width", "items": [{"type": "double_edit", "value": obj.linewidth, "min_val": 0.0, "max_val": 10.0}]},
                 {"title": "Point_Size", "items": [{"type": "double_edit", "value": obj.pointsize, "min_val": 0.0, "max_val": 10.0}]},
                 {"title": "Opacity", "items": [{"type": "double_edit", "value": obj.opacity, "min_val": 0.0, "max_val": 1.0}]},

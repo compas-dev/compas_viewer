@@ -3,7 +3,8 @@ from PySide6.QtWidgets import QLabel
 from PySide6.QtWidgets import QLayout
 from PySide6.QtWidgets import QVBoxLayout
 
-from compas_viewer.components.combobox import ColorComboBox
+from compas_viewer.components.color import ColorButton
+from compas_viewer.components.color import ColorComboBox
 from compas_viewer.components.double_edit import DoubleEdit
 from compas_viewer.components.label import LabelWidget
 from compas_viewer.components.textedit import TextEdit
@@ -84,6 +85,9 @@ def base_layout(items: list) -> tuple[QVBoxLayout, dict]:
                 widget = TextEdit(text=text)
                 right_layout.addWidget(widget)
                 widgets[f"{l_title}_{type}"] = widget
+            elif type == "color_dialog":
+                widget = ColorButton(obj=obj, attr=attr)
+                right_layout.addWidget(widget)
 
         sub_layout.addLayout(left_layout)
         sub_layout.addLayout(right_layout)
