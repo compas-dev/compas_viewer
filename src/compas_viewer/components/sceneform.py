@@ -65,7 +65,7 @@ class Sceneform(QTreeWidget):
         return self.viewer.scene
 
     def update(self):
-        self.clear()
+        self.clear()  # TODO: do not clear when objects are same.
         self.checkbox_columns = {}
 
         for node in self.scene.traverse("breadthfirst"):
@@ -93,6 +93,15 @@ class Sceneform(QTreeWidget):
             widget = QTreeWidgetItem(parent_widget, strings)
             widget.node = node
             widget.setSelected(node.is_selected)
+            if node.is_selected:
+
+                def expand(node):
+                    node.attributes["widget"].setExpanded(True)
+                    if node.parent and not node.parent.is_root:
+                        expand(node.parent)
+
+                expand(node.parent)
+
             widget.setFlags(widget.flags() | Qt.ItemIsUserCheckable | Qt.ItemIsSelectable | Qt.ItemIsEnabled)
 
             for col, col_data in self.checkbox_columns.items():
