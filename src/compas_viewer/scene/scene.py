@@ -9,6 +9,7 @@ from compas.colors import Color
 from compas.datastructures import Datastructure
 from compas.geometry import Geometry
 from compas.scene import Scene
+from compas_viewer.observer import Observer
 
 from .sceneobject import ViewerSceneObject
 
@@ -68,6 +69,9 @@ class ViewerScene(Scene):
     def __init__(self, name: str = "ViewerScene", context: str = "Viewer"):
         super().__init__(name=name, context=context)
 
+        #  Observer
+        self._observer = None
+
         #  Primitive
         self.objects: list[ViewerSceneObject]
         #  Selection
@@ -75,10 +79,11 @@ class ViewerScene(Scene):
         self._instance_colors_generator = instance_colors_generator()
 
     @property
-    def viewer(self):
-        from compas_viewer import Viewer
-
-        return Viewer()
+    def observer(self):
+        """Observer: The observer object for the scene."""
+        if self._observer is None:
+            self._observer = Observer()
+        return self._observer
 
     # TODO: These fixed kwargs could be moved to COMPAS core.
     def add(
@@ -183,4 +188,17 @@ class ViewerScene(Scene):
             u=u,
             **kwargs,
         )
+        self.observer.request_update()
         return sceneobject
+
+    def remove(self, obj: ViewerSceneObject) -> None:
+        """
+        Remove an object from the scene.
+
+        Parameters
+        ----------
+        obj : :class:`compas_viewer.scene.ViewerSceneObject`
+            The object to remove.
+        """
+        super().remove(obj)
+        self.observer.request_update()

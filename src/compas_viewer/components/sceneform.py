@@ -114,8 +114,6 @@ class Sceneform(QTreeWidget):
                 if self.callback and node.is_selected:
                     self.callback(node)
 
-        self.viewer.renderer.update()
-
     def on_item_selection_changed(self):
         for item in self.selectedItems():
             if self.callback:
