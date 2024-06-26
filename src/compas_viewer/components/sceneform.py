@@ -96,7 +96,7 @@ class Sceneform(QTreeWidget):
             widget.setFlags(widget.flags() | Qt.ItemIsUserCheckable | Qt.ItemIsSelectable | Qt.ItemIsEnabled)
 
             for col, col_data in self.checkbox_columns.items():
-                widget.setCheckState(col, Qt.Checked if col_data["action"](node) else Qt.Unchecked)
+                widget.setCheckState(col, Qt.Checked if col_data["checked"](node) else Qt.Unchecked)
 
             node.attributes["widget"] = widget
 
@@ -104,7 +104,7 @@ class Sceneform(QTreeWidget):
 
     def on_item_clicked(self, item, column):
         if column in self.checkbox_columns:
-            check = self.checkbox_columns[column]["checked"]
+            check = self.checkbox_columns[column]["action"]
             check(item.node, item.checkState(column) == Qt.Checked)
 
         if self.selectedItems():

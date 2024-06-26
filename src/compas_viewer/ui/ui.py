@@ -52,6 +52,7 @@ class UI:
     def init(self):
         self.resize(self.viewer.config.window.width, self.viewer.config.window.height)
         self.window.widget.show()
+        self.sidebar.update()
 
     def resize(self, w: int, h: int) -> None:
         self.window.widget.resize(w, h)
