@@ -246,7 +246,17 @@ class SidebarConfig(ConfigBase):
     show: bool = True
     show_widgets: bool = True
     sceneform: bool = True
-    items: list[dict[str, str]] = None
+    items: list[dict] = field(
+        default_factory=lambda: [
+            {
+                "type": "Sceneform",
+                "columns": [
+                    {"title": "Name", "type": "label", "text": lambda obj: obj.name},
+                    {"title": "Show", "type": "checkbox", "checked": lambda obj: obj.show, "action": lambda obj, checked: setattr(obj, "show", checked)},
+                ],
+            },
+        ]
+    )
 
 
 # =============================================================================

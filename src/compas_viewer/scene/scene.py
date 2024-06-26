@@ -70,10 +70,15 @@ class ViewerScene(Scene):
 
         #  Primitive
         self.objects: list[ViewerSceneObject]
-
         #  Selection
         self.instance_colors: dict[tuple[int, int, int], ViewerSceneObject] = {}
         self._instance_colors_generator = instance_colors_generator()
+
+    @property
+    def viewer(self):
+        from compas_viewer import Viewer
+
+        return Viewer()
 
     # TODO: These fixed kwargs could be moved to COMPAS core.
     def add(
@@ -178,5 +183,4 @@ class ViewerScene(Scene):
             u=u,
             **kwargs,
         )
-
         return sceneobject
