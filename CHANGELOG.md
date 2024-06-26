@@ -22,9 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added default colors to `GeometryObject`.
 * Added `object_info_cmd` for `compas_viewer.commends`.
 * Added `gridmode` to `GridObject`.
-* Added click-boxes of `show` for `compas_viewer.components.SceneForm`.
-* Added observer pattern to of `show` for `compas_viewer.Scene.scene`.
-* Added Time Debounce pattern to of `show` for `compas_viewer.Scene.scene`.
+* Added click-boxes of function to `compas_viewer.components.SceneForm`.
 
 ### Changed
 
