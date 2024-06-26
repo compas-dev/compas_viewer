@@ -11,13 +11,17 @@ if TYPE_CHECKING:
     from .ui import UI
 
 
+def is_layout_empty(layout):
+    return layout.count() == 1
+
+
 class SideBarRight:
     def __init__(self, ui: "UI", show: bool, items: list[dict[str, Callable]]) -> None:
         self.ui = ui
         self.widget = QSplitter(QtCore.Qt.Orientation.Vertical)
         self.widget.setChildrenCollapsible(True)
         self.show = show
-        self.show_widget = True
+        self.hide_widget = True
         self.items = items
 
     def add_items(self) -> None:
@@ -43,6 +47,11 @@ class SideBarRight:
         self.widget.update()
         for widget in self.widget.children():
             widget.update()
+            if isinstance(widget, ObjectSetting):
+                if is_layout_empty(widget.layout) and self.hide_widget:
+                    widget.hide()
+                else:
+                    widget.show()
 
     @property
     def show(self):

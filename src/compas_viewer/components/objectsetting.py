@@ -75,7 +75,7 @@ class ObjectSetting(QWidget):
         self.clear_layout(self.layout)
         self.setting_layout = SettingLayout(viewer=self.viewer, items=self.items, type="obj_setting")
 
-        if self.setting_layout is not None:
+        if len(self.setting_layout.widgets) != 0:
             text = "Update Object"
             self.layout.addLayout(self.setting_layout.layout)
             self.update_button = QPushButton(text, self)
