@@ -315,7 +315,7 @@ class CameraConfig(ConfigBase):
     fov: float = 45.0
     near: float = 0.1
     far: float = 1000.0
-    position: list[float] = field(default_factory=lambda: [0.0, -10.0, 10.0])
+    position: list[float] = field(default_factory=lambda: [-10.0, -10.0, 10.0])
     target: list[float] = field(default_factory=lambda: [0.0, 0.0, 0.0])
     scale: float = 1.0
     zoomdelta: float = 0.05
