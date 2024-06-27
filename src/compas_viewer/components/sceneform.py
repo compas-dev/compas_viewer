@@ -115,9 +115,7 @@ class Sceneform(QTreeWidget):
                 if self.callback and node.is_selected:
                     self.callback(node)
 
-            for widget in self.viewer.ui.sidebar.widget.children():
-                if not isinstance(widget, Sceneform):
-                    widget.update()
+            self.viewer.ui.sidebar.update()
 
         self.viewer.renderer.update()
 

@@ -19,6 +19,7 @@ class TextEdit(QWidget):
         self.layout = self.default_layout
         self.layout.setAlignment(Qt.AlignRight)
         self.text_edit = QTextEdit()
+        self.text_edit.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.text_edit.setMaximumSize(100, 25)
         self.text_edit.setText(text)
         self.layout.addWidget(self.text_edit)
