@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+* Removed `is_locked` from `compas_viewer.scene.ViewerSceneObject`.
+
 
 ## [1.2.1] 2024-06-26
 

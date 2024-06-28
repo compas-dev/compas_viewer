@@ -70,7 +70,6 @@ class GridObject(Base):
         show_framez: Optional[bool] = None,
         **kwargs,
     ):
-        self.is_locked = True
         self.frame = frame
         self.linecolor = linecolor if linecolor else self.viewer.config.renderer.gridcolor
         self.gridmode = gridmode
