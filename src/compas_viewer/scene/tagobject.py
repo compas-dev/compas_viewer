@@ -20,7 +20,7 @@ from compas_viewer.gl import make_vertex_buffer
 
 from .sceneobject import ViewerSceneObject
 
-FONT = path.join(HERE, "configurations", "default_config", "FreeSans.ttf")
+FONT = path.join(HERE, "assets", "fonts", "FreeSans.ttf")
 
 
 class Tag(Geometry):

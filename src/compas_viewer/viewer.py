@@ -23,7 +23,7 @@ class Viewer(Singleton):
         self.app = QApplication(sys.argv)
         self.app.setApplicationName("COMPAS Viewer")
         self.app.setApplicationDisplayName("COMPAS Viewer")
-        self.app.setWindowIcon(QIcon(os.path.join(HERE, "icons", "compas_icon_white.png")))
+        self.app.setWindowIcon(QIcon(os.path.join(HERE, "assets", "icons", "compas_icon_white.png")))
 
         self._scene = None
 
