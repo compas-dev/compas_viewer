@@ -4,12 +4,11 @@ from compas.datastructures import Mesh
 from compas.geometry import Line
 from compas.geometry import Point
 from compas.geometry import Polyhedron
-from compas.scene import GeometryObject
 
-from .geometryobject import GeometryObject as ViewerGeometryObject
+from .geometryobject import GeometryObject
 
 
-class PolyhedronObject(ViewerGeometryObject, GeometryObject):
+class PolyhedronObject(GeometryObject):
     """Viewer scene object for displaying COMPAS Polyhedron geometry."""
 
     geometry: Polyhedron

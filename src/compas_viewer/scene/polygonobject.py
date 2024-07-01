@@ -5,12 +5,11 @@ from compas.geometry import Line
 from compas.geometry import Point
 from compas.geometry import Polygon
 from compas.geometry import earclip_polygon
-from compas.scene import GeometryObject
 
-from .geometryobject import GeometryObject as ViewerGeometryObject
+from .geometryobject import GeometryObject
 
 
-class PolygonObject(ViewerGeometryObject, GeometryObject):
+class PolygonObject(GeometryObject):
     """Viewer scene object for displaying COMPAS Polygon geometry."""
 
     geometry: Polygon

@@ -3,12 +3,11 @@ from typing import Optional
 from compas.geometry import Circle
 from compas.geometry import Line
 from compas.geometry import Point
-from compas.scene import GeometryObject
 
-from .geometryobject import GeometryObject as ViewerGeometryObject
+from .geometryobject import GeometryObject
 
 
-class CircleObject(ViewerGeometryObject, GeometryObject):
+class CircleObject(GeometryObject):
     """Viewer scene object for displaying COMPAS Circle geometry."""
 
     geometry: Circle
