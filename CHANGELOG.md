@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* Fixed issue of `SceneForm` collapsing when new object is selected.
+* Toggling `show` of Group or objects will hide/show all its descendents.
+* Moved assets related files to `assets` folder.
+* Fixed a bug to allow changing `Viewer.renderer.view` before `Viewer.show()`.
+* Fixed a bug of grid not showing while the scene is empty.
+
 ### Removed
 
 * Removed `is_locked` from `compas_viewer.scene.ViewerSceneObject`.
