@@ -48,6 +48,7 @@ class Sceneform(QTreeWidget):
         self.setColumnCount(len(columns))
         self.setHeaderLabels(col["title"] for col in self.columns)
         self.setHeaderHidden(not show_headers)
+        self.setSelectionMode(QTreeWidget.SingleSelection)
 
         self.callback = callback
 
@@ -123,6 +124,8 @@ class Sceneform(QTreeWidget):
                 node.is_selected = node in selected_nodes
                 if self.callback and node.is_selected:
                     self.callback(node)
+
+            self.viewer.ui.sidebar.update()
 
         self.viewer.renderer.update()
 

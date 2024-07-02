@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 
 def is_layout_empty(layout):
-    return layout.count() == 0
+    return layout.count() == 1
 
 
 class SideBarRight:
@@ -21,6 +21,7 @@ class SideBarRight:
         self.widget = QSplitter(QtCore.Qt.Orientation.Vertical)
         self.widget.setChildrenCollapsible(True)
         self.show = show
+        self.hide_widget = True
         self.items = items
 
     def add_items(self) -> None:
@@ -32,17 +33,22 @@ class SideBarRight:
 
             if itemtype == "Sceneform":
                 columns = item.get("columns", None)
-                if columns is not None:
-                    self.widget.addWidget(Sceneform(columns))
-                else:
-                    raise ValueError("Columns not provided for Sceneform")
+                if columns is None:
+                    raise ValueError("Please setup config for Sceneform")
+                self.widget.addWidget(Sceneform(columns=columns))
+
+            elif itemtype == "ObjectSetting":
+                items = item.get("items", None)
+                if items is None:
+                    raise ValueError("Please setup config for ObjectSetting")
+                self.widget.addWidget(ObjectSetting(viewer=self.ui.viewer, items=items))
 
     def update(self):
         self.widget.update()
         for widget in self.widget.children():
             widget.update()
             if isinstance(widget, ObjectSetting):
-                if is_layout_empty(widget.layout):
+                if is_layout_empty(widget.layout) and self.hide_widget:
                     widget.hide()
                 else:
                     widget.show()
