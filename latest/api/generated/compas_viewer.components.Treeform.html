@@ -565,7 +565,7 @@ document.write(`
 <h1>Treeform</h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="compas_viewer.components.Treeform">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Treeform</span></span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/25dc00b/src/compas_viewer/components/treeform.py#L11"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Treeform</span></span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/3b385f0/src/compas_viewer/components/treeform.py#L12"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QTreeWidget</span></code></p>
 <p>Class for displaying tree-like data.
 Treeform is an abstract class that could be placed in either the viewport or the sidedock.</p>
@@ -577,9 +577,6 @@ object tree: <code class="xref py py-attr docutils literal notranslate"><span cl
 </dd>
 <dt><strong>columns</strong><span class="classifier">dict[str, callable]</span></dt><dd><p>A dictionary of column names and their corresponding attributes.
 Example: <code class="docutils literal notranslate"><span class="pre">{&quot;Name&quot;:</span> <span class="pre">(lambda</span> <span class="pre">o:</span> <span class="pre">o.name),</span> <span class="pre">&quot;Object&quot;:</span> <span class="pre">(lambda</span> <span class="pre">o:</span> <span class="pre">o)}</span></code></p>
-</dd>
-<dt><strong>column_editable</strong><span class="classifier">list, optional</span></dt><dd><p>A list of booleans indicating whether the corresponding column is editable.
-Defaults to <code class="docutils literal notranslate"><span class="pre">[False]</span></code>.</p>
 </dd>
 <dt><strong>show_headers</strong><span class="classifier">bool, optional</span></dt><dd><p>Show the header of the tree.
 Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
@@ -631,7 +628,13 @@ Example: <code class="docutils literal notranslate"><span class="pre">{&quot;Obj
 <tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.Treeform.on_item_selection_changed.html#compas_viewer.components.Treeform.on_item_selection_changed" title="compas_viewer.components.Treeform.on_item_selection_changed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_item_selection_changed</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.Treeform.update.html#compas_viewer.components.Treeform.update" title="compas_viewer.components.Treeform.update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.Treeform.tree_from_dict.html#compas_viewer.components.Treeform.tree_from_dict" title="compas_viewer.components.Treeform.tree_from_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tree_from_dict</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.Treeform.update.html#compas_viewer.components.Treeform.update" title="compas_viewer.components.Treeform.update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.Treeform.update_from_dict.html#compas_viewer.components.Treeform.update_from_dict" title="compas_viewer.components.Treeform.update_from_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_from_dict</span></code></a></p></td>
 <td><p></p></td>
 </tr>
 </tbody>
