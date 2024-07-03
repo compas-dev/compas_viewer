@@ -5,6 +5,7 @@ from PySide6 import QtCore
 from PySide6.QtWidgets import QSplitter
 
 from compas_viewer.components import Sceneform
+from compas_viewer.components import Treeform
 from compas_viewer.components.objectsetting import ObjectSetting
 
 if TYPE_CHECKING:
@@ -22,6 +23,7 @@ class SideBarRight:
         self.widget.setChildrenCollapsible(True)
         self.show = show
         self.items = items
+        self.sceneform = None
 
     def add_items(self) -> None:
         if not self.items:
@@ -32,10 +34,15 @@ class SideBarRight:
 
             if itemtype == "Sceneform":
                 columns = item.get("columns", None)
-                if columns is not None:
-                    self.widget.addWidget(Sceneform(columns))
-                else:
+                callback = item.get("callback", None)
+                if columns is None:
                     raise ValueError("Columns not provided for Sceneform")
+                self.sceneform = Sceneform(columns, callback=callback)
+                self.widget.addWidget(self.sceneform)
+
+            elif itemtype == "Treeform":
+                item.pop("type")
+                self.widget.addWidget(Treeform(**item))
 
     def update(self):
         self.widget.update()
