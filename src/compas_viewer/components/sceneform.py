@@ -122,14 +122,14 @@ class Sceneform(QTreeWidget):
             for node in self.scene.objects:
                 node.is_selected = node in selected_nodes
                 if self.callback and node.is_selected:
-                    self.callback(node)
+                    self.callback(self, node)
 
         self.viewer.renderer.update()
 
     def on_item_selection_changed(self):
         for item in self.selectedItems():
             if self.callback:
-                self.callback(item.node)
+                self.callback(self, item.node)
 
     def adjust_column_widths(self):
         for i in range(self.columnCount()):

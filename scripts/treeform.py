@@ -29,8 +29,8 @@ for i in range(N):
 treeform = Treeform()
 viewer.ui.sidebar.widget.addWidget(treeform)
 
-def update_treeform(obj):
-    treeform.update_from_dict({"name": obj.name, "objtype": obj.__class__, "item": obj.item, "settings": obj.settings})
+def update_treeform(form, node):
+    treeform.update_from_dict({"name": node.name, "objtype": node.__class__, "item": node.item, "settings": node.settings})
 
 viewer.ui.sidebar.sceneform.callback = update_treeform
 
