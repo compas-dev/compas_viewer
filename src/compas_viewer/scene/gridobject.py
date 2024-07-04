@@ -70,7 +70,6 @@ class GridObject(Base):
         show_framez: Optional[bool] = None,
         **kwargs,
     ):
-        self.is_locked = True
         self.frame = frame
         self.linecolor = linecolor if linecolor else self.viewer.config.renderer.gridcolor
         self.gridmode = gridmode
@@ -182,6 +181,7 @@ class GridObject(Base):
         }
 
     def draw(self, shader: Shader):
+        shader.uniform1f("object_opacity", 1)
         shader.enable_attribute("position")
         shader.enable_attribute("color")
         shader.bind_attribute("position", self._lines_buffer["positions"])

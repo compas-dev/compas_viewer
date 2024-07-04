@@ -1,11 +1,10 @@
 from compas.geometry import Point
 from compas.geometry import Pointcloud
-from compas.scene import GeometryObject
 
-from .geometryobject import GeometryObject as ViewerGeometryObject
+from .geometryobject import GeometryObject
 
 
-class PointcloudObject(ViewerGeometryObject, GeometryObject):
+class PointcloudObject(GeometryObject):
     """Viewer scene object for displaying COMPAS Pointcloud geometry."""
 
     geometry: Pointcloud

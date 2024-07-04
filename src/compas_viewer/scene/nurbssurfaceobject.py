@@ -7,13 +7,12 @@ from compas.geometry import Line
 from compas.geometry import NurbsSurface
 from compas.geometry import Point
 from compas.itertools import pairwise
-from compas.scene import GeometryObject
 from compas.tolerance import TOL
 
-from .geometryobject import GeometryObject as ViewerGeometryObject
+from .geometryobject import GeometryObject
 
 
-class NurbsSurfaceObject(ViewerGeometryObject, GeometryObject):
+class NurbsSurfaceObject(GeometryObject):
     """Viewer scene object for displaying COMPAS NurbsSurface geometry."""
 
     geometry: NurbsSurface
