@@ -287,6 +287,7 @@ class ViewerSceneObject(SceneObject, Base):
         self.make_buffers()
         self._update_matrix()
         self.instance_color = Color.from_rgb255(*next(self.viewer.scene._instance_colors_generator))
+        # TODO: check robot add instance color error
         self.scene.instance_colors[self.instance_color.rgb255] = self
 
     def update(self, update_positions: bool = True, update_colors: bool = True, update_elements: bool = True):

@@ -1,7 +1,7 @@
 from compas_robots import RobotModel
 from compas_robots.resources import GithubPackageMeshLoader
 from compas_robots.viewer.scene.robotmodelobject import RobotModelObject
-
+from compas.data import Data
 from compas_viewer import Viewer
 
 viewer = Viewer(rendermode="lighted")
@@ -12,7 +12,7 @@ model = RobotModel.from_urdf_file(github.load_urdf("irb6640.urdf"))
 model.load_geometry(github)
 
 configuration = model.random_configuration()
-robot_object: RobotModelObject = viewer.scene.add(model, show_lines=False, show_points=False, configuration=configuration)  # type: ignore
+robot_object: RobotModelObject = viewer.scene.add(model, show_edges=False, show_vertices=False, configuration=configuration)  # type: ignore
 
 
 def rotate(value, robot_object: RobotModelObject, index: int):
