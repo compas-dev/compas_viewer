@@ -2,12 +2,11 @@ from typing import Optional
 
 from compas.geometry import Line
 from compas.geometry import Point
-from compas.scene import GeometryObject
 
-from .geometryobject import GeometryObject as ViewerGeometryObject
+from .geometryobject import GeometryObject
 
 
-class PointObject(ViewerGeometryObject, GeometryObject):
+class PointObject(GeometryObject):
     """Viewer scene object for displaying COMPAS Point geometry."""
 
     geometry: Point

@@ -9,7 +9,7 @@ from PySide6 import QtWidgets
 
 
 def set_icon_path(icon_name: str) -> str:
-    path = QtGui.QIcon(str(pathlib.Path(__file__).parent.parent / "icons" / icon_name))
+    path = QtGui.QIcon(str(pathlib.Path(__file__).parent.parent / "assets" / "icons" / icon_name))
     return path
 
 

@@ -3,12 +3,11 @@ from typing import Optional
 from compas.geometry import Ellipse
 from compas.geometry import Line
 from compas.geometry import Point
-from compas.scene import GeometryObject
 
-from .geometryobject import GeometryObject as ViewerGeometryObject
+from .geometryobject import GeometryObject
 
 
-class EllipseObject(ViewerGeometryObject, GeometryObject):
+class EllipseObject(GeometryObject):
     """Viewer scene object for displaying COMPAS Ellipse geometry."""
 
     geometry: Ellipse

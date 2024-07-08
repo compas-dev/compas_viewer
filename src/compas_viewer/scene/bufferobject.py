@@ -195,7 +195,6 @@ class BufferObject(SceneObject, Base):
         opacity: Optional[float] = None,
         doublesided: Optional[bool] = None,
         is_visiable: Optional[bool] = None,
-        is_locked: Optional[bool] = None,
         **kwargs,
     ):
         super().__init__(**kwargs)
@@ -208,7 +207,6 @@ class BufferObject(SceneObject, Base):
         self.opacity = 1.0 if opacity is None else opacity
         self.doublesided = True if doublesided is None else doublesided
         self.show = True if is_visiable is None else is_visiable
-        self._is_locked = False if is_locked is None else is_locked
 
         self.is_selected = False
         self.background = False

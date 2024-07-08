@@ -5,12 +5,11 @@ from compas.geometry import Line
 from compas.geometry import NurbsCurve
 from compas.geometry import Point
 from compas.itertools import pairwise
-from compas.scene import GeometryObject
 
-from .geometryobject import GeometryObject as ViewerGeometryObject
+from .geometryobject import GeometryObject
 
 
-class NurbsCurveObject(ViewerGeometryObject, GeometryObject):
+class NurbsCurveObject(GeometryObject):
     """Viewer scene object for displaying COMPAS NurbsCurve geometry."""
 
     geometry: NurbsCurve

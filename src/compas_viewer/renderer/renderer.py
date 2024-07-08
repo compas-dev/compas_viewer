@@ -124,12 +124,13 @@ class Renderer(QOpenGLWidget):
     @view.setter
     def view(self, view):
         self._view = view
-        self.shader_model.bind()
-        self.shader_model.uniform4x4("projection", self.camera.projection(self.width(), self.height()))
-        self.shader_model.release()
         self.camera.reset_position()
-        self.update_projection()
-        self.update()
+        if self.viewer.running:
+            self.shader_model.bind()
+            self.shader_model.uniform4x4("projection", self.camera.projection(self.width(), self.height()))
+            self.shader_model.release()
+            self.update_projection()
+            self.update()
 
     @property
     def opacity(self) -> float:

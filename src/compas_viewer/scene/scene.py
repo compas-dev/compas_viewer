@@ -92,7 +92,6 @@ class ViewerScene(Scene):
         item: Union[Geometry, Datastructure, ViewerSceneObject],
         parent: Optional[ViewerSceneObject] = None,
         is_selected: bool = False,
-        is_locked: bool = False,
         show: bool = True,
         show_points: Optional[bool] = None,
         show_lines: Optional[bool] = None,
@@ -123,9 +122,6 @@ class ViewerScene(Scene):
             The parent of the item.
         is_selected : bool, optional
             Whether the object is selected.
-            Default to False.
-        is_locked : bool, optional
-            Whether the object is locked (not selectable).
             Default to False.
         show : bool, optional
             Whether to show object.
@@ -170,7 +166,6 @@ class ViewerScene(Scene):
             parent=parent,
             is_selected=is_selected,
             show=show,
-            is_locked=is_locked,
             show_points=show_points,
             show_lines=show_lines,
             show_faces=show_faces,
