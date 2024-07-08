@@ -38,6 +38,7 @@ class Viewer(Singleton):
         self.ui = UI(self)
 
         self.running = False
+        self._unit = "m"
 
     @property
     def scene(self) -> ViewerScene:
@@ -51,6 +52,24 @@ class Viewer(Singleton):
         if self.running:
             for obj in self._scene.objects:
                 obj.init()
+
+    @property
+    def unit(self) -> str:
+        return self._unit
+
+    @unit.setter
+    def unit(self, unit: str):
+        if unit == "m":
+            self.renderer.scale = 1
+        elif unit == "cm":
+            self.renderer.scale = 0.01
+        elif unit == "mm":
+            self.renderer.scale = 0.001
+        else:
+            raise ValueError("Unit must be one of 'm', 'cm', 'mm'")
+
+        self._unit = unit
+        self.renderer.update()
 
     def show(self):
         self.running = True

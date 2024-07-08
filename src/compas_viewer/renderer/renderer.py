@@ -62,6 +62,7 @@ class Renderer(QOpenGLWidget):
         self._now = time.time()
 
         self.grid = None
+        self.scale = 1.0
 
         self.shader_model: Shader = None
         self.shader_tag: Shader = None
@@ -581,7 +582,9 @@ class Renderer(QOpenGLWidget):
         self.shader_model.bind()
         self.shader_model.uniform4x4("viewworld", viewworld)
         if self.grid is not None:
+            self.shader_model.uniform1f("scale", 1.0)  # grid does not scale
             self.grid.draw(self.shader_model)
+        self.shader_model.uniform1f("scale", self.scale)
         for obj in self.sort_objects_from_viewworld(mesh_objs, viewworld):
             obj.draw(self.shader_model, self.rendermode == "wireframe", self.rendermode == "lighted")
         self.shader_model.release()
@@ -589,6 +592,7 @@ class Renderer(QOpenGLWidget):
         # Draw vector arrows
         self.shader_arrow.bind()
         self.shader_arrow.uniform4x4("viewworld", viewworld)
+        self.shader_arrow.uniform1f("scale", self.scale)
         for obj in vector_objs:
             obj.draw(self.shader_arrow)
         self.shader_arrow.release()
@@ -596,6 +600,7 @@ class Renderer(QOpenGLWidget):
         # Draw text tag sprites
         self.shader_tag.bind()
         self.shader_tag.uniform4x4("viewworld", viewworld)
+        self.shader_tag.uniform1f("scale", self.scale)
         for obj in tag_objs:
             obj.draw(self.shader_tag, self.camera.position)
         self.shader_tag.release()
@@ -636,6 +641,7 @@ class Renderer(QOpenGLWidget):
 
         self.shader_instance.bind()
         self.shader_instance.uniform4x4("viewworld", viewworld)
+        self.shader_instance.uniform1f("scale", self.scale)
         for obj in mesh_objs:
             obj.draw_instance(self.shader_instance, self.rendermode == "wireframe")
         self.shader_instance.release()

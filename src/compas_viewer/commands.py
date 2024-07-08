@@ -196,8 +196,8 @@ def zoom_selected(viewer: "Viewer"):
         return
 
     extents = extents.reshape(-1, 3)
-    max_corner = extents.max(axis=0)
-    min_corner = extents.min(axis=0)
+    max_corner = extents.max(axis=0) * viewer.renderer.scale
+    min_corner = extents.min(axis=0) * viewer.renderer.scale
     viewer.renderer.camera.scale = float((norm(max_corner - min_corner)) / 10)  # 10 is a tuned magic number
     center = (max_corner + min_corner) / 2
     distance = max(norm(max_corner - min_corner), 1)
