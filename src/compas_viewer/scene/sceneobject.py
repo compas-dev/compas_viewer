@@ -33,8 +33,6 @@ class ViewerSceneObject(SceneObject, Base):
         The viewer object.
     is_selected : bool, optional
         Whether the object is selected. Default is False.
-    is_locked : bool, optional
-        Whether the object is locked. Default is False.
     show : bool, optional
         Whether to show object. Default is True.
     show_points : bool, optional
@@ -56,9 +54,6 @@ class ViewerSceneObject(SceneObject, Base):
     ----------
     is_selected : bool
         Whether the object is selected.
-    is_locked : bool
-        Whether the object is locked (selectable).
-        The global grid is a typical object that is not selectable.
     show : bool
         Whether to show object.
     show_points : bool
@@ -88,7 +83,6 @@ class ViewerSceneObject(SceneObject, Base):
     def __init__(
         self,
         is_selected: bool = False,
-        is_locked: bool = False,
         show: bool = True,
         show_points: Optional[bool] = None,
         show_lines: Optional[bool] = None,
@@ -110,8 +104,7 @@ class ViewerSceneObject(SceneObject, Base):
         self.opacity = opacity if opacity is not None else self.viewer.config.ui.display.opacity
 
         #  Selection
-        self._is_locked = is_locked
-        self.is_selected = not is_locked and is_selected
+        self.is_selected = is_selected
 
         #  Visual
         self.background: bool = False
@@ -134,20 +127,6 @@ class ViewerSceneObject(SceneObject, Base):
         self._backfaces_buffer: [dict[str, Any]] = None  # type: ignore
 
         self._inited = False
-
-    @property
-    def is_locked(self):
-        return self._is_locked
-
-    @is_locked.setter
-    def is_locked(self, value: bool):
-        self._is_locked = value
-        if value:
-            self.is_selected = False
-            # scene parent
-            self.scene.instance_colors.pop(self.instance_color.rgb255)
-        else:
-            self.scene.instance_colors[self.instance_color.rgb255] = self
 
     @property
     def bounding_box(self):
@@ -287,7 +266,7 @@ class ViewerSceneObject(SceneObject, Base):
         self.make_buffers()
         self._update_matrix()
         self.instance_color = Color.from_rgb255(*next(self.viewer.scene._instance_colors_generator))
-        self.scene.instance_colors[self.instance_color.rgb255] = self
+        self.viewer.scene.instance_colors[self.instance_color.rgb255] = self
 
     def update(self, update_positions: bool = True, update_colors: bool = True, update_elements: bool = True):
         """Update the object.
@@ -455,7 +434,6 @@ class ViewerSceneObject(SceneObject, Base):
         settings = {
             "name": self.name,
             "is_selected": self.is_selected,
-            "is_locked": self.is_locked,
             "show": self.show,
             "show_points": self.show_points,
             "show_lines": self.show_lines,

@@ -22,7 +22,6 @@ class GroupObject(SceneObject):
         super().__init__(item=Group(item), **kwargs)
         self.show = True
         self.is_selected = False
-        self.is_locked = False
         self.opacity = 1.0
         self.bounding_box = None
 

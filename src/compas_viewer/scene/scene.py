@@ -67,12 +67,18 @@ class ViewerScene(Scene):
 
     def __init__(self, name: str = "ViewerScene", context: str = "Viewer"):
         super().__init__(name=name, context=context)
-
-        #  Primitive
-        self.objects: list[ViewerSceneObject]
-        #  Selection
         self.instance_colors: dict[tuple[int, int, int], ViewerSceneObject] = {}
         self._instance_colors_generator = instance_colors_generator()
+
+    @property
+    def visiable_objects(self) -> list[ViewerSceneObject]:
+        def traverse(obj):
+            for child in obj.children:
+                if child.show:
+                    yield child
+                    yield from traverse(child)
+
+        return traverse(self.root)
 
     @property
     def viewer(self):
@@ -86,7 +92,6 @@ class ViewerScene(Scene):
         item: Union[Geometry, Datastructure, ViewerSceneObject],
         parent: Optional[ViewerSceneObject] = None,
         is_selected: bool = False,
-        is_locked: bool = False,
         show: bool = True,
         show_points: Optional[bool] = None,
         show_lines: Optional[bool] = None,
@@ -117,9 +122,6 @@ class ViewerScene(Scene):
             The parent of the item.
         is_selected : bool, optional
             Whether the object is selected.
-            Default to False.
-        is_locked : bool, optional
-            Whether the object is locked (not selectable).
             Default to False.
         show : bool, optional
             Whether to show object.
@@ -164,7 +166,6 @@ class ViewerScene(Scene):
             parent=parent,
             is_selected=is_selected,
             show=show,
-            is_locked=is_locked,
             show_points=show_points,
             show_lines=show_lines,
             show_faces=show_faces,

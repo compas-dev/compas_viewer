@@ -5,6 +5,7 @@ from PySide6 import QtCore
 from PySide6.QtWidgets import QSplitter
 
 from compas_viewer.components import Sceneform
+from compas_viewer.components import Treeform
 from compas_viewer.components.objectsetting import ObjectSetting
 
 if TYPE_CHECKING:
@@ -23,6 +24,7 @@ class SideBarRight:
         self.show = show
         self.hide_widget = True
         self.items = items
+        self.sceneform = None
 
     def add_items(self) -> None:
         if not self.items:

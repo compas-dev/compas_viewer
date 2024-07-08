@@ -6,6 +6,7 @@ from PySide6.QtWidgets import QTreeWidget
 from PySide6.QtWidgets import QTreeWidgetItem
 
 from compas.datastructures import Tree
+from compas.datastructures import TreeNode
 
 
 class Treeform(QTreeWidget):
@@ -21,9 +22,6 @@ class Treeform(QTreeWidget):
     columns : dict[str, callable]
         A dictionary of column names and their corresponding attributes.
         Example: ``{"Name": (lambda o: o.name), "Object": (lambda o: o)}``
-    column_editable : list, optional
-        A list of booleans indicating whether the corresponding column is editable.
-        Defaults to ``[False]``.
     show_headers : bool, optional
         Show the header of the tree.
         Defaults to ``True``.
@@ -69,37 +67,28 @@ class Treeform(QTreeWidget):
 
     def __init__(
         self,
-        tree: Tree,
-        columns: dict[str, Callable],
-        column_editable: list[bool] = [False],
+        tree: Tree = None,
+        columns: dict[str, Callable] = None,
         show_headers: bool = True,
         stretch: int = 2,
         backgrounds: Optional[dict[str, Callable]] = None,
         callback: Optional[Callable] = None,
     ):
         super().__init__()
-        self.columns = columns
-        self.column_editable = column_editable + [False] * (len(columns) - len(column_editable))
-        self.setColumnCount(len(columns))
+        self.columns = columns or {"Name": lambda node: node.name, "Value": lambda node: node.attributes.get("value", "")}
+        self.setColumnCount(len(self.columns))
         self.setHeaderLabels(list(self.columns.keys()))
         self.setHeaderHidden(not show_headers)
         self.stretch = stretch
         self._backgrounds = backgrounds
 
-        self.tree = tree
-        self._tree = tree
-
+        self.tree = tree or Tree()
         self.callback = callback
         self.itemSelectionChanged.connect(self.on_item_selection_changed)
 
-    @property
-    def tree(self) -> Tree:
-        return self._tree
-
-    @tree.setter
-    def tree(self, tree: Tree):
+    def update(self):
         self.clear()
-        for node in tree.traverse("breadthfirst"):
+        for node in self.tree.traverse("breadthfirst"):
             if node.is_root:
                 continue
 
@@ -119,10 +108,33 @@ class Treeform(QTreeWidget):
                 for col, background in self._backgrounds.items():
                     node.attributes["widget_item"].setBackground(list(self.columns.keys()).index(col), QColor(*background(node).rgb255))
 
-        self._tree = tree
+    def tree_from_dict(self, data):
+        tree = Tree()
+        root = TreeNode("Root")
+        tree.add(root)
 
-    def update(self):
-        self.tree = self._tree
+        def add_children(key, data, parent):
+            if isinstance(data, dict):
+                node = TreeNode(name=key)
+                for child_key, child_data in data.items():
+                    add_children(child_key, child_data, node)
+            elif isinstance(data, (list, tuple)):
+                node = TreeNode(name=key)
+                for child_index, child_data in enumerate(data):
+                    add_children(child_index, child_data, node)
+            else:
+                node = TreeNode(name=key, value=data)
+
+            parent.add(node)
+
+        for key, data in data.items():
+            add_children(key, data, root)
+
+        return tree
+
+    def update_from_dict(self, data):
+        self.tree = self.tree_from_dict(data)
+        self.update()
 
     def on_item_selection_changed(self):
         for item in self.selectedItems():

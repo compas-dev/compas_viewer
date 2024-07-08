@@ -3,12 +3,11 @@ from typing import Optional
 from compas.geometry import Line
 from compas.geometry import Point
 from compas.geometry import Polyline
-from compas.scene import GeometryObject
 
-from .geometryobject import GeometryObject as ViewerGeometryObject
+from .geometryobject import GeometryObject
 
 
-class PolylineObject(ViewerGeometryObject, GeometryObject):
+class PolylineObject(GeometryObject):
     """Viewer scene object for displaying COMPAS Polyline geometry."""
 
     geometry: Polyline

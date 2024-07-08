@@ -3,7 +3,6 @@ from compas_model.elements import BlockElement
 from compas_model.models import Model
 
 from compas.colors import Color
-from compas.plugins import plugin
 from compas.scene import register
 from compas.scene import register_scene_objects
 from compas_viewer import Viewer
@@ -11,7 +10,9 @@ from compas_viewer.scene import GroupObject
 
 
 class ModelObject(GroupObject):
-    def __init__(self, model, **kwargs):
+    def __init__(self, **kwargs):
+        
+        model = kwargs.pop("item")
 
         elements = []
 
@@ -40,7 +41,7 @@ class ModelObject(GroupObject):
         blocks = (elements, {"name": "blocks"})
         interfaces = ([], {"name": "interfaces"})
         forces = ([], {"name": "forces"})
-        super().__init__([blocks, interfaces, forces], name=model.name, **kwargs)
+        super().__init__(item=[blocks, interfaces, forces], name=model.name, **kwargs)
 
 
 register_scene_objects()  # This has to be called before registering the model object

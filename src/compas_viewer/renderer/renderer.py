@@ -54,7 +54,7 @@ class Renderer(QOpenGLWidget):
 
         self.viewer = viewer
 
-        self._view = None
+        self._view = self.viewer.config.renderer.view
         self._rendermode = self.viewer.config.renderer.rendermode
         self._opacity = self.viewer.config.renderer.ghostopacity if self.rendermode == "ghosted" else 1.0
 
@@ -124,12 +124,13 @@ class Renderer(QOpenGLWidget):
     @view.setter
     def view(self, view):
         self._view = view
-        self.shader_model.bind()
-        self.shader_model.uniform4x4("projection", self.camera.projection(self.width(), self.height()))
-        self.shader_model.release()
         self.camera.reset_position()
-        self.update_projection()
-        self.update()
+        if self.viewer.running:
+            self.shader_model.bind()
+            self.shader_model.uniform4x4("projection", self.camera.projection(self.width(), self.height()))
+            self.shader_model.release()
+            self.update_projection()
+            self.update()
 
     @property
     def opacity(self) -> float:
@@ -440,8 +441,6 @@ class Renderer(QOpenGLWidget):
         self.shader_grid.uniform4x4("transform", transform)
         self.shader_grid.release()
 
-        self.view = self.viewer.config.renderer.view
-
     def update_projection(self, w=None, h=None):
         """
         Update the projection matrix.
@@ -576,7 +575,7 @@ class Renderer(QOpenGLWidget):
         viewworld = self.camera.viewworld()
         self.update_projection()
         # Object categorization
-        tag_objs, vector_objs, mesh_objs = self.sort_objects_from_category((obj for obj in self.viewer.scene.objects if obj.show))
+        tag_objs, vector_objs, mesh_objs = self.sort_objects_from_category(self.viewer.scene.visiable_objects)
 
         # Draw model objects in the scene
         self.shader_model.bind()

@@ -234,7 +234,7 @@ zoom_view_cmd = Command(title="Zoom View", callback=zoom_view, wheelbinding="")
 
 def select_all(viewer: "Viewer"):
     for obj in viewer.scene.objects:
-        if obj.show and not obj.is_locked:
+        if obj.show:
             obj.is_selected = True
 
     viewer.ui.sidebar.update()
