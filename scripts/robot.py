@@ -1,7 +1,7 @@
 from compas_robots import RobotModel
 from compas_robots.resources import GithubPackageMeshLoader
 from compas_robots.viewer.scene.robotmodelobject import RobotModelObject
-from compas.data import Data
+from compas_viewer.components import Slider
 from compas_viewer import Viewer
 
 viewer = Viewer(rendermode="lighted")
@@ -11,33 +11,23 @@ github = GithubPackageMeshLoader("ros-industrial/abb", "abb_irb6600_support", "k
 model = RobotModel.from_urdf_file(github.load_urdf("irb6640.urdf"))
 model.load_geometry(github)
 
-configuration = model.random_configuration()
-robot_object: RobotModelObject = viewer.scene.add(model, show_edges=False, show_vertices=False, configuration=configuration)  # type: ignore
+configuration = model.zero_configuration()
+robot_object: RobotModelObject = viewer.scene.add(model, show_lines=True, show_points=False, configuration=configuration)  # type: ignore
 
+viewer.ui.sidedock.show = True
 
-def rotate(value, robot_object: RobotModelObject, index: int):
-    config = robot_object.configuration
-    config.joint_values[index] = value / 360 * 2 * 3.14159
-    robot_object.update_joints(config)
+for i, joint in enumerate(robot_object.configuration.joint_names):
 
+    def make_rotate_function(index):
+        def rotate(slider: Slider, value: int):
+            config = robot_object.configuration
+            config.joint_values[index] = value / 360 * 2 * 3.14159
+            robot_object.update_joints(config)
+        return rotate
 
-# for i, joint in enumerate(robot_object.configuration.joint_names):
-#     slider = Slider(
-#         rotate,
-#         configuration.joint_values[i] / 360 * 2 * 3.14159,
-#         -180,
-#         180,
-#         1,
-#         joint,
-#         robot_object=robot_object,
-#         index=i,
-#     )
-#     slider = viewer.layout.sidedock.add_element(slider)
+    rotate_function = make_rotate_function(i)
+    viewer.ui.sidedock.add(Slider(title=joint, starting_val=0, min_val=-180, max_val=180, step=1, action=rotate_function))
 
-
-# treeform = Treeform(viewer.scene, {"Name": (lambda o: o.name), "Object": (lambda o: o)})
-
-# viewer.layout.sidedock.add_element(treeform)
 
 robot_object.update_joints(robot_object.configuration)
 
