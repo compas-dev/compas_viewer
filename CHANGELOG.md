@@ -9,10 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Added `list` to accepted types for `Scene.add`.
+* Added `list[float]` to accepted types for `Camera.position` and `Camera.target`.
+
 ### Changed
 
 ### Removed
-
 
 ## [1.2.3] 2024-07-03
 
