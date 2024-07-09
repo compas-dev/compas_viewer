@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING
 from PySide6.QtCore import Signal
 from PySide6.QtWidgets import QDialog
 from PySide6.QtWidgets import QPushButton
+from PySide6.QtWidgets import QScrollArea
 from PySide6.QtWidgets import QVBoxLayout
 from PySide6.QtWidgets import QWidget
 
@@ -54,8 +55,21 @@ class ObjectSetting(QWidget):
         super().__init__()
         self.viewer = viewer
         self.items = items
-        self.setFixedHeight(260)
-        self.layout = QVBoxLayout(self)
+        self.setFixedHeight(200)
+
+        # Main layout
+        self.main_layout = QVBoxLayout(self)
+
+        # Scroll area setup
+        self.scroll_area = QScrollArea(self)
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_content = QWidget()
+        self.scroll_layout = QVBoxLayout(self.scroll_content)
+        self.scroll_area.setWidget(self.scroll_content)
+
+        self.main_layout.addWidget(self.scroll_area)
+
+        # Initialize spin boxes dictionary
         self.spin_boxes = {}
 
     def clear_layout(self, layout):
@@ -72,17 +86,17 @@ class ObjectSetting(QWidget):
 
     def update(self):
         """Update the layout with the latest object settings."""
-        self.clear_layout(self.layout)
+        self.clear_layout(self.scroll_layout)
         self.setting_layout = SettingLayout(viewer=self.viewer, items=self.items, type="obj_setting")
 
         if len(self.setting_layout.widgets) != 0:
             text = "Update Object"
-            self.layout.addLayout(self.setting_layout.layout)
+            self.scroll_layout.addLayout(self.setting_layout.layout)
             self.update_button = QPushButton(text, self)
             self.update_button.clicked.connect(self.obj_update)
-            self.layout.addWidget(self.update_button)
+            self.scroll_layout.addWidget(self.update_button)
         else:
-            self.layout.addWidget(LabelWidget(text="No object Selected", alignment="center"))
+            self.scroll_layout.addWidget(LabelWidget(text="No object Selected", alignment="center"))
 
     def obj_update(self):
         """Apply the settings from spin boxes to the selected objects."""
