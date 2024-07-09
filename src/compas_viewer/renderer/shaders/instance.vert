@@ -7,7 +7,17 @@ uniform mat4 viewworld;
 uniform mat4 transform;
 uniform float scale;
 
-void main()
-{
-    gl_Position = projection * viewworld * transform * vec4(position * scale, 1.0);
+void main() {
+    // Create the scaling matrix
+    mat4 scalingMatrix = mat4(scale, 0.0, 0.0, 0.0, 0.0, scale, 0.0, 0.0, 0.0, 0.0, scale, 0.0, 0.0, 0.0, 0.0, 1.0);
+
+    // Scale the translation component of the transform matrix
+    mat4 scaledTransform = transform;
+    scaledTransform[3] = transform[3] * vec4(scale, scale, scale, 1.0);
+
+    // Apply the scaling matrix to the transformation matrix
+    scaledTransform = scaledTransform * scalingMatrix;
+
+    // Calculate the position in clip space
+    gl_Position = projection * viewworld * scaledTransform * vec4(position, 1.0);
 }

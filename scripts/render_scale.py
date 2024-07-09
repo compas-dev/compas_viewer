@@ -8,13 +8,15 @@ viewer = Viewer()
 
 for i in range(5):
     for j in range(5):
-        viewer.scene.add(
-            Box(0.5, 0.5, 0.5, Frame([i, j, 0], [1, 0, 0], [0, 1, 0])),
+        obj = viewer.scene.add(
+            Box(0.5, 0.5, 0.5),
             show_points=True,
             show_lines=True,
             surfacecolor=Color(i / 10, j / 10, 0.0),
             name=f"Box_{i}_{j}",
         )
+
+        obj.transformation =  Frame([i, j, 0], [1, 0, 0], [0, 1, 0]).to_transformation()
 
 
 def update_renderscale(slider: Slider, value: int):
