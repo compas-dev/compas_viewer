@@ -89,7 +89,7 @@ class ViewerScene(Scene):
     # TODO: These fixed kwargs could be moved to COMPAS core.
     def add(
         self,
-        item: Union[Geometry, Datastructure, ViewerSceneObject],
+        item: Union[Geometry, Datastructure, ViewerSceneObject, list],
         parent: Optional[ViewerSceneObject] = None,
         is_selected: bool = False,
         show: bool = True,
