@@ -8,8 +8,8 @@ from PySide6.QtWidgets import QLabel
 from PySide6.QtWidgets import QLayout
 from PySide6.QtWidgets import QVBoxLayout
 
-from compas_viewer.components.color import ColorButton
 from compas_viewer.components.color import ColorComboBox
+from compas_viewer.components.color import ColorDialog
 from compas_viewer.components.double_edit import DoubleEdit
 from compas_viewer.components.label import LabelWidget
 from compas_viewer.components.textedit import TextEdit
@@ -134,7 +134,7 @@ class SettingLayout:
                     widget = TextEdit(text=text)
                     self.widgets[f"{layout_title}_{type}"] = widget
                 elif type == "color_dialog":
-                    widget = ColorButton(obj=obj, attr=attr)
+                    widget = ColorDialog(obj=obj, attr=attr)
 
                 right_layout.addWidget(widget)
                 if sub_title is None:

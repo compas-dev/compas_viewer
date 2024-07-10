@@ -113,7 +113,7 @@ class ColorComboBox(QWidget, Base):
         self.obj.update()
 
 
-class ColorButton(QWidget):
+class ColorDialog(QWidget):
     """
     A custom QWidget that provides a QPushButton to open a QColorDialog for selecting colors.
 
