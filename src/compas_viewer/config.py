@@ -334,11 +334,7 @@ class CameraConfig(ConfigBase):
     zoomdelta: float = 0.05
     rotationdelta: float = 0.01
     pandelta: float = 0.05
-
-
-@dataclass
-class CameraDialogConfig(ConfigBase):
-    items: list[dict] = field(
+    dialog_settings: list[dict] = field(
         default_factory=lambda: [
             {
                 "title": "Camera_Target",
@@ -410,7 +406,6 @@ class Config(ConfigBase):
     window: WindowConfig = field(default_factory=WindowConfig)
     renderer: RendererConfig = field(default_factory=RendererConfig)
     camera: CameraConfig = field(default_factory=CameraConfig)
-    cameradialog: CameraDialogConfig = field(default_factory=CameraDialogConfig)
     commands: list[Command] = field(
         default_factory=lambda: [
             camera_settings_cmd,
