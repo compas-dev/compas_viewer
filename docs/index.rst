@@ -8,7 +8,10 @@ COMPAS Viewer
 
 .. rst-class:: lead
 
-More info coming soon...
+:mod:`compas_viewer` is a standalone CAD viewer and data management interface for COMPAS.
+It is based on Qt (through PySide6) and OpenGL (through PyOpenGL) and can be installed on Windows, OSX, and Linux to work with COMPAS geometry and data objects without further requirements or additional software.
+In addition, :mod:`compas_viewer` provides an easy-to-use API to make custom interfaces with specialised controls and widgets.
+
 
 Table of Contents
 =================
