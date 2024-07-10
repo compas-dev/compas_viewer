@@ -211,10 +211,17 @@ class BufferObject(SceneObject, Base):
         self.is_selected = False
         self.background = False
         self._matrix_buffer = None
+        self._bounding_box_center = None
 
     @property
     def buffergeometry(self) -> BufferGeometry:
         return self.item
+
+    @property
+    def bounding_box_center(self) -> NDArray:
+        if self._bounding_box_center is None:
+            self._bounding_box_center = np.mean(self.buffergeometry.points.reshape(-1, 3), axis=0)
+        return self._bounding_box_center
 
     def init(self):
         """Initialize the object"""

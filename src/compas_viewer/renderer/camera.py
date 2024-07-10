@@ -4,6 +4,7 @@ from math import tan
 from typing import TYPE_CHECKING
 from typing import Optional
 from typing import Sequence
+from typing import Union
 
 from numpy import array
 from numpy import asfortranarray
@@ -151,7 +152,7 @@ class Camera:
         return self._position
 
     @position.setter
-    def position(self, position: Position):
+    def position(self, position: Union[Position, list[float]]):
         self._position.set(*position, pause_update=False)
 
     @property
@@ -169,7 +170,7 @@ class Camera:
         return self._target
 
     @target.setter
-    def target(self, target: Position):
+    def target(self, target: Union[Position, list[float]]):
         self._target.set(*target, pause_update=False)
 
     @property
