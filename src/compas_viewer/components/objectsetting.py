@@ -8,8 +8,10 @@ from PySide6.QtWidgets import QVBoxLayout
 from PySide6.QtWidgets import QWidget
 
 from compas_viewer.base import Base
+from compas_viewer.components.double_edit import DoubleEdit
 from compas_viewer.components.label import LabelWidget
 from compas_viewer.components.layout import SettingLayout
+from compas_viewer.components.textedit import TextEdit
 
 if TYPE_CHECKING:
     from compas_viewer import Viewer
@@ -36,8 +38,6 @@ class ObjectSetting(QWidget):
         The main layout for the widget.
     update_button : QPushButton
         The button to trigger the object update.
-    spin_boxes : dict
-        Dictionary to hold spin boxes for object properties.
 
     Methods
     -------
@@ -69,9 +69,6 @@ class ObjectSetting(QWidget):
 
         self.main_layout.addWidget(self.scroll_area)
 
-        # Initialize spin boxes dictionary
-        self.spin_boxes = {}
-
     def clear_layout(self, layout):
         """Clear all widgets from the layout."""
         while layout.count():
@@ -90,11 +87,12 @@ class ObjectSetting(QWidget):
         self.setting_layout = SettingLayout(viewer=self.viewer, items=self.items, type="obj_setting")
 
         if len(self.setting_layout.widgets) != 0:
-            text = "Update Object"
             self.scroll_layout.addLayout(self.setting_layout.layout)
-            self.update_button = QPushButton(text, self)
-            self.update_button.clicked.connect(self.obj_update)
-            self.scroll_layout.addWidget(self.update_button)
+            for _, widget in self.setting_layout.widgets.items():
+                if isinstance(widget, DoubleEdit):
+                    widget.spinbox.valueChanged.connect(self.obj_update)
+                elif isinstance(widget, TextEdit):
+                    widget.text_edit.textChanged.connect(self.obj_update)
         else:
             self.scroll_layout.addWidget(LabelWidget(text="No object Selected", alignment="center"))
 
@@ -126,8 +124,6 @@ class ObjectSettingDialog(QDialog, Base):
         The layout of the dialog.
     items : list
         A list of dictionaries containing the settings for the object.
-    spin_boxes : dict
-        Dictionary containing spin boxes for adjusting object properties.
     update_button : QPushButton
         Button to apply changes to the selected objects.
 
