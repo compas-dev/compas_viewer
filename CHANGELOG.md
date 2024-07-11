@@ -12,10 +12,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added `list` to accepted types for `Scene.add`.
 * Added `list[float]` to accepted types for `Camera.position` and `Camera.target`.
 * Added `unit` to `Viewer` and `Config`.
+* Added `bounding_box` and `_update_bounding_box` to `BufferObject`.
 
 ### Changed
 
 * Fixed `opacity` bug with `BufferObject`.
+* Updated `SceneForm` to avoid completely reload when scene objects not changed.
 
 ### Removed
 
