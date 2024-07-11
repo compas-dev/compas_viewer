@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 * Fixed `opacity` bug with `BufferObject`.
+* Updated `SceneForm` to avoid completely reload when scene objects not changed.
 
 ### Removed
 
