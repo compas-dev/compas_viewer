@@ -11,10 +11,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Added `list` to accepted types for `Scene.add`.
 * Added `list[float]` to accepted types for `Camera.position` and `Camera.target`.
+* Added `TextEdit` to handle `name` change.
+* Added `DefaultLayout` to handle gerneral `layout` setting to minimal.
+* Added `ColorDialog` to manage color dialog.
+* Added `SettingLayout` to manage complex layout with config input.
+
 
 ### Changed
 
 * Fixed `opacity` bug with `BufferObject`.
+* Updated callback to `SceneTree`.
+* Updated `ObjectSetting` and `CameraSetting` to support setting from config.
+* Updated `Slider` to be able change value with `TextEdit`
 
 ### Removed
 
@@ -23,15 +31,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 * Added `scripts/treeform.py` example.
-* Added `TextEdit` to handle `name` change.
-* Added `DefaultLayout` to handle gerneral `layout` setting to minimal.
-* Added `ColorDialog` to manage color dialog.
-* Added `SettingLayout` to manage complex layout with config input.
 
 ### Changed
-
-* Updated callback to `SceneTree`.
-* Updated `ObjectSetting` and `CameraSetting` to support setting from config.
 
 ### Removed
 

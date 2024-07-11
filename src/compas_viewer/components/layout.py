@@ -136,12 +136,12 @@ class SettingLayout:
                 elif type == "color_dialog":
                     widget = ColorDialog(obj=obj, attr=attr)
 
-                right_layout.addWidget(widget)
                 if sub_title is None:
                     widget_name = f"{layout_title}_{type}"
                 else:
                     widget_name = f"{layout_title}_{sub_title}_{type}"
                 self.widgets[widget_name] = widget
+                right_layout.addWidget(widget)
 
             sub_layout.addLayout(left_layout)
             sub_layout.addLayout(right_layout)
