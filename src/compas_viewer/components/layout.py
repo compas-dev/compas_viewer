@@ -80,24 +80,24 @@ class SettingLayout:
         super().__init__()
 
         self.viewer = viewer
+        self.items = items
         self.type = type
         self.layout = QVBoxLayout()
         self.widgets = {}
-        self.generate_layout(viewer, items)
 
-    def generate_layout(self, viewer: "Viewer", items: list[dict]) -> None:
+    def generate_layout(self) -> None:
         if self.type == "camera_setting":
-            self.set_layout(items, self.viewer.renderer.camera)
+            self.set_layout(self.items, self.viewer.renderer.camera)
 
         elif self.type == "obj_setting":
             obj_list = []
-            for obj in viewer.scene.objects:
+            for obj in self.viewer.scene.objects:
                 if obj.is_selected:
                     obj_list.append(obj)
 
             if obj_list:
                 # Only support one item selected per time
-                self.set_layout(items, obj_list[0])
+                self.set_layout(self.items, obj_list[0])
 
     def set_layout(self, items: list[dict], obj: Any) -> None:
         self.layout = QVBoxLayout()

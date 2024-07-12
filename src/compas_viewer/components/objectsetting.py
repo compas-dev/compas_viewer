@@ -55,7 +55,7 @@ class ObjectSetting(QWidget):
         super().__init__()
         self.viewer = viewer
         self.items = items
-
+        self.setting_layout = SettingLayout(viewer=self.viewer, items=self.items, type="obj_setting")
         # Main layout
         self.main_layout = QVBoxLayout(self)
 
@@ -83,7 +83,7 @@ class ObjectSetting(QWidget):
     def update(self):
         """Update the layout with the latest object settings."""
         self.clear_layout(self.scroll_layout)
-        self.setting_layout = SettingLayout(viewer=self.viewer, items=self.items, type="obj_setting")
+        self.setting_layout.generate_layout()
 
         if len(self.setting_layout.widgets) != 0:
             self.scroll_layout.addLayout(self.setting_layout.layout)
