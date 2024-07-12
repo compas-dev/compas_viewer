@@ -24,9 +24,6 @@ class DefaultLayout:
         self.layout.setSpacing(0)  # Minimize the spacing between items
         self.layout.setContentsMargins(0, 0, 0, 0)  # Minimize the margins
 
-    def get_layout(self) -> QLayout:
-        return self.layout
-
 
 class SettingLayout:
     """
@@ -106,9 +103,9 @@ class SettingLayout:
             layout_title = item.get("title", "")
             sub_items = item.get("items", None)
 
-            sub_layout = DefaultLayout(QHBoxLayout()).get_layout()
-            left_layout = DefaultLayout(QHBoxLayout()).get_layout()
-            right_layout = DefaultLayout(QHBoxLayout()).get_layout()
+            sub_layout = DefaultLayout(QHBoxLayout()).layout
+            left_layout = DefaultLayout(QHBoxLayout()).layout
+            right_layout = DefaultLayout(QHBoxLayout()).layout
 
             label = QLabel(f"{layout_title}:")
             left_layout.addWidget(label)
