@@ -119,7 +119,7 @@ class Slider(QWidget):
         if self._default_layout is None:
             from compas_viewer.components.layout import DefaultLayout
 
-            self._default_layout = DefaultLayout(QVBoxLayout()).get_layout()
+            self._default_layout = DefaultLayout(QVBoxLayout()).layout
         return self._default_layout
 
     @property
