@@ -21,7 +21,7 @@ __author__ = ["Li Chen"]
 __copyright__ = "COMPAS Association"
 __license__ = "MIT License"
 __email__ = "li.chen@arch.ethz.ch"
-__version__ = "1.2.3"
+__version__ = "1.2.4"
 
 
 HERE = os.path.dirname(__file__)

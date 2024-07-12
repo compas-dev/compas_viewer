@@ -48,6 +48,7 @@ class Sceneform(QTreeWidget):
         self.setColumnCount(len(columns))
         self.setHeaderLabels(col["title"] for col in self.columns)
         self.setHeaderHidden(not show_headers)
+        self._sceneobjects = []
 
         self.callback = callback
 
@@ -65,52 +66,62 @@ class Sceneform(QTreeWidget):
         return self.viewer.scene
 
     def update(self):
-        self.clear()  # TODO: do not clear when objects are same.
-        self.checkbox_columns = {}
+        if list(self.scene.objects) == self._sceneobjects:
+            for node in self.scene.traverse("breadthfirst"):
+                widget = node.attributes.get("widget")
+                if widget:
+                    widget.setSelected(node.is_selected)
+                    if node.is_selected:
+                        self.expand(node.parent)
 
-        for node in self.scene.traverse("breadthfirst"):
-            if node.is_root:
-                continue
+        else:
+            self._sceneobjects = list(self.scene.objects)
 
-            strings = []
+            self.clear()
+            self.checkbox_columns = {}
 
-            for i, column in enumerate(self.columns):
-                type = column.get("type", None)
-                if type == "checkbox":
-                    action = column.get("action")
-                    checked = column.get("checked")
-                    if not action or not checked:
-                        raise ValueError("Both action and checked must be provided for checkbox")
-                    self.checkbox_columns[i] = {"action": action, "checked": checked}
-                    strings.append("")
-                elif type == "label":
-                    text = column.get("text")
-                    if not text:
-                        raise ValueError("Text must be provided for label")
-                    strings.append(text(node))
+            for node in self.scene.traverse("breadthfirst"):
+                if node.is_root:
+                    continue
 
-            parent_widget = self if node.parent.is_root else node.parent.attributes["widget"]
-            widget = QTreeWidgetItem(parent_widget, strings)
-            widget.node = node
-            widget.setSelected(node.is_selected)
-            if node.is_selected:
+                strings = []
 
-                def expand(node):
-                    if node.attributes.get("widget"):
-                        node.attributes["widget"].setExpanded(True)
-                        if node.parent and not node.parent.is_root:
-                            expand(node.parent)
+                for i, column in enumerate(self.columns):
+                    type = column.get("type", None)
+                    if type == "checkbox":
+                        action = column.get("action")
+                        checked = column.get("checked")
+                        if not action or not checked:
+                            raise ValueError("Both action and checked must be provided for checkbox")
+                        self.checkbox_columns[i] = {"action": action, "checked": checked}
+                        strings.append("")
+                    elif type == "label":
+                        text = column.get("text")
+                        if not text:
+                            raise ValueError("Text must be provided for label")
+                        strings.append(text(node))
 
-                expand(node.parent)
+                parent_widget = self if node.parent.is_root else node.parent.attributes["widget"]
+                widget = QTreeWidgetItem(parent_widget, strings)
+                widget.node = node
+                widget.setSelected(node.is_selected)
+                if node.is_selected:
+                    self.expand(node.parent)
 
-            widget.setFlags(widget.flags() | Qt.ItemIsUserCheckable | Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+                widget.setFlags(widget.flags() | Qt.ItemIsUserCheckable | Qt.ItemIsSelectable | Qt.ItemIsEnabled)
 
-            for col, col_data in self.checkbox_columns.items():
-                widget.setCheckState(col, Qt.Checked if col_data["checked"](node) else Qt.Unchecked)
+                for col, col_data in self.checkbox_columns.items():
+                    widget.setCheckState(col, Qt.Checked if col_data["checked"](node) else Qt.Unchecked)
 
-            node.attributes["widget"] = widget
+                node.attributes["widget"] = widget
 
-        self.adjust_column_widths()
+            self.adjust_column_widths()
+
+    def expand(self, node):
+        if node.attributes.get("widget"):
+            node.attributes["widget"].setExpanded(True)
+            if node.parent and not node.parent.is_root:
+                self.expand(node.parent)
 
     def on_item_clicked(self, item, column):
         if column in self.checkbox_columns:
