@@ -19,7 +19,6 @@ class SideBarRight:
         self.show = show
         self.hide_widget = True
         self.items = items
-        self.sceneform = None
 
     def add_items(self) -> None:
         if not self.items:
@@ -32,13 +31,18 @@ class SideBarRight:
                 columns = item.get("columns", None)
                 if columns is None:
                     raise ValueError("Please setup config for Sceneform")
-                self.widget.addWidget(Sceneform(columns=columns))
+                self.sceneform = Sceneform(columns=columns)
+                self.widget.addWidget(self.sceneform)
 
             elif itemtype == "ObjectSetting":
                 items = item.get("items", None)
                 if items is None:
                     raise ValueError("Please setup config for ObjectSetting")
-                self.widget.addWidget(ObjectSetting(viewer=self.ui.viewer, items=items))
+                self.object_setting = ObjectSetting(viewer=self.ui.viewer, items=items)
+                self.widget.addWidget(self.object_setting)
+
+        self.show_sceneform = True
+        self.show_objectsetting = True
 
     def update(self):
         self.widget.update()
@@ -51,7 +55,20 @@ class SideBarRight:
 
     @show.setter
     def show(self, value: bool):
-        if value:
-            self.widget.setVisible(True)
-        elif not value:
-            self.widget.setHidden(True)
+        self.widget.setVisible(value)
+
+    @property
+    def show_sceneform(self):
+        return self.sceneform.isVisible()
+
+    @show_sceneform.setter
+    def show_sceneform(self, value: bool):
+        self.sceneform.setVisible(value)
+
+    @property
+    def show_objectsetting(self):
+        return self.object_setting.isVisible()
+
+    @show_objectsetting.setter
+    def show_objectsetting(self, value: bool):
+        self.object_setting.setVisible(value)
