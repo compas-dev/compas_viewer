@@ -369,6 +369,7 @@ class UIConfig(ConfigBase):
 @dataclass
 class Config(ConfigBase):
     vectorsize: float = 0.1
+    unit: Literal["m", "cm", "mm"] = "m"
     ui: UIConfig = field(default_factory=UIConfig)
     window: WindowConfig = field(default_factory=WindowConfig)
     renderer: RendererConfig = field(default_factory=RendererConfig)
