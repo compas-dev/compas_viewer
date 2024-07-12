@@ -45,6 +45,7 @@ class CameraSettingsDialog(QDialog, Base):
 
         self.layout = QVBoxLayout(self)
         self.setting_layout = SettingLayout(viewer=self.viewer, items=items, type="camera_setting")
+        self.setting_layout.generate_layout()
 
         self.layout.addLayout(self.setting_layout.layout)
 
