@@ -55,7 +55,6 @@ class ObjectSetting(QWidget):
         super().__init__()
         self.viewer = viewer
         self.items = items
-        self.setFixedHeight(200)
 
         # Main layout
         self.main_layout = QVBoxLayout(self)
