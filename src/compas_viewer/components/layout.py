@@ -82,10 +82,11 @@ class SettingLayout:
         self.viewer = viewer
         self.items = items
         self.type = type
+
+    def generate_layout(self) -> None:
         self.layout = QVBoxLayout()
         self.widgets = {}
 
-    def generate_layout(self) -> None:
         if self.type == "camera_setting":
             self.set_layout(self.items, self.viewer.renderer.camera)
 
@@ -95,13 +96,12 @@ class SettingLayout:
                 if obj.is_selected:
                     obj_list.append(obj)
 
-            if obj_list:
-                # Only support one item selected per time
-                self.set_layout(self.items, obj_list[0])
+            if not obj_list:
+                return
+            # Only support one item selected per time
+            self.set_layout(self.items, obj_list[0])
 
     def set_layout(self, items: list[dict], obj: Any) -> None:
-        self.layout = QVBoxLayout()
-
         for item in items:
             layout_title = item.get("title", "")
             sub_items = item.get("items", None)
@@ -132,7 +132,6 @@ class SettingLayout:
                 elif type == "text_edit":
                     text = str(action(obj))
                     widget = TextEdit(text=text)
-                    self.widgets[f"{layout_title}_{type}"] = widget
                 elif type == "color_dialog":
                     widget = ColorDialog(obj=obj, attr=attr)
 
@@ -140,6 +139,7 @@ class SettingLayout:
                     widget_name = f"{layout_title}_{type}"
                 else:
                     widget_name = f"{layout_title}_{sub_title}_{type}"
+
                 self.widgets[widget_name] = widget
                 right_layout.addWidget(widget)
 

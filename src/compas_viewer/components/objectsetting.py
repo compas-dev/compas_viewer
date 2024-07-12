@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING
 
+from PySide6.QtCore import Qt
 from PySide6.QtCore import Signal
 from PySide6.QtWidgets import QDialog
 from PySide6.QtWidgets import QPushButton
@@ -64,6 +65,7 @@ class ObjectSetting(QWidget):
         self.scroll_area.setWidgetResizable(True)
         self.scroll_content = QWidget()
         self.scroll_layout = QVBoxLayout(self.scroll_content)
+        self.scroll_layout.setAlignment(Qt.AlignTop)
         self.scroll_area.setWidget(self.scroll_content)
 
         self.main_layout.addWidget(self.scroll_area)
