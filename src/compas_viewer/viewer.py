@@ -20,7 +20,6 @@ from compas_viewer.ui import UI
 
 class Viewer(Singleton):
     def __init__(self, config: Optional[Config] = None, **kwargs):
-
         self.running = False
         self.app = QApplication(sys.argv)
         self.app.setApplicationName("COMPAS Viewer")
