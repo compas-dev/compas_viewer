@@ -19,10 +19,23 @@ if TYPE_CHECKING:
 
 
 class DefaultLayout:
-    def __init__(self, layout: QLayout):
-        self.layout = layout
-        self.layout.setSpacing(0)  # Minimize the spacing between items
-        self.layout.setContentsMargins(0, 0, 0, 0)  # Minimize the margins
+    """
+    A class to create a default layout with minimal spacing and margins.
+
+    Parameters
+    ----------
+    layout : QLayout
+
+    Attributes
+    ----------
+    layout : QLayout
+        The layout with minimized spacing and margins.
+    """
+
+    def __new__(cls, layout: QLayout) -> QLayout:
+        layout.setSpacing(0)  # Minimize the spacing between items
+        layout.setContentsMargins(0, 0, 0, 0)  # Minimize the margins
+        return layout
 
 
 class SettingLayout:
@@ -103,9 +116,9 @@ class SettingLayout:
             layout_title = item.get("title", "")
             sub_items = item.get("items", None)
 
-            sub_layout = DefaultLayout(QHBoxLayout()).layout
-            left_layout = DefaultLayout(QHBoxLayout()).layout
-            right_layout = DefaultLayout(QHBoxLayout()).layout
+            sub_layout = DefaultLayout(QHBoxLayout())
+            left_layout = DefaultLayout(QHBoxLayout())
+            right_layout = DefaultLayout(QHBoxLayout())
 
             label = QLabel(f"{layout_title}:")
             left_layout.addWidget(label)

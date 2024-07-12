@@ -1,5 +1,6 @@
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QHBoxLayout
+from PySide6.QtWidgets import QSizePolicy
 from PySide6.QtWidgets import QTextEdit
 from PySide6.QtWidgets import QWidget
 
@@ -16,12 +17,15 @@ class TextEdit(QWidget):
         super().__init__()
 
         self._default_layout = None
-        self.layout = self.default_layout
-        self.layout.setAlignment(Qt.AlignRight)
+
         self.text_edit = QTextEdit()
         self.text_edit.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.text_edit.setMaximumSize(100, 25)
+        self.text_edit.setMaximumSize(85, 25)
+        self.text_edit.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.text_edit.setText(text)
+
+        self.layout = self.default_layout
+        self.layout.setAlignment(Qt.AlignCenter)
         self.layout.addWidget(self.text_edit)
         self.setLayout(self.layout)
 
@@ -30,5 +34,5 @@ class TextEdit(QWidget):
         if self._default_layout is None:
             from compas_viewer.components.layout import DefaultLayout
 
-            self._default_layout = DefaultLayout(QHBoxLayout()).layout
+            self._default_layout = DefaultLayout(QHBoxLayout())
         return self._default_layout

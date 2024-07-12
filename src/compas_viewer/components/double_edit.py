@@ -51,6 +51,8 @@ class DoubleEdit(QtWidgets.QWidget):
         self.layout = self.default_layout
         self.label = QtWidgets.QLabel(title)
         self.spinbox = QtWidgets.QDoubleSpinBox()
+        self.spinbox.setDecimals(1)
+        self.spinbox.setSingleStep(0.1)
         self.spinbox.setMinimum(min_val)
         self.spinbox.setMaximum(max_val)
         self.spinbox.setValue(value)
@@ -63,5 +65,5 @@ class DoubleEdit(QtWidgets.QWidget):
         if self._default_layout is None:
             from compas_viewer.components.layout import DefaultLayout
 
-            self._default_layout = DefaultLayout(QtWidgets.QHBoxLayout()).get_layout()
+            self._default_layout = DefaultLayout(QtWidgets.QHBoxLayout())
         return self._default_layout
