@@ -20,12 +20,14 @@ from compas_viewer.ui import UI
 
 class Viewer(Singleton):
     def __init__(self, config: Optional[Config] = None, **kwargs):
+        self.running = False
         self.app = QApplication(sys.argv)
         self.app.setApplicationName("COMPAS Viewer")
         self.app.setApplicationDisplayName("COMPAS Viewer")
         self.app.setWindowIcon(QIcon(os.path.join(HERE, "assets", "icons", "compas_icon_white.png")))
 
         self._scene = None
+        self._unit = "m"
 
         self.config = config or Config()
         self.timer = QTimer()
@@ -36,8 +38,7 @@ class Viewer(Singleton):
         # renderer should be part of UI
         self.renderer = Renderer(self)
         self.ui = UI(self)
-
-        self.running = False
+        self.unit = self.config.unit
 
     @property
     def scene(self) -> ViewerScene:
@@ -51,6 +52,31 @@ class Viewer(Singleton):
         if self.running:
             for obj in self._scene.objects:
                 obj.init()
+
+    @property
+    def unit(self) -> str:
+        return self._unit
+
+    @unit.setter
+    def unit(self, unit: str):
+        if self.running:
+            raise NotImplementedError("Changing the unit after the viewer is running is not yet supported.")
+        if unit != self._unit:
+            previous_scale = self.config.camera.scale
+            if unit == "m":
+                self.config.renderer.gridsize = (10.0, 10, 10.0, 10)
+                self.renderer.camera.scale = 1.0
+            elif unit == "cm":
+                self.config.renderer.gridsize = (1000.0, 10, 1000.0, 10)
+                self.renderer.camera.scale = 100.0
+            elif unit == "mm":
+                self.config.renderer.gridsize = (10000.0, 10, 10000.0, 10)
+                self.renderer.camera.scale = 1000.0
+            else:
+                raise ValueError(f"Invalid unit: {unit}. Valid units are 'm', 'cm', 'mm'.")
+            self.renderer.camera.distance *= self.renderer.camera.scale / previous_scale
+
+        self._unit = unit
 
     def show(self):
         self.running = True

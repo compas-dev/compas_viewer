@@ -211,6 +211,7 @@ class BufferObject(SceneObject, Base):
         self.is_selected = False
         self.background = False
         self._matrix_buffer = None
+        self._bounding_box = None
         self._bounding_box_center = None
 
     @property
@@ -218,10 +219,21 @@ class BufferObject(SceneObject, Base):
         return self.item
 
     @property
+    def bounding_box(self) -> NDArray:
+        if self._bounding_box is None:
+            self._bounding_box = np.array([np.min(self.buffergeometry.points, axis=0), np.max(self.buffergeometry.points, axis=0)])
+        return self._bounding_box
+
+    @property
     def bounding_box_center(self) -> NDArray:
         if self._bounding_box_center is None:
             self._bounding_box_center = np.mean(self.buffergeometry.points.reshape(-1, 3), axis=0)
         return self._bounding_box_center
+
+    def _update_bounding_box(self):
+        self._bounding_box = None
+        self._bounding_box_center = None
+        # Set to None so that they are recalculated next time they are accessed
 
     def init(self):
         """Initialize the object"""
