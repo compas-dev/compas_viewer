@@ -114,7 +114,8 @@ change_view_cmd = Command(title="Set View3D View", callback=change_view)
 
 
 def camera_settings(viewer: "Viewer"):
-    CameraSettingsDialog().exec()
+    items = viewer.config.camera.dialog_settings
+    CameraSettingsDialog(items=items).exec()
 
 
 camera_settings_cmd = Command(title="Camera Settings", callback=camera_settings)

@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Added `TextEdit` to handle `name` change.
+* Added `DefaultLayout` to handle gerneral `layout` setting to minimal.
+* Added `ColorDialog` to manage color dialog.
+* Added `SettingLayout` to manage complex layout with config input.
+* Added `robot.py` example.
+
 ### Changed
 
 ### Removed
@@ -22,12 +28,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added `list[float]` to accepted types for `Camera.position` and `Camera.target`.
 * Added `unit` to `Viewer` and `Config`.
 * Added `bounding_box` and `_update_bounding_box` to `BufferObject`.
-* Added `robot.py` example.
 
 ### Changed
 
 * Fixed `opacity` bug with `BufferObject`.
 * Updated `SceneForm` to avoid completely reload when scene objects not changed.
+* Updated callback to `SceneTree`.
+* Updated `ObjectSetting` and `CameraSetting` to support setting from config.
+* Updated `Slider` to be able change value with `TextEdit`
 
 ### Removed
 

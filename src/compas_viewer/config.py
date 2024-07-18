@@ -244,6 +244,7 @@ class StatusbarConfig(ConfigBase):
 @dataclass
 class SidebarConfig(ConfigBase):
     show: bool = True
+    show_widgets: bool = True
     sceneform: bool = True
     items: list[dict] = field(
         default_factory=lambda: [
@@ -252,6 +253,18 @@ class SidebarConfig(ConfigBase):
                 "columns": [
                     {"title": "Name", "type": "label", "text": lambda obj: obj.name},
                     {"title": "Show", "type": "checkbox", "checked": lambda obj: obj.show, "action": lambda obj, checked: setattr(obj, "show", checked)},
+                ],
+            },
+            {
+                "type": "ObjectSetting",
+                "items": [
+                    {"title": "Name", "items": [{"type": "text_edit", "action": lambda obj: obj.name}]},
+                    {"title": "Point_Color", "items": [{"type": "color_dialog", "attr": "pointcolor"}]},
+                    {"title": "Line_Color", "items": [{"type": "color_dialog", "attr": "linecolor"}]},
+                    {"title": "Face_Color", "items": [{"type": "color_dialog", "attr": "facecolor"}]},
+                    {"title": "Line_Width", "items": [{"type": "double_edit", "action": lambda obj: obj.linewidth, "min_val": 0.0, "max_val": 10.0}]},
+                    {"title": "Point_Size", "items": [{"type": "double_edit", "action": lambda obj: obj.pointsize, "min_val": 0.0, "max_val": 10.0}]},
+                    {"title": "Opacity", "items": [{"type": "double_edit", "action": lambda obj: obj.opacity, "min_val": 0.0, "max_val": 1.0}]},
                 ],
             },
         ]
@@ -321,6 +334,26 @@ class CameraConfig(ConfigBase):
     zoomdelta: float = 0.05
     rotationdelta: float = 0.01
     pandelta: float = 0.05
+    dialog_settings: list[dict] = field(
+        default_factory=lambda: [
+            {
+                "title": "Camera_Target",
+                "items": [
+                    {"type": "double_edit", "title": "X", "action": lambda camera: camera.target.x, "min_val": None, "max_val": None},
+                    {"type": "double_edit", "title": "Y", "action": lambda camera: camera.target.y, "min_val": None, "max_val": None},
+                    {"type": "double_edit", "title": "Z", "action": lambda camera: camera.target.z, "min_val": None, "max_val": None},
+                ],
+            },
+            {
+                "title": "Camera_Position",
+                "items": [
+                    {"type": "double_edit", "title": "X", "action": lambda camera: camera.position.x, "min_val": None, "max_val": None},
+                    {"type": "double_edit", "title": "Y", "action": lambda camera: camera.position.y, "min_val": None, "max_val": None},
+                    {"type": "double_edit", "title": "Z", "action": lambda camera: camera.position.z, "min_val": None, "max_val": None},
+                ],
+            },
+        ]
+    )
 
 
 @dataclass
