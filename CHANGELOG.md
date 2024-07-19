@@ -36,6 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Updated callback to `SceneTree`.
 * Updated `ObjectSetting` and `CameraSetting` to support setting from config.
 * Updated `Slider` to be able change value with `TextEdit`
+* Updated `ViewerSceneObject` with hash ability to check if `kwarg` is equal 
 
 ### Removed
 
