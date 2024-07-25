@@ -20,7 +20,7 @@ class TextEdit(QWidget):
 
         self.text_edit = QTextEdit()
         self.text_edit.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.text_edit.setMaximumSize(50, 25)
+        self.text_edit.setMaximumSize(70, 25)
         self.text_edit.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.text = text
 
