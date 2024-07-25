@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING
 
+from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QColorDialog
 from PySide6.QtWidgets import QPushButton
@@ -180,8 +181,10 @@ class ColorDialog(QWidget):
         default_color = QColor(*remap_rgb(default_color, to_range_one=False))
 
         self.color_button = QPushButton(self)
+        self.color_button.setMaximumSize(70, 25)
         self.layout = QVBoxLayout(self)
         self.layout.addWidget(self.color_button)
+        self.layout.setAlignment(Qt.AlignCenter)
         self.color_button.clicked.connect(self.open_color_dialog)
         self.set_button_color(default_color)
 

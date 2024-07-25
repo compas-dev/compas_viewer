@@ -20,14 +20,23 @@ class TextEdit(QWidget):
 
         self.text_edit = QTextEdit()
         self.text_edit.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.text_edit.setMaximumSize(85, 25)
+        self.text_edit.setMaximumSize(70, 25)
         self.text_edit.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        self.text_edit.setText(text)
+        self.text = text
 
         self.layout = self.default_layout
         self.layout.setAlignment(Qt.AlignCenter)
         self.layout.addWidget(self.text_edit)
         self.setLayout(self.layout)
+
+    @property
+    def text(self) -> str:
+        return self.text_edit.toPlainText()
+
+    @text.setter
+    def text(self, text: str) -> None:
+        self.text_edit.setText(text)
+        self.text_edit.setAlignment(Qt.AlignRight)
 
     @property
     def default_layout(self):

@@ -1,3 +1,4 @@
+import copy
 from typing import Any
 from typing import Optional
 
@@ -95,6 +96,7 @@ class ViewerSceneObject(SceneObject, Base):
     ):
         #  Basic
         super().__init__(**kwargs)
+        self.kwargs = kwargs
         self.show = show
         self.show_points = show_points if show_points is not None else False
         self.show_lines = show_lines if show_lines is not None else True
@@ -127,6 +129,14 @@ class ViewerSceneObject(SceneObject, Base):
         self._backfaces_buffer: [dict[str, Any]] = None  # type: ignore
 
         self._inited = False
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, ViewerSceneObject):
+            return False
+        return self.settings == other.settings
+
+    def __hash__(self):
+        return hash(tuple(self.settings))
 
     @property
     def bounding_box(self):
