@@ -133,16 +133,10 @@ class ViewerSceneObject(SceneObject, Base):
     def __eq__(self, other) -> bool:
         if not isinstance(other, ViewerSceneObject):
             return False
-        return self.compair_kwargs == other.compair_kwargs
+        return self.settings == other.settings
 
     def __hash__(self):
-        return hash(tuple(self.compair_kwargs))
-
-    @property
-    def compair_kwargs(self):
-        kwarg = copy.deepcopy(self.kwargs)
-        del kwarg["item"]
-        return kwarg
+        return hash(tuple(self.settings))
 
     @property
     def bounding_box(self):
