@@ -99,11 +99,11 @@ class Slider(QWidget):
         self._min_label = QLabel(str(self.min_val), alignment=Qt.AlignLeft)
         self._max_label = QLabel(str(self.max_val), alignment=Qt.AlignRight)
         self.value_label = QLabel(f"{self.title}:")
-        self.text_edit = TextEdit(str(self.starting_val))
-        self.text_edit.text_edit.textChanged.connect(self.text_update)
+        self.text_widget = TextEdit(str(self.starting_val))
+        self.text_widget.text_edit.textChanged.connect(self.text_update)
 
         self._text_layout.addWidget(self.value_label)
-        self._text_layout.addWidget(self.text_edit.text_edit)
+        self._text_layout.addWidget(self.text_widget.text_edit)
 
         # Add widgets to layout
         self._domain_layout.addWidget(self._min_label)
@@ -135,7 +135,7 @@ class Slider(QWidget):
             return
         self._updating = True
         scaled_value = round(value * self.step, 2)
-        self.text_edit.text_edit.setText(str(scaled_value))
+        self.text_widget.text = str(scaled_value)
         if self.action:
             self.action(self, scaled_value)
         self._updating = False
@@ -145,7 +145,7 @@ class Slider(QWidget):
             return
         self._updating = True
         try:
-            value = float(self.text_edit.text_edit.toPlainText()) / self.step
+            value = float(self.text_widget.text) / self.step
             self.slider.setValue(value)
             if self.action:
                 self.action(self, value * self.step)
