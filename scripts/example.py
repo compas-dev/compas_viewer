@@ -21,5 +21,5 @@ for i in range(N):
             facecolor=Color(i / N, j / M, 0.0),
             name=f"Box_{i}_{j}",
         )
-
+# viewer.ui.sidebar.show_objectsetting = False
 viewer.show()

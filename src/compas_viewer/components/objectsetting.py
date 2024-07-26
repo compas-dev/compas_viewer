@@ -1,11 +1,8 @@
-from typing import TYPE_CHECKING
-
 from PySide6.QtCore import Qt
 from PySide6.QtCore import Signal
 from PySide6.QtWidgets import QDialog
 from PySide6.QtWidgets import QPushButton
 from PySide6.QtWidgets import QScrollArea
-from PySide6.QtWidgets import QTabWidget
 from PySide6.QtWidgets import QVBoxLayout
 from PySide6.QtWidgets import QWidget
 
@@ -14,9 +11,6 @@ from compas_viewer.components.double_edit import DoubleEdit
 from compas_viewer.components.label import LabelWidget
 from compas_viewer.components.layout import SettingLayout
 from compas_viewer.components.textedit import TextEdit
-
-if TYPE_CHECKING:
-    from compas_viewer import Viewer
 
 
 class ObjectSetting(QWidget):
@@ -53,45 +47,28 @@ class ObjectSetting(QWidget):
 
     update_requested = Signal()
 
-    def __init__(self, viewer: "Viewer", items: list[dict]):
+    def __init__(self, items: list[dict]):
         super().__init__()
-        self.viewer = viewer
         self.items = items
-        self.setting_layout = SettingLayout(viewer=self.viewer, items=self.items, type="obj_setting")
+        # self.setting_layout = SettingLayout(viewer=self.viewer, items=self.items, type="obj_setting")
         # Main layout
         self.main_layout = QVBoxLayout(self)
 
-        # Tab widget setup
-        self.tab_widget = QTabWidget(self)
+        # Scroll area setup
+        self.scroll_area = QScrollArea(self)
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_content = QWidget()
+        self.scroll_layout = QVBoxLayout(self.scroll_content)
+        self.scroll_layout.setAlignment(Qt.AlignTop)
+        self.scroll_area.setWidget(self.scroll_content)
 
-        # Tab 1 setup
-        self.tab1_content = QWidget()
-        self.tab1_scroll_area = QScrollArea(self.tab1_content)
-        self.tab1_scroll_area.setWidgetResizable(True)
-        self.tab1_scroll_content = QWidget()
-        self.tab1_scroll_layout = QVBoxLayout(self.tab1_scroll_content)
-        self.tab1_scroll_layout.setAlignment(Qt.AlignTop)
-        self.tab1_scroll_area.setWidget(self.tab1_scroll_content)
+        self.main_layout.addWidget(self.scroll_area)
 
-        tab1_layout = QVBoxLayout(self.tab1_content)
-        tab1_layout.addWidget(self.tab1_scroll_area)
-        self.tab_widget.addTab(self.tab1_content, "Tab 1")
+    @property
+    def viewer(self):
+        from compas_viewer import Viewer
 
-        # Tab 2 setup
-        self.tab2_content = QWidget()
-        self.tab2_scroll_area = QScrollArea(self.tab2_content)
-        self.tab2_scroll_area.setWidgetResizable(True)
-        self.tab2_scroll_content = QWidget()
-        self.tab2_scroll_layout = QVBoxLayout(self.tab2_scroll_content)
-        self.tab2_scroll_layout.setAlignment(Qt.AlignTop)
-        self.tab2_scroll_area.setWidget(self.tab2_scroll_content)
-
-        tab2_layout = QVBoxLayout(self.tab2_content)
-        tab2_layout.addWidget(self.tab2_scroll_area)
-        self.tab_widget.addTab(self.tab2_content, "Tab 2")
-
-        # Add tab widget to main layout
-        self.main_layout.addWidget(self.tab_widget)
+        return Viewer()
 
     def clear_layout(self, layout):
         """Clear all widgets from the layout."""
@@ -107,18 +84,19 @@ class ObjectSetting(QWidget):
 
     def update(self):
         """Update the layout with the latest object settings."""
-        self.clear_layout(self.tab1_scroll_layout)
+        self.clear_layout(self.scroll_layout)
+        self.setting_layout = SettingLayout(viewer=self.viewer, items=self.items, type="obj_setting")
         self.setting_layout.generate_layout()
 
         if len(self.setting_layout.widgets) != 0:
-            self.tab1_scroll_layout.addLayout(self.setting_layout.layout)
+            self.scroll_layout.addLayout(self.setting_layout.layout)
             for _, widget in self.setting_layout.widgets.items():
                 if isinstance(widget, DoubleEdit):
                     widget.spinbox.valueChanged.connect(self.obj_update)
                 elif isinstance(widget, TextEdit):
                     widget.text_edit.textChanged.connect(self.obj_update)
         else:
-            self.tab1_scroll_layout.addWidget(LabelWidget(text="No object Selected", alignment="center"))
+            self.scroll_layout.addWidget(LabelWidget(text="No object Selected", alignment="center"))
 
     def obj_update(self):
         """Apply the settings from spin boxes to the selected objects."""
