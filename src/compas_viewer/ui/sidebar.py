@@ -1,9 +1,12 @@
 from typing import TYPE_CHECKING
 from typing import Callable
+from typing import Optional
 
 from PySide6 import QtCore
+from PySide6.QtWidgets import QHeaderView
 from PySide6.QtWidgets import QSplitter
 from PySide6.QtWidgets import QTabWidget
+from PySide6.QtWidgets import QWidget
 
 from compas_viewer.components import Sceneform
 from compas_viewer.components.objectsetting import ObjectSetting
@@ -23,29 +26,16 @@ class SideBarRight:
         self.ui = ui
         self.widget = QSplitter(QtCore.Qt.Orientation.Vertical)
         self.widget.setChildrenCollapsible(True)
-        self._tab_widget = None
+        self._tab_widget: Optional[QTabWidget] = None
         self.show = show
         self.hide_widget = True
         self.items = items
-
-        # # Tab 1 setup
-        # self.tab1_content = QWidget()
-        # self.tab1_scroll_area = QScrollArea(self.tab1_content)
-        # self.tab1_scroll_area.setWidgetResizable(True)
-        # self.tab1_scroll_content = QWidget()
-        # self.tab1_scroll_layout = QVBoxLayout(self.tab1_scroll_content)
-        # self.tab1_scroll_layout.setAlignment(Qt.AlignTop)
-        # self.tab1_scroll_area.setWidget(self.tab1_scroll_content)
-
-        # tab1_layout = QVBoxLayout(self.tab1_content)
-        # tab1_layout.addWidget(self.tab1_scroll_area)
-        # self.tab_widget.addTab(self.tab1_content, "Tab 1")
 
     @property
     def tab_widget(self):
         if self._tab_widget is None:
             self._tab_widget = QTabWidget(self.widget)
-
+            self.widget.addWidget(self._tab_widget)
         return self._tab_widget
 
     @property
@@ -58,26 +48,26 @@ class SideBarRight:
 
     @property
     def show_sceneform(self):
-        return self.Sceneform.isVisible()
+        return getattr(self, "Sceneform", QWidget()).isVisible()
 
     @show_sceneform.setter
     def show_sceneform(self, value: bool):
-        self.Sceneform.setVisible(value)
+        getattr(self, "Sceneform", QWidget()).setVisible(value)
 
     @property
     def show_objectsetting(self):
-        return self.ObjectSetting.isVisible()
+        return getattr(self, "ObjectSetting", QWidget()).isVisible()
 
     @show_objectsetting.setter
     def show_objectsetting(self, value: bool):
-        self.ObjectSetting.setVisible(value)
+        getattr(self, "ObjectSetting", QWidget()).setVisible(value)
 
     def add_items(self) -> None:
         if not self.items:
             return
 
         for item in self.items:
-            # area = item.get("area", None)
+            area = item.get("area", None)
             itemtype = item.get("type", None)
             items = item.get("items", None)
 
@@ -87,9 +77,16 @@ class SideBarRight:
                 widget = type_registry[itemtype](items=items)
                 # set the attribute dynamically
                 setattr(self, itemtype, widget)
-                self.widget.addWidget(widget)
+                if area == "tab":
+                    self.tab_widget.addTab(widget, itemtype)
+                else:
+                    self.widget.addWidget(widget)
 
     def update(self):
-        self.widget.update()
-        for widget in self.widget.children():
+        self._update_recursive(self.widget)
+
+    def _update_recursive(self, widget: QWidget) -> None:
+        if not isinstance(widget, QHeaderView) and hasattr(widget, "update"):
             widget.update()
+        for child in widget.findChildren(QWidget):
+            self._update_recursive(child)

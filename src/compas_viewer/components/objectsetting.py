@@ -50,7 +50,6 @@ class ObjectSetting(QWidget):
     def __init__(self, items: list[dict]):
         super().__init__()
         self.items = items
-        # self.setting_layout = SettingLayout(viewer=self.viewer, items=self.items, type="obj_setting")
         # Main layout
         self.main_layout = QVBoxLayout(self)
 
@@ -84,6 +83,7 @@ class ObjectSetting(QWidget):
 
     def update(self):
         """Update the layout with the latest object settings."""
+        print("Updating object settings")
         self.clear_layout(self.scroll_layout)
         self.setting_layout = SettingLayout(viewer=self.viewer, items=self.items, type="obj_setting")
         self.setting_layout.generate_layout()
