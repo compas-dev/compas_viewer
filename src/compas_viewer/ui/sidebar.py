@@ -87,4 +87,3 @@ class SideBarRight:
         self.widget.update()
         for widget in self.update_widgets:
             widget.update()
-
