@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added `ColorDialog` to manage color dialog.
 * Added `SettingLayout` to manage complex layout with config input.
 * Added `robot.py` example.
+* Added `QTabWidget` to `SideBarRight`.
 
 ### Changed
 
