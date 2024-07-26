@@ -249,6 +249,7 @@ class SidebarConfig(ConfigBase):
     items: list[dict] = field(
         default_factory=lambda: [
             {
+                "area": "splitter",
                 "type": "Sceneform",
                 "items": [
                     {"title": "Name", "type": "label", "text": lambda obj: obj.name},
@@ -257,7 +258,6 @@ class SidebarConfig(ConfigBase):
             },
             {
                 "area": "tab",
-                "title": "OBJ",
                 "type": "ObjectSetting",
                 "items": [
                     {"title": "Name", "items": [{"type": "text_edit", "action": lambda obj: obj.name}]},

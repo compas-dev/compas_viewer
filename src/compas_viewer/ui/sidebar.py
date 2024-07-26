@@ -3,7 +3,6 @@ from typing import Callable
 from typing import Optional
 
 from PySide6 import QtCore
-from PySide6.QtWidgets import QHeaderView
 from PySide6.QtWidgets import QSplitter
 from PySide6.QtWidgets import QTabWidget
 from PySide6.QtWidgets import QWidget
@@ -14,7 +13,6 @@ from compas_viewer.components.objectsetting import ObjectSetting
 if TYPE_CHECKING:
     from .ui import UI
 
-# Factory registry
 type_registry = {
     "Sceneform": Sceneform,
     "ObjectSetting": ObjectSetting,
@@ -31,11 +29,13 @@ class SideBarRight:
         self.hide_widget = True
         self.items = items
 
+        # add widgets manualy to avoide multiple emits signals from QTabWidget
+        self.update_widgets = []
+
     @property
     def tab_widget(self):
         if self._tab_widget is None:
             self._tab_widget = QTabWidget(self.widget)
-            self.widget.addWidget(self._tab_widget)
         return self._tab_widget
 
     @property
@@ -73,20 +73,18 @@ class SideBarRight:
 
             if itemtype in type_registry:
                 if items is None:
-                    raise ValueError("Please setup config for Sceneform")
+                    raise ValueError(f"Please setup config for {itemtype} widget")
                 widget = type_registry[itemtype](items=items)
                 # set the attribute dynamically
                 setattr(self, itemtype, widget)
                 if area == "tab":
                     self.tab_widget.addTab(widget, itemtype)
-                else:
+                elif area == "splitter":
                     self.widget.addWidget(widget)
+                self.update_widgets.append(widget)
 
     def update(self):
-        self._update_recursive(self.widget)
-
-    def _update_recursive(self, widget: QWidget) -> None:
-        if not isinstance(widget, QHeaderView) and hasattr(widget, "update"):
+        self.widget.update()
+        for widget in self.update_widgets:
             widget.update()
-        for child in widget.findChildren(QWidget):
-            self._update_recursive(child)
+
