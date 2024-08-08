@@ -93,6 +93,13 @@ class SettingLayout:
         self.items = items
         self.type = type
 
+    @property
+    def exclude_type_list(self) -> tuple[type, ...]:
+        from compas_viewer.scene import GroupObject
+        from compas_viewer.scene import TagObject
+
+        return (GroupObject, TagObject)
+
     def generate_layout(self) -> None:
         self.layout = QVBoxLayout()
         self.widgets = {}
@@ -106,7 +113,7 @@ class SettingLayout:
                 if obj.is_selected:
                     obj_list.append(obj)
 
-            if not obj_list:
+            if not obj_list or isinstance(obj_list[0], self.exclude_type_list):
                 return
             # Only support one item selected per time
             self.set_layout(self.items, obj_list[0])
