@@ -319,6 +319,8 @@ class Camera:
             self.rotation.set(pi / 2, 0, 0, False)
         if view == "right":
             self.rotation.set(pi / 2, 0, pi / 2, False)
+        if view == "ortho":
+            self.rotation.set(pi / 4, 0, -pi / 4, False)
 
     def rotate(self, dx: float, dy: float):
         """Rotate the camera based on current mouse movement.
@@ -338,7 +340,7 @@ class Camera:
         is a perspective view (``camera.renderer.config.view == "perspective"``).
 
         """
-        if self.renderer.view == "perspective":
+        if self.renderer.view == "perspective" or self.renderer.view == "ortho":
             self.rotation += [-self.rotationdelta * dy, 0, -self.rotationdelta * dx]
 
     def pan(self, dx: float, dy: float):
