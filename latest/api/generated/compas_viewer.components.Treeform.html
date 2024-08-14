@@ -570,7 +570,7 @@ document.write(`
 <h1>Treeform</h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="compas_viewer.components.Treeform">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Treeform</span></span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/3b09834/src/compas_viewer/components/treeform.py#L12"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Treeform</span></span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/23b6046/src/compas_viewer/components/treeform.py#L12"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QTreeWidget</span></code></p>
 <p>Class for displaying tree-like data.
 Treeform is an abstract class that could be placed in either the viewport or the sidedock.</p>
@@ -591,6 +591,12 @@ Defaults to <code class="docutils literal notranslate"><span class="pre">2</span
 </dd>
 <dt><strong>backgrounds</strong><span class="classifier">dict[str, callable], optional</span></dt><dd><p>A dictionary of column names and their corresponding color.
 Example: <code class="docutils literal notranslate"><span class="pre">{&quot;Object-Color&quot;:</span> <span class="pre">(lambda</span> <span class="pre">o:</span> <span class="pre">o.surfacecolor)}</span></code></p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Attributes<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt><strong>tree</strong><span class="classifier"><a class="reference external" href="https://compas.dev/compas/latest/api/compas.datastructures.Tree.html#compas.datastructures.Tree" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.datastructures.Tree</span></code></a></span></dt><dd><p>The tree to be displayed.</p>
 </dd>
 </dl>
 </dd>
@@ -619,14 +625,6 @@ Example: <code class="docutils literal notranslate"><span class="pre">{&quot;Obj
 <span class="n">viewer</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<dl class="field-list">
-<dt class="field-odd">Attributes<span class="colon">:</span></dt>
-<dd class="field-odd"><dl>
-<dt><strong>tree</strong><span class="classifier"><a class="reference external" href="https://compas.dev/compas/latest/api/compas.datastructures.Tree.html#compas.datastructures.Tree" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.datastructures.Tree</span></code></a></span></dt><dd><p>The tree to be displayed.</p>
-</dd>
-</dl>
-</dd>
-</dl>
 <p class="rubric">Methods</p>
 <table class="autosummary longtable table autosummary">
 <tbody>
