@@ -15,10 +15,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added `SettingLayout` to manage complex layout with config input.
 * Added `robot.py` example.
 * Added `ortho` option to view.
+* Added `vertical_align` and `horizontal_align` options to `Tag`.
 
 ### Changed
 
 * Fixed `GroupObject` `pointcolor` not found error with impliment `exclude_type_list`.
+* Fixed `Tag` inconsistent height issue.
 
 ### Removed
 
