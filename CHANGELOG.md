@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Fixed `GroupObject` `pointcolor` not found error with impliment `exclude_type_list`.
 * Fixed `Tag` inconsistent height issue.
+* Dynamically adjust camera pan delta based on distacne.
 
 ### Removed
 

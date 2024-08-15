@@ -356,7 +356,8 @@ class Camera:
             with each increment the size of :attr:`Camera.pan_delta`.
         """
         R = Rotation.from_euler_angles(self.rotation)
-        T = Translation.from_vector([-dx * self.pandelta * self.scale, dy * self.pandelta * self.scale, 0])
+        scaled_pandelta = self.pandelta * self.distance / 10
+        T = Translation.from_vector([-dx * scaled_pandelta, dy * scaled_pandelta, 0])
         M = (R * T).matrix
         vector = [M[i][3] for i in range(3)]
         self.target += vector
