@@ -138,6 +138,10 @@ class SettingLayout:
                 min_val: float = sub_item.get("min_val", None)
                 max_val: float = sub_item.get("max_val", None)
 
+                if attr and not hasattr(obj, attr):
+                    # TODO: @Tsai, this needs to be handled at upper level.
+                    continue
+
                 if type == "double_edit":
                     value = action(obj)
                     widget = DoubleEdit(title=sub_title, value=value, min_val=min_val, max_val=max_val)
