@@ -176,7 +176,7 @@ class ColorDialog(QWidget):
         elif isinstance(default_color, ColorDict):
             default_color = default_color.default
         else:
-            raise ValueError("Invalid color type.")
+            raise ValueError("Invalid color type. : {}".format(type(default_color)))
         default_color = QColor(*remap_rgb(default_color, to_range_one=False))
 
         self.color_button = QPushButton(self)

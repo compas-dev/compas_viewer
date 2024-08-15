@@ -138,7 +138,7 @@ class SettingLayout:
                 min_val: float = sub_item.get("min_val", None)
                 max_val: float = sub_item.get("max_val", None)
 
-                if attr and not hasattr(obj, attr):
+                if attr and getattr(obj, attr, None) is None:
                     # TODO: @Tsai, this needs to be handled at upper level.
                     continue
 
