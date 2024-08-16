@@ -1,0 +1,1608 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="../../_static/compas.ico" type="image/x-icon">
+    <title>ViewModeAction &#8212; COMPAS Viewer</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/compas.css?v=617b33e2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/tabs.css?v=4c969af8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script src="../../_static/documentation_options.js?v=96647119"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/tabs.js?v=3ee01567"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/generated/compas_viewer.components.ViewModeAction';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/compas-dev/compas_viewer/gh-pages/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '1.3';
+        </script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  <div class="navbar-header-items__start">
+    
+      <div class="navbar-item">
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/compas_icon_white.png" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="../../_static/compas_icon_white.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+    <p class="title logo__title">COMPAS Viewer</p>
+  
+</a></div>
+    
+  </div>
+  
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item"><nav class="navbar-nav">
+  <!-- <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../index.html">
+                        Introduction
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../installation.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../tutorial.html">
+                        Tutorial
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../examples.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../api.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../license.html">
+                        License
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../acknowledgements.html">
+                        Acknowledgements
+                      </a>
+                    </li>
+                
+
+                <li class="nav-item">
+                  <a class="nav-link nav-external" href="https://compas.dev">
+                    COMPAS Framework
+                  </a>
+                </li>
+                
+                </div>
+            </div>
+            
+  </ul> -->
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+        </div>
+      
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button type="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown">
+      1.3  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div class="version-switcher__menu dropdown-menu list-group-flush py-0">
+    <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/compas-dev/compas_viewer" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-github"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="http://forum.compas-framework.org/" title="Discourse" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-discourse"></i></span>
+            <label class="sr-only">Discourse</label></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/compas_viewer/" title="PyPI" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-python"></i></span>
+            <label class="sr-only">PyPI</label></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item"><nav class="navbar-nav">
+  <!-- <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../index.html">
+                        Introduction
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../installation.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../tutorial.html">
+                        Tutorial
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../examples.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../api.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../license.html">
+                        License
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../acknowledgements.html">
+                        Acknowledgements
+                      </a>
+                    </li>
+                
+
+                <li class="nav-item">
+                  <a class="nav-link nav-external" href="https://compas.dev">
+                    COMPAS Framework
+                  </a>
+                </li>
+                
+                </div>
+            </div>
+            
+  </ul> -->
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button type="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown">
+      1.3  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div class="version-switcher__menu dropdown-menu list-group-flush py-0">
+    <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/compas-dev/compas_viewer" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-github"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="http://forum.compas-framework.org/" title="Discourse" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-discourse"></i></span>
+            <label class="sr-only">Discourse</label></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/compas_viewer/" title="PyPI" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-python"></i></span>
+            <label class="sr-only">PyPI</label></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../tutorial.html">Tutorial</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial/000_basics.html">Viewer Basics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial/010_scenes.html">Viewer Scenes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial/020_configurations.html">Viewer Configurations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial/030_controls.html">Viewer Controls</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial/040_commands.html">Viewer Commands</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../api.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../generated/compas_viewer.Viewer.html">Viewer</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../acknowledgements.html">Acknowledgements</a></li>
+</ul>
+
+    </div>
+</nav></div>
+        <div class="sidebar-primary-item"><div class="sidebar-primary-item">
+    <a href="https://compas.dev" target="_blank">
+        COMPAS.dev <i class="fa fa-external-link" aria-hidden="true"></i>
+    </a>
+</div></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumbs">
+  <ul class="bd-breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">ViewModeAction</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section id="viewmodeaction">
+<h1>ViewModeAction</h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="compas_viewer.components.ViewModeAction">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ViewModeAction</span></span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/b86b729/src/compas_viewer/components/combobox.py#L148"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QWidget</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.change_view.html#compas_viewer.components.ViewModeAction.change_view" title="compas_viewer.components.ViewModeAction.change_view"><code class="xref py py-obj docutils literal notranslate"><span class="pre">change_view</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.combobox.html#compas_viewer.components.ViewModeAction.combobox" title="compas_viewer.components.ViewModeAction.combobox"><code class="xref py py-obj docutils literal notranslate"><span class="pre">combobox</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Inherited Methods</p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.acceptDrops.html#compas_viewer.components.ViewModeAction.acceptDrops" title="compas_viewer.components.ViewModeAction.acceptDrops"><code class="xref py py-obj docutils literal notranslate"><span class="pre">acceptDrops</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.accessibleDescription.html#compas_viewer.components.ViewModeAction.accessibleDescription" title="compas_viewer.components.ViewModeAction.accessibleDescription"><code class="xref py py-obj docutils literal notranslate"><span class="pre">accessibleDescription</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.accessibleName.html#compas_viewer.components.ViewModeAction.accessibleName" title="compas_viewer.components.ViewModeAction.accessibleName"><code class="xref py py-obj docutils literal notranslate"><span class="pre">accessibleName</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.actionEvent.html#compas_viewer.components.ViewModeAction.actionEvent" title="compas_viewer.components.ViewModeAction.actionEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">actionEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.actions.html#compas_viewer.components.ViewModeAction.actions" title="compas_viewer.components.ViewModeAction.actions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">actions</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.activateWindow.html#compas_viewer.components.ViewModeAction.activateWindow" title="compas_viewer.components.ViewModeAction.activateWindow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">activateWindow</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.addAction.html#compas_viewer.components.ViewModeAction.addAction" title="compas_viewer.components.ViewModeAction.addAction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">addAction</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.addActions.html#compas_viewer.components.ViewModeAction.addActions" title="compas_viewer.components.ViewModeAction.addActions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">addActions</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.adjustSize.html#compas_viewer.components.ViewModeAction.adjustSize" title="compas_viewer.components.ViewModeAction.adjustSize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">adjustSize</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.autoFillBackground.html#compas_viewer.components.ViewModeAction.autoFillBackground" title="compas_viewer.components.ViewModeAction.autoFillBackground"><code class="xref py py-obj docutils literal notranslate"><span class="pre">autoFillBackground</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.backgroundRole.html#compas_viewer.components.ViewModeAction.backgroundRole" title="compas_viewer.components.ViewModeAction.backgroundRole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">backgroundRole</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.backingStore.html#compas_viewer.components.ViewModeAction.backingStore" title="compas_viewer.components.ViewModeAction.backingStore"><code class="xref py py-obj docutils literal notranslate"><span class="pre">backingStore</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.baseSize.html#compas_viewer.components.ViewModeAction.baseSize" title="compas_viewer.components.ViewModeAction.baseSize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">baseSize</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.blockSignals.html#compas_viewer.components.ViewModeAction.blockSignals" title="compas_viewer.components.ViewModeAction.blockSignals"><code class="xref py py-obj docutils literal notranslate"><span class="pre">blockSignals</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.changeEvent.html#compas_viewer.components.ViewModeAction.changeEvent" title="compas_viewer.components.ViewModeAction.changeEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">changeEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.childAt.html#compas_viewer.components.ViewModeAction.childAt" title="compas_viewer.components.ViewModeAction.childAt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">childAt</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.childEvent.html#compas_viewer.components.ViewModeAction.childEvent" title="compas_viewer.components.ViewModeAction.childEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">childEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.children.html#compas_viewer.components.ViewModeAction.children" title="compas_viewer.components.ViewModeAction.children"><code class="xref py py-obj docutils literal notranslate"><span class="pre">children</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.childrenRect.html#compas_viewer.components.ViewModeAction.childrenRect" title="compas_viewer.components.ViewModeAction.childrenRect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">childrenRect</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.childrenRegion.html#compas_viewer.components.ViewModeAction.childrenRegion" title="compas_viewer.components.ViewModeAction.childrenRegion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">childrenRegion</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.clearFocus.html#compas_viewer.components.ViewModeAction.clearFocus" title="compas_viewer.components.ViewModeAction.clearFocus"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clearFocus</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.clearMask.html#compas_viewer.components.ViewModeAction.clearMask" title="compas_viewer.components.ViewModeAction.clearMask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clearMask</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.close.html#compas_viewer.components.ViewModeAction.close" title="compas_viewer.components.ViewModeAction.close"><code class="xref py py-obj docutils literal notranslate"><span class="pre">close</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.closeEvent.html#compas_viewer.components.ViewModeAction.closeEvent" title="compas_viewer.components.ViewModeAction.closeEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">closeEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.colorCount.html#compas_viewer.components.ViewModeAction.colorCount" title="compas_viewer.components.ViewModeAction.colorCount"><code class="xref py py-obj docutils literal notranslate"><span class="pre">colorCount</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.connect.html#compas_viewer.components.ViewModeAction.connect" title="compas_viewer.components.ViewModeAction.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connect</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.connectNotify.html#compas_viewer.components.ViewModeAction.connectNotify" title="compas_viewer.components.ViewModeAction.connectNotify"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connectNotify</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.contentsMargins.html#compas_viewer.components.ViewModeAction.contentsMargins" title="compas_viewer.components.ViewModeAction.contentsMargins"><code class="xref py py-obj docutils literal notranslate"><span class="pre">contentsMargins</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.contentsRect.html#compas_viewer.components.ViewModeAction.contentsRect" title="compas_viewer.components.ViewModeAction.contentsRect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">contentsRect</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.contextMenuEvent.html#compas_viewer.components.ViewModeAction.contextMenuEvent" title="compas_viewer.components.ViewModeAction.contextMenuEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">contextMenuEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.contextMenuPolicy.html#compas_viewer.components.ViewModeAction.contextMenuPolicy" title="compas_viewer.components.ViewModeAction.contextMenuPolicy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">contextMenuPolicy</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.create.html#compas_viewer.components.ViewModeAction.create" title="compas_viewer.components.ViewModeAction.create"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.createWinId.html#compas_viewer.components.ViewModeAction.createWinId" title="compas_viewer.components.ViewModeAction.createWinId"><code class="xref py py-obj docutils literal notranslate"><span class="pre">createWinId</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.createWindowContainer.html#compas_viewer.components.ViewModeAction.createWindowContainer" title="compas_viewer.components.ViewModeAction.createWindowContainer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">createWindowContainer</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.cursor.html#compas_viewer.components.ViewModeAction.cursor" title="compas_viewer.components.ViewModeAction.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.customEvent.html#compas_viewer.components.ViewModeAction.customEvent" title="compas_viewer.components.ViewModeAction.customEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">customEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.deleteLater.html#compas_viewer.components.ViewModeAction.deleteLater" title="compas_viewer.components.ViewModeAction.deleteLater"><code class="xref py py-obj docutils literal notranslate"><span class="pre">deleteLater</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.depth.html#compas_viewer.components.ViewModeAction.depth" title="compas_viewer.components.ViewModeAction.depth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">depth</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.destroy.html#compas_viewer.components.ViewModeAction.destroy" title="compas_viewer.components.ViewModeAction.destroy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">destroy</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.devType.html#compas_viewer.components.ViewModeAction.devType" title="compas_viewer.components.ViewModeAction.devType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">devType</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.devicePixelRatio.html#compas_viewer.components.ViewModeAction.devicePixelRatio" title="compas_viewer.components.ViewModeAction.devicePixelRatio"><code class="xref py py-obj docutils literal notranslate"><span class="pre">devicePixelRatio</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.devicePixelRatioF.html#compas_viewer.components.ViewModeAction.devicePixelRatioF" title="compas_viewer.components.ViewModeAction.devicePixelRatioF"><code class="xref py py-obj docutils literal notranslate"><span class="pre">devicePixelRatioF</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.devicePixelRatioFScale.html#compas_viewer.components.ViewModeAction.devicePixelRatioFScale" title="compas_viewer.components.ViewModeAction.devicePixelRatioFScale"><code class="xref py py-obj docutils literal notranslate"><span class="pre">devicePixelRatioFScale</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.disconnect.html#compas_viewer.components.ViewModeAction.disconnect" title="compas_viewer.components.ViewModeAction.disconnect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">disconnect</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.disconnectNotify.html#compas_viewer.components.ViewModeAction.disconnectNotify" title="compas_viewer.components.ViewModeAction.disconnectNotify"><code class="xref py py-obj docutils literal notranslate"><span class="pre">disconnectNotify</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.dragEnterEvent.html#compas_viewer.components.ViewModeAction.dragEnterEvent" title="compas_viewer.components.ViewModeAction.dragEnterEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dragEnterEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.dragLeaveEvent.html#compas_viewer.components.ViewModeAction.dragLeaveEvent" title="compas_viewer.components.ViewModeAction.dragLeaveEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dragLeaveEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.dragMoveEvent.html#compas_viewer.components.ViewModeAction.dragMoveEvent" title="compas_viewer.components.ViewModeAction.dragMoveEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dragMoveEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.dropEvent.html#compas_viewer.components.ViewModeAction.dropEvent" title="compas_viewer.components.ViewModeAction.dropEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dropEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.dumpObjectInfo.html#compas_viewer.components.ViewModeAction.dumpObjectInfo" title="compas_viewer.components.ViewModeAction.dumpObjectInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dumpObjectInfo</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.dumpObjectTree.html#compas_viewer.components.ViewModeAction.dumpObjectTree" title="compas_viewer.components.ViewModeAction.dumpObjectTree"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dumpObjectTree</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.dynamicPropertyNames.html#compas_viewer.components.ViewModeAction.dynamicPropertyNames" title="compas_viewer.components.ViewModeAction.dynamicPropertyNames"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dynamicPropertyNames</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.effectiveWinId.html#compas_viewer.components.ViewModeAction.effectiveWinId" title="compas_viewer.components.ViewModeAction.effectiveWinId"><code class="xref py py-obj docutils literal notranslate"><span class="pre">effectiveWinId</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.emit.html#compas_viewer.components.ViewModeAction.emit" title="compas_viewer.components.ViewModeAction.emit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">emit</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.ensurePolished.html#compas_viewer.components.ViewModeAction.ensurePolished" title="compas_viewer.components.ViewModeAction.ensurePolished"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ensurePolished</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.enterEvent.html#compas_viewer.components.ViewModeAction.enterEvent" title="compas_viewer.components.ViewModeAction.enterEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">enterEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.event.html#compas_viewer.components.ViewModeAction.event" title="compas_viewer.components.ViewModeAction.event"><code class="xref py py-obj docutils literal notranslate"><span class="pre">event</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.eventFilter.html#compas_viewer.components.ViewModeAction.eventFilter" title="compas_viewer.components.ViewModeAction.eventFilter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eventFilter</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.find.html#compas_viewer.components.ViewModeAction.find" title="compas_viewer.components.ViewModeAction.find"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.findChild.html#compas_viewer.components.ViewModeAction.findChild" title="compas_viewer.components.ViewModeAction.findChild"><code class="xref py py-obj docutils literal notranslate"><span class="pre">findChild</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.findChildren.html#compas_viewer.components.ViewModeAction.findChildren" title="compas_viewer.components.ViewModeAction.findChildren"><code class="xref py py-obj docutils literal notranslate"><span class="pre">findChildren</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.focusInEvent.html#compas_viewer.components.ViewModeAction.focusInEvent" title="compas_viewer.components.ViewModeAction.focusInEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">focusInEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.focusNextChild.html#compas_viewer.components.ViewModeAction.focusNextChild" title="compas_viewer.components.ViewModeAction.focusNextChild"><code class="xref py py-obj docutils literal notranslate"><span class="pre">focusNextChild</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.focusNextPrevChild.html#compas_viewer.components.ViewModeAction.focusNextPrevChild" title="compas_viewer.components.ViewModeAction.focusNextPrevChild"><code class="xref py py-obj docutils literal notranslate"><span class="pre">focusNextPrevChild</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.focusOutEvent.html#compas_viewer.components.ViewModeAction.focusOutEvent" title="compas_viewer.components.ViewModeAction.focusOutEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">focusOutEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.focusPolicy.html#compas_viewer.components.ViewModeAction.focusPolicy" title="compas_viewer.components.ViewModeAction.focusPolicy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">focusPolicy</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.focusPreviousChild.html#compas_viewer.components.ViewModeAction.focusPreviousChild" title="compas_viewer.components.ViewModeAction.focusPreviousChild"><code class="xref py py-obj docutils literal notranslate"><span class="pre">focusPreviousChild</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.focusProxy.html#compas_viewer.components.ViewModeAction.focusProxy" title="compas_viewer.components.ViewModeAction.focusProxy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">focusProxy</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.focusWidget.html#compas_viewer.components.ViewModeAction.focusWidget" title="compas_viewer.components.ViewModeAction.focusWidget"><code class="xref py py-obj docutils literal notranslate"><span class="pre">focusWidget</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.font.html#compas_viewer.components.ViewModeAction.font" title="compas_viewer.components.ViewModeAction.font"><code class="xref py py-obj docutils literal notranslate"><span class="pre">font</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.fontInfo.html#compas_viewer.components.ViewModeAction.fontInfo" title="compas_viewer.components.ViewModeAction.fontInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fontInfo</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.fontMetrics.html#compas_viewer.components.ViewModeAction.fontMetrics" title="compas_viewer.components.ViewModeAction.fontMetrics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fontMetrics</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.foregroundRole.html#compas_viewer.components.ViewModeAction.foregroundRole" title="compas_viewer.components.ViewModeAction.foregroundRole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">foregroundRole</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.frameGeometry.html#compas_viewer.components.ViewModeAction.frameGeometry" title="compas_viewer.components.ViewModeAction.frameGeometry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">frameGeometry</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.frameSize.html#compas_viewer.components.ViewModeAction.frameSize" title="compas_viewer.components.ViewModeAction.frameSize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">frameSize</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.geometry.html#compas_viewer.components.ViewModeAction.geometry" title="compas_viewer.components.ViewModeAction.geometry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">geometry</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.grab.html#compas_viewer.components.ViewModeAction.grab" title="compas_viewer.components.ViewModeAction.grab"><code class="xref py py-obj docutils literal notranslate"><span class="pre">grab</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.grabGesture.html#compas_viewer.components.ViewModeAction.grabGesture" title="compas_viewer.components.ViewModeAction.grabGesture"><code class="xref py py-obj docutils literal notranslate"><span class="pre">grabGesture</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.grabKeyboard.html#compas_viewer.components.ViewModeAction.grabKeyboard" title="compas_viewer.components.ViewModeAction.grabKeyboard"><code class="xref py py-obj docutils literal notranslate"><span class="pre">grabKeyboard</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.grabMouse.html#compas_viewer.components.ViewModeAction.grabMouse" title="compas_viewer.components.ViewModeAction.grabMouse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">grabMouse</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.grabShortcut.html#compas_viewer.components.ViewModeAction.grabShortcut" title="compas_viewer.components.ViewModeAction.grabShortcut"><code class="xref py py-obj docutils literal notranslate"><span class="pre">grabShortcut</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.graphicsEffect.html#compas_viewer.components.ViewModeAction.graphicsEffect" title="compas_viewer.components.ViewModeAction.graphicsEffect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">graphicsEffect</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.graphicsProxyWidget.html#compas_viewer.components.ViewModeAction.graphicsProxyWidget" title="compas_viewer.components.ViewModeAction.graphicsProxyWidget"><code class="xref py py-obj docutils literal notranslate"><span class="pre">graphicsProxyWidget</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.hasFocus.html#compas_viewer.components.ViewModeAction.hasFocus" title="compas_viewer.components.ViewModeAction.hasFocus"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hasFocus</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.hasHeightForWidth.html#compas_viewer.components.ViewModeAction.hasHeightForWidth" title="compas_viewer.components.ViewModeAction.hasHeightForWidth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hasHeightForWidth</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.hasMouseTracking.html#compas_viewer.components.ViewModeAction.hasMouseTracking" title="compas_viewer.components.ViewModeAction.hasMouseTracking"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hasMouseTracking</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.hasTabletTracking.html#compas_viewer.components.ViewModeAction.hasTabletTracking" title="compas_viewer.components.ViewModeAction.hasTabletTracking"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hasTabletTracking</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.height.html#compas_viewer.components.ViewModeAction.height" title="compas_viewer.components.ViewModeAction.height"><code class="xref py py-obj docutils literal notranslate"><span class="pre">height</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.heightForWidth.html#compas_viewer.components.ViewModeAction.heightForWidth" title="compas_viewer.components.ViewModeAction.heightForWidth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">heightForWidth</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.heightMM.html#compas_viewer.components.ViewModeAction.heightMM" title="compas_viewer.components.ViewModeAction.heightMM"><code class="xref py py-obj docutils literal notranslate"><span class="pre">heightMM</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.hide.html#compas_viewer.components.ViewModeAction.hide" title="compas_viewer.components.ViewModeAction.hide"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hide</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.hideEvent.html#compas_viewer.components.ViewModeAction.hideEvent" title="compas_viewer.components.ViewModeAction.hideEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hideEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.inherits.html#compas_viewer.components.ViewModeAction.inherits" title="compas_viewer.components.ViewModeAction.inherits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inherits</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.initPainter.html#compas_viewer.components.ViewModeAction.initPainter" title="compas_viewer.components.ViewModeAction.initPainter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initPainter</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.inputMethodEvent.html#compas_viewer.components.ViewModeAction.inputMethodEvent" title="compas_viewer.components.ViewModeAction.inputMethodEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inputMethodEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.inputMethodHints.html#compas_viewer.components.ViewModeAction.inputMethodHints" title="compas_viewer.components.ViewModeAction.inputMethodHints"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inputMethodHints</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.inputMethodQuery.html#compas_viewer.components.ViewModeAction.inputMethodQuery" title="compas_viewer.components.ViewModeAction.inputMethodQuery"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inputMethodQuery</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.insertAction.html#compas_viewer.components.ViewModeAction.insertAction" title="compas_viewer.components.ViewModeAction.insertAction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">insertAction</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.insertActions.html#compas_viewer.components.ViewModeAction.insertActions" title="compas_viewer.components.ViewModeAction.insertActions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">insertActions</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.installEventFilter.html#compas_viewer.components.ViewModeAction.installEventFilter" title="compas_viewer.components.ViewModeAction.installEventFilter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">installEventFilter</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.internalWinId.html#compas_viewer.components.ViewModeAction.internalWinId" title="compas_viewer.components.ViewModeAction.internalWinId"><code class="xref py py-obj docutils literal notranslate"><span class="pre">internalWinId</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.isActiveWindow.html#compas_viewer.components.ViewModeAction.isActiveWindow" title="compas_viewer.components.ViewModeAction.isActiveWindow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isActiveWindow</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.isAncestorOf.html#compas_viewer.components.ViewModeAction.isAncestorOf" title="compas_viewer.components.ViewModeAction.isAncestorOf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isAncestorOf</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.isEnabled.html#compas_viewer.components.ViewModeAction.isEnabled" title="compas_viewer.components.ViewModeAction.isEnabled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isEnabled</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.isEnabledTo.html#compas_viewer.components.ViewModeAction.isEnabledTo" title="compas_viewer.components.ViewModeAction.isEnabledTo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isEnabledTo</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.isFullScreen.html#compas_viewer.components.ViewModeAction.isFullScreen" title="compas_viewer.components.ViewModeAction.isFullScreen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isFullScreen</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.isHidden.html#compas_viewer.components.ViewModeAction.isHidden" title="compas_viewer.components.ViewModeAction.isHidden"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isHidden</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.isLeftToRight.html#compas_viewer.components.ViewModeAction.isLeftToRight" title="compas_viewer.components.ViewModeAction.isLeftToRight"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isLeftToRight</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.isMaximized.html#compas_viewer.components.ViewModeAction.isMaximized" title="compas_viewer.components.ViewModeAction.isMaximized"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isMaximized</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.isMinimized.html#compas_viewer.components.ViewModeAction.isMinimized" title="compas_viewer.components.ViewModeAction.isMinimized"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isMinimized</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.isModal.html#compas_viewer.components.ViewModeAction.isModal" title="compas_viewer.components.ViewModeAction.isModal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isModal</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.isQuickItemType.html#compas_viewer.components.ViewModeAction.isQuickItemType" title="compas_viewer.components.ViewModeAction.isQuickItemType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isQuickItemType</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.isRightToLeft.html#compas_viewer.components.ViewModeAction.isRightToLeft" title="compas_viewer.components.ViewModeAction.isRightToLeft"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isRightToLeft</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.isSignalConnected.html#compas_viewer.components.ViewModeAction.isSignalConnected" title="compas_viewer.components.ViewModeAction.isSignalConnected"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isSignalConnected</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.isTopLevel.html#compas_viewer.components.ViewModeAction.isTopLevel" title="compas_viewer.components.ViewModeAction.isTopLevel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isTopLevel</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.isVisible.html#compas_viewer.components.ViewModeAction.isVisible" title="compas_viewer.components.ViewModeAction.isVisible"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isVisible</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.isVisibleTo.html#compas_viewer.components.ViewModeAction.isVisibleTo" title="compas_viewer.components.ViewModeAction.isVisibleTo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isVisibleTo</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.isWidgetType.html#compas_viewer.components.ViewModeAction.isWidgetType" title="compas_viewer.components.ViewModeAction.isWidgetType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isWidgetType</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.isWindow.html#compas_viewer.components.ViewModeAction.isWindow" title="compas_viewer.components.ViewModeAction.isWindow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isWindow</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.isWindowModified.html#compas_viewer.components.ViewModeAction.isWindowModified" title="compas_viewer.components.ViewModeAction.isWindowModified"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isWindowModified</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.isWindowType.html#compas_viewer.components.ViewModeAction.isWindowType" title="compas_viewer.components.ViewModeAction.isWindowType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isWindowType</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.keyPressEvent.html#compas_viewer.components.ViewModeAction.keyPressEvent" title="compas_viewer.components.ViewModeAction.keyPressEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">keyPressEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.keyReleaseEvent.html#compas_viewer.components.ViewModeAction.keyReleaseEvent" title="compas_viewer.components.ViewModeAction.keyReleaseEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">keyReleaseEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.keyboardGrabber.html#compas_viewer.components.ViewModeAction.keyboardGrabber" title="compas_viewer.components.ViewModeAction.keyboardGrabber"><code class="xref py py-obj docutils literal notranslate"><span class="pre">keyboardGrabber</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.killTimer.html#compas_viewer.components.ViewModeAction.killTimer" title="compas_viewer.components.ViewModeAction.killTimer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">killTimer</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.layout.html#compas_viewer.components.ViewModeAction.layout" title="compas_viewer.components.ViewModeAction.layout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">layout</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.layoutDirection.html#compas_viewer.components.ViewModeAction.layoutDirection" title="compas_viewer.components.ViewModeAction.layoutDirection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">layoutDirection</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.leaveEvent.html#compas_viewer.components.ViewModeAction.leaveEvent" title="compas_viewer.components.ViewModeAction.leaveEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">leaveEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.locale.html#compas_viewer.components.ViewModeAction.locale" title="compas_viewer.components.ViewModeAction.locale"><code class="xref py py-obj docutils literal notranslate"><span class="pre">locale</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.logicalDpiX.html#compas_viewer.components.ViewModeAction.logicalDpiX" title="compas_viewer.components.ViewModeAction.logicalDpiX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logicalDpiX</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.logicalDpiY.html#compas_viewer.components.ViewModeAction.logicalDpiY" title="compas_viewer.components.ViewModeAction.logicalDpiY"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logicalDpiY</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.lower.html#compas_viewer.components.ViewModeAction.lower" title="compas_viewer.components.ViewModeAction.lower"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lower</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.mapFrom.html#compas_viewer.components.ViewModeAction.mapFrom" title="compas_viewer.components.ViewModeAction.mapFrom"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mapFrom</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.mapFromGlobal.html#compas_viewer.components.ViewModeAction.mapFromGlobal" title="compas_viewer.components.ViewModeAction.mapFromGlobal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mapFromGlobal</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.mapFromParent.html#compas_viewer.components.ViewModeAction.mapFromParent" title="compas_viewer.components.ViewModeAction.mapFromParent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mapFromParent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.mapTo.html#compas_viewer.components.ViewModeAction.mapTo" title="compas_viewer.components.ViewModeAction.mapTo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mapTo</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.mapToGlobal.html#compas_viewer.components.ViewModeAction.mapToGlobal" title="compas_viewer.components.ViewModeAction.mapToGlobal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mapToGlobal</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.mapToParent.html#compas_viewer.components.ViewModeAction.mapToParent" title="compas_viewer.components.ViewModeAction.mapToParent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mapToParent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.mask.html#compas_viewer.components.ViewModeAction.mask" title="compas_viewer.components.ViewModeAction.mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mask</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.maximumHeight.html#compas_viewer.components.ViewModeAction.maximumHeight" title="compas_viewer.components.ViewModeAction.maximumHeight"><code class="xref py py-obj docutils literal notranslate"><span class="pre">maximumHeight</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.maximumSize.html#compas_viewer.components.ViewModeAction.maximumSize" title="compas_viewer.components.ViewModeAction.maximumSize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">maximumSize</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.maximumWidth.html#compas_viewer.components.ViewModeAction.maximumWidth" title="compas_viewer.components.ViewModeAction.maximumWidth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">maximumWidth</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.metaObject.html#compas_viewer.components.ViewModeAction.metaObject" title="compas_viewer.components.ViewModeAction.metaObject"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metaObject</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.metric.html#compas_viewer.components.ViewModeAction.metric" title="compas_viewer.components.ViewModeAction.metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metric</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.minimumHeight.html#compas_viewer.components.ViewModeAction.minimumHeight" title="compas_viewer.components.ViewModeAction.minimumHeight"><code class="xref py py-obj docutils literal notranslate"><span class="pre">minimumHeight</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.minimumSize.html#compas_viewer.components.ViewModeAction.minimumSize" title="compas_viewer.components.ViewModeAction.minimumSize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">minimumSize</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.minimumSizeHint.html#compas_viewer.components.ViewModeAction.minimumSizeHint" title="compas_viewer.components.ViewModeAction.minimumSizeHint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">minimumSizeHint</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.minimumWidth.html#compas_viewer.components.ViewModeAction.minimumWidth" title="compas_viewer.components.ViewModeAction.minimumWidth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">minimumWidth</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.mouseDoubleClickEvent.html#compas_viewer.components.ViewModeAction.mouseDoubleClickEvent" title="compas_viewer.components.ViewModeAction.mouseDoubleClickEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mouseDoubleClickEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.mouseGrabber.html#compas_viewer.components.ViewModeAction.mouseGrabber" title="compas_viewer.components.ViewModeAction.mouseGrabber"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mouseGrabber</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.mouseMoveEvent.html#compas_viewer.components.ViewModeAction.mouseMoveEvent" title="compas_viewer.components.ViewModeAction.mouseMoveEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mouseMoveEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.mousePressEvent.html#compas_viewer.components.ViewModeAction.mousePressEvent" title="compas_viewer.components.ViewModeAction.mousePressEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mousePressEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.mouseReleaseEvent.html#compas_viewer.components.ViewModeAction.mouseReleaseEvent" title="compas_viewer.components.ViewModeAction.mouseReleaseEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mouseReleaseEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.move.html#compas_viewer.components.ViewModeAction.move" title="compas_viewer.components.ViewModeAction.move"><code class="xref py py-obj docutils literal notranslate"><span class="pre">move</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.moveEvent.html#compas_viewer.components.ViewModeAction.moveEvent" title="compas_viewer.components.ViewModeAction.moveEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">moveEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.moveToThread.html#compas_viewer.components.ViewModeAction.moveToThread" title="compas_viewer.components.ViewModeAction.moveToThread"><code class="xref py py-obj docutils literal notranslate"><span class="pre">moveToThread</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.nativeEvent.html#compas_viewer.components.ViewModeAction.nativeEvent" title="compas_viewer.components.ViewModeAction.nativeEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nativeEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.nativeParentWidget.html#compas_viewer.components.ViewModeAction.nativeParentWidget" title="compas_viewer.components.ViewModeAction.nativeParentWidget"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nativeParentWidget</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.nextInFocusChain.html#compas_viewer.components.ViewModeAction.nextInFocusChain" title="compas_viewer.components.ViewModeAction.nextInFocusChain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nextInFocusChain</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.normalGeometry.html#compas_viewer.components.ViewModeAction.normalGeometry" title="compas_viewer.components.ViewModeAction.normalGeometry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">normalGeometry</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.objectName.html#compas_viewer.components.ViewModeAction.objectName" title="compas_viewer.components.ViewModeAction.objectName"><code class="xref py py-obj docutils literal notranslate"><span class="pre">objectName</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.overrideWindowFlags.html#compas_viewer.components.ViewModeAction.overrideWindowFlags" title="compas_viewer.components.ViewModeAction.overrideWindowFlags"><code class="xref py py-obj docutils literal notranslate"><span class="pre">overrideWindowFlags</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.overrideWindowState.html#compas_viewer.components.ViewModeAction.overrideWindowState" title="compas_viewer.components.ViewModeAction.overrideWindowState"><code class="xref py py-obj docutils literal notranslate"><span class="pre">overrideWindowState</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.paintEngine.html#compas_viewer.components.ViewModeAction.paintEngine" title="compas_viewer.components.ViewModeAction.paintEngine"><code class="xref py py-obj docutils literal notranslate"><span class="pre">paintEngine</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.paintEvent.html#compas_viewer.components.ViewModeAction.paintEvent" title="compas_viewer.components.ViewModeAction.paintEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">paintEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.paintingActive.html#compas_viewer.components.ViewModeAction.paintingActive" title="compas_viewer.components.ViewModeAction.paintingActive"><code class="xref py py-obj docutils literal notranslate"><span class="pre">paintingActive</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.palette.html#compas_viewer.components.ViewModeAction.palette" title="compas_viewer.components.ViewModeAction.palette"><code class="xref py py-obj docutils literal notranslate"><span class="pre">palette</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.parent.html#compas_viewer.components.ViewModeAction.parent" title="compas_viewer.components.ViewModeAction.parent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.parentWidget.html#compas_viewer.components.ViewModeAction.parentWidget" title="compas_viewer.components.ViewModeAction.parentWidget"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parentWidget</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.physicalDpiX.html#compas_viewer.components.ViewModeAction.physicalDpiX" title="compas_viewer.components.ViewModeAction.physicalDpiX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">physicalDpiX</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.physicalDpiY.html#compas_viewer.components.ViewModeAction.physicalDpiY" title="compas_viewer.components.ViewModeAction.physicalDpiY"><code class="xref py py-obj docutils literal notranslate"><span class="pre">physicalDpiY</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.pos.html#compas_viewer.components.ViewModeAction.pos" title="compas_viewer.components.ViewModeAction.pos"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pos</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.previousInFocusChain.html#compas_viewer.components.ViewModeAction.previousInFocusChain" title="compas_viewer.components.ViewModeAction.previousInFocusChain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">previousInFocusChain</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.property.html#compas_viewer.components.ViewModeAction.property" title="compas_viewer.components.ViewModeAction.property"><code class="xref py py-obj docutils literal notranslate"><span class="pre">property</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.raise_.html#compas_viewer.components.ViewModeAction.raise_" title="compas_viewer.components.ViewModeAction.raise_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">raise_</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.receivers.html#compas_viewer.components.ViewModeAction.receivers" title="compas_viewer.components.ViewModeAction.receivers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">receivers</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.rect.html#compas_viewer.components.ViewModeAction.rect" title="compas_viewer.components.ViewModeAction.rect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rect</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.redirected.html#compas_viewer.components.ViewModeAction.redirected" title="compas_viewer.components.ViewModeAction.redirected"><code class="xref py py-obj docutils literal notranslate"><span class="pre">redirected</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.releaseKeyboard.html#compas_viewer.components.ViewModeAction.releaseKeyboard" title="compas_viewer.components.ViewModeAction.releaseKeyboard"><code class="xref py py-obj docutils literal notranslate"><span class="pre">releaseKeyboard</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.releaseMouse.html#compas_viewer.components.ViewModeAction.releaseMouse" title="compas_viewer.components.ViewModeAction.releaseMouse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">releaseMouse</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.releaseShortcut.html#compas_viewer.components.ViewModeAction.releaseShortcut" title="compas_viewer.components.ViewModeAction.releaseShortcut"><code class="xref py py-obj docutils literal notranslate"><span class="pre">releaseShortcut</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.removeAction.html#compas_viewer.components.ViewModeAction.removeAction" title="compas_viewer.components.ViewModeAction.removeAction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">removeAction</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.removeEventFilter.html#compas_viewer.components.ViewModeAction.removeEventFilter" title="compas_viewer.components.ViewModeAction.removeEventFilter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">removeEventFilter</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.render.html#compas_viewer.components.ViewModeAction.render" title="compas_viewer.components.ViewModeAction.render"><code class="xref py py-obj docutils literal notranslate"><span class="pre">render</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.repaint.html#compas_viewer.components.ViewModeAction.repaint" title="compas_viewer.components.ViewModeAction.repaint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">repaint</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.resize.html#compas_viewer.components.ViewModeAction.resize" title="compas_viewer.components.ViewModeAction.resize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">resize</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.resizeEvent.html#compas_viewer.components.ViewModeAction.resizeEvent" title="compas_viewer.components.ViewModeAction.resizeEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">resizeEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.restoreGeometry.html#compas_viewer.components.ViewModeAction.restoreGeometry" title="compas_viewer.components.ViewModeAction.restoreGeometry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">restoreGeometry</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.saveGeometry.html#compas_viewer.components.ViewModeAction.saveGeometry" title="compas_viewer.components.ViewModeAction.saveGeometry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">saveGeometry</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.screen.html#compas_viewer.components.ViewModeAction.screen" title="compas_viewer.components.ViewModeAction.screen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">screen</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.scroll.html#compas_viewer.components.ViewModeAction.scroll" title="compas_viewer.components.ViewModeAction.scroll"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scroll</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.sender.html#compas_viewer.components.ViewModeAction.sender" title="compas_viewer.components.ViewModeAction.sender"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sender</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.senderSignalIndex.html#compas_viewer.components.ViewModeAction.senderSignalIndex" title="compas_viewer.components.ViewModeAction.senderSignalIndex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">senderSignalIndex</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setAcceptDrops.html#compas_viewer.components.ViewModeAction.setAcceptDrops" title="compas_viewer.components.ViewModeAction.setAcceptDrops"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setAcceptDrops</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setAccessibleDescription.html#compas_viewer.components.ViewModeAction.setAccessibleDescription" title="compas_viewer.components.ViewModeAction.setAccessibleDescription"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setAccessibleDescription</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setAccessibleName.html#compas_viewer.components.ViewModeAction.setAccessibleName" title="compas_viewer.components.ViewModeAction.setAccessibleName"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setAccessibleName</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setAttribute.html#compas_viewer.components.ViewModeAction.setAttribute" title="compas_viewer.components.ViewModeAction.setAttribute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setAttribute</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setAutoFillBackground.html#compas_viewer.components.ViewModeAction.setAutoFillBackground" title="compas_viewer.components.ViewModeAction.setAutoFillBackground"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setAutoFillBackground</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setBackgroundRole.html#compas_viewer.components.ViewModeAction.setBackgroundRole" title="compas_viewer.components.ViewModeAction.setBackgroundRole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setBackgroundRole</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setBaseSize.html#compas_viewer.components.ViewModeAction.setBaseSize" title="compas_viewer.components.ViewModeAction.setBaseSize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setBaseSize</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setContentsMargins.html#compas_viewer.components.ViewModeAction.setContentsMargins" title="compas_viewer.components.ViewModeAction.setContentsMargins"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setContentsMargins</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setContextMenuPolicy.html#compas_viewer.components.ViewModeAction.setContextMenuPolicy" title="compas_viewer.components.ViewModeAction.setContextMenuPolicy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setContextMenuPolicy</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setCursor.html#compas_viewer.components.ViewModeAction.setCursor" title="compas_viewer.components.ViewModeAction.setCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setCursor</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setDisabled.html#compas_viewer.components.ViewModeAction.setDisabled" title="compas_viewer.components.ViewModeAction.setDisabled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setDisabled</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setEnabled.html#compas_viewer.components.ViewModeAction.setEnabled" title="compas_viewer.components.ViewModeAction.setEnabled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setEnabled</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setFixedHeight.html#compas_viewer.components.ViewModeAction.setFixedHeight" title="compas_viewer.components.ViewModeAction.setFixedHeight"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setFixedHeight</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setFixedSize.html#compas_viewer.components.ViewModeAction.setFixedSize" title="compas_viewer.components.ViewModeAction.setFixedSize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setFixedSize</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setFixedWidth.html#compas_viewer.components.ViewModeAction.setFixedWidth" title="compas_viewer.components.ViewModeAction.setFixedWidth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setFixedWidth</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setFocus.html#compas_viewer.components.ViewModeAction.setFocus" title="compas_viewer.components.ViewModeAction.setFocus"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setFocus</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setFocusPolicy.html#compas_viewer.components.ViewModeAction.setFocusPolicy" title="compas_viewer.components.ViewModeAction.setFocusPolicy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setFocusPolicy</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setFocusProxy.html#compas_viewer.components.ViewModeAction.setFocusProxy" title="compas_viewer.components.ViewModeAction.setFocusProxy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setFocusProxy</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setFont.html#compas_viewer.components.ViewModeAction.setFont" title="compas_viewer.components.ViewModeAction.setFont"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setFont</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setForegroundRole.html#compas_viewer.components.ViewModeAction.setForegroundRole" title="compas_viewer.components.ViewModeAction.setForegroundRole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setForegroundRole</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setGeometry.html#compas_viewer.components.ViewModeAction.setGeometry" title="compas_viewer.components.ViewModeAction.setGeometry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setGeometry</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setGraphicsEffect.html#compas_viewer.components.ViewModeAction.setGraphicsEffect" title="compas_viewer.components.ViewModeAction.setGraphicsEffect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setGraphicsEffect</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setHidden.html#compas_viewer.components.ViewModeAction.setHidden" title="compas_viewer.components.ViewModeAction.setHidden"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setHidden</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setInputMethodHints.html#compas_viewer.components.ViewModeAction.setInputMethodHints" title="compas_viewer.components.ViewModeAction.setInputMethodHints"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setInputMethodHints</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setLayout.html#compas_viewer.components.ViewModeAction.setLayout" title="compas_viewer.components.ViewModeAction.setLayout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setLayout</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setLayoutDirection.html#compas_viewer.components.ViewModeAction.setLayoutDirection" title="compas_viewer.components.ViewModeAction.setLayoutDirection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setLayoutDirection</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setLocale.html#compas_viewer.components.ViewModeAction.setLocale" title="compas_viewer.components.ViewModeAction.setLocale"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setLocale</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setMask.html#compas_viewer.components.ViewModeAction.setMask" title="compas_viewer.components.ViewModeAction.setMask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setMask</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setMaximumHeight.html#compas_viewer.components.ViewModeAction.setMaximumHeight" title="compas_viewer.components.ViewModeAction.setMaximumHeight"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setMaximumHeight</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setMaximumSize.html#compas_viewer.components.ViewModeAction.setMaximumSize" title="compas_viewer.components.ViewModeAction.setMaximumSize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setMaximumSize</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setMaximumWidth.html#compas_viewer.components.ViewModeAction.setMaximumWidth" title="compas_viewer.components.ViewModeAction.setMaximumWidth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setMaximumWidth</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setMinimumHeight.html#compas_viewer.components.ViewModeAction.setMinimumHeight" title="compas_viewer.components.ViewModeAction.setMinimumHeight"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setMinimumHeight</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setMinimumSize.html#compas_viewer.components.ViewModeAction.setMinimumSize" title="compas_viewer.components.ViewModeAction.setMinimumSize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setMinimumSize</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setMinimumWidth.html#compas_viewer.components.ViewModeAction.setMinimumWidth" title="compas_viewer.components.ViewModeAction.setMinimumWidth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setMinimumWidth</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setMouseTracking.html#compas_viewer.components.ViewModeAction.setMouseTracking" title="compas_viewer.components.ViewModeAction.setMouseTracking"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setMouseTracking</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setObjectName.html#compas_viewer.components.ViewModeAction.setObjectName" title="compas_viewer.components.ViewModeAction.setObjectName"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setObjectName</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setPalette.html#compas_viewer.components.ViewModeAction.setPalette" title="compas_viewer.components.ViewModeAction.setPalette"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setPalette</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setParent.html#compas_viewer.components.ViewModeAction.setParent" title="compas_viewer.components.ViewModeAction.setParent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setParent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setProperty.html#compas_viewer.components.ViewModeAction.setProperty" title="compas_viewer.components.ViewModeAction.setProperty"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setProperty</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setScreen.html#compas_viewer.components.ViewModeAction.setScreen" title="compas_viewer.components.ViewModeAction.setScreen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setScreen</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setShortcutAutoRepeat.html#compas_viewer.components.ViewModeAction.setShortcutAutoRepeat" title="compas_viewer.components.ViewModeAction.setShortcutAutoRepeat"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setShortcutAutoRepeat</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setShortcutEnabled.html#compas_viewer.components.ViewModeAction.setShortcutEnabled" title="compas_viewer.components.ViewModeAction.setShortcutEnabled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setShortcutEnabled</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setSizeIncrement.html#compas_viewer.components.ViewModeAction.setSizeIncrement" title="compas_viewer.components.ViewModeAction.setSizeIncrement"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setSizeIncrement</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setSizePolicy.html#compas_viewer.components.ViewModeAction.setSizePolicy" title="compas_viewer.components.ViewModeAction.setSizePolicy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setSizePolicy</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setStatusTip.html#compas_viewer.components.ViewModeAction.setStatusTip" title="compas_viewer.components.ViewModeAction.setStatusTip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setStatusTip</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setStyle.html#compas_viewer.components.ViewModeAction.setStyle" title="compas_viewer.components.ViewModeAction.setStyle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setStyle</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setStyleSheet.html#compas_viewer.components.ViewModeAction.setStyleSheet" title="compas_viewer.components.ViewModeAction.setStyleSheet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setStyleSheet</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setTabOrder.html#compas_viewer.components.ViewModeAction.setTabOrder" title="compas_viewer.components.ViewModeAction.setTabOrder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setTabOrder</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setTabletTracking.html#compas_viewer.components.ViewModeAction.setTabletTracking" title="compas_viewer.components.ViewModeAction.setTabletTracking"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setTabletTracking</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setToolTip.html#compas_viewer.components.ViewModeAction.setToolTip" title="compas_viewer.components.ViewModeAction.setToolTip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setToolTip</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setToolTipDuration.html#compas_viewer.components.ViewModeAction.setToolTipDuration" title="compas_viewer.components.ViewModeAction.setToolTipDuration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setToolTipDuration</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setUpdatesEnabled.html#compas_viewer.components.ViewModeAction.setUpdatesEnabled" title="compas_viewer.components.ViewModeAction.setUpdatesEnabled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setUpdatesEnabled</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setVisible.html#compas_viewer.components.ViewModeAction.setVisible" title="compas_viewer.components.ViewModeAction.setVisible"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setVisible</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setWhatsThis.html#compas_viewer.components.ViewModeAction.setWhatsThis" title="compas_viewer.components.ViewModeAction.setWhatsThis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setWhatsThis</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setWindowFilePath.html#compas_viewer.components.ViewModeAction.setWindowFilePath" title="compas_viewer.components.ViewModeAction.setWindowFilePath"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setWindowFilePath</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setWindowFlag.html#compas_viewer.components.ViewModeAction.setWindowFlag" title="compas_viewer.components.ViewModeAction.setWindowFlag"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setWindowFlag</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setWindowFlags.html#compas_viewer.components.ViewModeAction.setWindowFlags" title="compas_viewer.components.ViewModeAction.setWindowFlags"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setWindowFlags</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setWindowIcon.html#compas_viewer.components.ViewModeAction.setWindowIcon" title="compas_viewer.components.ViewModeAction.setWindowIcon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setWindowIcon</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setWindowIconText.html#compas_viewer.components.ViewModeAction.setWindowIconText" title="compas_viewer.components.ViewModeAction.setWindowIconText"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setWindowIconText</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setWindowModality.html#compas_viewer.components.ViewModeAction.setWindowModality" title="compas_viewer.components.ViewModeAction.setWindowModality"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setWindowModality</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setWindowModified.html#compas_viewer.components.ViewModeAction.setWindowModified" title="compas_viewer.components.ViewModeAction.setWindowModified"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setWindowModified</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setWindowOpacity.html#compas_viewer.components.ViewModeAction.setWindowOpacity" title="compas_viewer.components.ViewModeAction.setWindowOpacity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setWindowOpacity</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setWindowRole.html#compas_viewer.components.ViewModeAction.setWindowRole" title="compas_viewer.components.ViewModeAction.setWindowRole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setWindowRole</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setWindowState.html#compas_viewer.components.ViewModeAction.setWindowState" title="compas_viewer.components.ViewModeAction.setWindowState"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setWindowState</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.setWindowTitle.html#compas_viewer.components.ViewModeAction.setWindowTitle" title="compas_viewer.components.ViewModeAction.setWindowTitle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setWindowTitle</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.sharedPainter.html#compas_viewer.components.ViewModeAction.sharedPainter" title="compas_viewer.components.ViewModeAction.sharedPainter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sharedPainter</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.show.html#compas_viewer.components.ViewModeAction.show" title="compas_viewer.components.ViewModeAction.show"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.showEvent.html#compas_viewer.components.ViewModeAction.showEvent" title="compas_viewer.components.ViewModeAction.showEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">showEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.showFullScreen.html#compas_viewer.components.ViewModeAction.showFullScreen" title="compas_viewer.components.ViewModeAction.showFullScreen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">showFullScreen</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.showMaximized.html#compas_viewer.components.ViewModeAction.showMaximized" title="compas_viewer.components.ViewModeAction.showMaximized"><code class="xref py py-obj docutils literal notranslate"><span class="pre">showMaximized</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.showMinimized.html#compas_viewer.components.ViewModeAction.showMinimized" title="compas_viewer.components.ViewModeAction.showMinimized"><code class="xref py py-obj docutils literal notranslate"><span class="pre">showMinimized</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.showNormal.html#compas_viewer.components.ViewModeAction.showNormal" title="compas_viewer.components.ViewModeAction.showNormal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">showNormal</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.signalsBlocked.html#compas_viewer.components.ViewModeAction.signalsBlocked" title="compas_viewer.components.ViewModeAction.signalsBlocked"><code class="xref py py-obj docutils literal notranslate"><span class="pre">signalsBlocked</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.size.html#compas_viewer.components.ViewModeAction.size" title="compas_viewer.components.ViewModeAction.size"><code class="xref py py-obj docutils literal notranslate"><span class="pre">size</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.sizeHint.html#compas_viewer.components.ViewModeAction.sizeHint" title="compas_viewer.components.ViewModeAction.sizeHint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sizeHint</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.sizeIncrement.html#compas_viewer.components.ViewModeAction.sizeIncrement" title="compas_viewer.components.ViewModeAction.sizeIncrement"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sizeIncrement</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.sizePolicy.html#compas_viewer.components.ViewModeAction.sizePolicy" title="compas_viewer.components.ViewModeAction.sizePolicy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sizePolicy</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.stackUnder.html#compas_viewer.components.ViewModeAction.stackUnder" title="compas_viewer.components.ViewModeAction.stackUnder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stackUnder</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.startTimer.html#compas_viewer.components.ViewModeAction.startTimer" title="compas_viewer.components.ViewModeAction.startTimer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">startTimer</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.statusTip.html#compas_viewer.components.ViewModeAction.statusTip" title="compas_viewer.components.ViewModeAction.statusTip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statusTip</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.style.html#compas_viewer.components.ViewModeAction.style" title="compas_viewer.components.ViewModeAction.style"><code class="xref py py-obj docutils literal notranslate"><span class="pre">style</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.styleSheet.html#compas_viewer.components.ViewModeAction.styleSheet" title="compas_viewer.components.ViewModeAction.styleSheet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">styleSheet</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.tabletEvent.html#compas_viewer.components.ViewModeAction.tabletEvent" title="compas_viewer.components.ViewModeAction.tabletEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tabletEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.testAttribute.html#compas_viewer.components.ViewModeAction.testAttribute" title="compas_viewer.components.ViewModeAction.testAttribute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">testAttribute</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.thread.html#compas_viewer.components.ViewModeAction.thread" title="compas_viewer.components.ViewModeAction.thread"><code class="xref py py-obj docutils literal notranslate"><span class="pre">thread</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.timerEvent.html#compas_viewer.components.ViewModeAction.timerEvent" title="compas_viewer.components.ViewModeAction.timerEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">timerEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.toolTip.html#compas_viewer.components.ViewModeAction.toolTip" title="compas_viewer.components.ViewModeAction.toolTip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">toolTip</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.toolTipDuration.html#compas_viewer.components.ViewModeAction.toolTipDuration" title="compas_viewer.components.ViewModeAction.toolTipDuration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">toolTipDuration</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.topLevelWidget.html#compas_viewer.components.ViewModeAction.topLevelWidget" title="compas_viewer.components.ViewModeAction.topLevelWidget"><code class="xref py py-obj docutils literal notranslate"><span class="pre">topLevelWidget</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.tr.html#compas_viewer.components.ViewModeAction.tr" title="compas_viewer.components.ViewModeAction.tr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tr</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.underMouse.html#compas_viewer.components.ViewModeAction.underMouse" title="compas_viewer.components.ViewModeAction.underMouse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">underMouse</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.ungrabGesture.html#compas_viewer.components.ViewModeAction.ungrabGesture" title="compas_viewer.components.ViewModeAction.ungrabGesture"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ungrabGesture</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.unsetCursor.html#compas_viewer.components.ViewModeAction.unsetCursor" title="compas_viewer.components.ViewModeAction.unsetCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unsetCursor</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.unsetLayoutDirection.html#compas_viewer.components.ViewModeAction.unsetLayoutDirection" title="compas_viewer.components.ViewModeAction.unsetLayoutDirection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unsetLayoutDirection</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.unsetLocale.html#compas_viewer.components.ViewModeAction.unsetLocale" title="compas_viewer.components.ViewModeAction.unsetLocale"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unsetLocale</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.update.html#compas_viewer.components.ViewModeAction.update" title="compas_viewer.components.ViewModeAction.update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.updateGeometry.html#compas_viewer.components.ViewModeAction.updateGeometry" title="compas_viewer.components.ViewModeAction.updateGeometry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">updateGeometry</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.updateMicroFocus.html#compas_viewer.components.ViewModeAction.updateMicroFocus" title="compas_viewer.components.ViewModeAction.updateMicroFocus"><code class="xref py py-obj docutils literal notranslate"><span class="pre">updateMicroFocus</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.updatesEnabled.html#compas_viewer.components.ViewModeAction.updatesEnabled" title="compas_viewer.components.ViewModeAction.updatesEnabled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">updatesEnabled</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.visibleRegion.html#compas_viewer.components.ViewModeAction.visibleRegion" title="compas_viewer.components.ViewModeAction.visibleRegion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">visibleRegion</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.whatsThis.html#compas_viewer.components.ViewModeAction.whatsThis" title="compas_viewer.components.ViewModeAction.whatsThis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">whatsThis</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.wheelEvent.html#compas_viewer.components.ViewModeAction.wheelEvent" title="compas_viewer.components.ViewModeAction.wheelEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wheelEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.width.html#compas_viewer.components.ViewModeAction.width" title="compas_viewer.components.ViewModeAction.width"><code class="xref py py-obj docutils literal notranslate"><span class="pre">width</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.widthMM.html#compas_viewer.components.ViewModeAction.widthMM" title="compas_viewer.components.ViewModeAction.widthMM"><code class="xref py py-obj docutils literal notranslate"><span class="pre">widthMM</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.winId.html#compas_viewer.components.ViewModeAction.winId" title="compas_viewer.components.ViewModeAction.winId"><code class="xref py py-obj docutils literal notranslate"><span class="pre">winId</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.window.html#compas_viewer.components.ViewModeAction.window" title="compas_viewer.components.ViewModeAction.window"><code class="xref py py-obj docutils literal notranslate"><span class="pre">window</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.windowFilePath.html#compas_viewer.components.ViewModeAction.windowFilePath" title="compas_viewer.components.ViewModeAction.windowFilePath"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowFilePath</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.windowFlags.html#compas_viewer.components.ViewModeAction.windowFlags" title="compas_viewer.components.ViewModeAction.windowFlags"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowFlags</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.windowHandle.html#compas_viewer.components.ViewModeAction.windowHandle" title="compas_viewer.components.ViewModeAction.windowHandle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowHandle</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.windowIcon.html#compas_viewer.components.ViewModeAction.windowIcon" title="compas_viewer.components.ViewModeAction.windowIcon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowIcon</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.windowIconText.html#compas_viewer.components.ViewModeAction.windowIconText" title="compas_viewer.components.ViewModeAction.windowIconText"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowIconText</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.windowModality.html#compas_viewer.components.ViewModeAction.windowModality" title="compas_viewer.components.ViewModeAction.windowModality"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowModality</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.windowOpacity.html#compas_viewer.components.ViewModeAction.windowOpacity" title="compas_viewer.components.ViewModeAction.windowOpacity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowOpacity</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.windowRole.html#compas_viewer.components.ViewModeAction.windowRole" title="compas_viewer.components.ViewModeAction.windowRole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowRole</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.windowState.html#compas_viewer.components.ViewModeAction.windowState" title="compas_viewer.components.ViewModeAction.windowState"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowState</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.windowTitle.html#compas_viewer.components.ViewModeAction.windowTitle" title="compas_viewer.components.ViewModeAction.windowTitle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowTitle</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.windowType.html#compas_viewer.components.ViewModeAction.windowType" title="compas_viewer.components.ViewModeAction.windowType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowType</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.x.html#compas_viewer.components.ViewModeAction.x" title="compas_viewer.components.ViewModeAction.x"><code class="xref py py-obj docutils literal notranslate"><span class="pre">x</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.ViewModeAction.y.html#compas_viewer.components.ViewModeAction.y" title="compas_viewer.components.ViewModeAction.y"><code class="xref py py-obj docutils literal notranslate"><span class="pre">y</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+              
+              
+                <footer class="bd-footer-article">
+                  
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#compas_viewer.components.ViewModeAction"><code class="docutils literal notranslate"><span class="pre">ViewModeAction</span></code></a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+  <p class="copyright">
+    
+      © Copyright COMPAS Association.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.0.2.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item"><p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.13.3.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
