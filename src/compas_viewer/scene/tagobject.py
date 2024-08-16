@@ -117,7 +117,6 @@ class TagObject(ViewerSceneObject, GeometryObject):
     HORIZONTAL_ALIGN = {"left": -1, "center": 0, "right": 1}
 
     def make_buffers(self):
-
         positions = [
             0,
             0,
