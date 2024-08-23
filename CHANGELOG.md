@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Added `update_app`, `update_renderer`, `update_sidebar` options to `compas_viewer.commands.Command`.
+
 ### Changed
 
 ### Removed
