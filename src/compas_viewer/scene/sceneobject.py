@@ -1,4 +1,3 @@
-import copy
 from typing import Any
 from typing import Optional
 
@@ -130,13 +129,10 @@ class ViewerSceneObject(SceneObject, Base):
 
         self._inited = False
 
-    def __eq__(self, other) -> bool:
-        if not isinstance(other, ViewerSceneObject):
-            return False
-        return self.settings == other.settings
-
     def __hash__(self):
-        return hash(tuple(self.settings))
+        # Convert self.settings.items() to a hashable type (e.g., frozenset) but convert Color objects to tuples
+        hashable_settings = frozenset((key, (value.rgb255 if isinstance(value, Color) else value)) for key, value in self.settings.items())
+        return hash(hashable_settings)
 
     @property
     def bounding_box(self):

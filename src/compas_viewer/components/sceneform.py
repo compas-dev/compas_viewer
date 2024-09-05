@@ -67,7 +67,7 @@ class Sceneform(QTreeWidget):
         return self.viewer.scene
 
     def update(self):
-        current_scene_objects = {hash(obj) for obj in self.scene.objects}
+        current_scene_objects = [hash(obj) for obj in self.scene.objects]
         if current_scene_objects == self._sceneobjects:
             for node in self.scene.traverse("breadthfirst"):
                 widget = node.attributes.get("widget")
@@ -78,7 +78,7 @@ class Sceneform(QTreeWidget):
                         self.scrollToItem(widget)
 
         else:
-            self._sceneobjects = list(self.scene.objects)
+            self._sceneobjects = [hash(obj) for obj in self.scene.objects]
 
             self.clear()
             self.checkbox_columns = {}
