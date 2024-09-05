@@ -38,7 +38,7 @@ class Sceneform(QTreeWidget):
         self,
         columns: list[dict],
         column_editable: Optional[list[bool]] = None,
-        show_headers: bool = True,
+        show_headers: Optional[bool] = True,
         callback: Optional[Callable] = None,
     ):
         super().__init__()

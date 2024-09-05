@@ -16,10 +16,10 @@ class Treeform(QTreeWidget):
 
     Parameters
     ----------
-    tree : :class:`compas.datastructures.Tree`
+    tree : :class:`compas.datastructures.Tree`, optional
         The tree to be displayed. An typical example is the scene
         object tree: :attr:`compas_viewer.viewer.Viewer._tree`.
-    columns : dict[str, callable]
+    columns : dict[str, callable], optional
         A dictionary of column names and their corresponding attributes.
         Example: ``{"Name": (lambda o: o.name), "Object": (lambda o: o)}``
     show_headers : bool, optional
@@ -67,10 +67,10 @@ class Treeform(QTreeWidget):
 
     def __init__(
         self,
-        tree: Tree = None,
-        columns: dict[str, Callable] = None,
-        show_headers: bool = True,
-        stretch: int = 2,
+        tree: Optional[Tree] = None,
+        columns: Optional[dict[str, Callable]] = None,
+        show_headers: Optional[bool] = True,
+        stretch: Optional[int] = 2,
         backgrounds: Optional[dict[str, Callable]] = None,
         callback: Optional[Callable] = None,
     ):
