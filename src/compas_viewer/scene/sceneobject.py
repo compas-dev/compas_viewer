@@ -95,6 +95,7 @@ class ViewerSceneObject(SceneObject, Base):
     ):
         #  Basic
         super().__init__(**kwargs)
+        self.kwargs = kwargs
         self.show = show
         self.show_points = show_points if show_points is not None else False
         self.show_lines = show_lines if show_lines is not None else True
@@ -127,6 +128,11 @@ class ViewerSceneObject(SceneObject, Base):
         self._backfaces_buffer: [dict[str, Any]] = None  # type: ignore
 
         self._inited = False
+
+    def __hash__(self):
+        # Convert self.settings.items() to a hashable type (e.g., frozenset) but convert Color objects to tuples
+        hashable_settings = frozenset((key, (value.rgb255 if isinstance(value, Color) else value)) for key, value in self.settings.items())
+        return hash(hashable_settings)
 
     @property
     def bounding_box(self):
