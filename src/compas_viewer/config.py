@@ -141,6 +141,7 @@ class MenubarConfig(ConfigBase):
                             {"title": "Top", "action": change_view_cmd, "kwargs": {"mode": "top"}},
                             {"title": "Front", "action": change_view_cmd, "kwargs": {"mode": "front"}},
                             {"title": "Right", "action": change_view_cmd, "kwargs": {"mode": "right"}},
+                            {"title": "Ortho", "action": change_view_cmd, "kwargs": {"mode": "ortho"}},
                         ],
                     },
                     {"type": "separator"},
