@@ -75,6 +75,7 @@ class Sceneform(QTreeWidget):
                     widget.setSelected(node.is_selected)
                     if node.is_selected:
                         self.expand(node.parent)
+                        self.scrollToItem(widget)
 
         else:
             self._sceneobjects = list(self.scene.objects)
