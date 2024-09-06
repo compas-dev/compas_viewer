@@ -31,7 +31,7 @@ class SideBarRight:
                 columns = item.get("columns", None)
                 if columns is None:
                     raise ValueError("Please setup config for Sceneform")
-                self.sceneform = Sceneform(columns=columns)
+                self.sceneform = Sceneform(columns=columns, show_selected_tree=self.ui.viewer.config.ui.sidebar.show_selected_tree)
                 self.widget.addWidget(self.sceneform)
 
             elif itemtype == "ObjectSetting":

@@ -5,6 +5,8 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QTreeWidget
 from PySide6.QtWidgets import QTreeWidgetItem
 
+from compas_viewer.components.treeform import Treeform
+
 
 class Sceneform(QTreeWidget):
     """
@@ -37,12 +39,14 @@ class Sceneform(QTreeWidget):
     def __init__(
         self,
         columns: list[dict],
+        show_selected_tree: Optional[bool] = True,
         column_editable: Optional[list[bool]] = None,
         show_headers: Optional[bool] = True,
         callback: Optional[Callable] = None,
     ):
         super().__init__()
         self.columns = columns
+        self.show_selected_tree = show_selected_tree
         self.checkbox_columns: dict[int, str] = {}
         self.column_editable = (column_editable or [False]) + [False] * (len(columns) - len(column_editable or [False]))
         self.setColumnCount(len(columns))
@@ -75,6 +79,8 @@ class Sceneform(QTreeWidget):
                     if node.is_selected:
                         self.expand(node.parent)
                         self.scrollToItem(widget)
+                        if self.show_selected_tree:
+                            self.update_selected(node)
 
         else:
             self._sceneobjects = list(self.scene.objects)
@@ -109,6 +115,8 @@ class Sceneform(QTreeWidget):
                 widget.setSelected(node.is_selected)
                 if node.is_selected:
                     self.expand(node.parent)
+                    if self.show_selected_tree:
+                        self.update_selected(node)
 
                 widget.setFlags(widget.flags() | Qt.ItemIsUserCheckable | Qt.ItemIsSelectable | Qt.ItemIsEnabled)
 
@@ -118,6 +126,13 @@ class Sceneform(QTreeWidget):
                 node.attributes["widget"] = widget
 
             self.adjust_column_widths()
+
+    def update_selected(self, node):
+        if not hasattr(self, "treeform"):
+            self.treeform = Treeform()
+            self.viewer.ui.sidebar.widget.addWidget(self.treeform)
+
+        self.treeform.update_from_dict({"objtype": node.__class__, "item": node.item, "settings": node.settings})
 
     def expand(self, node):
         if node.attributes.get("widget"):
