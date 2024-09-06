@@ -121,7 +121,7 @@ class Treeform(QTreeWidget):
 
         def add_children(key, data, parent):
             if isinstance(data, dict):
-                # TODO: bug - if key == 0, TreeNode name show Treenode is not created
+                # TODO: bug - if key == 0, TreeNode name show Treenode instead of 0
                 node = TreeNode(name=key)
                 for child_key, child_data in data.items():
                     add_children(child_key, child_data, node)
