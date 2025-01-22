@@ -80,6 +80,8 @@ class Tag(Geometry):
         height: float = 50,
         absolute_height: bool = False,
         font: Optional[PathLike] = None,
+        vertical_align: str = "bottom",
+        horizontal_align: str = "left",
     ):
         super().__init__()
         self.text = text
@@ -88,6 +90,8 @@ class Tag(Geometry):
         self.height = height
         self.absolute_height = absolute_height
         self.font = font or FONT
+        self.vertical_align = vertical_align
+        self.horizontal_align = horizontal_align
 
     def transform(self, transformation):
         """Transform the tag.
@@ -109,12 +113,30 @@ class TagObject(ViewerSceneObject, GeometryObject):
 
     geometry: Tag
 
+    VERTICAL_ALIGN = {"top": 1, "center": 0, "bottom": -1}
+    HORIZONTAL_ALIGN = {"left": -1, "center": 0, "right": 1}
+
     def make_buffers(self):
+        positions = [
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            1,
+            0,
+            1,
+            1,
+            0,
+        ]
+
         self._text_buffer = {
-            "positions": make_vertex_buffer(self.geometry.position),
-            "elements": make_index_buffer([0]),
+            "positions": make_vertex_buffer(positions),
+            "elements": make_index_buffer([0, 1, 2, 3]),
             "text_texture": self.make_text_texture(),
-            "n": 1,
+            "n": 4,
         }
 
     def make_text_texture(self):
@@ -142,8 +164,7 @@ class TagObject(ViewerSceneObject, GeometryObject):
 
         # The width and height of the texture must be a multiple of 4
         total_width = (total_width + 3) // 4 * 4
-        # The height is doubled because the text is rendered in the middle of the texture
-        max_height = (max_height * 2 + 3) // 4 * 4
+        max_height = (max_height + 10 + 3) // 4 * 4
 
         string_buffer = zeros(shape=(max_height, total_width), dtype="uint8")
 
@@ -186,6 +207,8 @@ class TagObject(ViewerSceneObject, GeometryObject):
             GL.GL_UNSIGNED_BYTE,
             string_buffer,
         )
+
+        self.text_aspect = total_width / 50
         return texture
 
     def _calculate_text_height(self, camera_position):
@@ -195,19 +218,23 @@ class TagObject(ViewerSceneObject, GeometryObject):
         else:
             return self.geometry.height
 
-    def draw(self, shader, camera_position):
+    def draw(self, shader, camera_position, width, height):
         """Draw the object from its buffers"""
         shader.enable_attribute("position")
         if self.worldtransformation is not None:
             shader.uniform4x4("transform", self.worldtransformation.matrix)
         shader.uniform1f("object_opacity", self.opacity)
-        shader.uniform1i("text_height", self._calculate_text_height(camera_position))
-        shader.uniform1i("text_num", len(self.geometry.text))
+        shader.uniform1f("screen_aspect", width / height)
+        shader.uniform1f("screen_height", height)
+        shader.uniform1f("text_aspect", self.text_aspect)
+        shader.uniform1f("text_height", self._calculate_text_height(camera_position))
+        shader.uniform3f("text_position", self.geometry.position)
         shader.uniform3f("text_color", self.geometry.color)
+        shader.uniform1i("vertical_align", self.VERTICAL_ALIGN[self.geometry.vertical_align])
+        shader.uniform1i("horizontal_align", self.HORIZONTAL_ALIGN[self.geometry.horizontal_align])
         shader.uniformText("text_texture", self._text_buffer["text_texture"])
         shader.bind_attribute("position", self._text_buffer["positions"])
         shader.draw_texts(elements=self._text_buffer["elements"], n=self._text_buffer["n"])
-        shader.uniform1i("is_text", 0)
         shader.uniform1f("object_opacity", 1)
         shader.disable_attribute("position")
 

@@ -319,6 +319,8 @@ class Camera:
             self.rotation.set(pi / 2, 0, 0, False)
         if view == "right":
             self.rotation.set(pi / 2, 0, pi / 2, False)
+        if view == "ortho":
+            self.rotation.set(pi / 4, 0, -pi / 4, False)
 
     def rotate(self, dx: float, dy: float):
         """Rotate the camera based on current mouse movement.
@@ -338,7 +340,7 @@ class Camera:
         is a perspective view (``camera.renderer.config.view == "perspective"``).
 
         """
-        if self.renderer.view == "perspective":
+        if self.renderer.view == "perspective" or self.renderer.view == "ortho":
             self.rotation += [-self.rotationdelta * dy, 0, -self.rotationdelta * dx]
 
     def pan(self, dx: float, dy: float):
@@ -354,7 +356,8 @@ class Camera:
             with each increment the size of :attr:`Camera.pan_delta`.
         """
         R = Rotation.from_euler_angles(self.rotation)
-        T = Translation.from_vector([-dx * self.pandelta * self.scale, dy * self.pandelta * self.scale, 0])
+        scaled_pandelta = self.pandelta * self.distance / 10
+        T = Translation.from_vector([-dx * scaled_pandelta, dy * scaled_pandelta, 0])
         M = (R * T).matrix
         vector = [M[i][3] for i in range(3)]
         self.target += vector

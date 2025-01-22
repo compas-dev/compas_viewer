@@ -9,13 +9,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Removed
+
+
+## [1.3.0] 2024-08-16
+
+### Added
+
 * Added `TextEdit` to handle `name` change.
 * Added `DefaultLayout` to handle gerneral `layout` setting to minimal.
 * Added `ColorDialog` to manage color dialog.
 * Added `SettingLayout` to manage complex layout with config input.
 * Added `robot.py` example.
+* Added `ortho` option to view.
+* Added `vertical_align` and `horizontal_align` options to `Tag`.
+* Added example files in the documentation.
 
 ### Changed
+
+* Fixed `GroupObject` `pointcolor` not found error with impliment `exclude_type_list`.
+* Fixed `Tag` inconsistent height issue.
+* Dynamically adjust camera pan delta based on distacne.
 
 ### Removed
 

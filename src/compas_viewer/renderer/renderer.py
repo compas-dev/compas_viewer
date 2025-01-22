@@ -597,7 +597,7 @@ class Renderer(QOpenGLWidget):
         self.shader_tag.bind()
         self.shader_tag.uniform4x4("viewworld", viewworld)
         for obj in tag_objs:
-            obj.draw(self.shader_tag, self.camera.position)
+            obj.draw(self.shader_tag, self.camera.position, self.width(), self.height())
         self.shader_tag.release()
 
         # draw 2D box for multi-selection
