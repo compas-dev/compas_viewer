@@ -16,23 +16,15 @@ class TextEdit(QWidget):
     ):
         super().__init__()
 
-        self._default_layout = None
-
         self.text_edit = QTextEdit()
         self.text_edit.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.text_edit.setMaximumSize(85, 25)
         self.text_edit.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.text_edit.setText(text)
 
-        self.layout = self.default_layout
+        self.layout = QHBoxLayout()
+        self.layout.setSpacing(0)
+        self.layout.setContentsMargins(0, 0, 0, 0)
         self.layout.setAlignment(Qt.AlignCenter)
         self.layout.addWidget(self.text_edit)
         self.setLayout(self.layout)
-
-    @property
-    def default_layout(self):
-        if self._default_layout is None:
-            from compas_viewer.components.layout import DefaultLayout
-
-            self._default_layout = DefaultLayout(QHBoxLayout())
-        return self._default_layout

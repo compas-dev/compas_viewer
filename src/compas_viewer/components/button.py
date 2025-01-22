@@ -23,12 +23,13 @@ class Button(QtWidgets.QPushButton):
         parent=None,
     ):
         super().__init__()
+
         if text:
             self.setText(text)
         if icon_path:
             self.setIcon(QtGui.QIcon(set_icon_path(icon_path)))
+            self.setIconSize(QtCore.QSize(17, 17))
         if tooltip:
             self.setToolTip(tooltip)
         if action:
             self.clicked.connect(action)
-        self.setIconSize(QtCore.QSize(17, 17))
