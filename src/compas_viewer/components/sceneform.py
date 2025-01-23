@@ -36,16 +36,16 @@ class Sceneform(QTreeWidget):
 
     def __init__(
         self,
-        columns: list[dict],
+        items: list[dict],
         column_editable: Optional[list[bool]] = None,
         show_headers: bool = True,
         callback: Optional[Callable] = None,
     ):
         super().__init__()
-        self.columns = columns
+        self.columns = items
         self.checkbox_columns: dict[int, str] = {}
-        self.column_editable = (column_editable or [False]) + [False] * (len(columns) - len(column_editable or [False]))
-        self.setColumnCount(len(columns))
+        self.column_editable = (column_editable or [False]) + [False] * (len(self.columns) - len(column_editable or [False]))
+        self.setColumnCount(len(self.columns))
         self.setHeaderLabels(col["title"] for col in self.columns)
         self.setHeaderHidden(not show_headers)
         self.setSelectionMode(QTreeWidget.SingleSelection)
