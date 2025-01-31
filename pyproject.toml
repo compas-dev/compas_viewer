@@ -54,7 +54,8 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 compas_viewer = ['config.json']
-"compas_viewer.assets" = ["*.svg", "*.png", "*.ttf"]
+"compas_viewer.assets" = ["*.svg", "*.png"]
+"compas_viewer.assets.fonts" = ["*.ttf"]
 "compas_viewer.renderer.shaders" = ["*.vert", "*.frag"]
 
 # ============================================================================
