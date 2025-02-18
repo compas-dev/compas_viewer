@@ -19,6 +19,7 @@ from compas.geometry import transform_points_numpy
 from compas_viewer.scene import TagObject
 from compas_viewer.scene.gridobject import GridObject
 from compas_viewer.scene.vectorobject import VectorObject
+from compas_viewer.scene.buffermanager import BufferManager
 
 from .camera import Camera
 from .shaders import Shader
@@ -84,6 +85,8 @@ class Renderer(QOpenGLWidget):
 
         self.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
         self.grabGesture(QtCore.Qt.GestureType.PinchGesture)
+
+        self.buffer_manager = BufferManager()
 
     @property
     def rendermode(self):
@@ -391,9 +394,12 @@ class Renderer(QOpenGLWidget):
             )
             self.grid.init()
 
-        # Init the buffers
+        # Add all objects to buffer manager
+        self.buffer_manager.clear()
         for obj in self.viewer.scene.objects:
             obj.init()
+            self.buffer_manager.add_object(obj)
+        self.buffer_manager.create_buffers()
 
         projection = self.camera.projection(self.viewer.config.window.width, self.viewer.config.window.height)
         viewworld = self.camera.viewworld()
@@ -559,17 +565,7 @@ class Renderer(QOpenGLWidget):
         return tag_objs, vector_objs, mesh_objs
 
     def paint(self):
-        """
-        Paint all the items in the render, which only be called by the paintGL function
-        and determines the performance of the renders
-        This function introduces decision tree for different render modes and settings.
-        It is only  called by the :class:`compas_viewer.components.render.Render.paintGL` function.
-
-        See Also
-        --------
-        :func:`compas_viewer.components.render.Render.paintGL`
-        :func:`compas_viewer.components.render.Render.paint_instance`
-        """
+        """Paint all the items in the render"""
 
         #  Matrix update
         viewworld = self.camera.viewworld()
@@ -577,13 +573,19 @@ class Renderer(QOpenGLWidget):
         # Object categorization
         tag_objs, vector_objs, mesh_objs = self.sort_objects_from_category(self.viewer.scene.visiable_objects)
 
-        # Draw model objects in the scene
+        # Clear color and depth buffers
         self.shader_model.bind()
         self.shader_model.uniform4x4("viewworld", viewworld)
         if self.grid is not None:
             self.grid.draw(self.shader_model)
-        for obj in self.sort_objects_from_viewworld(mesh_objs, viewworld):
-            obj.draw(self.shader_model, self.rendermode == "wireframe", self.rendermode == "lighted")
+
+        self.buffer_manager.draw(
+            self.shader_model,
+            wireframe=(self.rendermode == "wireframe"),
+            is_lighted=(self.rendermode == "lighted")
+        )
+        # for obj in self.sort_objects_from_viewworld(mesh_objs, viewworld):
+        #     obj.draw(self.shader_model, self.rendermode == "wireframe", self.rendermode == "lighted")
         self.shader_model.release()
 
         # Draw vector arrows
@@ -617,7 +619,7 @@ class Renderer(QOpenGLWidget):
         """
         Independent drawing function for the  instance map,
         which is only called by the :class:`compas_viewer.components.render.Render.paintGL` function.
-
+        return
         See Also
         --------
         :func:`compas_viewer.components.render.Render.paintGL`
