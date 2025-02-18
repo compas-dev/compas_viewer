@@ -399,6 +399,7 @@ class Renderer(QOpenGLWidget):
         for obj in self.viewer.scene.objects:
             obj.init()
             self.buffer_manager.add_object(obj)
+            obj.instance_index = self.buffer_manager.get_object_index(obj)
         self.buffer_manager.create_buffers()
 
         projection = self.camera.projection(self.viewer.config.window.width, self.viewer.config.window.height)
@@ -414,6 +415,7 @@ class Renderer(QOpenGLWidget):
         self.shader_model.uniform1i("is_selected", 0)
         self.shader_model.uniform1f("opacity", self.opacity)
         self.shader_model.uniform3f("selection_color", self.viewer.config.renderer.selectioncolor.rgb)
+        self.shader_model.uniformBuffer("transformBuffer", self.buffer_manager.transform_texture)
         self.shader_model.release()
 
         self.shader_tag = Shader(name="tag")

@@ -3,6 +3,7 @@ import numpy as np
 from compas.colors import Color
 from compas_viewer.gl import make_vertex_buffer, make_index_buffer
 from compas_viewer.renderer.shaders import Shader
+import OpenGL.GL as GL
 
 class BufferManager:
     """A class to manage and combine buffers from multiple objects for efficient rendering.
@@ -30,6 +31,8 @@ class BufferManager:
         self.elements: Dict[str, np.ndarray] = {}
         self.buffer_ids: Dict[str, Dict[str, int]] = {}
         self.object_ranges: Dict[str, List[Tuple[int, int]]] = {}
+        self._object_indices: Dict[Any, int] = {}
+        self._transforms_data: List[float] = []
         
         # Initialize empty buffers for each geometry type
         for buffer_type in ['points', 'lines', 'faces', 'backfaces']:
@@ -51,6 +54,23 @@ class BufferManager:
         obj : Any
             The scene object containing buffer data to add
         """
+        # Store object index
+        index = len(self._object_indices)
+        self._object_indices[obj] = index
+        
+        # Store transformation
+        if getattr(obj, 'transformation', None):
+            # Convert to column-major order for OpenGL
+            matrix = np.array(obj._matrix_buffer)
+            # self._transforms_data.append(matrix.flatten())
+            self._transforms_data.append(matrix)
+            print(np.identity(4).flatten())
+            print(matrix.flatten())
+            print("............................")
+        else:
+            # Identity matrix in column-major order
+            self._transforms_data.append(np.identity(4).flatten())
+
         # Process points data
         if hasattr(obj, '_points_data') and obj._points_data:
             self._add_buffer_data('points', obj._points_data)
@@ -63,7 +83,7 @@ class BufferManager:
         if hasattr(obj, '_frontfaces_data') and obj._frontfaces_data:
             self._add_buffer_data('faces', obj._frontfaces_data)
             
-        # # Process backfaces data
+        # Process backfaces data
         if hasattr(obj, '_backfaces_data') and obj._backfaces_data:
             self._add_buffer_data('backfaces', obj._backfaces_data)
 
@@ -99,15 +119,45 @@ class BufferManager:
         self.colors[buffer_type] = np.append(self.colors[buffer_type], col_array)
         self.elements[buffer_type] = np.append(self.elements[buffer_type], elem_array)
 
-    
-
     def create_buffers(self) -> None:
-        """Create OpenGL buffers from the combined data."""
+        """Create OpenGL buffers from the collected data."""
+        # Create transform buffer
+        self.transform_buffer = GL.glGenBuffers(1)
+        GL.glBindBuffer(GL.GL_TEXTURE_BUFFER, self.transform_buffer)
+        GL.glBufferData(
+            GL.GL_TEXTURE_BUFFER,
+            len(self._transforms_data) * 16 * 4,  # 4x4 matrices, 4 bytes per float
+            np.array(self._transforms_data, dtype=np.float32),
+            GL.GL_STATIC_DRAW
+        )
+
+        # Create transform texture
+        self.transform_texture = GL.glGenTextures(1)
+        GL.glBindTexture(GL.GL_TEXTURE_BUFFER, self.transform_texture)
+        GL.glTexBuffer(GL.GL_TEXTURE_BUFFER, GL.GL_RGBA32F, self.transform_buffer)
+
+
+        # Create other buffers...
         for buffer_type in self.positions:
             if len(self.positions[buffer_type]):
                 self.buffer_ids[buffer_type]['positions'] = make_vertex_buffer(self.positions[buffer_type])
                 self.buffer_ids[buffer_type]['colors'] = make_vertex_buffer(self.colors[buffer_type])
                 self.buffer_ids[buffer_type]['elements'] = make_index_buffer(self.elements[buffer_type])
+
+    def get_object_index(self, obj: Any) -> int:
+        """Get the index for an object's transformation.
+
+        Parameters
+        ----------
+        obj : Any
+            The scene object to get the index for
+
+        Returns
+        -------
+        int
+            The index of the object's transformation in the buffer
+        """
+        return self._object_indices.get(obj, 0)
 
     def draw(self, shader: Shader, wireframe: bool = False, is_lighted: bool = True) -> None:
         """Draw all objects using the combined buffers.

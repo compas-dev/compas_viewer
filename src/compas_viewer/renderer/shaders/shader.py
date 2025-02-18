@@ -81,6 +81,21 @@ class Shader:
         GL.glActiveTexture(GL.GL_TEXTURE0 + 0)  # type: ignore
         GL.glBindTexture(GL.GL_TEXTURE_2D, texture)
 
+    def uniformBuffer(self, name: str, buffer: Any):
+        """Store a uniform buffer in the shader program at a named location.
+
+        Parameters
+        ----------
+        name : str
+            The name of the location in the shader program.
+        buffer : Any
+            The buffer to store.
+        """
+        location = GL.glGetUniformLocation(self.program, name)
+        GL.glUniform1i(location, 0)  # Use texture unit 0
+        GL.glActiveTexture(GL.GL_TEXTURE0)
+        GL.glBindTexture(GL.GL_TEXTURE_BUFFER, buffer) 
+
     def bind(self):
         """Bind the shader program."""
         GL.glUseProgram(self.program)
