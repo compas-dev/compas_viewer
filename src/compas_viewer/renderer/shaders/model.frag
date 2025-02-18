@@ -1,7 +1,7 @@
-#version 120
+#version 330 core
 
-varying vec4 vertex_color;
-varying vec3 ec_pos;
+in vec4 vertex_color;
+in vec3 ec_pos;
 
 uniform float opacity;
 uniform float object_opacity;
@@ -9,6 +9,8 @@ uniform bool is_lighted;
 uniform bool is_selected;
 uniform vec3 selection_color;
 uniform int element_type;
+
+out vec4 fragColor;
 
 void main() {
     float alpha = opacity * object_opacity * vertex_color.a;
@@ -29,8 +31,8 @@ void main() {
     if(is_lighted) {
         vec3 ec_normal = normalize(cross(dFdx(ec_pos), dFdy(ec_pos)));
         vec3 L = normalize(-ec_pos);
-        gl_FragColor = vec4(color * dot(ec_normal, L), alpha);
+        fragColor = vec4(color * dot(ec_normal, L), alpha);
     } else {
-        gl_FragColor = vec4(color, alpha);
+        fragColor = vec4(color, alpha);
     }
 }
