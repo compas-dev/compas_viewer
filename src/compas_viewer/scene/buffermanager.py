@@ -1,7 +1,7 @@
 from typing import Any, Dict, List, Optional, Tuple
 import numpy as np
 from compas.colors import Color
-from compas_viewer.gl import make_vertex_buffer, make_index_buffer, make_texture_buffer
+from compas_viewer.gl import make_vertex_buffer, make_index_buffer, make_texture_buffer, update_texture_buffer, update_vertex_buffer
 from compas_viewer.renderer.shaders import Shader
 import OpenGL.GL as GL
 
@@ -30,6 +30,7 @@ class BufferManager:
         self.colors: Dict[str, np.ndarray] = {}
         self.elements: Dict[str, np.ndarray] = {}
         self.object_indices: Dict[str, np.ndarray] = {}
+        self.objects: Dict[Any, int] = {}
 
         # OpenGL buffer IDs
         self.buffer_ids: Dict[str, Dict[str, int]] = {}
@@ -47,6 +48,8 @@ class BufferManager:
 
     def add_object(self, obj: Any) -> None:
         """Add an object's buffer data to the combined buffers."""
+
+        self.objects[obj] = len(self.transforms)
 
         # Process geometry data
         if hasattr(obj, "_points_data") and obj._points_data:
@@ -144,3 +147,86 @@ class BufferManager:
             self.colors[buffer_type] = np.array([], dtype=np.float32)
             self.elements[buffer_type] = np.array([], dtype=np.int32)
             self.buffer_ids[buffer_type] = {}
+
+        self.transforms = []
+
+    def update_object_transform(self, obj: Any) -> None:
+        """Update the transformation matrix for a single object.
+
+        Parameters
+        ----------
+        obj : Any
+            The object whose transform should be updated.
+        """
+        if obj not in self.objects:
+            return
+
+        index = self.objects[obj]
+        obj._update_matrix()
+        if obj._matrix_buffer is None:
+            matrix = np.identity(4, dtype=np.float32).flatten()
+        else:
+            matrix = np.array(obj._matrix_buffer, dtype=np.float32)
+        self.transforms[index] = matrix
+        byte_offset = index * (4 * 16)
+        update_texture_buffer(matrix, self.transform_texture, offset=byte_offset)
+
+    def update_object_data(self, obj: Any) -> None:
+        """Update the position and color buffers for a single object.
+
+        Parameters
+        ----------
+        obj : Any
+            The object whose buffers should be updated.
+        """
+        if obj not in self.objects:
+            return
+
+        index = self.objects[obj]
+
+        # Update each buffer type that the object has
+        buffer_types = []
+        if hasattr(obj, "_points_data") and obj._points_data:
+            buffer_types.append("points")
+        if hasattr(obj, "_lines_data") and obj._lines_data:
+            buffer_types.append("lines")
+        if hasattr(obj, "_frontfaces_data") and obj._frontfaces_data:
+            buffer_types.append("faces")
+        if hasattr(obj, "_backfaces_data") and obj._backfaces_data:
+            buffer_types.append("backfaces")
+
+        for buffer_type in buffer_types:
+            # Get the data based on buffer type
+            if buffer_type == "points":
+                data = obj._points_data
+            elif buffer_type == "lines":
+                data = obj._lines_data
+            elif buffer_type == "faces":
+                data = obj._frontfaces_data
+            else:  # backfaces
+                data = obj._backfaces_data
+
+            positions, colors, _ = data  # We don't update elements as topology stays the same
+
+            # Convert to numpy arrays
+            pos_array = np.array(positions, dtype=np.float32).flatten()
+            col_array = np.array([c.rgba for c in colors], dtype=np.float32).flatten()
+
+            # Find the start and end indices for this object in the buffer
+            start_idx = 0
+            for i in range(len(self.object_indices[buffer_type])):
+                if self.object_indices[buffer_type][i] == index:
+                    start_idx = i
+                    break
+
+            vertices_per_object = len(positions)
+
+            # Update the position buffer
+            pos_byte_offset = start_idx * 3 * 4  # 3 floats per vertex * 4 bytes per float
+            pos_byte_size = vertices_per_object * 3 * 4
+            update_vertex_buffer(pos_array, self.buffer_ids[buffer_type]["positions"], offset=pos_byte_offset)
+
+            # Update the color buffer
+            col_byte_offset = start_idx * 4 * 4  # 4 floats per color * 4 bytes per float
+            col_byte_size = vertices_per_object * 4 * 4
+            update_vertex_buffer(col_array, self.buffer_ids[buffer_type]["colors"], offset=col_byte_offset)

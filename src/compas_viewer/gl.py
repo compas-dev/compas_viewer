@@ -90,7 +90,7 @@ def make_index_buffer(data, dynamic=False):
     return vbo
 
 
-def update_vertex_buffer(data, buffer):
+def update_vertex_buffer(data, buffer, offset=0):
     """Update a vertex buffer with new data.
 
     Parameters
@@ -99,12 +99,14 @@ def update_vertex_buffer(data, buffer):
         A flat list of floats.
     buffer : int
         The ID of the buffer.
+    offset : int
+        Byte offset into the buffer where the update should start.
     """
     n = len(data)
     size = n * ct.sizeof(ct.c_float)
     data = (ct.c_float * n)(*data)
     GL.glBindBuffer(GL.GL_ARRAY_BUFFER, buffer)
-    GL.glBufferSubData(GL.GL_ARRAY_BUFFER, 0, size, data)
+    GL.glBufferSubData(GL.GL_ARRAY_BUFFER, offset, size, data)
     GL.glBindBuffer(GL.GL_ARRAY_BUFFER, 0)
 
 
@@ -156,3 +158,22 @@ def make_texture_buffer(data):
     GL.glTexBuffer(GL.GL_TEXTURE_BUFFER, GL.GL_RGBA32F, buffer)
 
     return texture
+
+
+def update_texture_buffer(data, texture, offset=0):
+    """Update a texture buffer with new data.
+
+    Parameters
+    ----------
+    data : numpy.ndarray
+        A numpy array of floats.
+    texture : int
+        The texture ID.
+    offset : int
+        Byte offset into the buffer where the update should start.
+    """
+    GL.glBindTexture(GL.GL_TEXTURE_BUFFER, texture)
+    buffer = GL.glGetTexLevelParameteriv(GL.GL_TEXTURE_BUFFER, 0, GL.GL_TEXTURE_BUFFER_DATA_STORE_BINDING)
+    GL.glBindBuffer(GL.GL_TEXTURE_BUFFER, buffer)
+    GL.glBufferSubData(GL.GL_TEXTURE_BUFFER, offset, data.nbytes, data)
+    GL.glBindBuffer(GL.GL_TEXTURE_BUFFER, 0)
