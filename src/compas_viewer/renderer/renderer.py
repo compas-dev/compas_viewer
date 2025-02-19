@@ -382,12 +382,22 @@ class Renderer(QOpenGLWidget):
 
     def init(self):
         """Initialize the renderer."""
-
         # Create and bind a VAO (required in core-profile OpenGL).
         self._vao = GL.glGenVertexArrays(1)
         GL.glBindVertexArray(self._vao)
 
         self.buffer_manager.clear()
+
+        # Init the grid
+        self.grid = GridObject(
+            Frame.worldXY(),
+            gridmode=self.viewer.config.renderer.gridmode,
+            framesize=self.viewer.config.renderer.gridsize,
+            show_framez=self.viewer.config.renderer.show_gridz,
+            show=self.viewer.config.renderer.show_grid,
+        )
+        self.grid.init()
+
         for obj in self.viewer.scene.objects:
             obj.init()
             self.buffer_manager.add_object(obj)
@@ -576,9 +586,9 @@ class Renderer(QOpenGLWidget):
         # Clear color and depth buffers
         self.shader_model.bind()
         self.shader_model.uniform4x4("viewworld", viewworld)
-        # if self.grid is not None:
-        #     self.grid.draw(self.shader_model)
 
+        if self.viewer.config.renderer.show_grid:
+            self.grid.draw(self.shader_model)
         self.buffer_manager.draw(
             self.shader_model,
             wireframe=(self.rendermode == "wireframe"),

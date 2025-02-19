@@ -81,7 +81,6 @@ class GridObject(Base):
         if self.nx % 2 != 0 or self.ny % 2 != 0:
             raise ValueError("The number of grid cells in the X and Y directions must be even numbers.")
         self.show_lines = True
-        self._matrix_buffer = None
         self._lines_data = None
 
     def _read_lines_data(self) -> ShaderDataType:
@@ -182,6 +181,8 @@ class GridObject(Base):
 
     def draw(self, shader: Shader):
         shader.uniform1f("object_opacity", 1)
+        shader.uniform1i("element_type", 1)
+        shader.uniform1i("use_transform", False)
         shader.enable_attribute("position")
         shader.enable_attribute("color")
         shader.bind_attribute("position", self._lines_buffer["positions"])

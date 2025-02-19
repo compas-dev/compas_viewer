@@ -98,6 +98,7 @@ class BufferManager:
 
     def draw(self, shader: Shader, wireframe: bool = False, is_lighted: bool = True) -> None:
         """Draw all objects using the combined buffers."""
+        shader.uniform1i("use_transform", True)
         shader.enable_attribute("position")
         shader.enable_attribute("color")
         shader.enable_attribute("object_index")
