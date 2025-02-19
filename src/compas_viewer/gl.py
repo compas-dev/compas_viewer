@@ -124,3 +124,35 @@ def update_index_buffer(data, buffer):
     GL.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, buffer)
     GL.glBufferSubData(GL.GL_ELEMENT_ARRAY_BUFFER, 0, size, data)
     GL.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, 0)
+
+
+def make_texture_buffer(data):
+    """Make a texture buffer from the given data.
+
+    Parameters
+    ----------
+    data : numpy.ndarray
+        A numpy array of floats.
+
+    Returns
+    -------
+    int
+        The texture ID.
+    """
+    # Create buffer
+    buffer = GL.glGenBuffers(1)
+    GL.glBindBuffer(GL.GL_TEXTURE_BUFFER, buffer)
+    
+    GL.glBufferData(
+        GL.GL_TEXTURE_BUFFER,
+        data.nbytes,
+        data,
+        GL.GL_STATIC_DRAW
+    )
+
+    # Create texture
+    texture = GL.glGenTextures(1)
+    GL.glBindTexture(GL.GL_TEXTURE_BUFFER, texture)
+    GL.glTexBuffer(GL.GL_TEXTURE_BUFFER, GL.GL_RGBA32F, buffer)
+
+    return texture

@@ -384,22 +384,21 @@ class Renderer(QOpenGLWidget):
         """Initialize the renderer."""
 
         # Init the grid
-        if self.viewer.config.renderer.show_grid:
-            self.grid = GridObject(
-                Frame.worldXY(),
-                gridmode=self.viewer.config.renderer.gridmode,
-                framesize=self.viewer.config.renderer.gridsize,
-                show_framez=self.viewer.config.renderer.show_gridz,
-                show=self.viewer.config.renderer.show_grid,
-            )
-            self.grid.init()
+        # if self.viewer.config.renderer.show_grid:
+        #     self.grid = GridObject(
+        #         Frame.worldXY(),
+        #         gridmode=self.viewer.config.renderer.gridmode,
+        #         framesize=self.viewer.config.renderer.gridsize,
+        #         show_framez=self.viewer.config.renderer.show_gridz,
+        #         show=self.viewer.config.renderer.show_grid,
+        #     )
+        #     self.grid.init()
 
         # Add all objects to buffer manager
         self.buffer_manager.clear()
         for obj in self.viewer.scene.objects:
             obj.init()
             self.buffer_manager.add_object(obj)
-            obj.instance_index = self.buffer_manager.get_object_index(obj)
         self.buffer_manager.create_buffers()
 
         projection = self.camera.projection(self.viewer.config.window.width, self.viewer.config.window.height)
@@ -414,6 +413,7 @@ class Renderer(QOpenGLWidget):
         self.shader_model.uniform4x4("transform", transform)
         self.shader_model.uniform1i("is_selected", 0)
         self.shader_model.uniform1f("opacity", self.opacity)
+        self.shader_model.uniform1f("object_opacity", 1)
         self.shader_model.uniform3f("selection_color", self.viewer.config.renderer.selectioncolor.rgb)
         self.shader_model.uniformBuffer("transformBuffer", self.buffer_manager.transform_texture)
         self.shader_model.release()
@@ -442,12 +442,12 @@ class Renderer(QOpenGLWidget):
         self.shader_instance.uniform4x4("transform", transform)
         self.shader_instance.release()
 
-        self.shader_grid = Shader(name="grid")
-        self.shader_grid.bind()
-        self.shader_grid.uniform4x4("projection", projection)
-        self.shader_grid.uniform4x4("viewworld", viewworld)
-        self.shader_grid.uniform4x4("transform", transform)
-        self.shader_grid.release()
+        # self.shader_grid = Shader(name="grid")
+        # self.shader_grid.bind()
+        # self.shader_grid.uniform4x4("projection", projection)
+        # self.shader_grid.uniform4x4("viewworld", viewworld)
+        # self.shader_grid.uniform4x4("transform", transform)
+        # self.shader_grid.release()
 
     def update_projection(self, w=None, h=None):
         """
@@ -481,9 +481,9 @@ class Renderer(QOpenGLWidget):
         self.shader_instance.uniform4x4("projection", projection)
         self.shader_instance.release()
 
-        self.shader_grid.bind()
-        self.shader_grid.uniform4x4("projection", projection)
-        self.shader_grid.release()
+        # self.shader_grid.bind()
+        # self.shader_grid.uniform4x4("projection", projection)
+        # self.shader_grid.release()
 
     def resize(self, w: int, h: int):
         """
@@ -578,8 +578,8 @@ class Renderer(QOpenGLWidget):
         # Clear color and depth buffers
         self.shader_model.bind()
         self.shader_model.uniform4x4("viewworld", viewworld)
-        if self.grid is not None:
-            self.grid.draw(self.shader_model)
+        # if self.grid is not None:
+        #     self.grid.draw(self.shader_model)
 
         self.buffer_manager.draw(
             self.shader_model,
