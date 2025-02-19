@@ -28,6 +28,17 @@ void main() {
             alpha = 0.5;
     }
 
+    if(element_type == 0) {
+        // gl_PointCoord is in [0,1], with (0,0) at the lower-left of the point
+        vec2 center = gl_PointCoord - vec2(0.5);
+        float dist = length(center);
+
+        // If the fragment is outside the radius, discard it
+        if (dist > 0.5) {
+            discard;
+        }
+    }
+
     if(is_lighted) {
         vec3 ec_normal = normalize(cross(dFdx(ec_pos), dFdy(ec_pos)));
         vec3 L = normalize(-ec_pos);

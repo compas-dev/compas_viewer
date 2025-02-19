@@ -184,9 +184,9 @@ class Renderer(QOpenGLWidget):
         GL.glDepthFunc(GL.GL_LESS)
         GL.glEnable(GL.GL_BLEND)
         GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA)
-        GL.glEnable(GL.GL_POINT_SMOOTH)
-        GL.glEnable(GL.GL_LINE_SMOOTH)
+        GL.glEnable(GL.GL_MULTISAMPLE)
         GL.glEnable(GL.GL_FRAMEBUFFER_SRGB)
+        GL.glEnable(GL.GL_PROGRAM_POINT_SIZE)
         self.init()
 
     def resizeGL(self, w: int, h: int):
@@ -383,23 +383,18 @@ class Renderer(QOpenGLWidget):
     def init(self):
         """Initialize the renderer."""
 
-        # Init the grid
-        # if self.viewer.config.renderer.show_grid:
-        #     self.grid = GridObject(
-        #         Frame.worldXY(),
-        #         gridmode=self.viewer.config.renderer.gridmode,
-        #         framesize=self.viewer.config.renderer.gridsize,
-        #         show_framez=self.viewer.config.renderer.show_gridz,
-        #         show=self.viewer.config.renderer.show_grid,
-        #     )
-        #     self.grid.init()
+        # Create and bind a VAO (required in core-profile OpenGL).
+        self._vao = GL.glGenVertexArrays(1)
+        GL.glBindVertexArray(self._vao)
 
-        # Add all objects to buffer manager
         self.buffer_manager.clear()
         for obj in self.viewer.scene.objects:
             obj.init()
             self.buffer_manager.add_object(obj)
         self.buffer_manager.create_buffers()
+
+        # Unbind VAO when setup is complete.
+        GL.glBindVertexArray(0)
 
         projection = self.camera.projection(self.viewer.config.window.width, self.viewer.config.window.height)
         viewworld = self.camera.viewworld()
@@ -416,31 +411,32 @@ class Renderer(QOpenGLWidget):
         self.shader_model.uniform1f("object_opacity", 1)
         self.shader_model.uniform3f("selection_color", self.viewer.config.renderer.selectioncolor.rgb)
         self.shader_model.uniformBuffer("transformBuffer", self.buffer_manager.transform_texture)
+        self.shader_model.uniform1f("pointSize", 10.0)
         self.shader_model.release()
 
-        self.shader_tag = Shader(name="tag")
-        self.shader_tag.bind()
-        self.shader_tag.uniform4x4("projection", projection)
-        self.shader_tag.uniform4x4("viewworld", viewworld)
-        self.shader_tag.uniform4x4("transform", transform)
-        self.shader_tag.uniform1f("opacity", self.opacity)
-        self.shader_tag.release()
+        # self.shader_tag = Shader(name="tag")
+        # self.shader_tag.bind()
+        # self.shader_tag.uniform4x4("projection", projection)
+        # self.shader_tag.uniform4x4("viewworld", viewworld)
+        # self.shader_tag.uniform4x4("transform", transform)
+        # self.shader_tag.uniform1f("opacity", self.opacity)
+        # self.shader_tag.release()
 
-        self.shader_arrow = Shader(name="arrow")
-        self.shader_arrow.bind()
-        self.shader_arrow.uniform4x4("projection", projection)
-        self.shader_arrow.uniform4x4("viewworld", viewworld)
-        self.shader_arrow.uniform4x4("transform", transform)
-        self.shader_arrow.uniform1f("opacity", self.opacity)
-        self.shader_arrow.uniform1f("aspect", self.width() / self.height())
-        self.shader_arrow.release()
+        # self.shader_arrow = Shader(name="arrow")
+        # self.shader_arrow.bind()
+        # self.shader_arrow.uniform4x4("projection", projection)
+        # self.shader_arrow.uniform4x4("viewworld", viewworld)
+        # self.shader_arrow.uniform4x4("transform", transform)
+        # self.shader_arrow.uniform1f("opacity", self.opacity)
+        # self.shader_arrow.uniform1f("aspect", self.width() / self.height())
+        # self.shader_arrow.release()
 
-        self.shader_instance = Shader(name="instance")
-        self.shader_instance.bind()
-        self.shader_instance.uniform4x4("projection", projection)
-        self.shader_instance.uniform4x4("viewworld", viewworld)
-        self.shader_instance.uniform4x4("transform", transform)
-        self.shader_instance.release()
+        # self.shader_instance = Shader(name="instance")
+        # self.shader_instance.bind()
+        # self.shader_instance.uniform4x4("projection", projection)
+        # self.shader_instance.uniform4x4("viewworld", viewworld)
+        # self.shader_instance.uniform4x4("transform", transform)
+        # self.shader_instance.release()
 
         # self.shader_grid = Shader(name="grid")
         # self.shader_grid.bind()
@@ -468,18 +464,18 @@ class Renderer(QOpenGLWidget):
         self.shader_model.uniform4x4("projection", projection)
         self.shader_model.release()
 
-        self.shader_tag.bind()
-        self.shader_tag.uniform4x4("projection", projection)
-        self.shader_tag.release()
+        # self.shader_tag.bind()
+        # self.shader_tag.uniform4x4("projection", projection)
+        # self.shader_tag.release()
 
-        self.shader_arrow.bind()
-        self.shader_arrow.uniform4x4("projection", projection)
-        self.shader_arrow.uniform1f("aspect", w / h)
-        self.shader_arrow.release()
+        # self.shader_arrow.bind()
+        # self.shader_arrow.uniform4x4("projection", projection)
+        # self.shader_arrow.uniform1f("aspect", w / h)
+        # self.shader_arrow.release()
 
-        self.shader_instance.bind()
-        self.shader_instance.uniform4x4("projection", projection)
-        self.shader_instance.release()
+        # self.shader_instance.bind()
+        # self.shader_instance.uniform4x4("projection", projection)
+        # self.shader_instance.release()
 
         # self.shader_grid.bind()
         # self.shader_grid.uniform4x4("projection", projection)
@@ -569,7 +565,9 @@ class Renderer(QOpenGLWidget):
     def paint(self):
         """Paint all the items in the render"""
 
-        #  Matrix update
+        # Bind the same VAO created in init()
+        GL.glBindVertexArray(self._vao)
+
         viewworld = self.camera.viewworld()
         self.update_projection()
         # Object categorization
@@ -590,32 +588,35 @@ class Renderer(QOpenGLWidget):
         #     obj.draw(self.shader_model, self.rendermode == "wireframe", self.rendermode == "lighted")
         self.shader_model.release()
 
-        # Draw vector arrows
-        self.shader_arrow.bind()
-        self.shader_arrow.uniform4x4("viewworld", viewworld)
-        for obj in vector_objs:
-            obj.draw(self.shader_arrow)
-        self.shader_arrow.release()
+        # # Draw vector arrows
+        # self.shader_arrow.bind()
+        # self.shader_arrow.uniform4x4("viewworld", viewworld)
+        # for obj in vector_objs:
+        #     obj.draw(self.shader_arrow)
+        # self.shader_arrow.release()
 
-        # Draw text tag sprites
-        self.shader_tag.bind()
-        self.shader_tag.uniform4x4("viewworld", viewworld)
-        for obj in tag_objs:
-            obj.draw(self.shader_tag, self.camera.position, self.width(), self.height())
-        self.shader_tag.release()
+        # # Draw text tag sprites
+        # self.shader_tag.bind()
+        # self.shader_tag.uniform4x4("viewworld", viewworld)
+        # for obj in tag_objs:
+        #     obj.draw(self.shader_tag, self.camera.position, self.width(), self.height())
+        # self.shader_tag.release()
 
-        # draw 2D box for multi-selection
-        if self.viewer.mouse.is_tracing_a_window:
-            self.shader_model.draw_2d_box(
-                (
-                    self.viewer.mouse.window_start_point.x(),
-                    self.viewer.mouse.window_start_point.y(),
-                    self.viewer.mouse.last_pos.x(),
-                    self.viewer.mouse.last_pos.y(),
-                ),
-                self.width(),
-                self.height(),
-            )
+        # # draw 2D box for multi-selection
+        # if self.viewer.mouse.is_tracing_a_window:
+        #     self.shader_model.draw_2d_box(
+        #         (
+        #             self.viewer.mouse.window_start_point.x(),
+        #             self.viewer.mouse.window_start_point.y(),
+        #             self.viewer.mouse.last_pos.x(),
+        #             self.viewer.mouse.last_pos.y(),
+        #         ),
+        #         self.width(),
+        #         self.height(),
+        #     )
+
+        # Unbind once we're done
+        GL.glBindVertexArray(0)
 
     def paint_instance(self):
         """

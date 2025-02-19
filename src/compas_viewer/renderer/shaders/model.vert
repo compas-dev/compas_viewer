@@ -7,6 +7,7 @@ in float object_index;
 uniform mat4 projection;
 uniform mat4 viewworld;
 uniform samplerBuffer transformBuffer;
+uniform float pointSize;
 
 out vec4 vertex_color;
 out vec3 ec_pos;
@@ -26,5 +27,6 @@ void main() {
     vec4 viewPos = viewworld * worldPos;
     gl_Position = projection * viewPos;
     ec_pos = vec3(viewPos);
+    gl_PointSize = pointSize;
 
 }
