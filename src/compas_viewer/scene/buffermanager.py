@@ -58,7 +58,8 @@ class BufferManager:
         if hasattr(obj, "_backfaces_data") and obj._backfaces_data:
             self._add_buffer_data("backfaces", obj._backfaces_data)
 
-        self.transforms.append(obj._matrix_buffer)
+        matrix = obj._matrix_buffer if obj._matrix_buffer is not None else np.identity(4, dtype=np.float32).flatten()
+        self.transforms.append(matrix)
 
     def _add_buffer_data(self, buffer_type: str, data: Tuple[List, List, List]) -> None:
         """Add buffer data for a specific geometry type."""
@@ -109,7 +110,7 @@ class BufferManager:
             shader.uniform1i("element_type", 2)
 
             for face_type in ["faces", "backfaces"]:
-                if self.buffer_ids[face_type]["positions"]:
+                if self.buffer_ids[face_type]:
                     shader.bind_attribute("position", self.buffer_ids[face_type]["positions"])
                     shader.bind_attribute("color", self.buffer_ids[face_type]["colors"], step=4)
                     shader.bind_attribute("object_index", self.buffer_ids[face_type]["object_indices"], step=1)
@@ -118,7 +119,7 @@ class BufferManager:
         # Draw lines
         shader.uniform1i("is_lighted", False)
         shader.uniform1i("element_type", 1)
-        if self.buffer_ids["lines"]["positions"]:
+        if self.buffer_ids["lines"]:
             shader.bind_attribute("position", self.buffer_ids["lines"]["positions"])
             shader.bind_attribute("color", self.buffer_ids["lines"]["colors"], step=4)
             shader.bind_attribute("object_index", self.buffer_ids["lines"]["object_indices"], step=1)
@@ -126,7 +127,7 @@ class BufferManager:
 
         # Draw points
         shader.uniform1i("element_type", 0)
-        if self.buffer_ids["points"]["positions"]:
+        if self.buffer_ids["points"]:
             shader.bind_attribute("position", self.buffer_ids["points"]["positions"])
             shader.bind_attribute("color", self.buffer_ids["points"]["colors"], step=4)
             shader.bind_attribute("object_index", self.buffer_ids["points"]["object_indices"], step=1)
