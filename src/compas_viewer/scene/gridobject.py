@@ -182,7 +182,7 @@ class GridObject(Base):
     def draw(self, shader: Shader):
         shader.uniform1f("object_opacity", 1)
         shader.uniform1i("element_type", 1)
-        shader.uniform1i("use_transform", False)
+        shader.uniform1i("is_grid", True)
         shader.enable_attribute("position")
         shader.enable_attribute("color")
         shader.bind_attribute("position", self._lines_buffer["positions"])

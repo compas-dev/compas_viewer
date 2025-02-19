@@ -7,16 +7,19 @@ in float object_index;
 uniform mat4 projection;
 uniform mat4 viewworld;
 uniform samplerBuffer transformBuffer;
-uniform bool use_transform;
+uniform samplerBuffer settingsBuffer;
+uniform bool is_grid;
 uniform float pointSize;
 
 out vec4 vertex_color;
 out vec3 ec_pos;
+out float is_selected;
 
 void main() {
-
     mat4 transform = mat4(1.0);
-    if (use_transform) {
+    if (is_grid) {
+        is_selected = 0.0;
+    } else {
         int offset = int(object_index) * 4;
         transform = transpose(mat4(
             texelFetch(transformBuffer, offset + 0),
@@ -24,6 +27,8 @@ void main() {
             texelFetch(transformBuffer, offset + 2),
             texelFetch(transformBuffer, offset + 3)
         ));
+
+        is_selected = texelFetch(settingsBuffer, int(object_index)).r;
     }
 
     vertex_color = color;
@@ -32,5 +37,4 @@ void main() {
     gl_Position = projection * viewPos;
     ec_pos = vec3(viewPos);
     gl_PointSize = pointSize;
-
 }

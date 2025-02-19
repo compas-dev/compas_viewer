@@ -2,11 +2,11 @@
 
 in vec4 vertex_color;
 in vec3 ec_pos;
+in float is_selected;
 
 uniform float opacity;
 uniform float object_opacity;
 uniform bool is_lighted;
-uniform bool is_selected;
 uniform vec3 selection_color;
 uniform int element_type;
 
@@ -16,7 +16,7 @@ void main() {
     float alpha = opacity * object_opacity * vertex_color.a;
     vec3 color;
     color = vertex_color.rgb;
-    if(is_selected) {
+    if(is_selected > 0.5) {
         if(element_type == 0) {
             color = selection_color * 0.9;
         } else if(element_type == 1) {
