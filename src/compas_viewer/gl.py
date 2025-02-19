@@ -128,14 +128,16 @@ def update_index_buffer(data, buffer):
     GL.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, 0)
 
 
-def make_texture_buffer(data):
+def make_texture_buffer(data, internal_format=GL.GL_RGBA32F):
     """Make a texture buffer from the given data.
 
     Parameters
     ----------
     data : numpy.ndarray
         A numpy array of floats.
-
+    internal_format : GLenum, optional
+        The internal format for the texture buffer. Default is GL.GL_RGBA32F.
+    
     Returns
     -------
     int
@@ -155,7 +157,7 @@ def make_texture_buffer(data):
     # Create texture
     texture = GL.glGenTextures(1)
     GL.glBindTexture(GL.GL_TEXTURE_BUFFER, texture)
-    GL.glTexBuffer(GL.GL_TEXTURE_BUFFER, GL.GL_RGBA32F, buffer)
+    GL.glTexBuffer(GL.GL_TEXTURE_BUFFER, internal_format, buffer)
 
     return texture
 

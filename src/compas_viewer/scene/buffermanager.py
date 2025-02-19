@@ -68,7 +68,7 @@ class BufferManager:
         self.transforms.append(matrix)
 
         # Add default settings (is_selected = 0.0)
-        self.settings.append(1.0)
+        # self.settings.append(1.0)
 
     def _add_buffer_data(self, buffer_type: str, data: Tuple[List, List, List]) -> None:
         """Add buffer data for a specific geometry type."""
@@ -99,9 +99,9 @@ class BufferManager:
         transforms_array = np.array(self.transforms, dtype=np.float32)
         self.transform_texture = make_texture_buffer(transforms_array)
 
-        # Create settings buffer and texture
-        settings_array = np.array(self.settings, dtype=np.float32)
-        self.settings_texture = make_texture_buffer(settings_array)
+        # Create settings buffer and texture using GL_R32F for a single float per texel
+        settings_array = np.array([0, 0, 1], dtype=np.float32) # TODO: finish this
+        self.settings_texture = make_texture_buffer(settings_array, internal_format=GL.GL_R32F)
         print(settings_array)
 
         for buffer_type in self.positions:
