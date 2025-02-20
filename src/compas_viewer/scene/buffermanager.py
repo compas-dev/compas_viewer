@@ -64,7 +64,9 @@ class BufferManager:
         if hasattr(obj, "_backfaces_data") and obj._backfaces_data:
             self._add_buffer_data("backfaces", obj._backfaces_data)
 
-        matrix = obj._matrix_buffer if obj._matrix_buffer is not None else np.identity(4, dtype=np.float32).flatten()
+        
+        matrix_buffer = getattr(obj, "_matrix_buffer", None)
+        matrix = matrix_buffer if matrix_buffer is not None else np.identity(4, dtype=np.float32).flatten()
         self.transforms.append(matrix)
 
         for obj in self.objects:

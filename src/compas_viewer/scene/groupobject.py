@@ -1,5 +1,5 @@
 from compas.data import Data
-
+from compas.colors import Color
 from .sceneobject import SceneObject
 
 
@@ -21,9 +21,14 @@ class GroupObject(SceneObject):
     def __init__(self, item=None, **kwargs):
         super().__init__(item=Group(item), **kwargs)
         self.show = True
+        self.show_points = False
+        self.show_lines = False
+        self.show_faces = False
         self.is_selected = False
         self.opacity = 1.0
         self.bounding_box = None
+        self._matrix_buffer = None
+        self.instance_color = Color.black()
 
         for item in self.items:
             if isinstance(item, (Data, list)):
