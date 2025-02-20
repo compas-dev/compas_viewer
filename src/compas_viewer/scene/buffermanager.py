@@ -41,8 +41,6 @@ class BufferManager:
         # Settings data
         self.settings: List[float] = []
 
-        self.settings_keys = ["is_selected", "show", "show_points", "show_lines", "show_faces"]
-
         # Initialize empty buffers for each geometry type
         for buffer_type in ["points", "lines", "faces", "backfaces"]:
             self.positions[buffer_type] = np.array([], dtype=np.float32)
@@ -69,8 +67,12 @@ class BufferManager:
         matrix = obj._matrix_buffer if obj._matrix_buffer is not None else np.identity(4, dtype=np.float32).flatten()
         self.transforms.append(matrix)
 
-        settings = [getattr(obj, key, False) for key in self.settings_keys]
-        self.settings.append(settings)
+        for obj in self.objects:
+            obj_settings = [
+                [obj.show, obj.show_points, obj.show_lines, obj.show_faces],  # Row 1
+                [*obj.instance_color.rgb, obj.is_selected],  # Row 2
+            ]
+            self.settings.append(obj_settings)
 
     def _add_buffer_data(self, buffer_type: str, data: Tuple[List, List, List]) -> None:
         """Add buffer data for a specific geometry type."""
@@ -102,9 +104,7 @@ class BufferManager:
         self.transform_texture = make_texture_buffer(transforms_array)
 
         settings_array = np.array(self.settings, dtype=np.float32)
-        self.settings_texture = make_texture_buffer(settings_array, internal_format=GL.GL_R32F)
-
-        print(settings_array)
+        self.settings_texture = make_texture_buffer(settings_array)
 
         for buffer_type in self.positions:
             if len(self.positions[buffer_type]):
@@ -118,8 +118,8 @@ class BufferManager:
         for obj in self.objects:
             self.update_object_settings(obj)
 
+        # shader.uniform1i("is_instance", True)
         shader.uniform1i("is_grid", False)
-        shader.uniform1i("setting_length", len(self.settings_keys))
         shader.enable_attribute("position")
         shader.enable_attribute("color")
         shader.enable_attribute("object_index")
@@ -260,8 +260,11 @@ class BufferManager:
         if obj not in self.objects:
             return
 
-        settings_values = [float(getattr(obj, key, False)) for key in self.settings_keys]
+        obj_settings = [
+            [obj.show, obj.show_points, obj.show_lines, obj.show_faces],  # Row 1
+            [*obj.instance_color.rgb, obj.is_selected],  # Row 2
+        ]
         index = self.objects[obj]
-        self.settings[index] = settings_values
-        byte_offset = index * 4 * len(settings_values)  # 1 float per setting * 4 bytes
-        update_texture_buffer(np.array(settings_values, dtype=np.float32), self.settings_texture, offset=byte_offset)
+        self.settings[index] = obj_settings
+        byte_offset = index * 4 * 8  # 1 float per setting * 4 bytes
+        update_texture_buffer(np.array(obj_settings, dtype=np.float32), self.settings_texture, offset=byte_offset)
