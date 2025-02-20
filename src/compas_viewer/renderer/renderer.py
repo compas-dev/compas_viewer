@@ -627,27 +627,17 @@ class Renderer(QOpenGLWidget):
         GL.glBindVertexArray(0)
 
     def read_instance_color(self, box: tuple[int, int, int, int]):
-        """
-        Paint the instance map to an FBO and read pixels from specified area.
 
-        Parameters
-        ----------
-        box : tuple[int, int, int, int]
-            The box area [x1, y1, x2, y2] to be read.
-
-        Returns
-        -------
-        numpy.ndarray
-            Instance color data from the specified area.
-        """
+        # TODO: Should be able to massively simplify this.
         # Get the rectangle area
         x1, y1, x2, y2 = box
         x, y = min(x1, x2), self.height() - max(y1, y2)
         width = max(self.PIXEL_SELECTION_INCREMENTAL, abs(x1 - x2))
         height = max(self.PIXEL_SELECTION_INCREMENTAL, abs(y1 - y2))
 
-        # Store current viewport
+        # Store current viewport and FBO
         viewport = GL.glGetIntegerv(GL.GL_VIEWPORT)
+        previous_fbo = GL.glGetIntegerv(GL.GL_FRAMEBUFFER_BINDING)
 
         # Create an FBO with original window size (not scaled)
         fbo = GL.glGenFramebuffers(1)
@@ -656,31 +646,59 @@ class Renderer(QOpenGLWidget):
         # Create a texture to attach to the FBO
         texture = GL.glGenTextures(1)
         GL.glBindTexture(GL.GL_TEXTURE_2D, texture)
-        GL.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGB, self.width(), self.height(), 0, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, None)
-        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR)
-        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR)
+        GL.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA8, self.width(), self.height(), 0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, None)
+        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST)
+        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST)
+        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP_TO_EDGE)
+        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP_TO_EDGE)
         GL.glFramebufferTexture2D(GL.GL_FRAMEBUFFER, GL.GL_COLOR_ATTACHMENT0, GL.GL_TEXTURE_2D, texture, 0)
 
+        # Create and attach depth buffer
+        depth_buffer = GL.glGenRenderbuffers(1)
+        GL.glBindRenderbuffer(GL.GL_RENDERBUFFER, depth_buffer)
+        GL.glRenderbufferStorage(GL.GL_RENDERBUFFER, GL.GL_DEPTH_COMPONENT24, self.width(), self.height())
+        GL.glFramebufferRenderbuffer(GL.GL_FRAMEBUFFER, GL.GL_DEPTH_ATTACHMENT, GL.GL_RENDERBUFFER, depth_buffer)
+
         # Check if FBO is complete
-        if GL.glCheckFramebufferStatus(GL.GL_FRAMEBUFFER) != GL.GL_FRAMEBUFFER_COMPLETE:
-            GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, 0)
-            raise Exception("Framebuffer is not complete!")
+        status = GL.glCheckFramebufferStatus(GL.GL_FRAMEBUFFER)
+        if status != GL.GL_FRAMEBUFFER_COMPLETE:
+            GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, previous_fbo)
+            GL.glDeleteRenderbuffers(1, [depth_buffer])
+            GL.glDeleteTextures(1, [texture])
+            GL.glDeleteFramebuffers(1, [fbo])
+            raise Exception(f"Framebuffer is not complete! Status: {status}")
+
+        # Set up rendering state
+        GL.glViewport(0, 0, self.width(), self.height())
+        GL.glEnable(GL.GL_DEPTH_TEST)
+        GL.glDepthFunc(GL.GL_LESS)
+        GL.glDepthMask(GL.GL_TRUE)
+        GL.glClearColor(0.0, 0.0, 0.0, 1.0)
+        GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
+
+        # Save current render states
+        prev_depth_test = GL.glIsEnabled(GL.GL_DEPTH_TEST)
+        prev_blend = GL.glIsEnabled(GL.GL_BLEND)
+
+        # Disable blending for instance rendering
+        GL.glDisable(GL.GL_BLEND)
 
         # Render the instance map to the FBO
         self.paintGL(is_instance=True)
         GL.glFlush()
+        GL.glFinish()
 
         # Debug block
         if hasattr(self.viewer.config.renderer, "debug_instance") and self.viewer.config.renderer.debug_instance:
             # Save the full frame
             GL.glPixelStorei(GL.GL_PACK_ALIGNMENT, 1)
-            full_buffer = GL.glReadPixels(0, 0, self.width(), self.height(), GL.GL_RGB, GL.GL_UNSIGNED_BYTE)
+            full_buffer = GL.glReadPixels(0, 0, self.width(), self.height(), GL.GL_RGBA, GL.GL_UNSIGNED_BYTE)
 
             import numpy as np
             from PIL import Image
 
             # Save full frame
-            full_map = np.frombuffer(full_buffer, dtype=np.uint8).reshape(self.height(), self.width(), 3)
+            full_map = np.frombuffer(full_buffer, dtype=np.uint8).reshape(self.height(), self.width(), 4)
             full_image = Image.fromarray(full_map)
             full_image = full_image.transpose(Image.FLIP_TOP_BOTTOM)
             full_image.save("instance_debug_full.png")
@@ -717,8 +735,15 @@ class Renderer(QOpenGLWidget):
             box_image.save("instance_debug_box.png")
             print(f"- Box area: instance_debug_box.png")
 
+        # Restore previous render states
+        if prev_blend:
+            GL.glEnable(GL.GL_BLEND)
+        if not prev_depth_test:
+            GL.glDisable(GL.GL_DEPTH_TEST)
+
         # Clean up
-        GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, 0)
+        GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, previous_fbo)
+        GL.glDeleteRenderbuffers(1, [depth_buffer])
         GL.glDeleteTextures(1, [texture])
         GL.glDeleteFramebuffers(1, [fbo])
 
