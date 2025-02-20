@@ -4,7 +4,7 @@ from compas_viewer.viewer import Viewer
 from compas.geometry import Translation
 
 viewer = Viewer()
-N = 5
+N = 10
 for i in range(N):
     for j in range(N):
         for k in range(N):

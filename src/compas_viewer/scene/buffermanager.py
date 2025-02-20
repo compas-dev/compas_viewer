@@ -41,6 +41,8 @@ class BufferManager:
         # Settings data
         self.settings: List[float] = []
 
+        self.settings_keys = ["is_selected", "show", "show_points", "show_lines", "show_faces"]
+
         # Initialize empty buffers for each geometry type
         for buffer_type in ["points", "lines", "faces", "backfaces"]:
             self.positions[buffer_type] = np.array([], dtype=np.float32)
@@ -67,8 +69,8 @@ class BufferManager:
         matrix = obj._matrix_buffer if obj._matrix_buffer is not None else np.identity(4, dtype=np.float32).flatten()
         self.transforms.append(matrix)
 
-        # Add default settings (is_selected = 0.0)
-        # self.settings.append(1.0)
+        settings = [getattr(obj, key, False) for key in self.settings_keys]
+        self.settings.append(settings)
 
     def _add_buffer_data(self, buffer_type: str, data: Tuple[List, List, List]) -> None:
         """Add buffer data for a specific geometry type."""
@@ -99,9 +101,9 @@ class BufferManager:
         transforms_array = np.array(self.transforms, dtype=np.float32)
         self.transform_texture = make_texture_buffer(transforms_array)
 
-        # Create settings buffer and texture using GL_R32F for a single float per texel
-        settings_array = np.array([0, 0, 1], dtype=np.float32) # TODO: finish this
+        settings_array = np.array(self.settings, dtype=np.float32)
         self.settings_texture = make_texture_buffer(settings_array, internal_format=GL.GL_R32F)
+
         print(settings_array)
 
         for buffer_type in self.positions:
@@ -113,7 +115,11 @@ class BufferManager:
 
     def draw(self, shader: Shader, wireframe: bool = False, is_lighted: bool = True) -> None:
         """Draw all objects using the combined buffers."""
+        for obj in self.objects:
+            self.update_object_settings(obj)
+
         shader.uniform1i("is_grid", False)
+        shader.uniform1i("setting_length", len(self.settings_keys))
         shader.enable_attribute("position")
         shader.enable_attribute("color")
         shader.enable_attribute("object_index")
@@ -243,20 +249,19 @@ class BufferManager:
             col_byte_size = vertices_per_object * 4 * 4
             update_vertex_buffer(col_array, self.buffer_ids[buffer_type]["colors"], offset=col_byte_offset)
 
-    def update_object_settings(self, obj: Any, is_selected: bool) -> None:
+    def update_object_settings(self, obj: Any) -> None:
         """Update the settings for a single object.
 
         Parameters
         ----------
         obj : Any
             The object whose settings should be updated.
-        is_selected : bool
-            Whether the object is selected.
         """
         if obj not in self.objects:
             return
 
+        settings_values = [float(getattr(obj, key, False)) for key in self.settings_keys]
         index = self.objects[obj]
-        self.settings[index] = float(is_selected)
-        byte_offset = index * 4  # 1 float * 4 bytes
-        update_texture_buffer(np.array([float(is_selected)], dtype=np.float32), self.settings_texture, offset=byte_offset)
+        self.settings[index] = settings_values
+        byte_offset = index * 4 * len(settings_values)  # 1 float per setting * 4 bytes
+        update_texture_buffer(np.array(settings_values, dtype=np.float32), self.settings_texture, offset=byte_offset)

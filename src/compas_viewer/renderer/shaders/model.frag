@@ -3,6 +3,10 @@
 in vec4 vertex_color;
 in vec3 ec_pos;
 in float is_selected;
+in float show;
+in float show_points;
+in float show_lines;
+in float show_faces;
 
 uniform float opacity;
 uniform float object_opacity;
@@ -13,6 +17,22 @@ uniform int element_type;
 out vec4 fragColor;
 
 void main() {
+    if(show == 0.0) {
+        discard;
+    }
+
+    if(element_type == 0 && show_points == 0.0) {
+        discard;
+    }
+
+    if(element_type == 1 && show_lines == 0.0) {
+        discard;
+    }
+
+    if(element_type == 2 && show_faces == 0.0) {
+        discard;
+    }
+
     float alpha = opacity * object_opacity * vertex_color.a;
     vec3 color;
     color = vertex_color.rgb;
@@ -29,16 +49,13 @@ void main() {
     }
 
     if(element_type == 0) {
-        // gl_PointCoord is in [0,1], with (0,0) at the lower-left of the point
+        // draw a circle
         vec2 center = gl_PointCoord - vec2(0.5);
         float dist = length(center);
-
-        // If the fragment is outside the radius, discard it
-        if (dist > 0.5) {
+        if(dist > 0.5) {
             discard;
         }
     }
-
     if(is_lighted) {
         vec3 ec_normal = normalize(cross(dFdx(ec_pos), dFdy(ec_pos)));
         vec3 L = normalize(-ec_pos);
