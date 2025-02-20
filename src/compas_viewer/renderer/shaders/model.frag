@@ -20,9 +20,9 @@ uniform bool is_grid;
 out vec4 fragColor;
 
 void main() {
-    // if(show == 0.0) {
-    //     discard;
-    // }
+    if(show == 0.0) {
+        discard;
+    }
 
     if(element_type == 0 && show_points == 0.0) {
         discard;
