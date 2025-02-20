@@ -213,28 +213,15 @@ class Renderer(QOpenGLWidget):
         self.resize(w, h)
 
     def paintGL(self, is_instance: bool = False):
-        """Paint the OpenGL canvas.
-
-        Parameters
-        ----------
-        is_instance : bool, optional
-            Whether the render is for instance map, by default False.
-
-        Notes
-        -----
-        This implements the virtual function of the OpenGL widget.
-        This method also paints the instance map used by the selector to identify selected objects.
-        The instance map is immediately cleared again, after which the real scene objects are drawn.
-
-        References
-        ----------
-        * https://doc.qt.io/qtforpython-6/PySide6/QtOpenGL/QOpenGLWindow.html#PySide6.QtOpenGL.PySide6.QtOpenGL.QOpenGLWindow.paintGL
-
-        """
+        """Paint the OpenGL canvas."""
         self.clear()
+
         if is_instance or self.rendermode == "instance":
+            GL.glViewport(0, 0, self.width(), self.height())  # Use unscaled viewport for FBO
             self.paint(is_instance=True)
         else:
+            r = self.devicePixelRatio()
+            GL.glViewport(0, 0, int(self.width() * r), int(self.height() * r))  # Normal scaled viewport
             self.paint()
 
         self._frames += 1
@@ -595,7 +582,6 @@ class Renderer(QOpenGLWidget):
         self.shader_model.uniformBuffer("settingsBuffer", self.buffer_manager.settings_texture, unit=1)
         self.shader_model.uniform1f("pointSize", 10.0)
 
-
         self.shader_model.uniform4x4("viewworld", viewworld)
         self.shader_model.uniform1i("is_instance", is_instance)
 
@@ -640,80 +626,40 @@ class Renderer(QOpenGLWidget):
         # Unbind once we're done
         GL.glBindVertexArray(0)
 
-    # def paint_instance(self):
-    #     """
-    #     Independent drawing function for the  instance map,
-    #     which is only called by the :class:`compas_viewer.components.render.Render.paintGL` function.
-    #     return
-    #     See Also
-    #     --------
-    #     :func:`compas_viewer.components.render.Render.paintGL`
-    #     :func:`compas_viewer.components.render.Render.paint`
-
-    #     """
-
-    #     #  Matrix update
-    #     viewworld = self.camera.viewworld()
-    #     self.update_projection()
-    #     # Object categorization
-    #     _, _, mesh_objs = self.sort_objects_from_category(tuple(self.viewer.scene.objects))
-    #     # Draw instance maps
-    #     GL.glDisable(GL.GL_POINT_SMOOTH)
-    #     GL.glDisable(GL.GL_LINE_SMOOTH)
-
-    #     self.shader_instance.bind()
-    #     self.shader_instance.uniform4x4("viewworld", viewworld)
-    #     for obj in mesh_objs:
-    #         obj.draw_instance(self.shader_instance, self.rendermode == "wireframe")
-    #     self.shader_instance.release()
-
-    #     GL.glEnable(GL.GL_POINT_SMOOTH)
-    #     GL.glEnable(GL.GL_LINE_SMOOTH)
-
     def read_instance_color(self, box: tuple[int, int, int, int]):
         """
         Paint the instance map to an FBO and read pixels from specified area.
-        
+
         Parameters
         ----------
         box : tuple[int, int, int, int]
             The box area [x1, y1, x2, y2] to be read.
-        
+
         Returns
         -------
         numpy.ndarray
-            Downsampled instance color data from the specified area.
+            Instance color data from the specified area.
         """
         # Get the rectangle area
         x1, y1, x2, y2 = box
         x, y = min(x1, x2), self.height() - max(y1, y2)
         width = max(self.PIXEL_SELECTION_INCREMENTAL, abs(x1 - x2))
         height = max(self.PIXEL_SELECTION_INCREMENTAL, abs(y1 - y2))
-        r = self.devicePixelRatio()
 
-        pixels_x = width * r
-        pixels_y = height * r
-        step_x = round(pixels_x / 1000) + 1
-        step_y = round(pixels_y / 1000) + 1
+        # Store current viewport
+        viewport = GL.glGetIntegerv(GL.GL_VIEWPORT)
 
-        # Create an FBO
+        # Create an FBO with original window size (not scaled)
         fbo = GL.glGenFramebuffers(1)
         GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, fbo)
 
         # Create a texture to attach to the FBO
         texture = GL.glGenTextures(1)
         GL.glBindTexture(GL.GL_TEXTURE_2D, texture)
-        GL.glTexImage2D(
-            GL.GL_TEXTURE_2D, 0, GL.GL_RGB, 
-            self.width() * r, self.height() * r, 0, 
-            GL.GL_RGB, GL.GL_UNSIGNED_BYTE, None
-        )
+        GL.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGB, self.width(), self.height(), 0, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, None)
         GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR)
         GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR)
-        GL.glFramebufferTexture2D(
-            GL.GL_FRAMEBUFFER, GL.GL_COLOR_ATTACHMENT0, 
-            GL.GL_TEXTURE_2D, texture, 0
-        )
+        GL.glFramebufferTexture2D(GL.GL_FRAMEBUFFER, GL.GL_COLOR_ATTACHMENT0, GL.GL_TEXTURE_2D, texture, 0)
 
         # Check if FBO is complete
         if GL.glCheckFramebufferStatus(GL.GL_FRAMEBUFFER) != GL.GL_FRAMEBUFFER_COMPLETE:
@@ -722,44 +668,61 @@ class Renderer(QOpenGLWidget):
 
         # Render the instance map to the FBO
         self.paintGL(is_instance=True)
-        GL.glFlush()  # Ensure rendering commands are finished
+        GL.glFlush()
 
-        # Adjust width and height based on the step
-        width_adjusted = max(1, (width // step_x) * step_x)
-        height_adjusted = max(1, (height // step_y) * step_y)
+        # Debug block
+        if hasattr(self.viewer.config.renderer, "debug_instance") and self.viewer.config.renderer.debug_instance:
+            # Save the full frame
+            GL.glPixelStorei(GL.GL_PACK_ALIGNMENT, 1)
+            full_buffer = GL.glReadPixels(0, 0, self.width(), self.height(), GL.GL_RGB, GL.GL_UNSIGNED_BYTE)
 
-        # Read only the pixels from the specified box area
-        GL.glPixelStorei(GL.GL_PACK_ALIGNMENT, 1)
-        instance_buffer = GL.glReadPixels(
-            int(x * r), int(y * r),
-            int(width_adjusted * r), int(height_adjusted * r),
-            GL.GL_RGB, GL.GL_UNSIGNED_BYTE
-        )
-
-        # Convert to numpy array and downsample
-        import numpy as np
-        instance_map = np.frombuffer(instance_buffer, dtype=np.uint8).reshape(
-            int(height_adjusted * r), int(width_adjusted * r), 3
-        )
-
-        # Downsample the data
-        instance_map = instance_map[::step_y, ::step_x, :]
-
-        # For debugging: save the cropped area as image
-        if True:  # Add this config option if needed
+            import numpy as np
             from PIL import Image
-            # Save the full image before downsampling
-            debug_image = Image.fromarray(instance_map)
-            debug_image = debug_image.transpose(Image.FLIP_TOP_BOTTOM)
-            debug_image.save("instance_debug.png")
-            print(f"Saved instance map debug image to 'instance_debug.png' (shape: {instance_map.shape})")
 
-        # Reshape to final form after saving debug image
-        instance_map = instance_map.reshape(-1, 3)
+            # Save full frame
+            full_map = np.frombuffer(full_buffer, dtype=np.uint8).reshape(self.height(), self.width(), 3)
+            full_image = Image.fromarray(full_map)
+            full_image = full_image.transpose(Image.FLIP_TOP_BOTTOM)
+            full_image.save("instance_debug_full.png")
+
+            # Draw a red rectangle on the full image to show the box area
+            from PIL import ImageDraw
+
+            draw = ImageDraw.Draw(full_image)
+            draw.rectangle([x1, y1, x2, y2], outline="red", width=2)
+            full_image.save("instance_debug_full_with_box.png")
+
+            print(f"Saved debug images:")
+            print(f"- Full frame: instance_debug_full.png")
+            print(f"- Full frame with box: instance_debug_full_with_box.png")
+            print(f"Box coordinates: x={x}, y={y}, width={width}, height={height}")
+            print(f"Original box: x1={x1}, y1={y1}, x2={x2}, y2={y2}")
+            print(f"Window size: {self.width()}x{self.height()}")
+            print(f"Viewport: {viewport}")
+
+        # Read the box area
+        GL.glPixelStorei(GL.GL_PACK_ALIGNMENT, 1)
+        box_buffer = GL.glReadPixels(x, y, width, height, GL.GL_RGB, GL.GL_UNSIGNED_BYTE)
+
+        import numpy as np
+
+        box_map = np.frombuffer(box_buffer, dtype=np.uint8).reshape(height, width, 3)
+
+        # Save box image if in debug mode
+        if hasattr(self.viewer.config.renderer, "debug_instance") and self.viewer.config.renderer.debug_instance:
+            from PIL import Image
+
+            box_image = Image.fromarray(box_map)
+            box_image = box_image.transpose(Image.FLIP_TOP_BOTTOM)
+            box_image.save("instance_debug_box.png")
+            print(f"- Box area: instance_debug_box.png")
 
         # Clean up
         GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, 0)
         GL.glDeleteTextures(1, [texture])
         GL.glDeleteFramebuffers(1, [fbo])
 
-        return instance_map
+        # Restore viewport
+        GL.glViewport(*viewport)
+
+        return box_map.reshape(-1, 3)
