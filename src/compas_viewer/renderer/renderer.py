@@ -233,7 +233,7 @@ class Renderer(QOpenGLWidget):
         """
         self.clear()
         if is_instance or self.rendermode == "instance":
-            self.paint_instance()
+            self.paint(is_instance=True)
         else:
             self.paint()
 
@@ -573,7 +573,7 @@ class Renderer(QOpenGLWidget):
 
         return tag_objs, vector_objs, mesh_objs
 
-    def paint(self):
+    def paint(self, is_instance: bool = False):
         """Paint all the items in the render"""
 
         # Bind the same VAO created in init()
@@ -582,18 +582,29 @@ class Renderer(QOpenGLWidget):
         viewworld = self.camera.viewworld()
         self.update_projection()
         # Object categorization
-        tag_objs, vector_objs, mesh_objs = self.sort_objects_from_category(self.viewer.scene.visiable_objects)
+        # tag_objs, vector_objs, mesh_objs = self.sort_objects_from_category(self.viewer.scene.visiable_objects)
 
         # Clear color and depth buffers
         self.shader_model.bind()
+
+        # TODO: figure out which ones are actually needed
+        self.shader_model.uniform1f("opacity", self.opacity)
+        self.shader_model.uniform1f("object_opacity", 1)
+        self.shader_model.uniform3f("selection_color", self.viewer.config.renderer.selectioncolor.rgb)
+        self.shader_model.uniformBuffer("transformBuffer", self.buffer_manager.transform_texture, unit=0)
+        self.shader_model.uniformBuffer("settingsBuffer", self.buffer_manager.settings_texture, unit=1)
+        self.shader_model.uniform1f("pointSize", 10.0)
+
+
         self.shader_model.uniform4x4("viewworld", viewworld)
+        self.shader_model.uniform1i("is_instance", is_instance)
 
         if self.viewer.config.renderer.show_grid:
             self.grid.draw(self.shader_model)
         self.buffer_manager.draw(
             self.shader_model,
             wireframe=(self.rendermode == "wireframe"),
-            is_lighted=(self.rendermode == "lighted")
+            is_lighted=(self.rendermode == "lighted"),
         )
         # for obj in self.sort_objects_from_viewworld(mesh_objs, viewworld):
         #     obj.draw(self.shader_model, self.rendermode == "wireframe", self.rendermode == "lighted")
@@ -629,95 +640,126 @@ class Renderer(QOpenGLWidget):
         # Unbind once we're done
         GL.glBindVertexArray(0)
 
-    def paint_instance(self):
-        """
-        Independent drawing function for the  instance map,
-        which is only called by the :class:`compas_viewer.components.render.Render.paintGL` function.
-        return
-        See Also
-        --------
-        :func:`compas_viewer.components.render.Render.paintGL`
-        :func:`compas_viewer.components.render.Render.paint`
+    # def paint_instance(self):
+    #     """
+    #     Independent drawing function for the  instance map,
+    #     which is only called by the :class:`compas_viewer.components.render.Render.paintGL` function.
+    #     return
+    #     See Also
+    #     --------
+    #     :func:`compas_viewer.components.render.Render.paintGL`
+    #     :func:`compas_viewer.components.render.Render.paint`
 
-        """
+    #     """
 
-        #  Matrix update
-        viewworld = self.camera.viewworld()
-        self.update_projection()
-        # Object categorization
-        _, _, mesh_objs = self.sort_objects_from_category(tuple(self.viewer.scene.objects))
-        # Draw instance maps
-        GL.glDisable(GL.GL_POINT_SMOOTH)
-        GL.glDisable(GL.GL_LINE_SMOOTH)
+    #     #  Matrix update
+    #     viewworld = self.camera.viewworld()
+    #     self.update_projection()
+    #     # Object categorization
+    #     _, _, mesh_objs = self.sort_objects_from_category(tuple(self.viewer.scene.objects))
+    #     # Draw instance maps
+    #     GL.glDisable(GL.GL_POINT_SMOOTH)
+    #     GL.glDisable(GL.GL_LINE_SMOOTH)
 
-        self.shader_instance.bind()
-        self.shader_instance.uniform4x4("viewworld", viewworld)
-        for obj in mesh_objs:
-            obj.draw_instance(self.shader_instance, self.rendermode == "wireframe")
-        self.shader_instance.release()
+    #     self.shader_instance.bind()
+    #     self.shader_instance.uniform4x4("viewworld", viewworld)
+    #     for obj in mesh_objs:
+    #         obj.draw_instance(self.shader_instance, self.rendermode == "wireframe")
+    #     self.shader_instance.release()
 
-        GL.glEnable(GL.GL_POINT_SMOOTH)
-        GL.glEnable(GL.GL_LINE_SMOOTH)
+    #     GL.glEnable(GL.GL_POINT_SMOOTH)
+    #     GL.glEnable(GL.GL_LINE_SMOOTH)
 
     def read_instance_color(self, box: tuple[int, int, int, int]):
         """
-        Paint the instance map quickly, and then read the color of the specified area.
-
+        Paint the instance map to an FBO and read pixels from specified area.
+        
         Parameters
         ----------
         box : tuple[int, int, int, int]
-            The box area [x1, y1, x2, y2] to be read. x1=x2 and y1=y2 means a single point.
-
-        Notes
-        -----
-        The instance map is used by the selector to identify selected objects.
-        The mechanism of a :class:`compas_viewer.components.renderer.selector.Selector`
-        is picking the color from instance map and then find the corresponding object.
-        Anti aliasing, which is always force opened in many machines,  can cause color picking inaccuracy.
-
-        The instance buffer created by the GL is based on the "device-independent pixels",
-        while "physical pixels" is the common unit. The method :func:`PySide6.QtGui.QPaintDevice.devicePixelRatio()`
-        plays a role in the conversion between the two units, which is different on different devices.
-        For example, Mac Retina display has a devicePixelRatio of 2.0.
-        This method contains an uniform-sampling-similar math operation,
-        which is not absolutely accurate but enough for the selection.
-
-        See Also
-        --------
-        :func:`compas_viewer.components.renderer.selector.Selector.ANTI_ALIASING_FACTOR`
-        :attr:`compas_viewer.components.renderer.rendermode`
-
-        References
-        ----------
-        * https://doc.qt.io/qt-6/qscreen.html#devicePixelRatio-prop
-        * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glReadPixels.xhtml
-        * https://doc.qt.io/qt-6/qopenglwidget.html#makeCurrent
+            The box area [x1, y1, x2, y2] to be read.
+        
+        Returns
+        -------
+        numpy.ndarray
+            Downsampled instance color data from the specified area.
         """
-
-        # Get the rectangle area.
+        # Get the rectangle area
         x1, y1, x2, y2 = box
         x, y = min(x1, x2), self.height() - max(y1, y2)
         width = max(self.PIXEL_SELECTION_INCREMENTAL, abs(x1 - x2))
         height = max(self.PIXEL_SELECTION_INCREMENTAL, abs(y1 - y2))
-        r = self.viewer.renderer.devicePixelRatio()
+        r = self.devicePixelRatio()
 
         pixels_x = width * r
         pixels_y = height * r
         step_x = round(pixels_x / 1000) + 1
         step_y = round(pixels_y / 1000) + 1
 
-        # Repaint the canvas with instance color.
-        self.viewer.renderer.makeCurrent()
-        self.viewer.renderer.paintGL(is_instance=True)
+        # Create an FBO
+        fbo = GL.glGenFramebuffers(1)
+        GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, fbo)
+
+        # Create a texture to attach to the FBO
+        texture = GL.glGenTextures(1)
+        GL.glBindTexture(GL.GL_TEXTURE_2D, texture)
+        GL.glTexImage2D(
+            GL.GL_TEXTURE_2D, 0, GL.GL_RGB, 
+            self.width() * r, self.height() * r, 0, 
+            GL.GL_RGB, GL.GL_UNSIGNED_BYTE, None
+        )
+        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR)
+        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR)
+        GL.glFramebufferTexture2D(
+            GL.GL_FRAMEBUFFER, GL.GL_COLOR_ATTACHMENT0, 
+            GL.GL_TEXTURE_2D, texture, 0
+        )
+
+        # Check if FBO is complete
+        if GL.glCheckFramebufferStatus(GL.GL_FRAMEBUFFER) != GL.GL_FRAMEBUFFER_COMPLETE:
+            GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, 0)
+            raise Exception("Framebuffer is not complete!")
+
+        # Render the instance map to the FBO
+        self.paintGL(is_instance=True)
+        GL.glFlush()  # Ensure rendering commands are finished
 
         # Adjust width and height based on the step
-        width_adjusted = (width // step_x) * step_x
-        height_adjusted = (height // step_y) * step_y
+        width_adjusted = max(1, (width // step_x) * step_x)
+        height_adjusted = max(1, (height // step_y) * step_y)
 
-        # Read the pixel data with downsampling
-        instance_buffer = GL.glReadPixels(int(x * r), int(y * r), int(width_adjusted * r), int(height_adjusted * r), GL.GL_RGB, GL.GL_UNSIGNED_BYTE)
-        instance_map = frombuffer(instance_buffer, dtype=uint8).reshape(int(height_adjusted * r), int(width_adjusted * r), 3)
+        # Read only the pixels from the specified box area
+        GL.glPixelStorei(GL.GL_PACK_ALIGNMENT, 1)
+        instance_buffer = GL.glReadPixels(
+            int(x * r), int(y * r),
+            int(width_adjusted * r), int(height_adjusted * r),
+            GL.GL_RGB, GL.GL_UNSIGNED_BYTE
+        )
+
+        # Convert to numpy array and downsample
+        import numpy as np
+        instance_map = np.frombuffer(instance_buffer, dtype=np.uint8).reshape(
+            int(height_adjusted * r), int(width_adjusted * r), 3
+        )
 
         # Downsample the data
-        instance_map = instance_map[::step_y, ::step_x, :].reshape(-1, 3)
+        instance_map = instance_map[::step_y, ::step_x, :]
+
+        # For debugging: save the cropped area as image
+        if True:  # Add this config option if needed
+            from PIL import Image
+            # Save the full image before downsampling
+            debug_image = Image.fromarray(instance_map)
+            debug_image = debug_image.transpose(Image.FLIP_TOP_BOTTOM)
+            debug_image.save("instance_debug.png")
+            print(f"Saved instance map debug image to 'instance_debug.png' (shape: {instance_map.shape})")
+
+        # Reshape to final form after saving debug image
+        instance_map = instance_map.reshape(-1, 3)
+
+        # Clean up
+        GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, 0)
+        GL.glDeleteTextures(1, [texture])
+        GL.glDeleteFramebuffers(1, [fbo])
+
         return instance_map

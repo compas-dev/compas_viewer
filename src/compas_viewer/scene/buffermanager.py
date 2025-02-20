@@ -118,7 +118,6 @@ class BufferManager:
         for obj in self.objects:
             self.update_object_settings(obj)
 
-        # shader.uniform1i("is_instance", True)
         shader.uniform1i("is_grid", False)
         shader.enable_attribute("position")
         shader.enable_attribute("color")
