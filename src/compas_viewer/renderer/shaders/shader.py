@@ -276,14 +276,31 @@ class Shader:
             x1, x2 = x2, x1
         if y1 > y2:
             y1, y2 = y2, y1
+
+        # Create vertices for the box
+        vertices = array([
+            x1, y1, 0.0,  # Bottom-left
+            x2, y1, 0.0,  # Bottom-right
+            x2, y2, 0.0,  # Top-right
+            x1, y2, 0.0,  # Top-left
+        ], dtype='float32')
+
+        # Create vertex buffer
+        vbo = GL.glGenBuffers(1)
+        GL.glBindBuffer(GL.GL_ARRAY_BUFFER, vbo)
+        GL.glBufferData(GL.GL_ARRAY_BUFFER, vertices.nbytes, vertices, GL.GL_STATIC_DRAW)
+
+        # Enable position attribute
+        self.enable_attribute('position')
+        self.bind_attribute('position', vbo, 3)
+
+        # Draw the box
         GL.glLineWidth(1)
-        GL.glBegin(GL.GL_LINE_LOOP)
-        GL.glColor3f(0, 0, 0)
-        GL.glVertex2f(x1, y1)
-        GL.glVertex2f(x2, y1)
-        GL.glVertex2f(x2, y2)
-        GL.glVertex2f(x1, y2)
-        GL.glEnd()
+        GL.glDrawArrays(GL.GL_LINE_LOOP, 0, 4)
+
+        # Clean up
+        self.disable_attribute('position')
+        GL.glDeleteBuffers(1, [vbo])
 
 
 def make_shader_program(name: str):

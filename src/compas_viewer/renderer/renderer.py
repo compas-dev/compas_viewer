@@ -577,17 +577,17 @@ class Renderer(QOpenGLWidget):
         self.shader_tag.release()
 
         # draw 2D box for multi-selection
-        # if self.viewer.mouse.is_tracing_a_window:
-        #     self.shader_model.draw_2d_box(
-        #         (
-        #             self.viewer.mouse.window_start_point.x(),
-        #             self.viewer.mouse.window_start_point.y(),
-        #             self.viewer.mouse.last_pos.x(),
-        #             self.viewer.mouse.last_pos.y(),
-        #         ),
-        #         self.width(),
-        #         self.height(),
-        #     )
+        if self.viewer.mouse.is_tracing_a_window:
+            self.shader_model.draw_2d_box(
+                (
+                    self.viewer.mouse.window_start_point.x(),
+                    self.viewer.mouse.window_start_point.y(),
+                    self.viewer.mouse.last_pos.x(),
+                    self.viewer.mouse.last_pos.y(),
+                ),
+                self.width(),
+                self.height(),
+            )
 
         # Unbind once we're done
         GL.glBindVertexArray(0)
