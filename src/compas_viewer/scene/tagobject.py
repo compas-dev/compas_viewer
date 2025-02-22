@@ -116,6 +116,9 @@ class TagObject(ViewerSceneObject, GeometryObject):
     VERTICAL_ALIGN = {"top": 1, "center": 0, "bottom": -1}
     HORIZONTAL_ALIGN = {"left": -1, "center": 0, "right": 1}
 
+    def init(self):
+        self.make_buffers()
+
     def make_buffers(self):
         positions = [
             0,
@@ -220,10 +223,13 @@ class TagObject(ViewerSceneObject, GeometryObject):
 
     def draw(self, shader, camera_position, width, height):
         """Draw the object from its buffers"""
+        if not self.show:
+            return
         shader.enable_attribute("position")
         if self.worldtransformation is not None:
             shader.uniform4x4("transform", self.worldtransformation.matrix)
         shader.uniform1f("object_opacity", self.opacity)
+        shader.uniform1f("is_selected", self.is_selected)
         shader.uniform1f("screen_aspect", width / height)
         shader.uniform1f("screen_height", height)
         shader.uniform1f("text_aspect", self.text_aspect)

@@ -1,6 +1,6 @@
-#version 120
+#version 330 core
 
-attribute vec3 position;
+in vec3 position;
 
 uniform mat4 projection;
 uniform mat4 viewworld;
@@ -13,12 +13,10 @@ uniform vec3 text_position;
 uniform int vertical_align;
 uniform int horizontal_align;
 
-
-varying vec2 texcoord;
+out vec2 texcoord;
 
 void main()
 {
-
     texcoord = vec2(position.x, position.y);
 
     vec2 position = vec2(position.x, position.y);
@@ -37,11 +35,9 @@ void main()
         position.y -= 1.0;
     }
 
-
-    vec4 screen_position = projection * viewworld * vec4(text_position, 1.0);
+    vec4 screen_position = projection * viewworld * transform * vec4(text_position, 1.0);
     vec2 adjustedPos = vec2(position.x / screen_aspect * text_aspect, position.y) * text_height / screen_height;
     vec4 offset = vec4(adjustedPos * screen_position.w, 0.0, 0.0);
     screen_position += offset;
     gl_Position = screen_position;
-
 }

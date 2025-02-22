@@ -387,7 +387,8 @@ class Renderer(QOpenGLWidget):
 
         for obj in self.viewer.scene.objects:
             obj.init()
-            self.buffer_manager.add_object(obj)
+            if not isinstance(obj, TagObject):
+                self.buffer_manager.add_object(obj)
         self.buffer_manager.create_buffers()
 
         # Unbind VAO when setup is complete.
@@ -412,13 +413,13 @@ class Renderer(QOpenGLWidget):
         self.shader_model.uniform1f("pointSize", 10.0)
         self.shader_model.release()
 
-        # self.shader_tag = Shader(name="tag")
-        # self.shader_tag.bind()
-        # self.shader_tag.uniform4x4("projection", projection)
-        # self.shader_tag.uniform4x4("viewworld", viewworld)
-        # self.shader_tag.uniform4x4("transform", transform)
-        # self.shader_tag.uniform1f("opacity", self.opacity)
-        # self.shader_tag.release()
+        self.shader_tag = Shader(name="tag")
+        self.shader_tag.bind()
+        self.shader_tag.uniform4x4("projection", projection)
+        self.shader_tag.uniform4x4("viewworld", viewworld)
+        self.shader_tag.uniform4x4("transform", transform)
+        self.shader_tag.uniform1f("opacity", self.opacity)
+        self.shader_tag.release()
 
     def update_projection(self, w=None, h=None):
         """
@@ -567,12 +568,13 @@ class Renderer(QOpenGLWidget):
         )
         self.shader_model.release()
 
-        # # Draw text tag sprites
-        # self.shader_tag.bind()
-        # self.shader_tag.uniform4x4("viewworld", viewworld)
-        # for obj in tag_objs:
-        #     obj.draw(self.shader_tag, self.camera.position, self.width(), self.height())
-        # self.shader_tag.release()
+        # Draw text tag sprites
+        tag_objs = [obj for obj in self.viewer.scene.objects if isinstance(obj, TagObject)]
+        self.shader_tag.bind()
+        self.shader_tag.uniform4x4("viewworld", viewworld)
+        for obj in tag_objs:
+            obj.draw(self.shader_tag, self.camera.position, self.width(), self.height())
+        self.shader_tag.release()
 
         # draw 2D box for multi-selection
         # if self.viewer.mouse.is_tracing_a_window:
