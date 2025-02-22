@@ -69,10 +69,15 @@ class BufferManager:
         matrix = matrix_buffer if matrix_buffer is not None else np.identity(4, dtype=np.float32).flatten()
         self.transforms.append(matrix)
 
+        if hasattr(obj, "instance_color"):
+            instance_color = obj.instance_color.rgb
+        else:
+            instance_color = [0.0, 0.0, 0.0]
+
         for obj in self.objects:
             obj_settings = [
                 [obj.show, obj.show_points, obj.show_lines, obj.show_faces],  # Row 1
-                [*obj.instance_color.rgb, obj.is_selected],  # Row 2
+                [*instance_color, obj.is_selected],  # Row 2
             ]
             self.settings.append(obj_settings)
 
@@ -260,10 +265,15 @@ class BufferManager:
         """
         if obj not in self.objects:
             return
+        
+        if hasattr(obj, "instance_color"):
+            instance_color = obj.instance_color.rgb
+        else:
+            instance_color = [0.0, 0.0, 0.0]
 
         obj_settings = [
             [obj.show, obj.show_points, obj.show_lines, obj.show_faces],  # Row 1
-            [*obj.instance_color.rgb, obj.is_selected],  # Row 2
+            [*instance_color, obj.is_selected],  # Row 2
         ]
         index = self.objects[obj]
         self.settings[index] = obj_settings

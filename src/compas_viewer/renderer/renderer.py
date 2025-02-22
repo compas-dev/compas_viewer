@@ -420,29 +420,6 @@ class Renderer(QOpenGLWidget):
         # self.shader_tag.uniform1f("opacity", self.opacity)
         # self.shader_tag.release()
 
-        # self.shader_arrow = Shader(name="arrow")
-        # self.shader_arrow.bind()
-        # self.shader_arrow.uniform4x4("projection", projection)
-        # self.shader_arrow.uniform4x4("viewworld", viewworld)
-        # self.shader_arrow.uniform4x4("transform", transform)
-        # self.shader_arrow.uniform1f("opacity", self.opacity)
-        # self.shader_arrow.uniform1f("aspect", self.width() / self.height())
-        # self.shader_arrow.release()
-
-        # self.shader_instance = Shader(name="instance")
-        # self.shader_instance.bind()
-        # self.shader_instance.uniform4x4("projection", projection)
-        # self.shader_instance.uniform4x4("viewworld", viewworld)
-        # self.shader_instance.uniform4x4("transform", transform)
-        # self.shader_instance.release()
-
-        # self.shader_grid = Shader(name="grid")
-        # self.shader_grid.bind()
-        # self.shader_grid.uniform4x4("projection", projection)
-        # self.shader_grid.uniform4x4("viewworld", viewworld)
-        # self.shader_grid.uniform4x4("transform", transform)
-        # self.shader_grid.release()
-
     def update_projection(self, w=None, h=None):
         """
         Update the projection matrix.
@@ -568,10 +545,6 @@ class Renderer(QOpenGLWidget):
 
         viewworld = self.camera.viewworld()
         self.update_projection()
-        # Object categorization
-        # tag_objs, vector_objs, mesh_objs = self.sort_objects_from_category(self.viewer.scene.visiable_objects)
-
-        # Clear color and depth buffers
         self.shader_model.bind()
 
         # TODO: figure out which ones are actually needed
@@ -592,16 +565,7 @@ class Renderer(QOpenGLWidget):
             wireframe=(self.rendermode == "wireframe"),
             is_lighted=(self.rendermode == "lighted"),
         )
-        # for obj in self.sort_objects_from_viewworld(mesh_objs, viewworld):
-        #     obj.draw(self.shader_model, self.rendermode == "wireframe", self.rendermode == "lighted")
         self.shader_model.release()
-
-        # # Draw vector arrows
-        # self.shader_arrow.bind()
-        # self.shader_arrow.uniform4x4("viewworld", viewworld)
-        # for obj in vector_objs:
-        #     obj.draw(self.shader_arrow)
-        # self.shader_arrow.release()
 
         # # Draw text tag sprites
         # self.shader_tag.bind()
@@ -610,7 +574,7 @@ class Renderer(QOpenGLWidget):
         #     obj.draw(self.shader_tag, self.camera.position, self.width(), self.height())
         # self.shader_tag.release()
 
-        # # draw 2D box for multi-selection
+        # draw 2D box for multi-selection
         # if self.viewer.mouse.is_tracing_a_window:
         #     self.shader_model.draw_2d_box(
         #         (
