@@ -57,7 +57,6 @@ class BufferManager:
 
     def add_object(self, obj: Any) -> None:
         """Add an object's buffer data to the combined buffers."""
-
         self.objects[obj] = len(self.transforms)
 
         # Process geometry data
@@ -79,12 +78,17 @@ class BufferManager:
         else:
             instance_color = [0.0, 0.0, 0.0]
 
-        for obj in self.objects:
-            obj_settings = [
-                [obj.show, obj.show_points, obj.show_lines, obj.show_faces],  # Row 1
-                [*instance_color, obj.is_selected],  # Row 2
-            ]
-            self.settings.append(obj_settings)
+        # Get parent index
+        parent_index = -1.0
+        if hasattr(obj, "parent") and obj.parent in self.objects:
+            parent_index = float(self.objects[obj.parent])
+
+        obj_settings = [
+            [obj.show, obj.show_points, obj.show_lines, obj.show_faces],  # Row 1
+            [*instance_color, obj.is_selected],  # Row 2
+            [parent_index, 0.0, 0.0, 0.0],  # Row 3: parent index and padding
+        ]
+        self.settings.append(obj_settings)
 
     def _add_buffer_data(self, buffer_type: str, data: Tuple[List, List, List]) -> None:
         """Add buffer data for a specific geometry type."""
@@ -257,13 +261,7 @@ class BufferManager:
             update_vertex_buffer(col_array, self.buffer_ids[buffer_type]["colors"], offset=col_byte_offset)
 
     def update_object_settings(self, obj: Any) -> None:
-        """Update the settings for a single object.
-
-        Parameters
-        ----------
-        obj : Any
-            The object whose settings should be updated.
-        """
+        """Update the settings for a single object."""
         if obj not in self.objects:
             return
 
@@ -272,11 +270,17 @@ class BufferManager:
         else:
             instance_color = [0.0, 0.0, 0.0]
 
+        # Get parent index
+        parent_index = -1.0
+        if hasattr(obj, "parent") and obj.parent in self.objects:
+            parent_index = float(self.objects[obj.parent])
+
         obj_settings = [
             [obj.show, obj.show_points, obj.show_lines, obj.show_faces],  # Row 1
             [*instance_color, obj.is_selected],  # Row 2
+            [parent_index, 0.0, 0.0, 0.0],  # Row 3: parent index and padding
         ]
         index = self.objects[obj]
         self.settings[index] = obj_settings
-        byte_offset = index * 4 * 8  # 1 float per setting * 4 bytes
+        byte_offset = index * 4 * 12  # 3 rows * 4 floats per row * 4 bytes per float
         update_texture_buffer(np.array(obj_settings, dtype=np.float32), self.settings_texture, offset=byte_offset)
