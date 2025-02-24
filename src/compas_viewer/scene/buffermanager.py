@@ -220,12 +220,16 @@ class BufferManager:
         # Update each buffer type that the object has
         buffer_types = []
         if hasattr(obj, "_points_data") and obj._points_data:
+            obj._points_data = obj._read_points_data()
             buffer_types.append("points")
         if hasattr(obj, "_lines_data") and obj._lines_data:
+            obj._lines_data = obj._read_lines_data()
             buffer_types.append("lines")
         if hasattr(obj, "_frontfaces_data") and obj._frontfaces_data:
+            obj._frontfaces_data = obj._read_frontfaces_data()
             buffer_types.append("faces")
         if hasattr(obj, "_backfaces_data") and obj._backfaces_data:
+            obj._backfaces_data = obj._read_backfaces_data()
             buffer_types.append("backfaces")
 
         for buffer_type in buffer_types:

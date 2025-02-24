@@ -3,7 +3,7 @@ from random import random
 from compas.datastructures import Mesh
 from compas.geometry import Box
 from compas_viewer import Viewer
-from compas.geometry import Translation, Scale
+from compas.geometry import Translation
 
 viewer = Viewer()
 
@@ -15,6 +15,7 @@ obj2.transformation = Translation.from_vector([5, 0, 0])
 obj3 = viewer.scene.add(mesh)
 obj3.transformation = Translation.from_vector([-5, 0, 0])
 
+
 @viewer.on(interval=100)
 def deform_mesh(frame):
     for v in mesh.vertices():
@@ -24,19 +25,18 @@ def deform_mesh(frame):
         vertex[2] += (random() - 0.5) * 0.1
         mesh.vertex_attributes(v, "xyz", vertex)
 
-    obj1.update()
-    obj2.update()
-
     obj1.transformation = Translation.from_vector([random() - 0.5, random() - 0.5, random() - 0.5])
-    # obj1.transformation = Scale.from_factors([0.51, 0.51, 0.51])
     obj3.transformation *= Translation.from_euler_angles([0.05, 0, 0])
 
-    viewer.renderer.buffer_manager.update_object_transform(obj1)
-    viewer.renderer.buffer_manager.update_object_data(obj1)
-    viewer.renderer.buffer_manager.update_object_data(obj2)
-    viewer.renderer.buffer_manager.update_object_transform(obj3)
-    # viewer.renderer.buffer_manager.update_object_settings(obj1, True)
+    # Three objects share the same geometry data, but updated differently
+    # obj1 should move around and deform
+    obj1.update(update_transform=True, update_data=True)
 
-# TODO: clean up all the update calls
+    # obj2 will not move but will deform
+    obj2.update(update_transform=False, update_data=True)
+
+    # obj3 will rotate but not deform
+    obj3.update(update_transform=True, update_data=False)
+
 
 viewer.show()

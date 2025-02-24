@@ -172,26 +172,21 @@ class ViewerSceneObject(SceneObject, Base):
         self.instance_color = Color.from_rgb255(*next(self.viewer.scene._instance_colors_generator))
         self.viewer.scene.instance_colors[self.instance_color.rgb255] = self
 
-    def update(self, update_positions: bool = True, update_colors: bool = True, update_elements: bool = True):
+    def update(self, update_transform: bool = True, update_data: bool = False):
         """Update the object.
 
         Parameters
         ----------
-        update_positions : bool, optional
-            Whether to update positions of the object.
-        update_colors : bool, optional
-            Whether to update colors of the object.
-        update_elements : bool, optional
-            Whether to update elements of the object.
+        update_transform : bool, optional
+            Whether to update the transform of the object.
+        update_data : bool, optional
+            Whether to update the geometric data of the object.
         """
-
-        # Update the matrix from object's translation, rotation and scale.
-        self._update_matrix()
-
-        self._points_data = self._read_points_data()
-        self._lines_data = self._read_lines_data()
-        self._frontfaces_data = self._read_frontfaces_data()
-        self._backfaces_data = self._read_backfaces_data()
+        if update_transform:
+            self._update_matrix()
+            self.buffer_manager.update_object_transform(self)
+        if update_data:
+            self.buffer_manager.update_object_data(self)
 
     def _update_bounding_box(self, positions: Optional[list[Point]] = None):
         """Update the bounding box of the object"""
@@ -235,3 +230,7 @@ class ViewerSceneObject(SceneObject, Base):
             settings["facecolor"] = self.facecolor
 
         return settings
+
+    @property
+    def buffer_manager(self):
+        return self.viewer.renderer.buffer_manager
