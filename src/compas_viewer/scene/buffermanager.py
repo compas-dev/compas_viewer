@@ -48,7 +48,7 @@ class BufferManager:
         self.settings: List[float] = []
 
         # Initialize empty buffers for each geometry type
-        for buffer_type in ["points", "lines", "faces", "backfaces"]:
+        for buffer_type in ["_points_data", "_lines_data", "_frontfaces_data", "_backfaces_data"]:
             self.positions[buffer_type] = np.array([], dtype=np.float32)
             self.colors[buffer_type] = np.array([], dtype=np.float32)
             self.elements[buffer_type] = np.array([], dtype=np.int32)
@@ -60,14 +60,9 @@ class BufferManager:
         self.objects[obj] = len(self.transforms)
 
         # Process geometry data
-        if hasattr(obj, "_points_data") and obj._points_data:
-            self._add_buffer_data("points", obj._points_data)
-        if hasattr(obj, "_lines_data") and obj._lines_data:
-            self._add_buffer_data("lines", obj._lines_data)
-        if hasattr(obj, "_frontfaces_data") and obj._frontfaces_data:
-            self._add_buffer_data("faces", obj._frontfaces_data)
-        if hasattr(obj, "_backfaces_data") and obj._backfaces_data:
-            self._add_buffer_data("backfaces", obj._backfaces_data)
+        for data_type in ["_points_data", "_lines_data", "_frontfaces_data", "_backfaces_data"]:
+            if hasattr(obj, data_type) and getattr(obj, data_type):
+                self._add_buffer_data(data_type, getattr(obj, data_type))
 
         matrix_buffer = getattr(obj, "_matrix_buffer", None)
         matrix = matrix_buffer if matrix_buffer is not None else np.identity(4, dtype=np.float32).flatten()
@@ -144,7 +139,7 @@ class BufferManager:
             shader.uniform1i("is_lighted", is_lighted)
             shader.uniform1i("element_type", 2)
 
-            for face_type in ["faces", "backfaces"]:
+            for face_type in ["_frontfaces_data", "_backfaces_data"]:
                 if self.buffer_ids[face_type]:
                     shader.bind_attribute("position", self.buffer_ids[face_type]["positions"])
                     shader.bind_attribute("color", self.buffer_ids[face_type]["colors"], step=4)
@@ -154,19 +149,19 @@ class BufferManager:
         # Draw lines
         shader.uniform1i("is_lighted", False)
         shader.uniform1i("element_type", 1)
-        if self.buffer_ids["lines"]:
-            shader.bind_attribute("position", self.buffer_ids["lines"]["positions"])
-            shader.bind_attribute("color", self.buffer_ids["lines"]["colors"], step=4)
-            shader.bind_attribute("object_index", self.buffer_ids["lines"]["object_indices"], step=1)
-            shader.draw_lines(elements=self.buffer_ids["lines"]["elements"], n=len(self.elements["lines"]), width=1.0)
+        if self.buffer_ids["_lines_data"]:
+            shader.bind_attribute("position", self.buffer_ids["_lines_data"]["positions"])
+            shader.bind_attribute("color", self.buffer_ids["_lines_data"]["colors"], step=4)
+            shader.bind_attribute("object_index", self.buffer_ids["_lines_data"]["object_indices"], step=1)
+            shader.draw_lines(elements=self.buffer_ids["_lines_data"]["elements"], n=len(self.elements["_lines_data"]), width=1.0)
 
         # Draw points
         shader.uniform1i("element_type", 0)
-        if self.buffer_ids["points"]:
-            shader.bind_attribute("position", self.buffer_ids["points"]["positions"])
-            shader.bind_attribute("color", self.buffer_ids["points"]["colors"], step=4)
-            shader.bind_attribute("object_index", self.buffer_ids["points"]["object_indices"], step=1)
-            shader.draw_points(elements=self.buffer_ids["points"]["elements"], n=len(self.elements["points"]), size=10.0)
+        if self.buffer_ids["_points_data"]:
+            shader.bind_attribute("position", self.buffer_ids["_points_data"]["positions"])
+            shader.bind_attribute("color", self.buffer_ids["_points_data"]["colors"], step=4)
+            shader.bind_attribute("object_index", self.buffer_ids["_points_data"]["object_indices"], step=1)
+            shader.draw_points(elements=self.buffer_ids["_points_data"]["elements"], n=len(self.elements["_points_data"]), size=10.0)
 
         shader.disable_attribute("object_index")
         shader.disable_attribute("position")
@@ -205,64 +200,38 @@ class BufferManager:
         update_texture_buffer(matrix, self.transform_texture, offset=byte_offset)
 
     def update_object_data(self, obj: Any) -> None:
-        """Update the position and color buffers for a single object.
-
-        Parameters
-        ----------
-        obj : Any
-            The object whose buffers should be updated.
-        """
+        """Update the position and color buffers for a single object."""
         if obj not in self.objects:
             return
 
         index = self.objects[obj]
 
         # Update each buffer type that the object has
-        buffer_types = []
-        if hasattr(obj, "_points_data") and obj._points_data:
-            obj._points_data = obj._read_points_data()
-            buffer_types.append("points")
-        if hasattr(obj, "_lines_data") and obj._lines_data:
-            obj._lines_data = obj._read_lines_data()
-            buffer_types.append("lines")
-        if hasattr(obj, "_frontfaces_data") and obj._frontfaces_data:
-            obj._frontfaces_data = obj._read_frontfaces_data()
-            buffer_types.append("faces")
-        if hasattr(obj, "_backfaces_data") and obj._backfaces_data:
-            obj._backfaces_data = obj._read_backfaces_data()
-            buffer_types.append("backfaces")
+        data_types = ["_points_data", "_lines_data", "_frontfaces_data", "_backfaces_data"]
+        for data_type in data_types:
+            if hasattr(obj, data_type) and getattr(obj, data_type):
+                setattr(obj, data_type, getattr(obj, f"_read{data_type}")())
+                data = getattr(obj, data_type)
+                positions, colors, _ = data  # We don't update elements as topology stays the same
 
-        for buffer_type in buffer_types:
-            # Get the data based on buffer type
-            if buffer_type == "points":
-                data = obj._points_data
-            elif buffer_type == "lines":
-                data = obj._lines_data
-            elif buffer_type == "faces":
-                data = obj._frontfaces_data
-            else:  # backfaces
-                data = obj._backfaces_data
+                # Convert to numpy arrays
+                pos_array = np.array(positions, dtype=np.float32).flatten()
+                col_array = np.array([c.rgba for c in colors], dtype=np.float32).flatten()
 
-            positions, colors, _ = data  # We don't update elements as topology stays the same
+                # Find the start and end indices for this object in the buffer
+                start_idx = 0
+                for i in range(len(self.object_indices[data_type])):
+                    if self.object_indices[data_type][i] == index:
+                        start_idx = i
+                        break
 
-            # Convert to numpy arrays
-            pos_array = np.array(positions, dtype=np.float32).flatten()
-            col_array = np.array([c.rgba for c in colors], dtype=np.float32).flatten()
+                # Update the position buffer
+                pos_byte_offset = start_idx * 3 * 4  # 3 floats per vertex * 4 bytes per float
+                update_vertex_buffer(pos_array, self.buffer_ids[data_type]["positions"], offset=pos_byte_offset)
 
-            # Find the start and end indices for this object in the buffer
-            start_idx = 0
-            for i in range(len(self.object_indices[buffer_type])):
-                if self.object_indices[buffer_type][i] == index:
-                    start_idx = i
-                    break
-
-            # Update the position buffer
-            pos_byte_offset = start_idx * 3 * 4  # 3 floats per vertex * 4 bytes per float
-            update_vertex_buffer(pos_array, self.buffer_ids[buffer_type]["positions"], offset=pos_byte_offset)
-
-            # Update the color buffer
-            col_byte_offset = start_idx * 4 * 4  # 4 floats per color * 4 bytes per float
-            update_vertex_buffer(col_array, self.buffer_ids[buffer_type]["colors"], offset=col_byte_offset)
+                # Update the color buffer
+                col_byte_offset = start_idx * 4 * 4  # 4 floats per color * 4 bytes per float
+                update_vertex_buffer(col_array, self.buffer_ids[data_type]["colors"], offset=col_byte_offset)
 
     def update_object_settings(self, obj: Any) -> None:
         """Update the settings for a single object."""
