@@ -169,8 +169,10 @@ class ViewerSceneObject(SceneObject, Base):
         self._frontfaces_data = self._read_frontfaces_data()
         self._backfaces_data = self._read_backfaces_data()
         self._update_matrix()
+        self._update_bounding_box()
         self.instance_color = Color.from_rgb255(*next(self.viewer.scene._instance_colors_generator))
         self.viewer.scene.instance_colors[self.instance_color.rgb255] = self
+
 
     def update(self, update_transform: bool = True, update_data: bool = False):
         """Update the object.
