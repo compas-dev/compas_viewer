@@ -19,14 +19,12 @@ from compas_viewer.singleton import Singleton
 from compas_viewer.ui import UI
 
 
-
 class Viewer(Singleton):
     def __init__(self, config: Optional[Config] = None, **kwargs):
-
         format = QSurfaceFormat()
         format.setVersion(3, 3)
         format.setProfile(QSurfaceFormat.CoreProfile)
-        format.setSamples(4) # Enable 4x MSAA (optional, can be set to 8, etc.)
+        format.setSamples(4)  # Enable 4x MSAA (optional, can be set to 8, etc.)
         QSurfaceFormat.setDefaultFormat(format)
 
         self.running = False

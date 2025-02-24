@@ -173,7 +173,6 @@ class ViewerSceneObject(SceneObject, Base):
         self.instance_color = Color.from_rgb255(*next(self.viewer.scene._instance_colors_generator))
         self.viewer.scene.instance_colors[self.instance_color.rgb255] = self
 
-
     def update(self, update_transform: bool = True, update_data: bool = False):
         """Update the object.
 

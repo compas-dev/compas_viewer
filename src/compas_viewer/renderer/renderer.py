@@ -593,7 +593,6 @@ class Renderer(QOpenGLWidget):
         GL.glBindVertexArray(0)
 
     def read_instance_color(self, box: tuple[int, int, int, int]):
-
         # TODO: Should be able to massively simplify this.
         # Get the rectangle area
         x1, y1, x2, y2 = box

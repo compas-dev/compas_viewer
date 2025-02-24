@@ -137,7 +137,7 @@ def make_texture_buffer(data, internal_format=GL.GL_RGBA32F):
         A numpy array of floats.
     internal_format : GLenum, optional
         The internal format for the texture buffer. Default is GL.GL_RGBA32F.
-    
+
     Returns
     -------
     int
@@ -146,13 +146,8 @@ def make_texture_buffer(data, internal_format=GL.GL_RGBA32F):
     # Create buffer
     buffer = GL.glGenBuffers(1)
     GL.glBindBuffer(GL.GL_TEXTURE_BUFFER, buffer)
-    
-    GL.glBufferData(
-        GL.GL_TEXTURE_BUFFER,
-        data.nbytes,
-        data,
-        GL.GL_STATIC_DRAW
-    )
+
+    GL.glBufferData(GL.GL_TEXTURE_BUFFER, data.nbytes, data, GL.GL_STATIC_DRAW)
 
     # Create texture
     texture = GL.glGenTextures(1)
