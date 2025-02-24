@@ -34,6 +34,17 @@ float getEffectiveShow(float objectIndex) {
     return showValue;
 }
 
+float getEffectiveSelection(float objectIndex) {
+    float selectionValue = texelFetch(settingsBuffer, int(objectIndex * 3) + 1).a;
+    float parentIndex = texelFetch(settingsBuffer, int(objectIndex * 3) + 2).r;
+    
+    while (parentIndex >= 0.0 && selectionValue == 0.0) {  // Continue until we find a selected parent
+        selectionValue = max(selectionValue, texelFetch(settingsBuffer, int(parentIndex * 3) + 1).a);
+        parentIndex = texelFetch(settingsBuffer, int(parentIndex * 3) + 2).r;
+    }
+    return selectionValue;
+}
+
 void main() {
     // Initialize transform matrix and handle grid case
     mat4 transform = is_grid ? mat4(1.0) : transpose(mat4(
@@ -56,7 +67,7 @@ void main() {
         show_lines = settings_row1.b;
         show_faces = settings_row1.a;
         instance_color = vec4(settings_row2.rgb, 1.0);
-        is_selected = settings_row2.a;
+        is_selected = getEffectiveSelection(object_index);
     }
 
     // Calculate final position
