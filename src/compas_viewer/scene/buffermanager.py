@@ -1,9 +1,7 @@
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Tuple
 import numpy as np
-from compas.colors import Color
 from compas_viewer.gl import make_vertex_buffer, make_index_buffer, make_texture_buffer, update_texture_buffer, update_vertex_buffer
 from compas_viewer.renderer.shaders import Shader
-import OpenGL.GL as GL
 
 
 class BufferManager:
@@ -20,8 +18,16 @@ class BufferManager:
         Combined color buffers for different geometry types
     elements : Dict[str, np.ndarray]
         Combined element index buffers for different geometry types
+    object_indices : Dict[str, np.ndarray]
+        Combined object index buffers for different geometry types
+    objects : Dict[Any, int]
+        Dictionary mapping objects to their indices in the buffer
     buffer_ids : Dict[str, Dict[str, int]]
-        OpenGL buffer IDs for positions, colors and elements
+        Dictionary mapping buffer types to their IDs
+    transforms : List[float]
+        List of transformation matrices for each object
+    settings : List[float]
+        List of setting values for each object
     """
 
     def __init__(self):
@@ -64,7 +70,6 @@ class BufferManager:
         if hasattr(obj, "_backfaces_data") and obj._backfaces_data:
             self._add_buffer_data("backfaces", obj._backfaces_data)
 
-        
         matrix_buffer = getattr(obj, "_matrix_buffer", None)
         matrix = matrix_buffer if matrix_buffer is not None else np.identity(4, dtype=np.float32).flatten()
         self.transforms.append(matrix)
@@ -243,16 +248,12 @@ class BufferManager:
                     start_idx = i
                     break
 
-            vertices_per_object = len(positions)
-
             # Update the position buffer
             pos_byte_offset = start_idx * 3 * 4  # 3 floats per vertex * 4 bytes per float
-            pos_byte_size = vertices_per_object * 3 * 4
             update_vertex_buffer(pos_array, self.buffer_ids[buffer_type]["positions"], offset=pos_byte_offset)
 
             # Update the color buffer
             col_byte_offset = start_idx * 4 * 4  # 4 floats per color * 4 bytes per float
-            col_byte_size = vertices_per_object * 4 * 4
             update_vertex_buffer(col_array, self.buffer_ids[buffer_type]["colors"], offset=col_byte_offset)
 
     def update_object_settings(self, obj: Any) -> None:
@@ -265,7 +266,7 @@ class BufferManager:
         """
         if obj not in self.objects:
             return
-        
+
         if hasattr(obj, "instance_color"):
             instance_color = obj.instance_color.rgb
         else:
