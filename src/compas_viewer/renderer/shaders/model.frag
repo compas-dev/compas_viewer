@@ -9,10 +9,10 @@ in float show_points;
 in float show_lines;
 in float show_faces;
 in vec4 instance_color;
+in float object_opacity;
 
 // Uniforms
 uniform float opacity;
-uniform float object_opacity;
 uniform bool is_lighted;
 uniform vec3 selection_color;
 uniform int element_type;

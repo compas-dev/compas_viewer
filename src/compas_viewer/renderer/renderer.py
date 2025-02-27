@@ -559,13 +559,31 @@ class Renderer(QOpenGLWidget):
         self.shader_model.uniform4x4("viewworld", viewworld)
         self.shader_model.uniform1i("is_instance", is_instance)
 
+        # First pass: Draw grid and opaque objects with depth writing enabled
+        GL.glDepthMask(GL.GL_TRUE)
+        
         if self.viewer.config.renderer.show_grid:
             self.grid.draw(self.shader_model)
+        
+        # Draw opaque objects
         self.buffer_manager.draw(
             self.shader_model,
             wireframe=(self.rendermode == "wireframe"),
             is_lighted=(self.rendermode == "lighted"),
+            transparent=False  # Only draw opaque objects in this pass
         )
+        
+        # Second pass: Draw transparent objects with depth writing disabled
+        if not is_instance:  # Skip transparent objects in instance rendering
+            GL.glDepthMask(GL.GL_FALSE)  # Disable depth writing for transparent objects
+            self.buffer_manager.draw(
+                self.shader_model,
+                wireframe=(self.rendermode == "wireframe"),
+                is_lighted=(self.rendermode == "lighted"),
+                transparent=True  # Only draw transparent objects in this pass
+            )
+            GL.glDepthMask(GL.GL_TRUE)  # Re-enable depth writing
+        
         self.shader_model.release()
 
         # Draw text tag sprites

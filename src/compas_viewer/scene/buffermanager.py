@@ -2,6 +2,7 @@ from typing import Any, Dict, List, Tuple
 import numpy as np
 from compas_viewer.gl import make_vertex_buffer, make_index_buffer, make_texture_buffer, update_texture_buffer, update_vertex_buffer
 from compas_viewer.renderer.shaders import Shader
+import OpenGL.GL as GL
 
 
 class BufferManager:
@@ -81,7 +82,7 @@ class BufferManager:
         obj_settings = [
             [obj.show, obj.show_points, obj.show_lines, obj.show_faces],  # Row 1
             [*instance_color, obj.is_selected],  # Row 2
-            [parent_index, 0.0, 0.0, 0.0],  # Row 3: parent index and padding
+            [parent_index, obj.opacity, 0.0, 0.0],  # Row 3: parent index and padding
         ]
         self.settings.append(obj_settings)
 
@@ -124,8 +125,21 @@ class BufferManager:
                 self.buffer_ids[buffer_type]["elements"] = make_index_buffer(self.elements[buffer_type])
                 self.buffer_ids[buffer_type]["object_indices"] = make_vertex_buffer(self.object_indices[buffer_type])
 
-    def draw(self, shader: Shader, wireframe: bool = False, is_lighted: bool = True) -> None:
-        """Draw all objects using the combined buffers."""
+    def draw(self, shader: Shader, wireframe: bool = False, is_lighted: bool = True, transparent: bool = None) -> None:
+        """Draw all objects using the combined buffers.
+        
+        Parameters
+        ----------
+        shader : Shader
+            The shader to use for rendering.
+        wireframe : bool, optional
+            Whether to render in wireframe mode.
+        is_lighted : bool, optional
+            Whether to apply lighting.
+        transparent : bool, optional
+            If True, only draw transparent objects. If False, only draw opaque objects.
+            If None, draw all objects.
+        """
         for obj in self.objects:
             self.update_object_settings(obj)
 
@@ -141,27 +155,57 @@ class BufferManager:
 
             for face_type in ["_frontfaces_data", "_backfaces_data"]:
                 if self.buffer_ids[face_type]:
-                    shader.bind_attribute("position", self.buffer_ids[face_type]["positions"])
-                    shader.bind_attribute("color", self.buffer_ids[face_type]["colors"], step=4)
-                    shader.bind_attribute("object_index", self.buffer_ids[face_type]["object_indices"], step=1)
-                    shader.draw_triangles(elements=self.buffer_ids[face_type]["elements"], n=len(self.elements[face_type]))
+                    # Skip if we're only drawing specific transparency types
+                    if transparent is not None:
+                        # Filter objects based on transparency
+                        indices_to_draw = []
+                        for i, obj_idx in enumerate(self.object_indices[face_type]):
+                            if i % 3 == 0:  # Only check once per vertex to avoid duplicates
+                                obj = next((obj for obj in self.objects if self.objects[obj] == int(obj_idx)), None)
+                                if obj:
+                                    is_obj_transparent = obj.opacity < 1.0
+                                    if (transparent and is_obj_transparent) or (not transparent and not is_obj_transparent):
+                                        indices_to_draw.extend([i, i+1, i+2])
+                        
+                        if not indices_to_draw:
+                            continue
+                        
+                        # Create a temporary element buffer with only the indices we want to draw
+                        temp_elements = np.array(indices_to_draw, dtype=np.int32)
+                        temp_element_buffer = make_index_buffer(temp_elements)
+                        
+                        shader.bind_attribute("position", self.buffer_ids[face_type]["positions"])
+                        shader.bind_attribute("color", self.buffer_ids[face_type]["colors"], step=4)
+                        shader.bind_attribute("object_index", self.buffer_ids[face_type]["object_indices"], step=1)
+                        shader.draw_triangles(elements=temp_element_buffer, n=len(temp_elements))
+                        
+                        # Clean up temporary buffer
+                        GL.glDeleteBuffers(1, [temp_element_buffer])
+                    else:
+                        # Draw all objects
+                        shader.bind_attribute("position", self.buffer_ids[face_type]["positions"])
+                        shader.bind_attribute("color", self.buffer_ids[face_type]["colors"], step=4)
+                        shader.bind_attribute("object_index", self.buffer_ids[face_type]["object_indices"], step=1)
+                        shader.draw_triangles(elements=self.buffer_ids[face_type]["elements"], n=len(self.elements[face_type]))
 
-        # Draw lines
-        shader.uniform1i("is_lighted", False)
-        shader.uniform1i("element_type", 1)
-        if self.buffer_ids["_lines_data"]:
-            shader.bind_attribute("position", self.buffer_ids["_lines_data"]["positions"])
-            shader.bind_attribute("color", self.buffer_ids["_lines_data"]["colors"], step=4)
-            shader.bind_attribute("object_index", self.buffer_ids["_lines_data"]["object_indices"], step=1)
-            shader.draw_lines(elements=self.buffer_ids["_lines_data"]["elements"], n=len(self.elements["_lines_data"]), width=1.0)
+        # For lines and points, we'll only filter if transparent is specified
+        if transparent is None or not transparent:  # Draw opaque objects or all objects
+            # Draw lines
+            shader.uniform1i("is_lighted", False)
+            shader.uniform1i("element_type", 1)
+            if self.buffer_ids["_lines_data"]:
+                shader.bind_attribute("position", self.buffer_ids["_lines_data"]["positions"])
+                shader.bind_attribute("color", self.buffer_ids["_lines_data"]["colors"], step=4)
+                shader.bind_attribute("object_index", self.buffer_ids["_lines_data"]["object_indices"], step=1)
+                shader.draw_lines(elements=self.buffer_ids["_lines_data"]["elements"], n=len(self.elements["_lines_data"]), width=1.0)
 
-        # Draw points
-        shader.uniform1i("element_type", 0)
-        if self.buffer_ids["_points_data"]:
-            shader.bind_attribute("position", self.buffer_ids["_points_data"]["positions"])
-            shader.bind_attribute("color", self.buffer_ids["_points_data"]["colors"], step=4)
-            shader.bind_attribute("object_index", self.buffer_ids["_points_data"]["object_indices"], step=1)
-            shader.draw_points(elements=self.buffer_ids["_points_data"]["elements"], n=len(self.elements["_points_data"]), size=10.0)
+            # Draw points
+            shader.uniform1i("element_type", 0)
+            if self.buffer_ids["_points_data"]:
+                shader.bind_attribute("position", self.buffer_ids["_points_data"]["positions"])
+                shader.bind_attribute("color", self.buffer_ids["_points_data"]["colors"], step=4)
+                shader.bind_attribute("object_index", self.buffer_ids["_points_data"]["object_indices"], step=1)
+                shader.draw_points(elements=self.buffer_ids["_points_data"]["elements"], n=len(self.elements["_points_data"]), size=10.0)
 
         shader.disable_attribute("object_index")
         shader.disable_attribute("position")
@@ -251,7 +295,7 @@ class BufferManager:
         obj_settings = [
             [obj.show, obj.show_points, obj.show_lines, obj.show_faces],  # Row 1
             [*instance_color, obj.is_selected],  # Row 2
-            [parent_index, 0.0, 0.0, 0.0],  # Row 3: parent index and padding
+            [parent_index, obj.opacity, 0.0, 0.0],  # Row 3: parent index and padding
         ]
         index = self.objects[obj]
         self.settings[index] = obj_settings

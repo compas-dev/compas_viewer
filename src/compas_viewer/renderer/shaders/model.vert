@@ -22,6 +22,7 @@ out float show_points;
 out float show_lines;
 out float show_faces;
 out vec4 instance_color;
+out float object_opacity;
 
 float getEffectiveShow(float objectIndex) {
     float showValue = texelFetch(settingsBuffer, int(objectIndex * 3)).r;
@@ -58,16 +59,18 @@ void main() {
     if (is_grid) {
         show = show_points = show_lines = show_faces = 1.0;
         is_selected = 0.0;
+        object_opacity = 1.0;
     } else {
         vec4 settings_row1 = texelFetch(settingsBuffer, int(object_index * 3));
         vec4 settings_row2 = texelFetch(settingsBuffer, int(object_index * 3) + 1);
-        
+        vec4 settings_row3 = texelFetch(settingsBuffer, int(object_index * 3) + 2);
         show = getEffectiveShow(object_index);
         show_points = settings_row1.g;
         show_lines = settings_row1.b;
         show_faces = settings_row1.a;
         instance_color = vec4(settings_row2.rgb, 1.0);
         is_selected = getEffectiveSelection(object_index);
+        object_opacity = settings_row3.g;
     }
 
     // Calculate final position
