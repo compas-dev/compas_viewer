@@ -53,6 +53,8 @@ class BufferManager:
             self.positions[buffer_type] = np.array([], dtype=np.float32)
             self.colors[buffer_type] = np.array([], dtype=np.float32)
             self.elements[buffer_type] = np.array([], dtype=np.int32)
+            if buffer_type == "_frontfaces_data" or buffer_type == "_backfaces_data":
+                self.elements[buffer_type + "_transparent"] = np.array([], dtype=np.int32)
             self.object_indices[buffer_type] = np.array([], dtype=np.float32)
             self.buffer_ids[buffer_type] = {}
 
@@ -63,7 +65,7 @@ class BufferManager:
         # Process geometry data
         for data_type in ["_points_data", "_lines_data", "_frontfaces_data", "_backfaces_data"]:
             if hasattr(obj, data_type) and getattr(obj, data_type):
-                self._add_buffer_data(data_type, getattr(obj, data_type))
+                self._add_buffer_data(obj, data_type)
 
         matrix_buffer = getattr(obj, "_matrix_buffer", None)
         matrix = matrix_buffer if matrix_buffer is not None else np.identity(4, dtype=np.float32).flatten()
@@ -86,14 +88,29 @@ class BufferManager:
         ]
         self.settings.append(obj_settings)
 
-    def _add_buffer_data(self, buffer_type: str, data: Tuple[List, List, List]) -> None:
+    def _add_buffer_data(self, obj: Any, buffer_type: str) -> None:
         """Add buffer data for a specific geometry type."""
-        positions, colors, elements = data
+        positions, colors, elements = getattr(obj, buffer_type)
 
         # Convert to numpy arrays
         pos_array = np.array(positions, dtype=np.float32).flatten()
         col_array = np.array([c.rgba for c in colors], dtype=np.float32).flatten()
         elem_array = np.array(elements, dtype=np.int32).flatten()
+
+
+        if buffer_type == "_frontfaces_data" or buffer_type == "_backfaces_data":
+            opaque_elements = []
+            transparent_elements = []
+            for e in elem_array:
+                if e >= len(colors):
+                    # print("WARNING: Element index out of range", obj) # TODO: Fix BREP from IFC
+                    continue
+
+
+                if colors[e].a < 1.0 or obj.opacity < 1.0:
+                    transparent_elements.append(e)
+                else:
+                    opaque_elements.append(e)
 
         # Update elements to account for offset
         start_idx = len(self.positions[buffer_type]) // 3
@@ -106,8 +123,19 @@ class BufferManager:
         # Append to existing buffers
         self.positions[buffer_type] = np.append(self.positions[buffer_type], pos_array)
         self.colors[buffer_type] = np.append(self.colors[buffer_type], col_array)
-        self.elements[buffer_type] = np.append(self.elements[buffer_type], elem_array)
         self.object_indices[buffer_type] = np.append(self.object_indices[buffer_type], obj_indices)
+
+        if buffer_type == "_frontfaces_data" or buffer_type == "_backfaces_data":
+
+            opaque_elements = np.array(opaque_elements, dtype=np.int32)
+            transparent_elements = np.array(transparent_elements, dtype=np.int32)
+            opaque_elements += start_idx
+            transparent_elements += start_idx
+
+            self.elements[buffer_type] = np.append(self.elements[buffer_type], opaque_elements)
+            self.elements[buffer_type + "_transparent"] = np.append(self.elements[buffer_type + "_transparent"], transparent_elements)
+        else:
+            self.elements[buffer_type] = np.append(self.elements[buffer_type], elem_array)
 
     def create_buffers(self) -> None:
         """Create OpenGL buffers from the collected data."""
@@ -122,12 +150,16 @@ class BufferManager:
             if len(self.positions[buffer_type]):
                 self.buffer_ids[buffer_type]["positions"] = make_vertex_buffer(self.positions[buffer_type])
                 self.buffer_ids[buffer_type]["colors"] = make_vertex_buffer(self.colors[buffer_type])
-                self.buffer_ids[buffer_type]["elements"] = make_index_buffer(self.elements[buffer_type])
                 self.buffer_ids[buffer_type]["object_indices"] = make_vertex_buffer(self.object_indices[buffer_type])
+                if buffer_type == "_frontfaces_data" or buffer_type == "_backfaces_data":
+                    self.buffer_ids[buffer_type]["elements"] = make_index_buffer(self.elements[buffer_type])
+                    self.buffer_ids[buffer_type]["elements_transparent"] = make_index_buffer(self.elements[buffer_type + "_transparent"])
+                else:
+                    self.buffer_ids[buffer_type]["elements"] = make_index_buffer(self.elements[buffer_type])
 
-    def draw(self, shader: Shader, wireframe: bool = False, is_lighted: bool = True, transparent: bool = None) -> None:
+    def draw(self, shader: Shader, wireframe: bool = False, is_lighted: bool = True, transparent: bool = False) -> None:
         """Draw all objects using the combined buffers.
-        
+
         Parameters
         ----------
         shader : Shader
@@ -138,7 +170,6 @@ class BufferManager:
             Whether to apply lighting.
         transparent : bool, optional
             If True, only draw transparent objects. If False, only draw opaque objects.
-            If None, draw all objects.
         """
         for obj in self.objects:
             self.update_object_settings(obj)
@@ -156,40 +187,20 @@ class BufferManager:
             for face_type in ["_frontfaces_data", "_backfaces_data"]:
                 if self.buffer_ids[face_type]:
                     # Skip if we're only drawing specific transparency types
-                    if transparent is not None:
-                        # Filter objects based on transparency
-                        indices_to_draw = []
-                        for i, obj_idx in enumerate(self.object_indices[face_type]):
-                            if i % 3 == 0:  # Only check once per vertex to avoid duplicates
-                                obj = next((obj for obj in self.objects if self.objects[obj] == int(obj_idx)), None)
-                                if obj:
-                                    is_obj_transparent = obj.opacity < 1.0
-                                    if (transparent and is_obj_transparent) or (not transparent and not is_obj_transparent):
-                                        indices_to_draw.extend([i, i+1, i+2])
-                        
-                        if not indices_to_draw:
-                            continue
-                        
-                        # Create a temporary element buffer with only the indices we want to draw
-                        temp_elements = np.array(indices_to_draw, dtype=np.int32)
-                        temp_element_buffer = make_index_buffer(temp_elements)
-                        
-                        shader.bind_attribute("position", self.buffer_ids[face_type]["positions"])
-                        shader.bind_attribute("color", self.buffer_ids[face_type]["colors"], step=4)
-                        shader.bind_attribute("object_index", self.buffer_ids[face_type]["object_indices"], step=1)
-                        shader.draw_triangles(elements=temp_element_buffer, n=len(temp_elements))
-                        
-                        # Clean up temporary buffer
-                        GL.glDeleteBuffers(1, [temp_element_buffer])
-                    else:
+                    if not transparent:
                         # Draw all objects
                         shader.bind_attribute("position", self.buffer_ids[face_type]["positions"])
                         shader.bind_attribute("color", self.buffer_ids[face_type]["colors"], step=4)
                         shader.bind_attribute("object_index", self.buffer_ids[face_type]["object_indices"], step=1)
                         shader.draw_triangles(elements=self.buffer_ids[face_type]["elements"], n=len(self.elements[face_type]))
+                    else:
+                        shader.bind_attribute("position", self.buffer_ids[face_type]["positions"])
+                        shader.bind_attribute("color", self.buffer_ids[face_type]["colors"], step=4)
+                        shader.bind_attribute("object_index", self.buffer_ids[face_type]["object_indices"], step=1)
+                        shader.draw_triangles(elements=self.buffer_ids[face_type]["elements_transparent"], n=len(self.elements[face_type + "_transparent"]))
 
         # For lines and points, we'll only filter if transparent is specified
-        if transparent is None or not transparent:  # Draw opaque objects or all objects
+        if not transparent:  # Draw opaque objects or all objects
             # Draw lines
             shader.uniform1i("is_lighted", False)
             shader.uniform1i("element_type", 1)
