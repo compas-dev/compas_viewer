@@ -267,6 +267,10 @@ class BufferManager:
             if hasattr(obj, data_type) and getattr(obj, data_type):
                 setattr(obj, data_type, getattr(obj, f"_read{data_type}")())
                 data = getattr(obj, data_type)
+
+                if not self.buffer_ids[data_type]:
+                    continue
+
                 positions, colors, _ = data  # We don't update elements as topology stays the same
 
                 # Convert to numpy arrays

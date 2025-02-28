@@ -11,7 +11,7 @@ mesh = Mesh.from_off(compas.get("tubemesh.off"))
 obj = viewer.scene.add(mesh, surfacecolor=Color.cyan(), use_vertexcolors=False)
 
 
-@viewer.on(interval=1000)
+@viewer.on(interval=200)
 def deform_mesh(frame):
     for v in mesh.vertices():
         vertex: list = mesh.vertex_attributes(v, "xyz")  # type: ignore
@@ -19,8 +19,7 @@ def deform_mesh(frame):
         vertex[1] += random() - 0.5
         vertex[2] += random() - 0.5
         mesh.vertex_attributes(v, "xyz", vertex)
-    obj.init()
-    obj.update()
+    obj.update(update_data=True)
     print(frame)
 
 
