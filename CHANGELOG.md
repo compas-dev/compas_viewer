@@ -9,9 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Added `BufferManager` to handle buffer data for all the scene objects.
+* Added `make_texture_buffer` in `gl.py` for matrix and settings array.
+
 ### Changed
 
+* Greatly improved performance for scenes with large number of objects.
+* All scene objects are rendered once in a combined buffer through single draw call.
+* Updated shaders to version OpenGL 330 Core Profile.
+* Implemented matrix and settings array as texture buffer instead of uniforms to improve performance.
+* Blending of transparent objects is handled in a second draw on top of the opaque objects.
+
 ### Removed
+
+* Removed all low-level buffer related functions from `SceneObject`s, which is now handled together by `BufferManager`.
+* Removed redundant Shaders: `grid_shader`, `instance_shader`, `surface_shader` and `arrow_shader`.
+* Removed `paint_instance` from `Renderer` as it handled by a shader flag.
 
 
 ## [1.3.1] 2025-01-22
