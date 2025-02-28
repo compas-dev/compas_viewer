@@ -5,8 +5,8 @@ from typing import Optional
 
 from PySide6.QtCore import QTimer
 from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import QApplication
 from PySide6.QtGui import QSurfaceFormat
+from PySide6.QtWidgets import QApplication
 
 from compas.scene import Scene
 from compas_viewer import HERE

@@ -1,8 +1,16 @@
-from typing import Any, Dict, List
+from typing import Any
+from typing import Dict
+from typing import List
+
 import numpy as np
-from compas_viewer.gl import make_vertex_buffer, make_index_buffer, make_texture_buffer, update_texture_buffer, update_vertex_buffer
-from compas_viewer.renderer.shaders import Shader
 import OpenGL.GL as GL
+
+from compas_viewer.gl import make_index_buffer
+from compas_viewer.gl import make_texture_buffer
+from compas_viewer.gl import make_vertex_buffer
+from compas_viewer.gl import update_texture_buffer
+from compas_viewer.gl import update_vertex_buffer
+from compas_viewer.renderer.shaders import Shader
 
 
 class BufferManager:
@@ -124,7 +132,6 @@ class BufferManager:
         self.object_indices[buffer_type] = np.append(self.object_indices[buffer_type], obj_indices)
 
         if buffer_type == "_frontfaces_data" or buffer_type == "_backfaces_data":
-
             opaque_elements = np.array(opaque_elements, dtype=np.int32)
             transparent_elements = np.array(transparent_elements, dtype=np.int32)
             opaque_elements += start_idx

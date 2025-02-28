@@ -3,9 +3,7 @@ from functools import lru_cache
 from typing import TYPE_CHECKING
 
 from numpy import float32
-from numpy import frombuffer
 from numpy import identity
-from numpy import uint8
 from OpenGL import GL
 from PySide6 import QtCore
 from PySide6.QtGui import QKeyEvent
@@ -17,9 +15,9 @@ from PySide6.QtWidgets import QGestureEvent
 from compas.geometry import Frame
 from compas.geometry import transform_points_numpy
 from compas_viewer.scene import TagObject
+from compas_viewer.scene.buffermanager import BufferManager
 from compas_viewer.scene.gridobject import GridObject
 from compas_viewer.scene.vectorobject import VectorObject
-from compas_viewer.scene.buffermanager import BufferManager
 
 from .camera import Camera
 from .shaders import Shader
@@ -442,22 +440,9 @@ class Renderer(QOpenGLWidget):
         self.shader_model.uniform4x4("projection", projection)
         self.shader_model.release()
 
-        # self.shader_tag.bind()
-        # self.shader_tag.uniform4x4("projection", projection)
-        # self.shader_tag.release()
-
-        # self.shader_arrow.bind()
-        # self.shader_arrow.uniform4x4("projection", projection)
-        # self.shader_arrow.uniform1f("aspect", w / h)
-        # self.shader_arrow.release()
-
-        # self.shader_instance.bind()
-        # self.shader_instance.uniform4x4("projection", projection)
-        # self.shader_instance.release()
-
-        # self.shader_grid.bind()
-        # self.shader_grid.uniform4x4("projection", projection)
-        # self.shader_grid.release()
+        self.shader_tag.bind()
+        self.shader_tag.uniform4x4("projection", projection)
+        self.shader_tag.release()
 
     def resize(self, w: int, h: int):
         """
@@ -559,18 +544,17 @@ class Renderer(QOpenGLWidget):
 
         self.shader_model.uniform4x4("viewworld", viewworld)
         self.shader_model.uniform1i("is_instance", is_instance)
-        
 
         if self.viewer.config.renderer.show_grid:
             self.grid.draw(self.shader_model)
-        
+
         # Draw opaque objects
         self.buffer_manager.draw(
             self.shader_model,
             self.rendermode,
             is_instance=is_instance,
         )
-        
+
         self.shader_model.release()
 
         # Draw text tag sprites
@@ -680,9 +664,9 @@ class Renderer(QOpenGLWidget):
             draw.rectangle([x1, y1, x2, y2], outline="red", width=2)
             full_image.save("instance_debug_full_with_box.png")
 
-            print(f"Saved debug images:")
-            print(f"- Full frame: instance_debug_full.png")
-            print(f"- Full frame with box: instance_debug_full_with_box.png")
+            print("Saved debug images:")
+            print("- Full frame: instance_debug_full.png")
+            print("- Full frame with box: instance_debug_full_with_box.png")
             print(f"Box coordinates: x={x}, y={y}, width={width}, height={height}")
             print(f"Original box: x1={x1}, y1={y1}, x2={x2}, y2={y2}")
             print(f"Window size: {self.width()}x{self.height()}")
@@ -703,7 +687,7 @@ class Renderer(QOpenGLWidget):
             box_image = Image.fromarray(box_map)
             box_image = box_image.transpose(Image.FLIP_TOP_BOTTOM)
             box_image.save("instance_debug_box.png")
-            print(f"- Box area: instance_debug_box.png")
+            print("- Box area: instance_debug_box.png")
 
         # Restore previous render states
         if prev_blend:
