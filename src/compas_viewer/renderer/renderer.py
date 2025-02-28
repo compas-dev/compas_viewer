@@ -387,8 +387,11 @@ class Renderer(QOpenGLWidget):
 
         for obj in self.viewer.scene.objects:
             obj.init()
+
+        for obj in self.viewer.scene.objects:
             if not isinstance(obj, TagObject):
                 self.buffer_manager.add_object(obj)
+
         self.buffer_manager.create_buffers()
 
         # Unbind VAO when setup is complete.

@@ -58,7 +58,7 @@ void main() {
     }
 
     // Apply lighting if needed
-    if (is_lighted) {
+    if (is_lighted && !is_grid) {
         vec3 ec_normal = normalize(cross(dFdx(ec_pos), dFdy(ec_pos)));
         vec3 L = normalize(-ec_pos);
         fragColor = vec4(color * dot(ec_normal, L), alpha);

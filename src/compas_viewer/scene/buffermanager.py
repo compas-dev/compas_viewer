@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List
 import numpy as np
 from compas_viewer.gl import make_vertex_buffer, make_index_buffer, make_texture_buffer, update_texture_buffer, update_vertex_buffer
 from compas_viewer.renderer.shaders import Shader
@@ -97,7 +97,6 @@ class BufferManager:
         col_array = np.array([c.rgba for c in colors], dtype=np.float32).flatten()
         elem_array = np.array(elements, dtype=np.int32).flatten()
 
-
         if buffer_type == "_frontfaces_data" or buffer_type == "_backfaces_data":
             opaque_elements = []
             transparent_elements = []
@@ -105,7 +104,6 @@ class BufferManager:
                 if e >= len(colors):
                     # print("WARNING: Element index out of range", obj) # TODO: Fix BREP from IFC
                     continue
-
 
                 if colors[e].a < 1.0 or obj.opacity < 1.0:
                     transparent_elements.append(e)
