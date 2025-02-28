@@ -15,6 +15,7 @@ obj2.transformation = Translation.from_vector([5, 0, 0])
 obj3 = viewer.scene.add(mesh)
 obj3.transformation = Translation.from_vector([-5, 0, 0])
 
+obj1.opacity = 0.7
 
 @viewer.on(interval=100)
 def deform_mesh(frame):
