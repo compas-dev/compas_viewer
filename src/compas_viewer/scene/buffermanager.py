@@ -84,7 +84,7 @@ class BufferManager:
         obj_settings = [
             [obj.show, obj.show_points, obj.show_lines, obj.show_faces],  # Row 1
             [*instance_color, obj.is_selected],  # Row 2
-            [parent_index, obj.opacity, 0.0, 0.0],  # Row 3: parent index and padding
+            [parent_index, obj.opacity, obj.pointsize, 0.0],  # Row 3: parent index and padding
         ]
         self.settings.append(obj_settings)
 
@@ -310,7 +310,7 @@ class BufferManager:
         obj_settings = [
             [obj.show, obj.show_points, obj.show_lines, obj.show_faces],  # Row 1
             [*instance_color, obj.is_selected],  # Row 2
-            [parent_index, obj.opacity, 0.0, 0.0],  # Row 3: parent index and padding
+            [parent_index, obj.opacity, obj.pointsize, 0.0],  # Row 3: parent index and padding
         ]
         index = self.objects[obj]
         self.settings[index] = obj_settings

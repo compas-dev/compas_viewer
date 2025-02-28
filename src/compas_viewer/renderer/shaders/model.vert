@@ -11,7 +11,6 @@ uniform mat4 viewworld;
 uniform samplerBuffer transformBuffer;
 uniform samplerBuffer settingsBuffer;
 uniform bool is_grid;
-uniform float pointSize;
 
 // Outputs
 out vec4 vertex_color;
@@ -55,6 +54,8 @@ void main() {
         texelFetch(transformBuffer, int(object_index * 4) + 3)
     ));
 
+    float pointSize = 1.0;
+
     // Set visibility and display settings
     if (is_grid) {
         show = show_points = show_lines = show_faces = 1.0;
@@ -71,6 +72,8 @@ void main() {
         instance_color = vec4(settings_row2.rgb, 1.0);
         is_selected = getEffectiveSelection(object_index);
         object_opacity = settings_row3.g;
+        pointSize = settings_row3.b;
+
     }
 
     // Calculate final position

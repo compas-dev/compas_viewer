@@ -410,7 +410,6 @@ class Renderer(QOpenGLWidget):
         self.shader_model.uniform3f("selection_color", self.viewer.config.renderer.selectioncolor.rgb)
         self.shader_model.uniformBuffer("transformBuffer", self.buffer_manager.transform_texture, unit=0)
         self.shader_model.uniformBuffer("settingsBuffer", self.buffer_manager.settings_texture, unit=1)
-        self.shader_model.uniform1f("pointSize", 10.0)
         self.shader_model.release()
 
         self.shader_tag = Shader(name="tag")
@@ -554,7 +553,6 @@ class Renderer(QOpenGLWidget):
         self.shader_model.uniform3f("selection_color", self.viewer.config.renderer.selectioncolor.rgb)
         self.shader_model.uniformBuffer("transformBuffer", self.buffer_manager.transform_texture, unit=0)
         self.shader_model.uniformBuffer("settingsBuffer", self.buffer_manager.settings_texture, unit=1)
-        self.shader_model.uniform1f("pointSize", 10.0)
 
         self.shader_model.uniform4x4("viewworld", viewworld)
         self.shader_model.uniform1i("is_instance", is_instance)
