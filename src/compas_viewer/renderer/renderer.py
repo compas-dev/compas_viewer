@@ -420,17 +420,13 @@ class Renderer(QOpenGLWidget):
 
         projection = self.camera.projection(self.viewer.config.window.width, self.viewer.config.window.height)
         viewworld = self.camera.viewworld()
-        transform = list(identity(4, dtype=float32))
-        # create the program
 
+        # create the program
         self.shader_model = Shader(name="model")
         self.shader_model.bind()
         self.shader_model.uniform4x4("projection", projection)
         self.shader_model.uniform4x4("viewworld", viewworld)
-        self.shader_model.uniform4x4("transform", transform)
-        self.shader_model.uniform1i("is_selected", 0)
         self.shader_model.uniform1f("opacity", self.opacity)
-        self.shader_model.uniform1f("object_opacity", 1)
         self.shader_model.uniform3f("selection_color", self.viewer.config.renderer.selectioncolor.rgb)
         self.shader_model.uniformBuffer("transformBuffer", self.buffer_manager.transform_texture, unit=0)
         self.shader_model.uniformBuffer("settingsBuffer", self.buffer_manager.settings_texture, unit=1)
@@ -551,11 +547,7 @@ class Renderer(QOpenGLWidget):
 
         # rebind the model shader
         self.shader_model.bind()
-
-        # TODO: figure out which ones are actually needed
         self.shader_model.uniform1f("opacity", self.opacity)
-        self.shader_model.uniform1f("object_opacity", 1)
-        self.shader_model.uniform3f("selection_color", self.viewer.config.renderer.selectioncolor.rgb)
         self.shader_model.uniformBuffer("transformBuffer", self.buffer_manager.transform_texture, unit=0)
         self.shader_model.uniformBuffer("settingsBuffer", self.buffer_manager.settings_texture, unit=1)
 
