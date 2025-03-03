@@ -63,7 +63,7 @@ class Renderer(QOpenGLWidget):
         self.grid = None
 
         self.shader_model: Shader = None
-        self.shader_tag: Shader = None
+        self._shader_tag: Shader = None
         self.shader_arrow: Shader = None
         self.shader_instance: Shader = None
         self.shader_grid: Shader = None
@@ -144,6 +144,29 @@ class Renderer(QOpenGLWidget):
             The opacity of the view.
         """
         return self._opacity
+
+    @property
+    def shader_tag(self) -> Shader:
+        """Lazy initialization of tag shader.
+
+        Returns
+        -------
+        Shader
+            The tag shader, initialized on first access.
+        """
+        if self._shader_tag is None:
+            projection = self.camera.projection(self.width(), self.height())
+            viewworld = self.camera.viewworld()
+            transform = list(identity(4, dtype=float32))
+
+            self._shader_tag = Shader(name="tag")
+            self._shader_tag.bind()
+            self._shader_tag.uniform4x4("projection", projection)
+            self._shader_tag.uniform4x4("viewworld", viewworld)
+            self._shader_tag.uniform4x4("transform", transform)
+            self._shader_tag.uniform1f("opacity", self.opacity)
+            self._shader_tag.release()
+        return self._shader_tag
 
     # ==========================================================================
     # GL
@@ -413,14 +436,6 @@ class Renderer(QOpenGLWidget):
         self.shader_model.uniformBuffer("settingsBuffer", self.buffer_manager.settings_texture, unit=1)
         self.shader_model.release()
 
-        self.shader_tag = Shader(name="tag")
-        self.shader_tag.bind()
-        self.shader_tag.uniform4x4("projection", projection)
-        self.shader_tag.uniform4x4("viewworld", viewworld)
-        self.shader_tag.uniform4x4("transform", transform)
-        self.shader_tag.uniform1f("opacity", self.opacity)
-        self.shader_tag.release()
-
     def update_projection(self, w=None, h=None):
         """
         Update the projection matrix.
@@ -548,22 +563,25 @@ class Renderer(QOpenGLWidget):
         if self.viewer.config.renderer.show_grid:
             self.grid.draw(self.shader_model)
 
-        # Draw opaque objects
+        # Draw all the objects in the buffer manager
         self.buffer_manager.draw(
             self.shader_model,
             self.rendermode,
             is_instance=is_instance,
         )
 
-        self.shader_model.release()
-
-        # Draw text tag sprites
+        # Draw text tag sprites if there are any
         tag_objs = [obj for obj in self.viewer.scene.objects if isinstance(obj, TagObject)]
-        self.shader_tag.bind()
-        self.shader_tag.uniform4x4("viewworld", viewworld)
-        for obj in tag_objs:
-            obj.draw(self.shader_tag, self.camera.position, self.width(), self.height())
-        self.shader_tag.release()
+        if tag_objs:
+            # release the model shader and bind the tag shader
+            self.shader_model.release()
+            self.shader_tag.bind()
+            self.shader_tag.uniform4x4("viewworld", viewworld)
+            for obj in tag_objs:
+                obj.draw(self.shader_tag, self.camera.position, self.width(), self.height())
+            # switch back to the model shader
+            self.shader_tag.release()
+            self.shader_model.bind()
 
         # draw 2D box for multi-selection
         if self.viewer.mouse.is_tracing_a_window:
