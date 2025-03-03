@@ -548,6 +548,8 @@ class Renderer(QOpenGLWidget):
 
         viewworld = self.camera.viewworld()
         self.update_projection()
+
+        # rebind the model shader
         self.shader_model.bind()
 
         # TODO: figure out which ones are actually needed
@@ -579,12 +581,11 @@ class Renderer(QOpenGLWidget):
             self.shader_tag.uniform4x4("viewworld", viewworld)
             for obj in tag_objs:
                 obj.draw(self.shader_tag, self.camera.position, self.width(), self.height())
-            # switch back to the model shader
             self.shader_tag.release()
-            self.shader_model.bind()
 
         # draw 2D box for multi-selection
         if self.viewer.mouse.is_tracing_a_window:
+            self.shader_model.release()
             self.shader_model.draw_2d_box(
                 (
                     self.viewer.mouse.window_start_point.x(),
