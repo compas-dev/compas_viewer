@@ -1,5 +1,4 @@
 import time
-from functools import lru_cache
 from typing import TYPE_CHECKING
 
 from numpy import float32
@@ -17,7 +16,6 @@ from compas.geometry import transform_points_numpy
 from compas_viewer.scene import TagObject
 from compas_viewer.scene.buffermanager import BufferManager
 from compas_viewer.scene.gridobject import GridObject
-from compas_viewer.scene.vectorobject import VectorObject
 
 from .camera import Camera
 from .shaders import Shader
@@ -498,43 +496,6 @@ class Renderer(QOpenGLWidget):
             transparent_objects = sorted(zip(transparent_objects, centers), key=lambda pair: pair[1][2])
             transparent_objects, _ = zip(*transparent_objects)
         return opaque_objects + list(transparent_objects)
-
-    @lru_cache(maxsize=3)
-    def sort_objects_from_category(self, objs: tuple["MeshObject"]) -> tuple[list["TagObject"], list["VectorObject"], list["MeshObject"]]:
-        """Sort objects by their categories
-
-        Returns
-        -------
-        tuple(list[:class:`compas_viewer.scene.tagobject.TagObject`],
-        list[:class:`compas_viewer.scene.vectorobject.VectorObject`],
-        list[:class:`compas_viewer.scene.sceneobject.MeshObject`])
-            A tuple of sorted objects.
-
-        Notes
-        -----
-        This function is cached to improve the performance.
-
-        References
-        ----------
-        * https://docs.python.org/3/library/functools.html#functools.lru_cache
-        * https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_recently_used_(LRU)
-        """
-        tag_objs = []
-        vector_objs = []
-        mesh_objs = []
-
-        def sort(obj):
-            if isinstance(obj, TagObject):
-                tag_objs.append(obj)
-            elif isinstance(obj, VectorObject):
-                vector_objs.append(obj)
-            else:
-                mesh_objs.append(obj)
-
-        for obj in objs:
-            sort(obj)
-
-        return tag_objs, vector_objs, mesh_objs
 
     def paint(self, is_instance: bool = False):
         """Paint all the items in the render"""
