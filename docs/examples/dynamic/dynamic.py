@@ -11,8 +11,7 @@ obj: PointObject = viewer.scene.add(Point(0, 0, 0), show_points=True, pointcolor
 def movepoint(frame):
     print("frame", frame)
     obj.geometry.x += 0.1
-    obj.init()
-    obj.update()
+    obj.update(update_data=True)
 
 
 viewer.show()

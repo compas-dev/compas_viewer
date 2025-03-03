@@ -18,14 +18,14 @@ viewer.renderer.camera.distance = 5
 viewer.scene.add(
     Mesh.from_shape(sphere, u=32, v=32),
     facecolor=Color.cyan(),
-    edgecolor=Color.blue(),
+    linecolor=Color.blue(),
     use_vertexcolors=False,
 )
 
 
 @viewer.on(interval=100)
 def orbit(f):
-    viewer.renderer.camera.rotation.z += 1
+    viewer.renderer.camera.rotation.z += 0.02
 
 
 viewer.show()
