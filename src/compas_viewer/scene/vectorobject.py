@@ -59,7 +59,7 @@ class VectorObject(ViewerSceneObject, GeometryObject):
             self._anchor + self.geometry,  # Arrow end
         ]
 
-        colors = [self.linecolor or self.viewer.config.linecolor] * len(positions)
+        colors = [self.linecolor or self.viewer.config.ui.display.linecolor] * len(positions)
         elements = [[0, 1]]
         return positions, colors, elements
 
