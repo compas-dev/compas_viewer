@@ -27,6 +27,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Removed `paint_instance` from `Renderer` as it handled by a shader flag.
 
 
+## [1.3.2] 2025-03-12
+
+### Added
+
+### Changed
+
+### Removed
+
+
 ## [1.3.1] 2025-01-22
 
 ### Added
@@ -359,6 +368,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * All color representations are now in `compas.colors.Color`.
 * Reduce the `numpy.array` representation. Mostly use `list` instead for clarity.
 * Comments improved and better type hints.
+* Fixed issue [#200](https://github.com/compas-dev/compas_viewer/issues/200) by adding installation package path.
 
 ### Removed
 * Removed `self.objects` from the `Render` class.`

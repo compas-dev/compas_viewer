@@ -1,7 +1,6 @@
 from typing import Optional
 
 from compas.datastructures import Mesh
-from compas.geometry import Frame
 from compas.geometry import Line
 from compas.geometry import Plane
 from compas.geometry import Point
@@ -26,7 +25,6 @@ class PlaneObject(GeometryObject):
 
     def __init__(self, planesize: float = 1, **kwargs):
         super().__init__(**kwargs)
-        self.frame: Frame = Frame.from_plane(self.plane)
         self.planesize = planesize
 
         self.vertices = [

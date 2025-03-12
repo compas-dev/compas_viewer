@@ -60,7 +60,7 @@ class VectorObject(ViewerSceneObject, GeometryObject):
             self._anchor + self.geometry,  # Arrow end
         ]
 
-        self._arrow_colors = [self.linecolor or self.viewer.config.linecolor] * len(self._arrow_vertices)
+        self._arrow_colors = [self.linecolor or self.viewer.config.ui.display.linecolor] * len(self._arrow_vertices)
 
     def _read_points_data(self) -> None:
         pass
