@@ -81,6 +81,23 @@ class Shader:
         GL.glActiveTexture(GL.GL_TEXTURE0 + 0)  # type: ignore
         GL.glBindTexture(GL.GL_TEXTURE_2D, texture)
 
+    def uniformBuffer(self, name: str, buffer: Any, unit: int = 0):
+        """Store a uniform buffer in the shader program at a named location.
+
+        Parameters
+        ----------
+        name : str
+            The name of the location in the shader program.
+        buffer : Any
+            The buffer to store.
+        unit : int
+            The texture unit to use (0-15 typically available)
+        """
+        location = GL.glGetUniformLocation(self.program, name)
+        GL.glUniform1i(location, unit)  # Use specified texture unit
+        GL.glActiveTexture(GL.GL_TEXTURE0 + unit)
+        GL.glBindTexture(GL.GL_TEXTURE_BUFFER, buffer)
+
     def bind(self):
         """Bind the shader program."""
         GL.glUseProgram(self.program)
@@ -259,14 +276,42 @@ class Shader:
             x1, x2 = x2, x1
         if y1 > y2:
             y1, y2 = y2, y1
+
+        # Create vertices for the box
+        vertices = array(
+            [
+                x1,
+                y1,
+                0.0,  # Bottom-left
+                x2,
+                y1,
+                0.0,  # Bottom-right
+                x2,
+                y2,
+                0.0,  # Top-right
+                x1,
+                y2,
+                0.0,  # Top-left
+            ],
+            dtype="float32",
+        )
+
+        # Create vertex buffer
+        vbo = GL.glGenBuffers(1)
+        GL.glBindBuffer(GL.GL_ARRAY_BUFFER, vbo)
+        GL.glBufferData(GL.GL_ARRAY_BUFFER, vertices.nbytes, vertices, GL.GL_STATIC_DRAW)
+
+        # Enable position attribute
+        self.enable_attribute("position")
+        self.bind_attribute("position", vbo, 3)
+
+        # Draw the box
         GL.glLineWidth(1)
-        GL.glBegin(GL.GL_LINE_LOOP)
-        GL.glColor3f(0, 0, 0)
-        GL.glVertex2f(x1, y1)
-        GL.glVertex2f(x2, y1)
-        GL.glVertex2f(x2, y2)
-        GL.glVertex2f(x1, y2)
-        GL.glEnd()
+        GL.glDrawArrays(GL.GL_LINE_LOOP, 0, 4)
+
+        # Clean up
+        self.disable_attribute("position")
+        GL.glDeleteBuffers(1, [vbo])
 
 
 def make_shader_program(name: str):
