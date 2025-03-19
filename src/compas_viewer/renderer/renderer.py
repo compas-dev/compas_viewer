@@ -538,7 +538,10 @@ class Renderer(QOpenGLWidget):
 
         # draw 2D box for multi-selection
         if self.viewer.mouse.is_tracing_a_window:
-            self.shader_model.release()
+            # Ensure the shader is bound before drawing
+            self.shader_model.bind()
+
+            # Draw the selection box
             self.shader_model.draw_2d_box(
                 (
                     self.viewer.mouse.window_start_point.x(),

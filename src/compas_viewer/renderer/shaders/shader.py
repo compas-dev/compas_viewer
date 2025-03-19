@@ -267,6 +267,23 @@ class Shader:
         height : int
             The height of the viewport.
         """
+        # Save current OpenGL state
+        depth_test_enabled = GL.glIsEnabled(GL.GL_DEPTH_TEST)
+        blend_enabled = GL.glIsEnabled(GL.GL_BLEND)
+        previous_line_width = GL.glGetFloat(GL.GL_LINE_WIDTH)
+
+        # Save current shader uniform matrices
+        identity_matrix = [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]
+
+        # Set identity matrices to ensure drawing in screen space
+        self.uniform4x4("projection", identity_matrix)
+        self.uniform4x4("viewworld", identity_matrix)
+
+        # Disable depth testing to ensure the box appears on top
+        GL.glDisable(GL.GL_DEPTH_TEST)
+        GL.glEnable(GL.GL_BLEND)
+        GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA)
+
         x1, y1, x2, y2 = box_coords
         x1 = (x1 / width - 0.5) * 2
         x2 = (x2 / width - 0.5) * 2
@@ -305,13 +322,33 @@ class Shader:
         self.enable_attribute("position")
         self.bind_attribute("position", vbo, 3)
 
-        # Draw the box
-        GL.glLineWidth(1)
+        # Draw filled rectangle with transparency
+        self.uniform1f("opacity", 0.2)  # Set low opacity for filled rectangle
+        GL.glPolygonMode(GL.GL_FRONT_AND_BACK, GL.GL_FILL)
+        GL.glDrawArrays(GL.GL_TRIANGLE_FAN, 0, 4)
+
+        # Draw the box outline with thicker line width
+        self.uniform1f("opacity", 1.0)  # Set full opacity for outline
+
+        # Get supported line width range
+        line_width_range = GL.glGetFloatv(GL.GL_LINE_WIDTH_RANGE)
+        max_line_width = min(line_width_range[1], 2.0)  # Use 2.0 or the max supported width, whichever is smaller
+
+        GL.glLineWidth(max_line_width)
+        # Use LINE_LOOP instead of TRIANGLE_FAN in polygon line mode to avoid diagonal lines
         GL.glDrawArrays(GL.GL_LINE_LOOP, 0, 4)
 
         # Clean up
         self.disable_attribute("position")
         GL.glDeleteBuffers(1, [vbo])
+
+        # Restore previous OpenGL state
+        if not blend_enabled:
+            GL.glDisable(GL.GL_BLEND)
+        if depth_test_enabled:
+            GL.glEnable(GL.GL_DEPTH_TEST)
+        GL.glLineWidth(previous_line_width)
+        GL.glPolygonMode(GL.GL_FRONT_AND_BACK, GL.GL_FILL)  # Reset polygon mode
 
 
 def make_shader_program(name: str):
