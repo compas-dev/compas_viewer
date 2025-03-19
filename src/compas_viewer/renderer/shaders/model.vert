@@ -45,14 +45,33 @@ float getEffectiveSelection(float objectIndex) {
     return selectionValue;
 }
 
+mat4 getEffectiveTransform(float objectIndex) {
+    mat4 transform = transpose(mat4(
+        texelFetch(transformBuffer, int(objectIndex * 4) + 0),
+        texelFetch(transformBuffer, int(objectIndex * 4) + 1),
+        texelFetch(transformBuffer, int(objectIndex * 4) + 2),
+        texelFetch(transformBuffer, int(objectIndex * 4) + 3)
+    ));
+    
+    float parentIndex = texelFetch(settingsBuffer, int(objectIndex * 3) + 2).r;
+    
+    while (parentIndex >= 0.0) {
+        mat4 parentTransform = transpose(mat4(
+            texelFetch(transformBuffer, int(parentIndex * 4) + 0),
+            texelFetch(transformBuffer, int(parentIndex * 4) + 1),
+            texelFetch(transformBuffer, int(parentIndex * 4) + 2),
+            texelFetch(transformBuffer, int(parentIndex * 4) + 3)
+        ));
+        transform = parentTransform * transform;
+        parentIndex = texelFetch(settingsBuffer, int(parentIndex * 3) + 2).r;
+    }
+    
+    return transform;
+}
+
 void main() {
     // Initialize transform matrix and handle grid case
-    mat4 transform = is_grid ? mat4(1.0) : transpose(mat4(
-        texelFetch(transformBuffer, int(object_index * 4) + 0),
-        texelFetch(transformBuffer, int(object_index * 4) + 1),
-        texelFetch(transformBuffer, int(object_index * 4) + 2),
-        texelFetch(transformBuffer, int(object_index * 4) + 3)
-    ));
+    mat4 transform = is_grid ? mat4(1.0) : getEffectiveTransform(object_index);
 
     float pointSize = 1.0;
 

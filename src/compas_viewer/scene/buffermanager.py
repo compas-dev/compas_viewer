@@ -75,8 +75,10 @@ class BufferManager:
             if hasattr(obj, data_type) and getattr(obj, data_type):
                 self._add_buffer_data(obj, data_type)
 
-        matrix_buffer = getattr(obj, "_matrix_buffer", None)
-        matrix = matrix_buffer if matrix_buffer is not None else np.identity(4, dtype=np.float32).flatten()
+        if obj.transformation is not None:
+            matrix = np.array(obj.transformation.matrix, dtype=np.float32).flatten()
+        else:
+            matrix = np.identity(4, dtype=np.float32).flatten()
         self.transforms.append(matrix)
 
         if hasattr(obj, "instance_color"):
@@ -262,11 +264,10 @@ class BufferManager:
             return
 
         index = self.objects[obj]
-        obj._update_matrix()
-        if obj._matrix_buffer is None:
-            matrix = np.identity(4, dtype=np.float32).flatten()
+        if obj.transformation is not None:
+            matrix = np.array(obj.transformation.matrix, dtype=np.float32).flatten()
         else:
-            matrix = np.array(obj._matrix_buffer, dtype=np.float32)
+            matrix = np.identity(4, dtype=np.float32).flatten()
         self.transforms[index] = matrix
         byte_offset = index * (4 * 16)
         update_texture_buffer(matrix, self.transform_texture, offset=byte_offset)

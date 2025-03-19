@@ -105,6 +105,3 @@ class ShapeObject(GeometryObject):
         colors = [self.facecolor] * len(positions)
         elements = [[3 * i + 2, 3 * i + 1, 3 * i] for i in range(len(self.geometry.triangles))]
         return positions, colors, elements
-
-    def update_matrix(self):
-        self._update_matrix()

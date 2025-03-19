@@ -105,7 +105,6 @@ class ViewerSceneObject(SceneObject, Base):
 
         #  Geometric
         self.transformation: Optional[Transformation] = None
-        self._matrix_buffer: Optional[list[list[float]]] = None
         self._bounding_box: Optional[list[float]] = None
         self._bounding_box_center: Optional[Point] = None
 
@@ -153,22 +152,12 @@ class ViewerSceneObject(SceneObject, Base):
     # general
     # ==========================================================================
 
-    def _update_matrix(self):
-        """Update the matrix from object's translation, rotation and scale"""
-        if self.transformation is not None:
-            self._matrix_buffer = list(array(self.worldtransformation.matrix).flatten())
-
-        if self.children:
-            for child in self.children:
-                child._update_matrix()
-
     def init(self):
         """Initialize the object"""
         self._points_data = self._read_points_data()
         self._lines_data = self._read_lines_data()
         self._frontfaces_data = self._read_frontfaces_data()
         self._backfaces_data = self._read_backfaces_data()
-        self._update_matrix()
         self._update_bounding_box()
         self.instance_color = Color.from_rgb255(*next(self.viewer.scene._instance_colors_generator))
         self.viewer.scene.instance_colors[self.instance_color.rgb255] = self
@@ -184,7 +173,6 @@ class ViewerSceneObject(SceneObject, Base):
             Whether to update the geometric data of the object.
         """
         if update_transform:
-            self._update_matrix()
             self.buffer_manager.update_object_transform(self)
         if update_data:
             self.buffer_manager.update_object_data(self)
