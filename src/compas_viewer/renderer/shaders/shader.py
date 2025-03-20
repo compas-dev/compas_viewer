@@ -81,6 +81,23 @@ class Shader:
         GL.glActiveTexture(GL.GL_TEXTURE0 + 0)  # type: ignore
         GL.glBindTexture(GL.GL_TEXTURE_2D, texture)
 
+    def uniformBuffer(self, name: str, buffer: Any, unit: int = 0):
+        """Store a uniform buffer in the shader program at a named location.
+
+        Parameters
+        ----------
+        name : str
+            The name of the location in the shader program.
+        buffer : Any
+            The buffer to store.
+        unit : int
+            The texture unit to use (0-15 typically available)
+        """
+        location = GL.glGetUniformLocation(self.program, name)
+        GL.glUniform1i(location, unit)  # Use specified texture unit
+        GL.glActiveTexture(GL.GL_TEXTURE0 + unit)
+        GL.glBindTexture(GL.GL_TEXTURE_BUFFER, buffer)
+
     def bind(self):
         """Bind the shader program."""
         GL.glUseProgram(self.program)
@@ -250,6 +267,19 @@ class Shader:
         height : int
             The height of the viewport.
         """
+        # Save current OpenGL state
+        depth_test_enabled = GL.glIsEnabled(GL.GL_DEPTH_TEST)
+        blend_enabled = GL.glIsEnabled(GL.GL_BLEND)
+        previous_line_width = GL.glGetFloat(GL.GL_LINE_WIDTH)
+
+        # Set element_type to 4 to bypass matrix transformations
+        self.uniform1i("element_type", 4)
+
+        # Disable depth testing to ensure the box appears on top
+        GL.glDisable(GL.GL_DEPTH_TEST)
+        GL.glEnable(GL.GL_BLEND)
+        GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA)
+
         x1, y1, x2, y2 = box_coords
         x1 = (x1 / width - 0.5) * 2
         x2 = (x2 / width - 0.5) * 2
@@ -259,14 +289,62 @@ class Shader:
             x1, x2 = x2, x1
         if y1 > y2:
             y1, y2 = y2, y1
-        GL.glLineWidth(1)
-        GL.glBegin(GL.GL_LINE_LOOP)
-        GL.glColor3f(0, 0, 0)
-        GL.glVertex2f(x1, y1)
-        GL.glVertex2f(x2, y1)
-        GL.glVertex2f(x2, y2)
-        GL.glVertex2f(x1, y2)
-        GL.glEnd()
+
+        # Create vertices for the box
+        vertices = array(
+            [
+                x1,
+                y1,
+                0.0,  # Bottom-left
+                x2,
+                y1,
+                0.0,  # Bottom-right
+                x2,
+                y2,
+                0.0,  # Top-right
+                x1,
+                y2,
+                0.0,  # Top-left
+            ],
+            dtype="float32",
+        )
+
+        # Create vertex buffer
+        vbo = GL.glGenBuffers(1)
+        GL.glBindBuffer(GL.GL_ARRAY_BUFFER, vbo)
+        GL.glBufferData(GL.GL_ARRAY_BUFFER, vertices.nbytes, vertices, GL.GL_STATIC_DRAW)
+
+        # Enable position attribute
+        self.enable_attribute("position")
+        self.bind_attribute("position", vbo, 3)
+
+        # Draw filled rectangle with transparency
+        self.uniform1f("opacity", 0.2)  # Set low opacity for filled rectangle
+        GL.glPolygonMode(GL.GL_FRONT_AND_BACK, GL.GL_FILL)
+        GL.glDrawArrays(GL.GL_TRIANGLE_FAN, 0, 4)
+
+        # Draw the box outline with thicker line width
+        self.uniform1f("opacity", 1.0)  # Set full opacity for outline
+
+        # Get supported line width range
+        line_width_range = GL.glGetFloatv(GL.GL_LINE_WIDTH_RANGE)
+        max_line_width = min(line_width_range[1], 2.0)  # Use 2.0 or the max supported width, whichever is smaller
+
+        GL.glLineWidth(max_line_width)
+        # Use LINE_LOOP instead of TRIANGLE_FAN in polygon line mode to avoid diagonal lines
+        GL.glDrawArrays(GL.GL_LINE_LOOP, 0, 4)
+
+        # Clean up
+        self.disable_attribute("position")
+        GL.glDeleteBuffers(1, [vbo])
+
+        # Restore previous OpenGL state
+        if not blend_enabled:
+            GL.glDisable(GL.GL_BLEND)
+        if depth_test_enabled:
+            GL.glEnable(GL.GL_DEPTH_TEST)
+        GL.glLineWidth(previous_line_width)
+        GL.glPolygonMode(GL.GL_FRONT_AND_BACK, GL.GL_FILL)  # Reset polygon mode
 
 
 def make_shader_program(name: str):

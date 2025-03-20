@@ -3,7 +3,6 @@ from typing import Any
 from compas.geometry import Point
 from compas.geometry import Vector
 from compas.scene import GeometryObject
-from compas_viewer.renderer.shaders import Shader
 
 from .sceneobject import ShaderDataType
 from .sceneobject import ViewerSceneObject
@@ -45,11 +44,13 @@ class VectorObject(ViewerSceneObject, GeometryObject):
         super().__init__(**kwargs)
         self.arrow_buffer: dict[str, Any]
         self._lines_buffer: dict[str, Any]
+        self._arrow_vertices: list[float] = []
+        self._arrow_colors: list[float] = []
 
-    def _read_lines_data(self) -> ShaderDataType:
+    def _calculate_arrow_buffer_data(self):
         arrow_end = self._anchor + self.geometry * (1 - self.viewer.config.vectorsize)
         arrow_width = 5 * self.viewer.config.vectorsize * self.viewer.config.vectorsize * self.geometry.length
-        positions = [
+        self._arrow_vertices = [
             self._anchor,  # Arrow start
             arrow_end,  # Arrow body end
             arrow_end + (self.geometry.cross([1, 0, 0]) / self.geometry.length) * arrow_width,  # Arrow corner 1
@@ -59,25 +60,26 @@ class VectorObject(ViewerSceneObject, GeometryObject):
             self._anchor + self.geometry,  # Arrow end
         ]
 
-        colors = [self.linecolor or self.viewer.config.ui.display.linecolor] * len(positions)
+        self._arrow_colors = [self.linecolor or self.viewer.config.ui.display.linecolor] * len(self._arrow_vertices)
+
+    def _read_points_data(self) -> None:
+        pass
+
+    def _read_lines_data(self) -> ShaderDataType:
+        positions = self._arrow_vertices
+        colors = self._arrow_colors
         elements = [[0, 1]]
         return positions, colors, elements
 
+    def _read_frontfaces_data(self) -> ShaderDataType:
+        positions = self._arrow_vertices
+        colors = self._arrow_colors
+        elements = self.ARROW_FACE_INDICES
+        return positions, colors, elements
+
+    def _read_backfaces_data(self) -> None:
+        pass
+
     def init(self):
-        self._lines_data = self._read_lines_data() if self.show_lines else None
-        self.make_buffers()
-        self.arrow_buffer = self.make_buffer_from_data([[], [], self.ARROW_FACE_INDICES])  # type: ignore
-
-    def draw(self, shader: "Shader"):
-        """Draw the object from its buffers"""
-
-        if self.worldtransformation is not None:
-            shader.uniform4x4("transform", self.worldtransformation.matrix)
-        shader.enable_attribute("position")
-        shader.enable_attribute("color")
-        shader.bind_attribute("position", self._lines_buffer["positions"])
-        shader.bind_attribute("color", self._lines_buffer["colors"], step=4)
-        shader.draw_arrows(elements=self._lines_buffer["elements"], n=self._lines_buffer["n"], width=self.linewidth, background=True)
-        shader.draw_triangles(elements=self.arrow_buffer["elements"], n=self.arrow_buffer["n"], background=True)
-        shader.disable_attribute("position")
-        shader.disable_attribute("color")
+        self._calculate_arrow_buffer_data()
+        super().init()

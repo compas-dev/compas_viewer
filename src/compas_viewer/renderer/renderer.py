@@ -1,11 +1,8 @@
 import time
-from functools import lru_cache
 from typing import TYPE_CHECKING
 
 from numpy import float32
-from numpy import frombuffer
 from numpy import identity
-from numpy import uint8
 from OpenGL import GL
 from PySide6 import QtCore
 from PySide6.QtGui import QKeyEvent
@@ -17,8 +14,8 @@ from PySide6.QtWidgets import QGestureEvent
 from compas.geometry import Frame
 from compas.geometry import transform_points_numpy
 from compas_viewer.scene import TagObject
+from compas_viewer.scene.buffermanager import BufferManager
 from compas_viewer.scene.gridobject import GridObject
-from compas_viewer.scene.vectorobject import VectorObject
 
 from .camera import Camera
 from .shaders import Shader
@@ -64,7 +61,7 @@ class Renderer(QOpenGLWidget):
         self.grid = None
 
         self.shader_model: Shader = None
-        self.shader_tag: Shader = None
+        self._shader_tag: Shader = None
         self.shader_arrow: Shader = None
         self.shader_instance: Shader = None
         self.shader_grid: Shader = None
@@ -84,6 +81,8 @@ class Renderer(QOpenGLWidget):
 
         self.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
         self.grabGesture(QtCore.Qt.GestureType.PinchGesture)
+
+        self.buffer_manager = BufferManager()
 
     @property
     def rendermode(self):
@@ -144,6 +143,29 @@ class Renderer(QOpenGLWidget):
         """
         return self._opacity
 
+    @property
+    def shader_tag(self) -> Shader:
+        """Lazy initialization of tag shader.
+
+        Returns
+        -------
+        Shader
+            The tag shader, initialized on first access.
+        """
+        if self._shader_tag is None:
+            projection = self.camera.projection(self.width(), self.height())
+            viewworld = self.camera.viewworld()
+            transform = list(identity(4, dtype=float32))
+
+            self._shader_tag = Shader(name="tag")
+            self._shader_tag.bind()
+            self._shader_tag.uniform4x4("projection", projection)
+            self._shader_tag.uniform4x4("viewworld", viewworld)
+            self._shader_tag.uniform4x4("transform", transform)
+            self._shader_tag.uniform1f("opacity", self.opacity)
+            self._shader_tag.release()
+        return self._shader_tag
+
     # ==========================================================================
     # GL
     # ==========================================================================
@@ -181,9 +203,9 @@ class Renderer(QOpenGLWidget):
         GL.glDepthFunc(GL.GL_LESS)
         GL.glEnable(GL.GL_BLEND)
         GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA)
-        GL.glEnable(GL.GL_POINT_SMOOTH)
-        GL.glEnable(GL.GL_LINE_SMOOTH)
+        GL.glEnable(GL.GL_MULTISAMPLE)
         GL.glEnable(GL.GL_FRAMEBUFFER_SRGB)
+        GL.glEnable(GL.GL_PROGRAM_POINT_SIZE)
         self.init()
 
     def resizeGL(self, w: int, h: int):
@@ -210,28 +232,15 @@ class Renderer(QOpenGLWidget):
         self.resize(w, h)
 
     def paintGL(self, is_instance: bool = False):
-        """Paint the OpenGL canvas.
-
-        Parameters
-        ----------
-        is_instance : bool, optional
-            Whether the render is for instance map, by default False.
-
-        Notes
-        -----
-        This implements the virtual function of the OpenGL widget.
-        This method also paints the instance map used by the selector to identify selected objects.
-        The instance map is immediately cleared again, after which the real scene objects are drawn.
-
-        References
-        ----------
-        * https://doc.qt.io/qtforpython-6/PySide6/QtOpenGL/QOpenGLWindow.html#PySide6.QtOpenGL.PySide6.QtOpenGL.QOpenGLWindow.paintGL
-
-        """
+        """Paint the OpenGL canvas."""
         self.clear()
+
         if is_instance or self.rendermode == "instance":
-            self.paint_instance()
+            GL.glViewport(0, 0, self.width(), self.height())  # Use unscaled viewport for FBO
+            self.paint(is_instance=True)
         else:
+            r = self.devicePixelRatio()
+            GL.glViewport(0, 0, int(self.width() * r), int(self.height() * r))  # Normal scaled viewport
             self.paint()
 
         self._frames += 1
@@ -379,67 +388,47 @@ class Renderer(QOpenGLWidget):
 
     def init(self):
         """Initialize the renderer."""
+        # Create and bind a VAO (required in core-profile OpenGL).
+        self._vao = GL.glGenVertexArrays(1)
+        GL.glBindVertexArray(self._vao)
+
+        self.buffer_manager.clear()
 
         # Init the grid
-        if self.viewer.config.renderer.show_grid:
-            self.grid = GridObject(
-                Frame.worldXY(),
-                gridmode=self.viewer.config.renderer.gridmode,
-                framesize=self.viewer.config.renderer.gridsize,
-                show_framez=self.viewer.config.renderer.show_gridz,
-                show=self.viewer.config.renderer.show_grid,
-            )
-            self.grid.init()
+        self.grid = GridObject(
+            Frame.worldXY(),
+            gridmode=self.viewer.config.renderer.gridmode,
+            framesize=self.viewer.config.renderer.gridsize,
+            show_framez=self.viewer.config.renderer.show_gridz,
+            show=self.viewer.config.renderer.show_grid,
+        )
+        self.grid.init()
 
-        # Init the buffers
         for obj in self.viewer.scene.objects:
             obj.init()
 
+        for obj in self.viewer.scene.objects:
+            if not isinstance(obj, TagObject):
+                self.buffer_manager.add_object(obj)
+
+        self.buffer_manager.create_buffers()
+
+        # Unbind VAO when setup is complete.
+        GL.glBindVertexArray(0)
+
         projection = self.camera.projection(self.viewer.config.window.width, self.viewer.config.window.height)
         viewworld = self.camera.viewworld()
-        transform = list(identity(4, dtype=float32))
-        # create the program
 
+        # create the program
         self.shader_model = Shader(name="model")
         self.shader_model.bind()
         self.shader_model.uniform4x4("projection", projection)
         self.shader_model.uniform4x4("viewworld", viewworld)
-        self.shader_model.uniform4x4("transform", transform)
-        self.shader_model.uniform1i("is_selected", 0)
         self.shader_model.uniform1f("opacity", self.opacity)
         self.shader_model.uniform3f("selection_color", self.viewer.config.renderer.selectioncolor.rgb)
+        self.shader_model.uniformBuffer("transformBuffer", self.buffer_manager.transform_texture, unit=0)
+        self.shader_model.uniformBuffer("settingsBuffer", self.buffer_manager.settings_texture, unit=1)
         self.shader_model.release()
-
-        self.shader_tag = Shader(name="tag")
-        self.shader_tag.bind()
-        self.shader_tag.uniform4x4("projection", projection)
-        self.shader_tag.uniform4x4("viewworld", viewworld)
-        self.shader_tag.uniform4x4("transform", transform)
-        self.shader_tag.uniform1f("opacity", self.opacity)
-        self.shader_tag.release()
-
-        self.shader_arrow = Shader(name="arrow")
-        self.shader_arrow.bind()
-        self.shader_arrow.uniform4x4("projection", projection)
-        self.shader_arrow.uniform4x4("viewworld", viewworld)
-        self.shader_arrow.uniform4x4("transform", transform)
-        self.shader_arrow.uniform1f("opacity", self.opacity)
-        self.shader_arrow.uniform1f("aspect", self.width() / self.height())
-        self.shader_arrow.release()
-
-        self.shader_instance = Shader(name="instance")
-        self.shader_instance.bind()
-        self.shader_instance.uniform4x4("projection", projection)
-        self.shader_instance.uniform4x4("viewworld", viewworld)
-        self.shader_instance.uniform4x4("transform", transform)
-        self.shader_instance.release()
-
-        self.shader_grid = Shader(name="grid")
-        self.shader_grid.bind()
-        self.shader_grid.uniform4x4("projection", projection)
-        self.shader_grid.uniform4x4("viewworld", viewworld)
-        self.shader_grid.uniform4x4("transform", transform)
-        self.shader_grid.release()
 
     def update_projection(self, w=None, h=None):
         """
@@ -463,19 +452,6 @@ class Renderer(QOpenGLWidget):
         self.shader_tag.bind()
         self.shader_tag.uniform4x4("projection", projection)
         self.shader_tag.release()
-
-        self.shader_arrow.bind()
-        self.shader_arrow.uniform4x4("projection", projection)
-        self.shader_arrow.uniform1f("aspect", w / h)
-        self.shader_arrow.release()
-
-        self.shader_instance.bind()
-        self.shader_instance.uniform4x4("projection", projection)
-        self.shader_instance.release()
-
-        self.shader_grid.bind()
-        self.shader_grid.uniform4x4("projection", projection)
-        self.shader_grid.release()
 
     def resize(self, w: int, h: int):
         """
@@ -521,87 +497,51 @@ class Renderer(QOpenGLWidget):
             transparent_objects, _ = zip(*transparent_objects)
         return opaque_objects + list(transparent_objects)
 
-    @lru_cache(maxsize=3)
-    def sort_objects_from_category(self, objs: tuple["MeshObject"]) -> tuple[list["TagObject"], list["VectorObject"], list["MeshObject"]]:
-        """Sort objects by their categories
+    def paint(self, is_instance: bool = False):
+        """Paint all the items in the render"""
 
-        Returns
-        -------
-        tuple(list[:class:`compas_viewer.scene.tagobject.TagObject`],
-        list[:class:`compas_viewer.scene.vectorobject.VectorObject`],
-        list[:class:`compas_viewer.scene.sceneobject.MeshObject`])
-            A tuple of sorted objects.
+        # Bind the same VAO created in init()
+        GL.glBindVertexArray(self._vao)
 
-        Notes
-        -----
-        This function is cached to improve the performance.
-
-        References
-        ----------
-        * https://docs.python.org/3/library/functools.html#functools.lru_cache
-        * https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_recently_used_(LRU)
-        """
-        tag_objs = []
-        vector_objs = []
-        mesh_objs = []
-
-        def sort(obj):
-            if isinstance(obj, TagObject):
-                tag_objs.append(obj)
-            elif isinstance(obj, VectorObject):
-                vector_objs.append(obj)
-            else:
-                mesh_objs.append(obj)
-
-        for obj in objs:
-            sort(obj)
-
-        return tag_objs, vector_objs, mesh_objs
-
-    def paint(self):
-        """
-        Paint all the items in the render, which only be called by the paintGL function
-        and determines the performance of the renders
-        This function introduces decision tree for different render modes and settings.
-        It is only  called by the :class:`compas_viewer.components.render.Render.paintGL` function.
-
-        See Also
-        --------
-        :func:`compas_viewer.components.render.Render.paintGL`
-        :func:`compas_viewer.components.render.Render.paint_instance`
-        """
-
-        #  Matrix update
         viewworld = self.camera.viewworld()
         self.update_projection()
-        # Object categorization
-        tag_objs, vector_objs, mesh_objs = self.sort_objects_from_category(self.viewer.scene.visiable_objects)
 
-        # Draw model objects in the scene
+        # rebind the model shader
         self.shader_model.bind()
+        self.shader_model.uniform1f("opacity", self.opacity)
+        self.shader_model.uniformBuffer("transformBuffer", self.buffer_manager.transform_texture, unit=0)
+        self.shader_model.uniformBuffer("settingsBuffer", self.buffer_manager.settings_texture, unit=1)
+
         self.shader_model.uniform4x4("viewworld", viewworld)
-        if self.grid is not None:
+        self.shader_model.uniform1i("is_instance", is_instance)
+
+        if self.viewer.config.renderer.show_grid:
             self.grid.draw(self.shader_model)
-        for obj in self.sort_objects_from_viewworld(mesh_objs, viewworld):
-            obj.draw(self.shader_model, self.rendermode == "wireframe", self.rendermode == "lighted")
-        self.shader_model.release()
 
-        # Draw vector arrows
-        self.shader_arrow.bind()
-        self.shader_arrow.uniform4x4("viewworld", viewworld)
-        for obj in vector_objs:
-            obj.draw(self.shader_arrow)
-        self.shader_arrow.release()
+        # Draw all the objects in the buffer manager
+        self.buffer_manager.draw(
+            self.shader_model,
+            self.rendermode,
+            is_instance=is_instance,
+        )
 
-        # Draw text tag sprites
-        self.shader_tag.bind()
-        self.shader_tag.uniform4x4("viewworld", viewworld)
-        for obj in tag_objs:
-            obj.draw(self.shader_tag, self.camera.position, self.width(), self.height())
-        self.shader_tag.release()
+        # Draw text tag sprites if there are any
+        tag_objs = [obj for obj in self.viewer.scene.objects if isinstance(obj, TagObject)]
+        if tag_objs:
+            # release the model shader and bind the tag shader
+            self.shader_model.release()
+            self.shader_tag.bind()
+            self.shader_tag.uniform4x4("viewworld", viewworld)
+            for obj in tag_objs:
+                obj.draw(self.shader_tag, self.camera.position, self.width(), self.height())
+            self.shader_tag.release()
 
         # draw 2D box for multi-selection
         if self.viewer.mouse.is_tracing_a_window:
+            # Ensure the shader is bound before drawing
+            self.shader_model.bind()
+
+            # Draw the selection box
             self.shader_model.draw_2d_box(
                 (
                     self.viewer.mouse.window_start_point.x(),
@@ -613,95 +553,130 @@ class Renderer(QOpenGLWidget):
                 self.height(),
             )
 
-    def paint_instance(self):
-        """
-        Independent drawing function for the  instance map,
-        which is only called by the :class:`compas_viewer.components.render.Render.paintGL` function.
-
-        See Also
-        --------
-        :func:`compas_viewer.components.render.Render.paintGL`
-        :func:`compas_viewer.components.render.Render.paint`
-
-        """
-
-        #  Matrix update
-        viewworld = self.camera.viewworld()
-        self.update_projection()
-        # Object categorization
-        _, _, mesh_objs = self.sort_objects_from_category(tuple(self.viewer.scene.objects))
-        # Draw instance maps
-        GL.glDisable(GL.GL_POINT_SMOOTH)
-        GL.glDisable(GL.GL_LINE_SMOOTH)
-
-        self.shader_instance.bind()
-        self.shader_instance.uniform4x4("viewworld", viewworld)
-        for obj in mesh_objs:
-            obj.draw_instance(self.shader_instance, self.rendermode == "wireframe")
-        self.shader_instance.release()
-
-        GL.glEnable(GL.GL_POINT_SMOOTH)
-        GL.glEnable(GL.GL_LINE_SMOOTH)
+        # Unbind once we're done
+        GL.glBindVertexArray(0)
 
     def read_instance_color(self, box: tuple[int, int, int, int]):
-        """
-        Paint the instance map quickly, and then read the color of the specified area.
-
-        Parameters
-        ----------
-        box : tuple[int, int, int, int]
-            The box area [x1, y1, x2, y2] to be read. x1=x2 and y1=y2 means a single point.
-
-        Notes
-        -----
-        The instance map is used by the selector to identify selected objects.
-        The mechanism of a :class:`compas_viewer.components.renderer.selector.Selector`
-        is picking the color from instance map and then find the corresponding object.
-        Anti aliasing, which is always force opened in many machines,  can cause color picking inaccuracy.
-
-        The instance buffer created by the GL is based on the "device-independent pixels",
-        while "physical pixels" is the common unit. The method :func:`PySide6.QtGui.QPaintDevice.devicePixelRatio()`
-        plays a role in the conversion between the two units, which is different on different devices.
-        For example, Mac Retina display has a devicePixelRatio of 2.0.
-        This method contains an uniform-sampling-similar math operation,
-        which is not absolutely accurate but enough for the selection.
-
-        See Also
-        --------
-        :func:`compas_viewer.components.renderer.selector.Selector.ANTI_ALIASING_FACTOR`
-        :attr:`compas_viewer.components.renderer.rendermode`
-
-        References
-        ----------
-        * https://doc.qt.io/qt-6/qscreen.html#devicePixelRatio-prop
-        * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glReadPixels.xhtml
-        * https://doc.qt.io/qt-6/qopenglwidget.html#makeCurrent
-        """
-
-        # Get the rectangle area.
+        # TODO: Should be able to massively simplify this.
+        # Get the rectangle area
         x1, y1, x2, y2 = box
         x, y = min(x1, x2), self.height() - max(y1, y2)
         width = max(self.PIXEL_SELECTION_INCREMENTAL, abs(x1 - x2))
         height = max(self.PIXEL_SELECTION_INCREMENTAL, abs(y1 - y2))
-        r = self.viewer.renderer.devicePixelRatio()
 
-        pixels_x = width * r
-        pixels_y = height * r
-        step_x = round(pixels_x / 1000) + 1
-        step_y = round(pixels_y / 1000) + 1
+        # Store current viewport and FBO
+        viewport = GL.glGetIntegerv(GL.GL_VIEWPORT)
+        previous_fbo = GL.glGetIntegerv(GL.GL_FRAMEBUFFER_BINDING)
 
-        # Repaint the canvas with instance color.
-        self.viewer.renderer.makeCurrent()
-        self.viewer.renderer.paintGL(is_instance=True)
+        # Create an FBO with original window size (not scaled)
+        fbo = GL.glGenFramebuffers(1)
+        GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, fbo)
 
-        # Adjust width and height based on the step
-        width_adjusted = (width // step_x) * step_x
-        height_adjusted = (height // step_y) * step_y
+        # Create a texture to attach to the FBO
+        texture = GL.glGenTextures(1)
+        GL.glBindTexture(GL.GL_TEXTURE_2D, texture)
+        GL.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA8, self.width(), self.height(), 0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, None)
+        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST)
+        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST)
+        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP_TO_EDGE)
+        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP_TO_EDGE)
+        GL.glFramebufferTexture2D(GL.GL_FRAMEBUFFER, GL.GL_COLOR_ATTACHMENT0, GL.GL_TEXTURE_2D, texture, 0)
 
-        # Read the pixel data with downsampling
-        instance_buffer = GL.glReadPixels(int(x * r), int(y * r), int(width_adjusted * r), int(height_adjusted * r), GL.GL_RGB, GL.GL_UNSIGNED_BYTE)
-        instance_map = frombuffer(instance_buffer, dtype=uint8).reshape(int(height_adjusted * r), int(width_adjusted * r), 3)
+        # Create and attach depth buffer
+        depth_buffer = GL.glGenRenderbuffers(1)
+        GL.glBindRenderbuffer(GL.GL_RENDERBUFFER, depth_buffer)
+        GL.glRenderbufferStorage(GL.GL_RENDERBUFFER, GL.GL_DEPTH_COMPONENT24, self.width(), self.height())
+        GL.glFramebufferRenderbuffer(GL.GL_FRAMEBUFFER, GL.GL_DEPTH_ATTACHMENT, GL.GL_RENDERBUFFER, depth_buffer)
 
-        # Downsample the data
-        instance_map = instance_map[::step_y, ::step_x, :].reshape(-1, 3)
-        return instance_map
+        # Check if FBO is complete
+        status = GL.glCheckFramebufferStatus(GL.GL_FRAMEBUFFER)
+        if status != GL.GL_FRAMEBUFFER_COMPLETE:
+            GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, previous_fbo)
+            GL.glDeleteRenderbuffers(1, [depth_buffer])
+            GL.glDeleteTextures(1, [texture])
+            GL.glDeleteFramebuffers(1, [fbo])
+            raise Exception(f"Framebuffer is not complete! Status: {status}")
+
+        # Set up rendering state
+        GL.glViewport(0, 0, self.width(), self.height())
+        GL.glEnable(GL.GL_DEPTH_TEST)
+        GL.glDepthFunc(GL.GL_LESS)
+        GL.glDepthMask(GL.GL_TRUE)
+        GL.glClearColor(0.0, 0.0, 0.0, 1.0)
+        GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
+
+        # Save current render states
+        prev_depth_test = GL.glIsEnabled(GL.GL_DEPTH_TEST)
+        prev_blend = GL.glIsEnabled(GL.GL_BLEND)
+
+        # Disable blending for instance rendering
+        GL.glDisable(GL.GL_BLEND)
+
+        # Render the instance map to the FBO
+        self.paintGL(is_instance=True)
+        GL.glFlush()
+        GL.glFinish()
+
+        # Debug block
+        if hasattr(self.viewer.config.renderer, "debug_instance") and self.viewer.config.renderer.debug_instance:
+            # Save the full frame
+            GL.glPixelStorei(GL.GL_PACK_ALIGNMENT, 1)
+            full_buffer = GL.glReadPixels(0, 0, self.width(), self.height(), GL.GL_RGBA, GL.GL_UNSIGNED_BYTE)
+
+            import numpy as np
+            from PIL import Image
+
+            # Save full frame
+            full_map = np.frombuffer(full_buffer, dtype=np.uint8).reshape(self.height(), self.width(), 4)
+            full_image = Image.fromarray(full_map)
+            full_image = full_image.transpose(Image.FLIP_TOP_BOTTOM)
+            full_image.save("instance_debug_full.png")
+
+            # Draw a red rectangle on the full image to show the box area
+            from PIL import ImageDraw
+
+            draw = ImageDraw.Draw(full_image)
+            draw.rectangle([x1, y1, x2, y2], outline="red", width=2)
+            full_image.save("instance_debug_full_with_box.png")
+
+            print("Saved debug images:")
+            print("- Full frame: instance_debug_full.png")
+            print("- Full frame with box: instance_debug_full_with_box.png")
+            print(f"Box coordinates: x={x}, y={y}, width={width}, height={height}")
+            print(f"Original box: x1={x1}, y1={y1}, x2={x2}, y2={y2}")
+            print(f"Window size: {self.width()}x{self.height()}")
+            print(f"Viewport: {viewport}")
+
+        # Read the box area
+        GL.glPixelStorei(GL.GL_PACK_ALIGNMENT, 1)
+        box_buffer = GL.glReadPixels(x, y, width, height, GL.GL_RGB, GL.GL_UNSIGNED_BYTE)
+
+        import numpy as np
+
+        box_map = np.frombuffer(box_buffer, dtype=np.uint8).reshape(height, width, 3)
+
+        # Save box image if in debug mode
+        if hasattr(self.viewer.config.renderer, "debug_instance") and self.viewer.config.renderer.debug_instance:
+            from PIL import Image
+
+            box_image = Image.fromarray(box_map)
+            box_image = box_image.transpose(Image.FLIP_TOP_BOTTOM)
+            box_image.save("instance_debug_box.png")
+            print("- Box area: instance_debug_box.png")
+
+        # Restore previous render states
+        if prev_blend:
+            GL.glEnable(GL.GL_BLEND)
+        if not prev_depth_test:
+            GL.glDisable(GL.GL_DEPTH_TEST)
+
+        # Clean up
+        GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, previous_fbo)
+        GL.glDeleteRenderbuffers(1, [depth_buffer])
+        GL.glDeleteTextures(1, [texture])
+        GL.glDeleteFramebuffers(1, [fbo])
+
+        # Restore viewport
+        GL.glViewport(*viewport)
+
+        return box_map.reshape(-1, 3)
