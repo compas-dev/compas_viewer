@@ -272,12 +272,8 @@ class Shader:
         blend_enabled = GL.glIsEnabled(GL.GL_BLEND)
         previous_line_width = GL.glGetFloat(GL.GL_LINE_WIDTH)
 
-        # Save current shader uniform matrices
-        identity_matrix = [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]
-
-        # Set identity matrices to ensure drawing in screen space
-        self.uniform4x4("projection", identity_matrix)
-        self.uniform4x4("viewworld", identity_matrix)
+        # Set element_type to 4 to bypass matrix transformations
+        self.uniform1i("element_type", 4)
 
         # Disable depth testing to ensure the box appears on top
         GL.glDisable(GL.GL_DEPTH_TEST)

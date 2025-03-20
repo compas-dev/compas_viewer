@@ -11,6 +11,7 @@ uniform mat4 viewworld;
 uniform samplerBuffer transformBuffer;
 uniform samplerBuffer settingsBuffer;
 uniform bool is_grid;
+uniform int element_type;
 
 // Outputs
 out vec4 vertex_color;
@@ -92,14 +93,21 @@ void main() {
         is_selected = getEffectiveSelection(object_index);
         object_opacity = settings_row3.g;
         pointSize = settings_row3.b;
-
     }
 
     // Calculate final position
     vertex_color = color;
     vec4 worldPos = transform * vec4(position, 1.0);
-    vec4 viewPos = viewworld * worldPos;
-    gl_Position = projection * viewPos;
-    ec_pos = vec3(viewPos);
+    
+    // Bypass matrix transformations 2D elements
+    if (element_type == 4) {
+        gl_Position = vec4(position, 1.0);
+        ec_pos = position;
+    } else {
+        vec4 viewPos = viewworld * worldPos;
+        gl_Position = projection * viewPos;
+        ec_pos = vec3(viewPos);
+    }
+    
     gl_PointSize = pointSize;
 }
