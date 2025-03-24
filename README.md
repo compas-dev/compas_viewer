@@ -19,11 +19,11 @@ More information is available in the docs: <https://compas.dev/compas_viewer/>
 
 ## Installation
 
-See the [Getting Started](https://compas.dev/compas_viewer/latest/gettingstarted.html) instructions in the docs.
+See the [Getting Started](https://compas.dev/compas_viewer/latest/installation.html) instructions in the docs.
 
 ## Tutorials
 
-This [tutorial page](https://compas.dev/compas_viewer/latest/tutorials.html) contains basic lead-through, configuration setting, and software concepts.
+This [tutorial page](https://compas.dev/compas_viewer/latest/tutorial.html) contains basic lead-through, configuration setting, and software concepts.
 
 ## Examples
 
