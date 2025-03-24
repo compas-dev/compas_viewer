@@ -210,7 +210,6 @@ class BufferObject(SceneObject, Base):
 
         self.is_selected = False
         self.background = False
-        self._matrix_buffer = None
         self._bounding_box = None
         self._bounding_box_center = None
 

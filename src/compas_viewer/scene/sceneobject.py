@@ -3,20 +3,13 @@ from typing import Optional
 
 from numpy import array
 from numpy import average
-from numpy import identity
 
 from compas.colors import Color
 from compas.geometry import Point
 from compas.geometry import Transformation
 from compas.geometry import transform_points_numpy
-from compas.itertools import flatten
 from compas.scene import SceneObject
 from compas_viewer.base import Base
-from compas_viewer.gl import make_index_buffer
-from compas_viewer.gl import make_vertex_buffer
-from compas_viewer.gl import update_index_buffer
-from compas_viewer.gl import update_vertex_buffer
-from compas_viewer.renderer.shaders import Shader
 
 # Type template of point/line/face data for generating the buffers.
 ShaderDataType = tuple[list[Point], list[Color], list[list[int]]]
@@ -112,7 +105,6 @@ class ViewerSceneObject(SceneObject, Base):
 
         #  Geometric
         self.transformation: Optional[Transformation] = None
-        self._matrix_buffer: Optional[list[list[float]]] = None
         self._bounding_box: Optional[list[float]] = None
         self._bounding_box_center: Optional[Point] = None
 
@@ -160,168 +152,30 @@ class ViewerSceneObject(SceneObject, Base):
     # general
     # ==========================================================================
 
-    def _update_matrix(self):
-        """Update the matrix from object's translation, rotation and scale"""
-        if self.transformation is not None:
-            self._matrix_buffer = list(array(self.worldtransformation.matrix).flatten())
-
-        if self.children:
-            for child in self.children:
-                child._update_matrix()
-
-    # ==========================================================================
-    # buffer
-    # ==========================================================================
-
-    def make_buffer_from_data(self, data: ShaderDataType) -> dict[str, Any]:
-        """Create buffers from point/line/face data.
-
-        Parameters
-        ----------
-        data : tuple[list[:class:`compas.geometry.Point`], list[:class:`compas.colors.Color`], list[int]]
-            Contains positions, colors, elements for the buffer.
-
-        Returns
-        -------
-        buffer_dict : dict[str, Any]
-            A dict with created buffer indexes.
-        """
-        positions, colors, elements = data
-        flat_positions = list(flatten(positions))
-        flat_colors = list(flatten([color.rgba for color in colors]))
-        flat_elements = list(flatten(elements))
-
-        return {
-            "positions": make_vertex_buffer(flat_positions),
-            "colors": make_vertex_buffer(flat_colors),
-            "elements": make_index_buffer(flat_elements),
-            "n": len(flat_elements),
-        }
-
-    def update_buffer_from_data(
-        self,
-        data: ShaderDataType,
-        buffer: dict[str, Any],
-        update_positions: bool,
-        update_colors: bool,
-        update_elements: bool,
-    ):
-        """Update existing buffers from point/line/face data.
-
-        Parameters
-        ----------
-        data : tuple[list[:class:`compas.geometry.Point`], list[:class:`compas.colors.Color`], list[int]]
-            Contains positions, colors, elements for the buffer.
-        buffer : dict[str, Any]
-            The dict with created buffer indexes
-        update_positions : bool
-            Whether to update positions in the buffer dict.
-        update_colors : bool
-            Whether to update colors in the buffer dict.
-        update_elements : bool
-            Whether to update elements in the buffer dict.
-        """
-        positions, colors, elements = data
-        flat_positions = list(flatten(positions))
-        flat_colors = list(flatten([color.rgba for color in colors]))
-        flat_elements = list(flatten(elements))
-
-        if update_positions:
-            update_vertex_buffer(flat_positions, buffer["positions"])
-        if update_colors:
-            update_vertex_buffer(flat_colors, buffer["colors"])
-        if update_elements:
-            update_index_buffer(flat_elements, buffer["elements"])
-        buffer["n"] = len(flat_elements)
-
-    def make_buffers(self):
-        """Create all buffers from object's data"""
-        if self._points_data is not None:
-            data = self._points_data
-            self._points_buffer = self.make_buffer_from_data(data)
-            if len(data[0]):
-                self._update_bounding_box(data[0])
-        if self._lines_data is not None:
-            data = self._lines_data
-            self._lines_buffer = self.make_buffer_from_data(data)
-            if len(data[0]) and self._bounding_box_center is None:
-                self._update_bounding_box(data[0])
-        if self._frontfaces_data is not None:
-            data = self._frontfaces_data
-            self._frontfaces_buffer = self.make_buffer_from_data(data)
-            if len(data[0]) and self._bounding_box_center is None:
-                self._update_bounding_box(data[0])
-        if self._backfaces_data is not None:
-            data = self._backfaces_data
-            self._backfaces_buffer = self.make_buffer_from_data(data)
-            if len(data[0]) and self._bounding_box_center is None:
-                self._update_bounding_box(data[0])
-
     def init(self):
         """Initialize the object"""
         self._points_data = self._read_points_data()
         self._lines_data = self._read_lines_data()
         self._frontfaces_data = self._read_frontfaces_data()
         self._backfaces_data = self._read_backfaces_data()
-        self.make_buffers()
-        self._update_matrix()
+        self._update_bounding_box()
         self.instance_color = Color.from_rgb255(*next(self.viewer.scene._instance_colors_generator))
         self.viewer.scene.instance_colors[self.instance_color.rgb255] = self
 
-    def update(self, update_positions: bool = True, update_colors: bool = True, update_elements: bool = True):
+    def update(self, update_transform: bool = True, update_data: bool = False):
         """Update the object.
 
         Parameters
         ----------
-        update_positions : bool, optional
-            Whether to update positions of the object.
-        update_colors : bool, optional
-            Whether to update colors of the object.
-        update_elements : bool, optional
-            Whether to update elements of the object.
+        update_transform : bool, optional
+            Whether to update the transform of the object.
+        update_data : bool, optional
+            Whether to update the geometric data of the object.
         """
-
-        # Update the matrix from object's translation, rotation and scale.
-        self._update_matrix()
-
-        self._points_data = self._read_points_data()
-        self._lines_data = self._read_lines_data()
-        self._frontfaces_data = self._read_frontfaces_data()
-        self._backfaces_data = self._read_backfaces_data()
-
-        # Update all buffers from object's data.
-        if self._points_data is not None:
-            self.update_buffer_from_data(
-                self._points_data,
-                self._points_buffer,
-                update_positions,
-                update_colors,
-                update_elements,
-            )
-        if self._lines_data is not None:
-            self.update_buffer_from_data(
-                self._lines_data,
-                self._lines_buffer,
-                update_positions,
-                update_colors,
-                update_elements,
-            )
-        if self._frontfaces_data is not None:
-            self.update_buffer_from_data(
-                self._frontfaces_data,
-                self._frontfaces_buffer,
-                update_positions,
-                update_colors,
-                update_elements,
-            )
-        if self._backfaces_data is not None:
-            self.update_buffer_from_data(
-                self._backfaces_data,
-                self._backfaces_buffer,
-                update_positions,
-                update_colors,
-                update_elements,
-            )
+        if update_transform:
+            self.buffer_manager.update_object_transform(self)
+        if update_data:
+            self.buffer_manager.update_object_data(self)
 
     def _update_bounding_box(self, positions: Optional[list[Point]] = None):
         """Update the bounding box of the object"""
@@ -339,95 +193,6 @@ class ViewerSceneObject(SceneObject, Base):
         _positions = array(positions)
         self._bounding_box = list(transform_points_numpy(array([_positions.min(axis=0), _positions.max(axis=0)]), self.worldtransformation))
         self._bounding_box_center = Point(*list(average(a=array(self.bounding_box), axis=0)))
-
-    def draw(self, shader: Shader, wireframe: bool, is_lighted: bool):
-        """Draw the object from its buffers"""
-        shader.enable_attribute("position")
-        shader.enable_attribute("color")
-        shader.uniform1i("is_selected", self.is_selected)
-        # Matrix
-        if self._matrix_buffer is not None:
-            shader.uniform4x4("transform", self._matrix_buffer)
-        shader.uniform1i("is_lighted", is_lighted)
-        shader.uniform1f("object_opacity", self.opacity)
-        shader.uniform1i("element_type", 2)
-        # Frontfaces
-        if self._frontfaces_buffer is not None and not wireframe and self.show_faces:
-            shader.bind_attribute("position", self._frontfaces_buffer["positions"])
-            shader.bind_attribute("color", self._frontfaces_buffer["colors"], step=4)
-            shader.draw_triangles(
-                elements=self._frontfaces_buffer["elements"],
-                n=self._frontfaces_buffer["n"],
-                background=self.background,
-            )
-        # Backfaces
-        if self._backfaces_buffer is not None and not wireframe and self.show_faces:
-            shader.bind_attribute("position", self._backfaces_buffer["positions"])
-            shader.bind_attribute("color", self._backfaces_buffer["colors"], step=4)
-            shader.draw_triangles(elements=self._backfaces_buffer["elements"], n=self._backfaces_buffer["n"], background=self.background)
-        shader.uniform1i("is_lighted", False)
-        shader.uniform1i("element_type", 1)
-        # Lines
-        if self._lines_buffer is not None and self.show_lines:
-            shader.bind_attribute("position", self._lines_buffer["positions"])
-            shader.bind_attribute("color", self._lines_buffer["colors"], step=4)
-            shader.draw_lines(
-                width=self.linewidth,
-                elements=self._lines_buffer["elements"],
-                n=self._lines_buffer["n"],
-                background=self.background,
-            )
-        shader.uniform1i("element_type", 0)
-        # Points
-        if self._points_buffer is not None and self.show_points:
-            shader.bind_attribute("position", self._points_buffer["positions"])
-            shader.bind_attribute("color", self._points_buffer["colors"], step=4)
-            shader.draw_points(
-                size=self.pointsize,
-                elements=self._points_buffer["elements"],
-                n=self._points_buffer["n"],
-                background=self.background,
-            )
-        # Reset
-        shader.uniform1i("is_selected", 0)
-        shader.uniform1f("object_opacity", 1)
-        if self._matrix_buffer is not None:
-            shader.uniform4x4("transform", list(identity(4).flatten()))
-        shader.disable_attribute("position")
-        shader.disable_attribute("color")
-
-    def draw_instance(self, shader, wireframe: bool):
-        """Draw the object instance for picking"""
-        shader.enable_attribute("position")
-        shader.uniform3f("instance_color", self.instance_color.rgb)
-        # Matrix
-        if self._matrix_buffer is not None:
-            shader.uniform4x4("transform", self._matrix_buffer)
-        # Points
-        if self._points_buffer is not None and self.show_points:
-            shader.bind_attribute("position", self._points_buffer["positions"])
-            shader.draw_points(size=self.pointsize, elements=self._points_buffer["elements"], n=self._points_buffer["n"])
-        # Lines
-        if self._lines_buffer is not None and (self.show_lines or wireframe):
-            shader.bind_attribute("position", self._lines_buffer["positions"])
-            shader.draw_lines(
-                width=self.linewidth + self.viewer.renderer.PIXEL_SELECTION_INCREMENTAL,
-                elements=self._lines_buffer["elements"],
-                n=self._lines_buffer["n"],
-            )
-        # Frontfaces
-        if self._frontfaces_buffer is not None and not wireframe and self.show_faces:
-            shader.bind_attribute("position", self._frontfaces_buffer["positions"])
-            shader.draw_triangles(elements=self._frontfaces_buffer["elements"], n=self._frontfaces_buffer["n"])
-        # Backfaces
-        if self._backfaces_buffer is not None and not wireframe and self.show_faces:
-            shader.bind_attribute("position", self._backfaces_buffer["positions"])
-            shader.draw_triangles(elements=self._backfaces_buffer["elements"], n=self._backfaces_buffer["n"])
-        # Reset
-        if self._matrix_buffer is not None:
-            shader.uniform4x4("transform", identity(4).flatten())
-        shader.uniform3f("instance_color", [0, 0, 0])
-        shader.disable_attribute("position")
 
     @property
     def settings(self):
@@ -454,3 +219,7 @@ class ViewerSceneObject(SceneObject, Base):
             settings["facecolor"] = self.facecolor
 
         return settings
+
+    @property
+    def buffer_manager(self):
+        return self.viewer.renderer.buffer_manager

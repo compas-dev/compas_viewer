@@ -22,4 +22,5 @@ group2 = viewer.scene.add([(box1, {"name": "box1", "facecolor": Color.red()}), (
 box1 = box1.transformed(Translation.from_vector([0, 5, 0]))
 box2 = box2.transformed(Translation.from_vector([0, 5, 0]))
 group3 = viewer.scene.add([[box1], box2])
+group3.transformation = Translation.from_vector([0, 0, 5])
 viewer.show()

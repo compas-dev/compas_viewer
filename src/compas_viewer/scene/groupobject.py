@@ -1,6 +1,6 @@
 from compas.data import Data
 
-from .sceneobject import SceneObject
+from .sceneobject import ViewerSceneObject
 
 
 class Group(Data):
@@ -15,16 +15,11 @@ class Group(Data):
         return {"items": self.items}
 
 
-class GroupObject(SceneObject):
+class GroupObject(ViewerSceneObject):
     """A group of scene objects."""
 
     def __init__(self, item=None, **kwargs):
         super().__init__(item=Group(item), **kwargs)
-        self.show = True
-        self.is_selected = False
-        self.opacity = 1.0
-        self.bounding_box = None
-
         for item in self.items:
             if isinstance(item, (Data, list)):
                 self.add(item, **kwargs)
@@ -41,10 +36,4 @@ class GroupObject(SceneObject):
         return self.item.items
 
     def init(self, *args, **kwargs):
-        pass
-
-    def draw(self, *args, **kwargs):
-        pass
-
-    def draw_instance(self, *args, **kwargs):
         pass
