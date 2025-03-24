@@ -575,7 +575,7 @@ document.write(`
 <h1>PlaneObject</h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="compas_viewer.scene.PlaneObject">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">PlaneObject</span></span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/b35b9f1/src/compas_viewer/scene/planeobject.py#L11"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">PlaneObject</span></span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/e0276c6/src/compas_viewer/scene/planeobject.py#L11"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">GeometryObject</span></code></p>
 <p>Viewer scene object for displaying COMPAS Plane geometry.</p>
 <dl class="field-list simple">
@@ -609,46 +609,34 @@ Default is 1.</p>
 <td><p>Make an independent copy of the data object.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.PlaneObject.draw.html#compas_viewer.scene.PlaneObject.draw" title="compas_viewer.scene.PlaneObject.draw"><code class="xref py py-obj docutils literal notranslate"><span class="pre">draw</span></code></a></p></td>
-<td><p>Draw the object from its buffers</p></td>
+<td><p>The main drawing method.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.PlaneObject.draw_instance.html#compas_viewer.scene.PlaneObject.draw_instance" title="compas_viewer.scene.PlaneObject.draw_instance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">draw_instance</span></code></a></p></td>
-<td><p>Draw the object instance for picking</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.PlaneObject.from_json.html#compas_viewer.scene.PlaneObject.from_json" title="compas_viewer.scene.PlaneObject.from_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_json</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.PlaneObject.from_json.html#compas_viewer.scene.PlaneObject.from_json" title="compas_viewer.scene.PlaneObject.from_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_json</span></code></a></p></td>
 <td><p>Construct an object of this type from a JSON file.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.PlaneObject.from_jsonstring.html#compas_viewer.scene.PlaneObject.from_jsonstring" title="compas_viewer.scene.PlaneObject.from_jsonstring"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_jsonstring</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.PlaneObject.from_jsonstring.html#compas_viewer.scene.PlaneObject.from_jsonstring" title="compas_viewer.scene.PlaneObject.from_jsonstring"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_jsonstring</span></code></a></p></td>
 <td><p>Construct an object of this type from a JSON string.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.PlaneObject.init.html#compas_viewer.scene.PlaneObject.init" title="compas_viewer.scene.PlaneObject.init"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.PlaneObject.init.html#compas_viewer.scene.PlaneObject.init" title="compas_viewer.scene.PlaneObject.init"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init</span></code></a></p></td>
 <td><p>Initialize the object</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.PlaneObject.make_buffer_from_data.html#compas_viewer.scene.PlaneObject.make_buffer_from_data" title="compas_viewer.scene.PlaneObject.make_buffer_from_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_buffer_from_data</span></code></a></p></td>
-<td><p>Create buffers from point/line/face data.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.PlaneObject.make_buffers.html#compas_viewer.scene.PlaneObject.make_buffers" title="compas_viewer.scene.PlaneObject.make_buffers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_buffers</span></code></a></p></td>
-<td><p>Create all buffers from object's data</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.PlaneObject.remove.html#compas_viewer.scene.PlaneObject.remove" title="compas_viewer.scene.PlaneObject.remove"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.PlaneObject.remove.html#compas_viewer.scene.PlaneObject.remove" title="compas_viewer.scene.PlaneObject.remove"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove</span></code></a></p></td>
 <td><p>Remove a child node from this node.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.PlaneObject.sha256.html#compas_viewer.scene.PlaneObject.sha256" title="compas_viewer.scene.PlaneObject.sha256"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sha256</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.PlaneObject.sha256.html#compas_viewer.scene.PlaneObject.sha256" title="compas_viewer.scene.PlaneObject.sha256"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sha256</span></code></a></p></td>
 <td><p>Compute a hash of the data for comparison during version control using the sha256 algorithm.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.PlaneObject.to_json.html#compas_viewer.scene.PlaneObject.to_json" title="compas_viewer.scene.PlaneObject.to_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_json</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.PlaneObject.to_json.html#compas_viewer.scene.PlaneObject.to_json" title="compas_viewer.scene.PlaneObject.to_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_json</span></code></a></p></td>
 <td><p>Convert an object to its native data representation and save it to a JSON file.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.PlaneObject.to_jsonstring.html#compas_viewer.scene.PlaneObject.to_jsonstring" title="compas_viewer.scene.PlaneObject.to_jsonstring"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_jsonstring</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.PlaneObject.to_jsonstring.html#compas_viewer.scene.PlaneObject.to_jsonstring" title="compas_viewer.scene.PlaneObject.to_jsonstring"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_jsonstring</span></code></a></p></td>
 <td><p>Convert an object to its native data representation and save it to a JSON string.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.PlaneObject.traverse.html#compas_viewer.scene.PlaneObject.traverse" title="compas_viewer.scene.PlaneObject.traverse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">traverse</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.PlaneObject.traverse.html#compas_viewer.scene.PlaneObject.traverse" title="compas_viewer.scene.PlaneObject.traverse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">traverse</span></code></a></p></td>
 <td><p>Traverse the tree from this node.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.PlaneObject.update.html#compas_viewer.scene.PlaneObject.update" title="compas_viewer.scene.PlaneObject.update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.PlaneObject.update.html#compas_viewer.scene.PlaneObject.update" title="compas_viewer.scene.PlaneObject.update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code></a></p></td>
 <td><p>Update the object.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.scene.PlaneObject.update_buffer_from_data.html#compas_viewer.scene.PlaneObject.update_buffer_from_data" title="compas_viewer.scene.PlaneObject.update_buffer_from_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_buffer_from_data</span></code></a></p></td>
-<td><p>Update existing buffers from point/line/face data.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.scene.PlaneObject.validate_data.html#compas_viewer.scene.PlaneObject.validate_data" title="compas_viewer.scene.PlaneObject.validate_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_data</span></code></a></p></td>
 <td><p>Validate the data against the object's data schema.</p></td>
