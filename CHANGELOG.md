@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
+* Added dynamic import to enable access from expended `TreeForm`. 
 
 * Added `BufferManager` to handle buffer data for all the scene objects.
 * Added `make_texture_buffer` in `gl.py` for matrix and settings array.
