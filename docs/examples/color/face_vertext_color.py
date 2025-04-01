@@ -9,9 +9,8 @@ viewer = Viewer()
 
 mesh = Mesh.from_obj(compas.get("faces.obj"))
 
-for vertex in mesh.vertices():
-    mesh.vertex_attribute(vertex, "color", Color.from_i(random()))
+vertexcolor = {vertex: Color.from_i(random()) for vertex in mesh.vertices()}
 
-viewer.scene.add(mesh, use_vertexcolors=True)
+viewer.scene.add(mesh, use_vertexcolors=True, vertexcolor=vertexcolor)
 
 viewer.show()

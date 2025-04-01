@@ -96,6 +96,7 @@ class ViewerScene(Scene):
         show_points: Optional[bool] = None,
         show_lines: Optional[bool] = None,
         show_faces: Optional[bool] = None,
+        vertexcolor: Optional[Union[Color, dict[Any, Color]]] = None,
         pointcolor: Optional[Union[Color, dict[Any, Color]]] = None,
         linecolor: Optional[Union[Color, dict[Any, Color]]] = None,
         facecolor: Optional[Union[Color, dict[Any, Color]]] = None,
@@ -161,6 +162,8 @@ class ViewerScene(Scene):
             The scene object.
         """
 
+        print(pointcolor)
+
         sceneobject: ViewerSceneObject = super().add(  # type: ignore
             item=item,
             parent=parent,
@@ -170,7 +173,7 @@ class ViewerScene(Scene):
             show_lines=show_lines,
             show_faces=show_faces,
             pointcolor=pointcolor,
-            vertexcolor=pointcolor,
+            vertexcolor=vertexcolor or pointcolor,
             linecolor=linecolor,
             edgecolor=linecolor,
             facecolor=facecolor,
