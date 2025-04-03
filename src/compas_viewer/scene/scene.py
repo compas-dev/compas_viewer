@@ -10,6 +10,7 @@ from compas.datastructures import Datastructure
 from compas.geometry import Geometry
 from compas.scene import Scene
 
+from .group import Group
 from .sceneobject import ViewerSceneObject
 
 
@@ -162,8 +163,6 @@ class ViewerScene(Scene):
             The scene object.
         """
 
-        print(pointcolor)
-
         sceneobject: ViewerSceneObject = super().add(  # type: ignore
             item=item,
             parent=parent,
@@ -188,3 +187,23 @@ class ViewerScene(Scene):
             **kwargs,
         )
         return sceneobject
+
+    def add_group(self, name: str = None, **kwargs) -> Group:
+        """
+        Add a group to the scene.
+
+        Parameters
+        ----------
+        name : str, optional
+            The name of the group.
+        **kwargs : dict, optional
+            The other possible parameters to be passed to the group.
+
+        Returns
+        -------
+        :class:`compas_viewer.scene.Group`
+            The group.
+        """
+        group = Group(name=name, **kwargs)
+        self.add(group)
+        return group

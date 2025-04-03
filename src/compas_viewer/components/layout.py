@@ -95,10 +95,10 @@ class SettingLayout:
 
     @property
     def exclude_type_list(self) -> tuple[type, ...]:
-        from compas_viewer.scene import GroupObject
+        from compas_viewer.scene import Group
         from compas_viewer.scene import TagObject
 
-        return (GroupObject, TagObject)
+        return (Group, TagObject)
 
     def generate_layout(self) -> None:
         self.layout = QVBoxLayout()
