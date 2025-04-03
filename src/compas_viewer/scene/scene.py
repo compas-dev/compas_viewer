@@ -72,16 +72,6 @@ class ViewerScene(Scene):
         self._instance_colors_generator = instance_colors_generator()
 
     @property
-    def visiable_objects(self) -> list[ViewerSceneObject]:
-        def traverse(obj):
-            for child in obj.children:
-                if child.show:
-                    yield child
-                    yield from traverse(child)
-
-        return traverse(self.root)
-
-    @property
     def viewer(self):
         from compas_viewer import Viewer
 

@@ -407,7 +407,6 @@ class Renderer(QOpenGLWidget):
 
         for obj in self.viewer.scene.objects:
             if not isinstance(obj, Group):
-                print(obj)
                 obj.init()
 
         for obj in self.viewer.scene.objects:
