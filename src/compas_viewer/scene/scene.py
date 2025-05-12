@@ -178,7 +178,7 @@ class ViewerScene(Scene):
         )
         return sceneobject
 
-    def add_group(self, name: str = None, **kwargs) -> Group:
+    def add_group(self, name: str = None, parent: Optional[ViewerSceneObject] = None, **kwargs) -> Group:
         """
         Add a group to the scene.
 
@@ -186,6 +186,8 @@ class ViewerScene(Scene):
         ----------
         name : str, optional
             The name of the group.
+        parent : :class:`compas_viewer.scene.ViewerSceneObject`, optional
+            The parent of the group.
         **kwargs : dict, optional
             The other possible parameters to be passed to the group.
 
@@ -195,5 +197,5 @@ class ViewerScene(Scene):
             The group.
         """
         group = Group(name=name, **kwargs)
-        self.add(group)
+        self.add(group, parent=parent)
         return group
