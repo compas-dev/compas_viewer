@@ -104,7 +104,8 @@ class BufferManager:
 
         if len(colors) > len(positions):
             print(
-                f"WARNING: Buffer type: {buffer_type} colors length: {len(colors)} greater than positions length: {len(positions)} for {obj}, the remaining colors will be ignored"
+                f"WARNING: Buffer type: {buffer_type} colors length: {len(colors)} greater than positions length: {len(positions)} for {obj},"
+                "the remaining colors will be ignored"
             )
             colors = colors[: len(positions)]
         elif len(colors) < len(positions):
@@ -302,11 +303,12 @@ class BufferManager:
 
                 if len(colors) > len(positions):
                     print(
-                        f"WARNING: Buffer type: {data_type} colors length: {len(colors)} greater than positions length: {len(positions)} for {obj}, the remaining colors will be ignored"
+                        f"WARNING: Buffer type: {data_type} colors length: {len(colors)} greater than positions length: {len(positions)} for {obj},"
+                        "the remaining colors will be ignored"
                     )
                     colors = colors[: len(positions)]
                 elif len(colors) < len(positions):
-                    print(f"WARNING: Buffer type: {data_type} colors length: {len(colors)} less than positions length: {len(positions)} for {obj}, last color will be repeated")
+                    print(f"WARNING: Buffer type: {data_type} colors length: {len(colors)} less than positions length: {len(positions)} for {obj}," "last color will be repeated")
                     colors = colors + [colors[-1]] * (len(positions) - len(colors))
 
                 # Convert to numpy arrays
