@@ -162,8 +162,6 @@ class ViewerScene(Scene):
             The scene object.
         """
 
-        print(pointcolor)
-
         sceneobject: ViewerSceneObject = super().add(  # type: ignore
             item=item,
             parent=parent,

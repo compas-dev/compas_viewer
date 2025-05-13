@@ -102,6 +102,15 @@ class BufferManager:
         """Add buffer data for a specific geometry type."""
         positions, colors, elements = getattr(obj, buffer_type)
 
+        if len(colors) > len(positions):
+            print(
+                f"WARNING: Buffer type: {buffer_type} colors length: {len(colors)} greater than positions length: {len(positions)} for {obj}, the remaining colors will be ignored"
+            )
+            colors = colors[: len(positions)]
+        elif len(colors) < len(positions):
+            print(f"WARNING: Buffer type: {buffer_type} colors length: {len(colors)} less than positions length: {len(positions)} for {obj}, last color will be repeated")
+            colors = colors + [colors[-1]] * (len(positions) - len(colors))
+
         # Convert to numpy arrays
         pos_array = np.array(positions, dtype=np.float32).flatten()
         col_array = np.array([c.rgba for c in colors], dtype=np.float32).flatten()
