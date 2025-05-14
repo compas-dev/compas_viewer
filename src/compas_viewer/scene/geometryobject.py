@@ -99,7 +99,7 @@ class GeometryObject(ViewerSceneObject, BaseGeometryObject):
         positions = []
         elements = []
         positions = list(flatten(self.lines))
-        colors = [self.linecolor] * 2 * len(positions)
+        colors = [self.linecolor] * len(positions)
         elements = [[2 * i, 2 * i + 1] for i in range(len(self.lines))]
         return positions, colors, elements
 
@@ -107,7 +107,7 @@ class GeometryObject(ViewerSceneObject, BaseGeometryObject):
         if self.viewmesh is None:
             return [], [], []
         positions, elements = self.viewmesh.to_vertices_and_faces()
-        colors = [self.facecolor] * 3 * len(positions)
+        colors = [self.facecolor] * len(positions)
         return positions, colors, elements  # type: ignore
 
     def _read_backfaces_data(self) -> ShaderDataType:
@@ -116,5 +116,5 @@ class GeometryObject(ViewerSceneObject, BaseGeometryObject):
         positions, elements = self.viewmesh.to_vertices_and_faces()
         for element in elements:
             element.reverse()
-        colors = [self.facecolor] * 3 * len(positions)
+        colors = [self.facecolor] * len(positions)
         return positions, colors, elements  # type: ignore
