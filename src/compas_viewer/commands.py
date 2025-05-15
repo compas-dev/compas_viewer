@@ -46,6 +46,9 @@ class Command:
         mousebinding: Optional[str] = None,
         wheelbinding: Optional[str] = None,
         gesturebinding: Optional[str] = None,
+        update_renderer: bool = False,
+        update_sidebar: bool = False,
+        update_app: bool = False,
     ):
         self.title = title
         self.callback = callback
@@ -55,9 +58,19 @@ class Command:
         self.mousebinding = mousebinding
         self.wheelbinding = wheelbinding
         self.gesturebinding = gesturebinding
+        self.update_renderer = update_renderer
+        self.update_sidebar = update_sidebar
+        self.update_app = update_app
 
     def __call__(self, *args: Any, **kwargs: Any) -> Callable:
-        return self.callback(self.viewer, *args, **kwargs)
+        result = self.callback(self.viewer, *args, **kwargs)
+
+        if self.update_renderer or self.update_app:
+            self.viewer.renderer.update()
+        if self.update_sidebar or self.update_app:
+            self.viewer.ui.sidebar.update()
+
+        return result
 
 
 # =============================================================================
@@ -99,18 +112,16 @@ toggle_statusbar_cmd = Command(title="Statusbar", callback=toggle_statusbar)
 
 def change_rendermode(viewer: "Viewer", mode: Literal["Shaded", "Ghosted", "Lighted", "Wireframe"]):
     viewer.renderer.rendermode = mode.lower()
-    viewer.renderer.update()
 
 
-change_rendermode_cmd = Command(title="Set View3D Render Mode", callback=change_rendermode)
+change_rendermode_cmd = Command(title="Set View3D Render Mode", callback=change_rendermode, update_renderer=True)
 
 
 def change_view(viewer: "Viewer", mode: Literal["Perspective", "Top", "Front", "Right"]):
     viewer.renderer.view = mode.lower()
-    viewer.renderer.update()
 
 
-change_view_cmd = Command(title="Set View3D View", callback=change_view)
+change_view_cmd = Command(title="Set View3D View", callback=change_view, update_renderer=True)
 
 
 def camera_settings(viewer: "Viewer"):
@@ -154,10 +165,8 @@ def pan_view(viewer: "Viewer", event: QMouseEvent):
     elif etype == QEvent.Type.MouseButtonRelease:
         QApplication.restoreOverrideCursor()
 
-    viewer.renderer.update()
 
-
-pan_view_cmd = Command(title="Pan View", callback=pan_view, mousebinding="RIGHT + SHIFT")
+pan_view_cmd = Command(title="Pan View", callback=pan_view, mousebinding="RIGHT + SHIFT", update_renderer=True)
 
 
 def rotate_view(viewer: "Viewer", event: QMouseEvent):
@@ -174,10 +183,8 @@ def rotate_view(viewer: "Viewer", event: QMouseEvent):
     elif etype == QEvent.Type.MouseButtonRelease:
         QApplication.restoreOverrideCursor()
 
-    viewer.renderer.update()
 
-
-rotate_view_cmd = Command(title="Rotate View", callback=rotate_view, mousebinding="RIGHT")
+rotate_view_cmd = Command(title="Rotate View", callback=rotate_view, mousebinding="RIGHT", update_renderer=True)
 
 
 def zoom_selected(viewer: "Viewer"):
@@ -207,20 +214,17 @@ def zoom_selected(viewer: "Viewer"):
     vec = (viewer.renderer.camera.target - viewer.renderer.camera.position) / norm(viewer.renderer.camera.target - viewer.renderer.camera.position)
     viewer.renderer.camera.position = viewer.renderer.camera.target - vec * distance
 
-    viewer.renderer.update()
 
-
-zoom_selected_cmd = Command(title="Zoom Selected", callback=zoom_selected, keybinding="F")
+zoom_selected_cmd = Command(title="Zoom Selected", callback=zoom_selected, keybinding="F", update_renderer=True)
 
 
 def zoom_view(viewer: "Viewer", event: QWheelEvent):
     degrees = event.angleDelta().y() / 8
     steps = degrees / 15
     viewer.renderer.camera.zoom(steps)
-    viewer.renderer.update()
 
 
-zoom_view_cmd = Command(title="Zoom View", callback=zoom_view, wheelbinding="")
+zoom_view_cmd = Command(title="Zoom View", callback=zoom_view, wheelbinding="", update_renderer=True)
 
 
 # =============================================================================
@@ -237,22 +241,16 @@ def select_all(viewer: "Viewer"):
         if obj.show:
             obj.is_selected = True
 
-    viewer.ui.sidebar.update()
-    viewer.renderer.update()
 
-
-select_all_cmd = Command(title="Select All", callback=select_all)
+select_all_cmd = Command(title="Select All", callback=select_all, update_app=True)
 
 
 def deselect_all(viewer: "Viewer"):
     for obj in viewer.scene.objects:
         obj.is_selected = False
 
-    viewer.ui.sidebar.update()
-    viewer.renderer.update()
 
-
-deselect_all_cmd = Command(title="DeSelect All", callback=deselect_all)
+deselect_all_cmd = Command(title="DeSelect All", callback=deselect_all, update_app=True)
 
 
 # -----------------------------------------------------------------------------
@@ -276,12 +274,8 @@ def select_object(viewer: "Viewer", event: QMouseEvent):
         if selected_obj:
             selected_obj.is_selected = True
 
-        viewer.ui.sidebar.update()
 
-    viewer.renderer.update()
-
-
-select_object_cmd = Command(title="Select Object", callback=select_object, mousebinding="LEFT")
+select_object_cmd = Command(title="Select Object", callback=select_object, mousebinding="LEFT", update_app=True)
 
 
 def select_multiple(viewer: "Viewer", event: QMouseEvent):
@@ -296,12 +290,9 @@ def select_multiple(viewer: "Viewer", event: QMouseEvent):
         selected_obj = viewer.scene.instance_colors.get(tuple(unique_color[0]))  # type: ignore
         if selected_obj:
             selected_obj.is_selected = True
-            viewer.ui.sidebar.update()
-
-    viewer.renderer.update()
 
 
-select_multiple_cmd = Command(title="Select Multiple", callback=select_multiple, mousebinding="LEFT")
+select_multiple_cmd = Command(title="Select Multiple", callback=select_multiple, mousebinding="LEFT", update_app=True)
 
 
 def select_window(viewer: "Viewer", event: QMouseEvent):
@@ -344,12 +335,8 @@ def select_window(viewer: "Viewer", event: QMouseEvent):
                 obj.is_selected = True
                 continue
 
-        viewer.ui.sidebar.update()
 
-    viewer.renderer.update()
-
-
-select_window_cmd = Command(title="Select Box", callback=select_window, mousebinding="LEFT + SHIFT")
+select_window_cmd = Command(title="Select Box", callback=select_window, mousebinding="LEFT + SHIFT", update_app=True)
 
 
 def deselect_object(viewer: "Viewer", event: QMouseEvent):
@@ -365,12 +352,8 @@ def deselect_object(viewer: "Viewer", event: QMouseEvent):
         if selected_obj:
             selected_obj.is_selected = False
 
-        viewer.ui.sidebar.update()
 
-    viewer.renderer.update()
-
-
-deselect_object_cmd = Command(title="Deselect Object", callback=deselect_object, mousebinding="LEFT")
+deselect_object_cmd = Command(title="Deselect Object", callback=deselect_object, mousebinding="LEFT", update_app=True)
 
 
 def deselect_window():
@@ -412,11 +395,8 @@ def clear_scene(viewer: "Viewer"):
         viewer.scene.remove(obj)
         del obj
 
-    viewer.ui.sidebar.update()
-    viewer.renderer.update()
 
-
-clear_scene_cmd = Command(title="Clear Scene", callback=clear_scene)
+clear_scene_cmd = Command(title="Clear Scene", callback=clear_scene, update_app=True)
 
 
 def load_scene(viewer: "Viewer"):
@@ -431,10 +411,9 @@ def load_scene(viewer: "Viewer"):
     clear_scene(viewer)
 
     viewer.scene = scene
-    viewer.renderer.update()
 
 
-load_scene_cmd = Command(title="Load Scene", callback=load_scene)
+load_scene_cmd = Command(title="Load Scene", callback=load_scene, update_app=True)
 
 
 def save_scene(viewer: "Viewer"):
