@@ -44,8 +44,7 @@ from .ellipseobject import EllipseObject
 from .polyhedronobject import PolyhedronObject
 from .geometryobject import GeometryObject
 from .shapeobject import ShapeObject
-from .groupobject import Group
-from .groupobject import GroupObject
+from .group import Group
 from .collectionobject import Collection
 from .collectionobject import CollectionObject
 from .bufferobject import BufferGeometry
@@ -86,7 +85,6 @@ def register_scene_objects():
     register(Cone, ShapeObject, context="Viewer")
     register(Capsule, ShapeObject, context="Viewer")
     register(Polyhedron, PolyhedronObject, context="Viewer")
-    register(list, GroupObject, context="Viewer")
     register(Collection, CollectionObject, context="Viewer")
     register(BufferGeometry, BufferObject, context="Viewer")
 
@@ -141,7 +139,6 @@ __all__ = [
     "GeometryObject",
     "ShapeObject",
     "Group",
-    "GroupObject",
     "Collection",
     "CollectionObject",
     "BufferGeometry",
