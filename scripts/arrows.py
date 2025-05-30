@@ -1,5 +1,3 @@
-
-import compas
 from compas.colors import Color
 from compas.geometry import Vector
 from compas_viewer.viewer import Viewer
