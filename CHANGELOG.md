@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Added back `BufferObject` and `BufferGeometry` to create geometry from low-level buffer data.
+
 ### Changed
 
 * Fixed kwargs error when assigning `vertexcolor`.

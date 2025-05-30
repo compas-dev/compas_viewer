@@ -5,6 +5,7 @@ from typing import List
 import numpy as np
 import OpenGL.GL as GL
 
+from compas.colors import Color
 from compas_viewer.gl import make_index_buffer
 from compas_viewer.gl import make_texture_buffer
 from compas_viewer.gl import make_vertex_buffer
@@ -114,7 +115,7 @@ class BufferManager:
 
         # Convert to numpy arrays
         pos_array = np.array(positions, dtype=np.float32).flatten()
-        col_array = np.array([c.rgba for c in colors], dtype=np.float32).flatten()
+        col_array = np.array([c.rgba for c in colors] if isinstance(colors[0], Color) else colors, dtype=np.float32).flatten()
         elem_array = np.array(elements, dtype=np.int32).flatten()
 
         if buffer_type == "_frontfaces_data" or buffer_type == "_backfaces_data":
@@ -125,7 +126,9 @@ class BufferManager:
                     # print("WARNING: Element index out of range", obj) # TODO: Fix BREP from IFC
                     continue
 
-                if colors[e].a < 1.0 or obj.opacity < 1.0:
+                color = colors[e]
+                alpha = color.a if isinstance(color, Color) else color[3]
+                if alpha < 1.0 or obj.opacity < 1.0:
                     transparent_elements.append(e)
                 else:
                     opaque_elements.append(e)
@@ -313,7 +316,7 @@ class BufferManager:
 
                 # Convert to numpy arrays
                 pos_array = np.array(positions, dtype=np.float32).flatten()
-                col_array = np.array([c.rgba for c in colors], dtype=np.float32).flatten()
+                col_array = np.array([c.rgba for c in colors] if isinstance(colors[0], Color) else colors, dtype=np.float32).flatten()
 
                 # Find the start and end indices for this object in the buffer
                 start_idx = 0

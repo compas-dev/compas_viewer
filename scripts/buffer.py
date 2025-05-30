@@ -28,7 +28,7 @@ def update(frame):
     geometry.faces = np.random.rand(1000 * 9, 3) * 10
     geometry.facecolor = np.random.rand(1000 * 9, 4)
 
-    obj.update()
+    obj.update(update_data=True)
 
 
 viewer.show()
