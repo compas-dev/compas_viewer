@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
+* Added dynamic import to enable access from expended `TreeForm`. 
 
 * Added back `BufferObject` and `BufferGeometry` to create geometry from low-level buffer data.
 
