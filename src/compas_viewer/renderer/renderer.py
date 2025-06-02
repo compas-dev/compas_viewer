@@ -13,6 +13,7 @@ from PySide6.QtWidgets import QGestureEvent
 
 from compas.geometry import Frame
 from compas.geometry import transform_points_numpy
+from compas.scene import Group
 from compas_viewer.scene import TagObject
 from compas_viewer.scene.buffermanager import BufferManager
 from compas_viewer.scene.gridobject import GridObject
@@ -405,7 +406,8 @@ class Renderer(QOpenGLWidget):
         self.grid.init()
 
         for obj in self.viewer.scene.objects:
-            obj.init()
+            if not isinstance(obj, Group):
+                obj.init()
 
         for obj in self.viewer.scene.objects:
             if not isinstance(obj, TagObject):

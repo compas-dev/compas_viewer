@@ -120,6 +120,7 @@ class ViewerSceneObject(SceneObject, Base):
         self._backfaces_buffer: [dict[str, Any]] = None  # type: ignore
 
         self._inited = False
+        self.context = "Viewer"
 
     @property
     def bounding_box(self):
@@ -135,19 +136,19 @@ class ViewerSceneObject(SceneObject, Base):
 
     def _read_points_data(self) -> Optional[ShaderDataType]:
         """Read points data from the object."""
-        raise NotImplementedError
+        pass
 
     def _read_lines_data(self) -> Optional[ShaderDataType]:
         """Read lines data from the object."""
-        raise NotImplementedError
+        pass
 
     def _read_frontfaces_data(self) -> Optional[ShaderDataType]:
         """Read frontfaces data from the object."""
-        raise NotImplementedError
+        pass
 
     def _read_backfaces_data(self) -> Optional[ShaderDataType]:
         """Read backfaces data from the object."""
-        raise NotImplementedError
+        pass
 
     # ==========================================================================
     # general
