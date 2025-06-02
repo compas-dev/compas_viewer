@@ -1,6 +1,7 @@
 from typing import Any
 from typing import Optional
 
+import numpy as np
 from numpy import array
 from numpy import average
 
@@ -181,14 +182,14 @@ class ViewerSceneObject(SceneObject, Base):
     def _update_bounding_box(self, positions: Optional[list[Point]] = None):
         """Update the bounding box of the object"""
         if positions is None:
-            positions = []
+            positions = np.array([]).reshape(0, 3)
             if self._points_data is not None:
-                positions += self._points_data[0]
+                positions = np.vstack([positions, self._points_data[0]])
             if self._lines_data is not None:
-                positions += self._lines_data[0]
+                positions = np.vstack([positions, self._lines_data[0]])
             if self._frontfaces_data is not None:
-                positions += self._frontfaces_data[0]
-            if not positions:
+                positions = np.vstack([positions, self._frontfaces_data[0]])
+            if len(positions) == 0:
                 return
 
         _positions = array(positions)
