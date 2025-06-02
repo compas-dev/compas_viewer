@@ -112,12 +112,20 @@ class BufferObject(ViewerSceneObject):
 
     """
 
+    def __init__(self, *args, show_points: bool = True, show_lines: bool = True, show_faces: bool = True, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.show_points = show_points if show_points is not None else self.buffergeometry.points is not None
+        self.show_lines = show_lines if show_lines is not None else self.buffergeometry.lines is not None
+        self.show_faces = show_faces if show_faces is not None else self.buffergeometry.faces is not None
+
     @property
     def buffergeometry(self) -> BufferGeometry:
         return self.item
 
     def _read_points_data(self):
         """Read points data from the object."""
+        if self.buffergeometry.points is None:
+            return None
         positions = self.buffergeometry.points
         colors = self.buffergeometry.pointcolor
         elements = np.arange(positions.shape[0] // 3, dtype=int)
@@ -125,6 +133,8 @@ class BufferObject(ViewerSceneObject):
 
     def _read_lines_data(self):
         """Read lines data from the object."""
+        if self.buffergeometry.lines is None:
+            return None
         positions = self.buffergeometry.lines
         colors = self.buffergeometry.linecolor
         elements = np.arange(positions.shape[0] // 3, dtype=int)
@@ -132,6 +142,8 @@ class BufferObject(ViewerSceneObject):
 
     def _read_frontfaces_data(self):
         """Read frontfaces data from the object."""
+        if self.buffergeometry.faces is None:
+            return None
         positions = self.buffergeometry.faces
         colors = self.buffergeometry.facecolor
         elements = np.arange(positions.shape[0] // 3, dtype=int)
@@ -139,6 +151,8 @@ class BufferObject(ViewerSceneObject):
 
     def _read_backfaces_data(self):
         """Read backfaces data from the object."""
+        if self.buffergeometry.faces is None:
+            return None
         positions = self.buffergeometry.faces
         colors = self.buffergeometry.facecolor
         elements = np.flip(np.arange(positions.shape[0] // 3, dtype=int))
