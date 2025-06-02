@@ -60,11 +60,6 @@ class GeometryObject(ViewerSceneObject, BaseGeometryObject):
 
     geometry: Geometry
 
-    def __init__(self, u: Optional[int] = 16, v: Optional[int] = 16, **kwargs):
-        super().__init__(**kwargs)
-        self.u = u
-        self.v = v
-
     @property
     def facecolor(self) -> Color:
         return self.surfacecolor

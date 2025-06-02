@@ -105,7 +105,6 @@ class ViewerSceneObject(SceneObject, Base):
         self.use_rgba = use_rgba
 
         #  Geometric
-        self.transformation: Optional[Transformation] = None
         self._bounding_box: Optional[list[float]] = None
         self._bounding_box_center: Optional[Point] = None
 

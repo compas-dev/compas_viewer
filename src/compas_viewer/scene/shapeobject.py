@@ -50,27 +50,6 @@ class ShapeObject(GeometryObject):
 
     geometry: Shape
 
-    def __init__(self, u: Optional[int] = 16, v: Optional[int] = 16, **kwargs):
-        super().__init__(**kwargs)
-        self.u = u
-        self.v = v
-
-    @property
-    def u(self) -> int:
-        return self.geometry.resolution_u
-
-    @u.setter
-    def u(self, u: int) -> None:
-        self.geometry.resolution_u = u
-
-    @property
-    def v(self) -> int:
-        return self.geometry.resolution_v
-
-    @v.setter
-    def v(self, v: int) -> None:
-        self.geometry.resolution_v = v
-
     @property
     def facecolor(self) -> Color:
         return self.surfacecolor

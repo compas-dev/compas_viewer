@@ -66,8 +66,8 @@ class ViewerScene(Scene):
     :class:`compas.scene.Scene`
     """
 
-    def __init__(self, name: str = "ViewerScene", context: str = "Viewer"):
-        super().__init__(name=name, context=context)
+    def __init__(self, name: str = "ViewerScene", context: str = "Viewer", **kwargs):
+        super().__init__(name=name, context=context, **kwargs)
         self.instance_colors: dict[tuple[int, int, int], ViewerSceneObject] = {}
         self._instance_colors_generator = instance_colors_generator()
 
@@ -140,10 +140,6 @@ class ViewerScene(Scene):
             Whether to hide the coplanar edges of the mesh.
         use_vertexcolors : bool, optional
             Whether to use vertex color.
-        v : int, optional
-            The number of vertices in the u-direction of non-OCC geometries. Default is 16.
-        u : int, optional
-            The number of vertices in the v-direction of non-OCC geometries. Default is 16.
         **kwargs : dict, optional
             The other possible parameters to be passed to the object.
 
@@ -172,8 +168,6 @@ class ViewerScene(Scene):
             opacity=opacity,
             hide_coplanaredges=hide_coplanaredges,
             use_vertexcolors=use_vertexcolors,
-            v=v,
-            u=u,
             **kwargs,
         )
         return sceneobject
@@ -196,6 +190,7 @@ class ViewerScene(Scene):
         :class:`compas_viewer.scene.Group`
             The group.
         """
+        parent = parent or self.root
         group = Group(name=name, **kwargs)
-        self.add(group, parent=parent)
+        super(Scene, self).add(group, parent=parent)
         return group
