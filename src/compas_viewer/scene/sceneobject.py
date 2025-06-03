@@ -183,11 +183,11 @@ class ViewerSceneObject(SceneObject, Base):
         """Update the bounding box of the object"""
         if positions is None:
             positions = np.array([]).reshape(0, 3)
-            if self._points_data is not None:
+            if self._points_data is not None and len(self._points_data[0]) > 0:
                 positions = np.vstack([positions, self._points_data[0]])
-            if self._lines_data is not None:
+            if self._lines_data is not None and len(self._lines_data[0]) > 0:
                 positions = np.vstack([positions, self._lines_data[0]])
-            if self._frontfaces_data is not None:
+            if self._frontfaces_data is not None and len(self._frontfaces_data[0]) > 0:
                 positions = np.vstack([positions, self._frontfaces_data[0]])
             if len(positions) == 0:
                 return

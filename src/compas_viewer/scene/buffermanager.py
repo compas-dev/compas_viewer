@@ -115,7 +115,7 @@ class BufferManager:
 
         # Convert to numpy arrays
         pos_array = np.array(positions, dtype=np.float32).flatten()
-        col_array = np.array([c.rgba for c in colors] if isinstance(colors[0], Color) else colors, dtype=np.float32).flatten()
+        col_array = np.array([c.rgba for c in colors] if len(colors) > 0 and isinstance(colors[0], Color) else colors, dtype=np.float32).flatten()
         elem_array = np.array(elements, dtype=np.int32).flatten()
 
         if buffer_type == "_frontfaces_data" or buffer_type == "_backfaces_data":
