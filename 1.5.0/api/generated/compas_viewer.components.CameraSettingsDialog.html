@@ -1,0 +1,1683 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <link rel="icon" href="../../_static/compas.ico" type="image/x-icon">
+    <title>CameraSettingsDialog &#8212; COMPAS Viewer</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/compas.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/tabs.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.4cbf315f70debaebd550c87a6162cf0f.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <script src="../../_static/tabs.js"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js"></script>
+    <script src="../../_static/design-tabs.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/generated/compas_viewer.components.CameraSettingsDialog';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/compas-dev/compas_viewer/gh-pages/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '1.5';
+        </script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  <div class="navbar-header-items__start">
+    
+      <div class="navbar-item">
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/compas_icon_white.png" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="../../_static/compas_icon_white.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+    <p class="title logo__title">COMPAS Viewer</p>
+  
+</a></div>
+    
+  </div>
+  
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item"><nav class="navbar-nav">
+  <!-- <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../index.html">
+                        Introduction
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../installation.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../tutorial.html">
+                        Tutorial
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../examples.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../api.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../license.html">
+                        License
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../acknowledgements.html">
+                        Acknowledgements
+                      </a>
+                    </li>
+                
+
+                <li class="nav-item">
+                  <a class="nav-link nav-external" href="https://compas.dev">
+                    COMPAS Framework
+                  </a>
+                </li>
+                
+                </div>
+            </div>
+            
+  </ul> -->
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+        </div>
+      
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button type="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown">
+      1.5  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div class="version-switcher__menu dropdown-menu list-group-flush py-0">
+    <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/compas-dev/compas_viewer" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-github"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="http://forum.compas-framework.org/" title="Discourse" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-discourse"></i></span>
+            <label class="sr-only">Discourse</label></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/compas_viewer/" title="PyPI" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-python"></i></span>
+            <label class="sr-only">PyPI</label></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item"><nav class="navbar-nav">
+  <!-- <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../index.html">
+                        Introduction
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../installation.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../tutorial.html">
+                        Tutorial
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../examples.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../api.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../license.html">
+                        License
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../acknowledgements.html">
+                        Acknowledgements
+                      </a>
+                    </li>
+                
+
+                <li class="nav-item">
+                  <a class="nav-link nav-external" href="https://compas.dev">
+                    COMPAS Framework
+                  </a>
+                </li>
+                
+                </div>
+            </div>
+            
+  </ul> -->
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button type="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown">
+      1.5  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div class="version-switcher__menu dropdown-menu list-group-flush py-0">
+    <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/compas-dev/compas_viewer" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-github"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="http://forum.compas-framework.org/" title="Discourse" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-discourse"></i></span>
+            <label class="sr-only">Discourse</label></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/compas_viewer/" title="PyPI" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-python"></i></span>
+            <label class="sr-only">PyPI</label></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../tutorial.html">Tutorial</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial/000_basics.html">Viewer Basics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial/010_scenes.html">Viewer Scenes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial/020_configurations.html">Viewer Configurations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial/030_controls.html">Viewer Controls</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial/040_commands.html">Viewer Commands</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../examples.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/color.html">Color Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/dynamic.html">Dynamic Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/object.html">Object Examples</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../api.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../generated/compas_viewer.Viewer.html">Viewer</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../acknowledgements.html">Acknowledgements</a></li>
+</ul>
+
+    </div>
+</nav></div>
+        <div class="sidebar-primary-item"><div class="sidebar-primary-item">
+    <a href="https://compas.dev" target="_blank">
+        COMPAS.dev <i class="fa fa-external-link" aria-hidden="true"></i>
+    </a>
+</div></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumbs">
+  <ul class="bd-breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">CameraSettingsDialog</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section id="camerasettingsdialog">
+<h1>CameraSettingsDialog</h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="compas_viewer.components.CameraSettingsDialog">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">CameraSettingsDialog</span></span><a class="reference external" href="https://github.com/compas-dev/compas_viewer/blob/ede75d3/src/compas_viewer/components/camerasetting.py#L9"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QDialog</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></p>
+<p>A dialog for displaying and updating camera settings in Qt applications.
+This dialog allows users to modify the camera’s target and position and
+applies these changes dynamically.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>items</strong><span class="classifier">list</span></dt><dd><p>A list of dictionaries containing the settings for the camera.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Attributes<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.layout.html#compas_viewer.components.CameraSettingsDialog.layout" title="compas_viewer.components.CameraSettingsDialog.layout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">layout</span></code></a><span class="classifier">QVBoxLayout</span></dt><dd><p>layout(self, /) -&gt; PySide6.QtWidgets.QLayout | None</p>
+</dd>
+<dt><strong>spin_boxes</strong><span class="classifier">dict</span></dt><dd><p>Dictionary containing spin boxes for adjusting camera settings.</p>
+</dd>
+<dt><strong>update_button</strong><span class="classifier">QPushButton</span></dt><dd><p>Button to apply changes to the camera settings.</p>
+</dd>
+<dt><strong>camera</strong><span class="classifier">Camera</span></dt><dd><p>The camera object from the viewer’s renderer.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="table">
+<tbody>
+<tr class="row-odd"><td><p><strong>update()</strong></p></td>
+<td><p>Updates the camera’s target and position and closes the dialog.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.update.html#compas_viewer.components.CameraSettingsDialog.update" title="compas_viewer.components.CameraSettingsDialog.update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Inherited Methods</p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.accept.html#compas_viewer.components.CameraSettingsDialog.accept" title="compas_viewer.components.CameraSettingsDialog.accept"><code class="xref py py-obj docutils literal notranslate"><span class="pre">accept</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.acceptDrops.html#compas_viewer.components.CameraSettingsDialog.acceptDrops" title="compas_viewer.components.CameraSettingsDialog.acceptDrops"><code class="xref py py-obj docutils literal notranslate"><span class="pre">acceptDrops</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.accessibleDescription.html#compas_viewer.components.CameraSettingsDialog.accessibleDescription" title="compas_viewer.components.CameraSettingsDialog.accessibleDescription"><code class="xref py py-obj docutils literal notranslate"><span class="pre">accessibleDescription</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.accessibleIdentifier.html#compas_viewer.components.CameraSettingsDialog.accessibleIdentifier" title="compas_viewer.components.CameraSettingsDialog.accessibleIdentifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">accessibleIdentifier</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.accessibleName.html#compas_viewer.components.CameraSettingsDialog.accessibleName" title="compas_viewer.components.CameraSettingsDialog.accessibleName"><code class="xref py py-obj docutils literal notranslate"><span class="pre">accessibleName</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.actionEvent.html#compas_viewer.components.CameraSettingsDialog.actionEvent" title="compas_viewer.components.CameraSettingsDialog.actionEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">actionEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.actions.html#compas_viewer.components.CameraSettingsDialog.actions" title="compas_viewer.components.CameraSettingsDialog.actions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">actions</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.activateWindow.html#compas_viewer.components.CameraSettingsDialog.activateWindow" title="compas_viewer.components.CameraSettingsDialog.activateWindow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">activateWindow</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.addAction.html#compas_viewer.components.CameraSettingsDialog.addAction" title="compas_viewer.components.CameraSettingsDialog.addAction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">addAction</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.addActions.html#compas_viewer.components.CameraSettingsDialog.addActions" title="compas_viewer.components.CameraSettingsDialog.addActions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">addActions</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.adjustPosition.html#compas_viewer.components.CameraSettingsDialog.adjustPosition" title="compas_viewer.components.CameraSettingsDialog.adjustPosition"><code class="xref py py-obj docutils literal notranslate"><span class="pre">adjustPosition</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.adjustSize.html#compas_viewer.components.CameraSettingsDialog.adjustSize" title="compas_viewer.components.CameraSettingsDialog.adjustSize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">adjustSize</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.autoFillBackground.html#compas_viewer.components.CameraSettingsDialog.autoFillBackground" title="compas_viewer.components.CameraSettingsDialog.autoFillBackground"><code class="xref py py-obj docutils literal notranslate"><span class="pre">autoFillBackground</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.backgroundRole.html#compas_viewer.components.CameraSettingsDialog.backgroundRole" title="compas_viewer.components.CameraSettingsDialog.backgroundRole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">backgroundRole</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.backingStore.html#compas_viewer.components.CameraSettingsDialog.backingStore" title="compas_viewer.components.CameraSettingsDialog.backingStore"><code class="xref py py-obj docutils literal notranslate"><span class="pre">backingStore</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.baseSize.html#compas_viewer.components.CameraSettingsDialog.baseSize" title="compas_viewer.components.CameraSettingsDialog.baseSize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">baseSize</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.blockSignals.html#compas_viewer.components.CameraSettingsDialog.blockSignals" title="compas_viewer.components.CameraSettingsDialog.blockSignals"><code class="xref py py-obj docutils literal notranslate"><span class="pre">blockSignals</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.changeEvent.html#compas_viewer.components.CameraSettingsDialog.changeEvent" title="compas_viewer.components.CameraSettingsDialog.changeEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">changeEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.childAt.html#compas_viewer.components.CameraSettingsDialog.childAt" title="compas_viewer.components.CameraSettingsDialog.childAt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">childAt</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.childEvent.html#compas_viewer.components.CameraSettingsDialog.childEvent" title="compas_viewer.components.CameraSettingsDialog.childEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">childEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.children.html#compas_viewer.components.CameraSettingsDialog.children" title="compas_viewer.components.CameraSettingsDialog.children"><code class="xref py py-obj docutils literal notranslate"><span class="pre">children</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.childrenRect.html#compas_viewer.components.CameraSettingsDialog.childrenRect" title="compas_viewer.components.CameraSettingsDialog.childrenRect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">childrenRect</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.childrenRegion.html#compas_viewer.components.CameraSettingsDialog.childrenRegion" title="compas_viewer.components.CameraSettingsDialog.childrenRegion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">childrenRegion</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.clearFocus.html#compas_viewer.components.CameraSettingsDialog.clearFocus" title="compas_viewer.components.CameraSettingsDialog.clearFocus"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clearFocus</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.clearMask.html#compas_viewer.components.CameraSettingsDialog.clearMask" title="compas_viewer.components.CameraSettingsDialog.clearMask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clearMask</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.close.html#compas_viewer.components.CameraSettingsDialog.close" title="compas_viewer.components.CameraSettingsDialog.close"><code class="xref py py-obj docutils literal notranslate"><span class="pre">close</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.closeEvent.html#compas_viewer.components.CameraSettingsDialog.closeEvent" title="compas_viewer.components.CameraSettingsDialog.closeEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">closeEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.colorCount.html#compas_viewer.components.CameraSettingsDialog.colorCount" title="compas_viewer.components.CameraSettingsDialog.colorCount"><code class="xref py py-obj docutils literal notranslate"><span class="pre">colorCount</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.connect.html#compas_viewer.components.CameraSettingsDialog.connect" title="compas_viewer.components.CameraSettingsDialog.connect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connect</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.connectNotify.html#compas_viewer.components.CameraSettingsDialog.connectNotify" title="compas_viewer.components.CameraSettingsDialog.connectNotify"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connectNotify</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.contentsMargins.html#compas_viewer.components.CameraSettingsDialog.contentsMargins" title="compas_viewer.components.CameraSettingsDialog.contentsMargins"><code class="xref py py-obj docutils literal notranslate"><span class="pre">contentsMargins</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.contentsRect.html#compas_viewer.components.CameraSettingsDialog.contentsRect" title="compas_viewer.components.CameraSettingsDialog.contentsRect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">contentsRect</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.contextMenuEvent.html#compas_viewer.components.CameraSettingsDialog.contextMenuEvent" title="compas_viewer.components.CameraSettingsDialog.contextMenuEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">contextMenuEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.contextMenuPolicy.html#compas_viewer.components.CameraSettingsDialog.contextMenuPolicy" title="compas_viewer.components.CameraSettingsDialog.contextMenuPolicy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">contextMenuPolicy</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.create.html#compas_viewer.components.CameraSettingsDialog.create" title="compas_viewer.components.CameraSettingsDialog.create"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.createWinId.html#compas_viewer.components.CameraSettingsDialog.createWinId" title="compas_viewer.components.CameraSettingsDialog.createWinId"><code class="xref py py-obj docutils literal notranslate"><span class="pre">createWinId</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.createWindowContainer.html#compas_viewer.components.CameraSettingsDialog.createWindowContainer" title="compas_viewer.components.CameraSettingsDialog.createWindowContainer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">createWindowContainer</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.cursor.html#compas_viewer.components.CameraSettingsDialog.cursor" title="compas_viewer.components.CameraSettingsDialog.cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cursor</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.customEvent.html#compas_viewer.components.CameraSettingsDialog.customEvent" title="compas_viewer.components.CameraSettingsDialog.customEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">customEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.deleteLater.html#compas_viewer.components.CameraSettingsDialog.deleteLater" title="compas_viewer.components.CameraSettingsDialog.deleteLater"><code class="xref py py-obj docutils literal notranslate"><span class="pre">deleteLater</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.depth.html#compas_viewer.components.CameraSettingsDialog.depth" title="compas_viewer.components.CameraSettingsDialog.depth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">depth</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.destroy.html#compas_viewer.components.CameraSettingsDialog.destroy" title="compas_viewer.components.CameraSettingsDialog.destroy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">destroy</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.devType.html#compas_viewer.components.CameraSettingsDialog.devType" title="compas_viewer.components.CameraSettingsDialog.devType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">devType</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.devicePixelRatio.html#compas_viewer.components.CameraSettingsDialog.devicePixelRatio" title="compas_viewer.components.CameraSettingsDialog.devicePixelRatio"><code class="xref py py-obj docutils literal notranslate"><span class="pre">devicePixelRatio</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.devicePixelRatioF.html#compas_viewer.components.CameraSettingsDialog.devicePixelRatioF" title="compas_viewer.components.CameraSettingsDialog.devicePixelRatioF"><code class="xref py py-obj docutils literal notranslate"><span class="pre">devicePixelRatioF</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.devicePixelRatioFScale.html#compas_viewer.components.CameraSettingsDialog.devicePixelRatioFScale" title="compas_viewer.components.CameraSettingsDialog.devicePixelRatioFScale"><code class="xref py py-obj docutils literal notranslate"><span class="pre">devicePixelRatioFScale</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.disconnect.html#compas_viewer.components.CameraSettingsDialog.disconnect" title="compas_viewer.components.CameraSettingsDialog.disconnect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">disconnect</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.disconnectNotify.html#compas_viewer.components.CameraSettingsDialog.disconnectNotify" title="compas_viewer.components.CameraSettingsDialog.disconnectNotify"><code class="xref py py-obj docutils literal notranslate"><span class="pre">disconnectNotify</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.done.html#compas_viewer.components.CameraSettingsDialog.done" title="compas_viewer.components.CameraSettingsDialog.done"><code class="xref py py-obj docutils literal notranslate"><span class="pre">done</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.dragEnterEvent.html#compas_viewer.components.CameraSettingsDialog.dragEnterEvent" title="compas_viewer.components.CameraSettingsDialog.dragEnterEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dragEnterEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.dragLeaveEvent.html#compas_viewer.components.CameraSettingsDialog.dragLeaveEvent" title="compas_viewer.components.CameraSettingsDialog.dragLeaveEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dragLeaveEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.dragMoveEvent.html#compas_viewer.components.CameraSettingsDialog.dragMoveEvent" title="compas_viewer.components.CameraSettingsDialog.dragMoveEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dragMoveEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.dropEvent.html#compas_viewer.components.CameraSettingsDialog.dropEvent" title="compas_viewer.components.CameraSettingsDialog.dropEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dropEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.dumpObjectInfo.html#compas_viewer.components.CameraSettingsDialog.dumpObjectInfo" title="compas_viewer.components.CameraSettingsDialog.dumpObjectInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dumpObjectInfo</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.dumpObjectTree.html#compas_viewer.components.CameraSettingsDialog.dumpObjectTree" title="compas_viewer.components.CameraSettingsDialog.dumpObjectTree"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dumpObjectTree</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.dynamicPropertyNames.html#compas_viewer.components.CameraSettingsDialog.dynamicPropertyNames" title="compas_viewer.components.CameraSettingsDialog.dynamicPropertyNames"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dynamicPropertyNames</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.effectiveWinId.html#compas_viewer.components.CameraSettingsDialog.effectiveWinId" title="compas_viewer.components.CameraSettingsDialog.effectiveWinId"><code class="xref py py-obj docutils literal notranslate"><span class="pre">effectiveWinId</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.emit.html#compas_viewer.components.CameraSettingsDialog.emit" title="compas_viewer.components.CameraSettingsDialog.emit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">emit</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.encodeMetricF.html#compas_viewer.components.CameraSettingsDialog.encodeMetricF" title="compas_viewer.components.CameraSettingsDialog.encodeMetricF"><code class="xref py py-obj docutils literal notranslate"><span class="pre">encodeMetricF</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.ensurePolished.html#compas_viewer.components.CameraSettingsDialog.ensurePolished" title="compas_viewer.components.CameraSettingsDialog.ensurePolished"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ensurePolished</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.enterEvent.html#compas_viewer.components.CameraSettingsDialog.enterEvent" title="compas_viewer.components.CameraSettingsDialog.enterEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">enterEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.event.html#compas_viewer.components.CameraSettingsDialog.event" title="compas_viewer.components.CameraSettingsDialog.event"><code class="xref py py-obj docutils literal notranslate"><span class="pre">event</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.eventFilter.html#compas_viewer.components.CameraSettingsDialog.eventFilter" title="compas_viewer.components.CameraSettingsDialog.eventFilter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eventFilter</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.exec.html#compas_viewer.components.CameraSettingsDialog.exec" title="compas_viewer.components.CameraSettingsDialog.exec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">exec</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.exec_.html#compas_viewer.components.CameraSettingsDialog.exec_" title="compas_viewer.components.CameraSettingsDialog.exec_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">exec_</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.find.html#compas_viewer.components.CameraSettingsDialog.find" title="compas_viewer.components.CameraSettingsDialog.find"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.findChild.html#compas_viewer.components.CameraSettingsDialog.findChild" title="compas_viewer.components.CameraSettingsDialog.findChild"><code class="xref py py-obj docutils literal notranslate"><span class="pre">findChild</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.findChildren.html#compas_viewer.components.CameraSettingsDialog.findChildren" title="compas_viewer.components.CameraSettingsDialog.findChildren"><code class="xref py py-obj docutils literal notranslate"><span class="pre">findChildren</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.focusInEvent.html#compas_viewer.components.CameraSettingsDialog.focusInEvent" title="compas_viewer.components.CameraSettingsDialog.focusInEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">focusInEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.focusNextChild.html#compas_viewer.components.CameraSettingsDialog.focusNextChild" title="compas_viewer.components.CameraSettingsDialog.focusNextChild"><code class="xref py py-obj docutils literal notranslate"><span class="pre">focusNextChild</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.focusNextPrevChild.html#compas_viewer.components.CameraSettingsDialog.focusNextPrevChild" title="compas_viewer.components.CameraSettingsDialog.focusNextPrevChild"><code class="xref py py-obj docutils literal notranslate"><span class="pre">focusNextPrevChild</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.focusOutEvent.html#compas_viewer.components.CameraSettingsDialog.focusOutEvent" title="compas_viewer.components.CameraSettingsDialog.focusOutEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">focusOutEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.focusPolicy.html#compas_viewer.components.CameraSettingsDialog.focusPolicy" title="compas_viewer.components.CameraSettingsDialog.focusPolicy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">focusPolicy</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.focusPreviousChild.html#compas_viewer.components.CameraSettingsDialog.focusPreviousChild" title="compas_viewer.components.CameraSettingsDialog.focusPreviousChild"><code class="xref py py-obj docutils literal notranslate"><span class="pre">focusPreviousChild</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.focusProxy.html#compas_viewer.components.CameraSettingsDialog.focusProxy" title="compas_viewer.components.CameraSettingsDialog.focusProxy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">focusProxy</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.focusWidget.html#compas_viewer.components.CameraSettingsDialog.focusWidget" title="compas_viewer.components.CameraSettingsDialog.focusWidget"><code class="xref py py-obj docutils literal notranslate"><span class="pre">focusWidget</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.font.html#compas_viewer.components.CameraSettingsDialog.font" title="compas_viewer.components.CameraSettingsDialog.font"><code class="xref py py-obj docutils literal notranslate"><span class="pre">font</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.fontInfo.html#compas_viewer.components.CameraSettingsDialog.fontInfo" title="compas_viewer.components.CameraSettingsDialog.fontInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fontInfo</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.fontMetrics.html#compas_viewer.components.CameraSettingsDialog.fontMetrics" title="compas_viewer.components.CameraSettingsDialog.fontMetrics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fontMetrics</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.foregroundRole.html#compas_viewer.components.CameraSettingsDialog.foregroundRole" title="compas_viewer.components.CameraSettingsDialog.foregroundRole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">foregroundRole</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.frameGeometry.html#compas_viewer.components.CameraSettingsDialog.frameGeometry" title="compas_viewer.components.CameraSettingsDialog.frameGeometry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">frameGeometry</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.frameSize.html#compas_viewer.components.CameraSettingsDialog.frameSize" title="compas_viewer.components.CameraSettingsDialog.frameSize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">frameSize</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.geometry.html#compas_viewer.components.CameraSettingsDialog.geometry" title="compas_viewer.components.CameraSettingsDialog.geometry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">geometry</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.grab.html#compas_viewer.components.CameraSettingsDialog.grab" title="compas_viewer.components.CameraSettingsDialog.grab"><code class="xref py py-obj docutils literal notranslate"><span class="pre">grab</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.grabGesture.html#compas_viewer.components.CameraSettingsDialog.grabGesture" title="compas_viewer.components.CameraSettingsDialog.grabGesture"><code class="xref py py-obj docutils literal notranslate"><span class="pre">grabGesture</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.grabKeyboard.html#compas_viewer.components.CameraSettingsDialog.grabKeyboard" title="compas_viewer.components.CameraSettingsDialog.grabKeyboard"><code class="xref py py-obj docutils literal notranslate"><span class="pre">grabKeyboard</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.grabMouse.html#compas_viewer.components.CameraSettingsDialog.grabMouse" title="compas_viewer.components.CameraSettingsDialog.grabMouse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">grabMouse</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.grabShortcut.html#compas_viewer.components.CameraSettingsDialog.grabShortcut" title="compas_viewer.components.CameraSettingsDialog.grabShortcut"><code class="xref py py-obj docutils literal notranslate"><span class="pre">grabShortcut</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.graphicsEffect.html#compas_viewer.components.CameraSettingsDialog.graphicsEffect" title="compas_viewer.components.CameraSettingsDialog.graphicsEffect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">graphicsEffect</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.graphicsProxyWidget.html#compas_viewer.components.CameraSettingsDialog.graphicsProxyWidget" title="compas_viewer.components.CameraSettingsDialog.graphicsProxyWidget"><code class="xref py py-obj docutils literal notranslate"><span class="pre">graphicsProxyWidget</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.hasFocus.html#compas_viewer.components.CameraSettingsDialog.hasFocus" title="compas_viewer.components.CameraSettingsDialog.hasFocus"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hasFocus</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.hasHeightForWidth.html#compas_viewer.components.CameraSettingsDialog.hasHeightForWidth" title="compas_viewer.components.CameraSettingsDialog.hasHeightForWidth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hasHeightForWidth</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.hasMouseTracking.html#compas_viewer.components.CameraSettingsDialog.hasMouseTracking" title="compas_viewer.components.CameraSettingsDialog.hasMouseTracking"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hasMouseTracking</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.hasTabletTracking.html#compas_viewer.components.CameraSettingsDialog.hasTabletTracking" title="compas_viewer.components.CameraSettingsDialog.hasTabletTracking"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hasTabletTracking</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.height.html#compas_viewer.components.CameraSettingsDialog.height" title="compas_viewer.components.CameraSettingsDialog.height"><code class="xref py py-obj docutils literal notranslate"><span class="pre">height</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.heightForWidth.html#compas_viewer.components.CameraSettingsDialog.heightForWidth" title="compas_viewer.components.CameraSettingsDialog.heightForWidth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">heightForWidth</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.heightMM.html#compas_viewer.components.CameraSettingsDialog.heightMM" title="compas_viewer.components.CameraSettingsDialog.heightMM"><code class="xref py py-obj docutils literal notranslate"><span class="pre">heightMM</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.hide.html#compas_viewer.components.CameraSettingsDialog.hide" title="compas_viewer.components.CameraSettingsDialog.hide"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hide</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.hideEvent.html#compas_viewer.components.CameraSettingsDialog.hideEvent" title="compas_viewer.components.CameraSettingsDialog.hideEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hideEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.inherits.html#compas_viewer.components.CameraSettingsDialog.inherits" title="compas_viewer.components.CameraSettingsDialog.inherits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inherits</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.initPainter.html#compas_viewer.components.CameraSettingsDialog.initPainter" title="compas_viewer.components.CameraSettingsDialog.initPainter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initPainter</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.inputMethodEvent.html#compas_viewer.components.CameraSettingsDialog.inputMethodEvent" title="compas_viewer.components.CameraSettingsDialog.inputMethodEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inputMethodEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.inputMethodHints.html#compas_viewer.components.CameraSettingsDialog.inputMethodHints" title="compas_viewer.components.CameraSettingsDialog.inputMethodHints"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inputMethodHints</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.inputMethodQuery.html#compas_viewer.components.CameraSettingsDialog.inputMethodQuery" title="compas_viewer.components.CameraSettingsDialog.inputMethodQuery"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inputMethodQuery</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.insertAction.html#compas_viewer.components.CameraSettingsDialog.insertAction" title="compas_viewer.components.CameraSettingsDialog.insertAction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">insertAction</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.insertActions.html#compas_viewer.components.CameraSettingsDialog.insertActions" title="compas_viewer.components.CameraSettingsDialog.insertActions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">insertActions</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.installEventFilter.html#compas_viewer.components.CameraSettingsDialog.installEventFilter" title="compas_viewer.components.CameraSettingsDialog.installEventFilter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">installEventFilter</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.internalWinId.html#compas_viewer.components.CameraSettingsDialog.internalWinId" title="compas_viewer.components.CameraSettingsDialog.internalWinId"><code class="xref py py-obj docutils literal notranslate"><span class="pre">internalWinId</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.isActiveWindow.html#compas_viewer.components.CameraSettingsDialog.isActiveWindow" title="compas_viewer.components.CameraSettingsDialog.isActiveWindow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isActiveWindow</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.isAncestorOf.html#compas_viewer.components.CameraSettingsDialog.isAncestorOf" title="compas_viewer.components.CameraSettingsDialog.isAncestorOf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isAncestorOf</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.isEnabled.html#compas_viewer.components.CameraSettingsDialog.isEnabled" title="compas_viewer.components.CameraSettingsDialog.isEnabled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isEnabled</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.isEnabledTo.html#compas_viewer.components.CameraSettingsDialog.isEnabledTo" title="compas_viewer.components.CameraSettingsDialog.isEnabledTo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isEnabledTo</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.isFullScreen.html#compas_viewer.components.CameraSettingsDialog.isFullScreen" title="compas_viewer.components.CameraSettingsDialog.isFullScreen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isFullScreen</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.isHidden.html#compas_viewer.components.CameraSettingsDialog.isHidden" title="compas_viewer.components.CameraSettingsDialog.isHidden"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isHidden</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.isLeftToRight.html#compas_viewer.components.CameraSettingsDialog.isLeftToRight" title="compas_viewer.components.CameraSettingsDialog.isLeftToRight"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isLeftToRight</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.isMaximized.html#compas_viewer.components.CameraSettingsDialog.isMaximized" title="compas_viewer.components.CameraSettingsDialog.isMaximized"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isMaximized</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.isMinimized.html#compas_viewer.components.CameraSettingsDialog.isMinimized" title="compas_viewer.components.CameraSettingsDialog.isMinimized"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isMinimized</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.isModal.html#compas_viewer.components.CameraSettingsDialog.isModal" title="compas_viewer.components.CameraSettingsDialog.isModal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isModal</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.isQuickItemType.html#compas_viewer.components.CameraSettingsDialog.isQuickItemType" title="compas_viewer.components.CameraSettingsDialog.isQuickItemType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isQuickItemType</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.isRightToLeft.html#compas_viewer.components.CameraSettingsDialog.isRightToLeft" title="compas_viewer.components.CameraSettingsDialog.isRightToLeft"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isRightToLeft</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.isSignalConnected.html#compas_viewer.components.CameraSettingsDialog.isSignalConnected" title="compas_viewer.components.CameraSettingsDialog.isSignalConnected"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isSignalConnected</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.isSizeGripEnabled.html#compas_viewer.components.CameraSettingsDialog.isSizeGripEnabled" title="compas_viewer.components.CameraSettingsDialog.isSizeGripEnabled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isSizeGripEnabled</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.isTopLevel.html#compas_viewer.components.CameraSettingsDialog.isTopLevel" title="compas_viewer.components.CameraSettingsDialog.isTopLevel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isTopLevel</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.isVisible.html#compas_viewer.components.CameraSettingsDialog.isVisible" title="compas_viewer.components.CameraSettingsDialog.isVisible"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isVisible</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.isVisibleTo.html#compas_viewer.components.CameraSettingsDialog.isVisibleTo" title="compas_viewer.components.CameraSettingsDialog.isVisibleTo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isVisibleTo</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.isWidgetType.html#compas_viewer.components.CameraSettingsDialog.isWidgetType" title="compas_viewer.components.CameraSettingsDialog.isWidgetType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isWidgetType</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.isWindow.html#compas_viewer.components.CameraSettingsDialog.isWindow" title="compas_viewer.components.CameraSettingsDialog.isWindow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isWindow</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.isWindowModified.html#compas_viewer.components.CameraSettingsDialog.isWindowModified" title="compas_viewer.components.CameraSettingsDialog.isWindowModified"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isWindowModified</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.isWindowType.html#compas_viewer.components.CameraSettingsDialog.isWindowType" title="compas_viewer.components.CameraSettingsDialog.isWindowType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isWindowType</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.keyPressEvent.html#compas_viewer.components.CameraSettingsDialog.keyPressEvent" title="compas_viewer.components.CameraSettingsDialog.keyPressEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">keyPressEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.keyReleaseEvent.html#compas_viewer.components.CameraSettingsDialog.keyReleaseEvent" title="compas_viewer.components.CameraSettingsDialog.keyReleaseEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">keyReleaseEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.keyboardGrabber.html#compas_viewer.components.CameraSettingsDialog.keyboardGrabber" title="compas_viewer.components.CameraSettingsDialog.keyboardGrabber"><code class="xref py py-obj docutils literal notranslate"><span class="pre">keyboardGrabber</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.killTimer.html#compas_viewer.components.CameraSettingsDialog.killTimer" title="compas_viewer.components.CameraSettingsDialog.killTimer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">killTimer</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.layout.html#compas_viewer.components.CameraSettingsDialog.layout" title="compas_viewer.components.CameraSettingsDialog.layout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">layout</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.layoutDirection.html#compas_viewer.components.CameraSettingsDialog.layoutDirection" title="compas_viewer.components.CameraSettingsDialog.layoutDirection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">layoutDirection</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.leaveEvent.html#compas_viewer.components.CameraSettingsDialog.leaveEvent" title="compas_viewer.components.CameraSettingsDialog.leaveEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">leaveEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.locale.html#compas_viewer.components.CameraSettingsDialog.locale" title="compas_viewer.components.CameraSettingsDialog.locale"><code class="xref py py-obj docutils literal notranslate"><span class="pre">locale</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.logicalDpiX.html#compas_viewer.components.CameraSettingsDialog.logicalDpiX" title="compas_viewer.components.CameraSettingsDialog.logicalDpiX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logicalDpiX</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.logicalDpiY.html#compas_viewer.components.CameraSettingsDialog.logicalDpiY" title="compas_viewer.components.CameraSettingsDialog.logicalDpiY"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logicalDpiY</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.lower.html#compas_viewer.components.CameraSettingsDialog.lower" title="compas_viewer.components.CameraSettingsDialog.lower"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lower</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.mapFrom.html#compas_viewer.components.CameraSettingsDialog.mapFrom" title="compas_viewer.components.CameraSettingsDialog.mapFrom"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mapFrom</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.mapFromGlobal.html#compas_viewer.components.CameraSettingsDialog.mapFromGlobal" title="compas_viewer.components.CameraSettingsDialog.mapFromGlobal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mapFromGlobal</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.mapFromParent.html#compas_viewer.components.CameraSettingsDialog.mapFromParent" title="compas_viewer.components.CameraSettingsDialog.mapFromParent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mapFromParent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.mapTo.html#compas_viewer.components.CameraSettingsDialog.mapTo" title="compas_viewer.components.CameraSettingsDialog.mapTo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mapTo</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.mapToGlobal.html#compas_viewer.components.CameraSettingsDialog.mapToGlobal" title="compas_viewer.components.CameraSettingsDialog.mapToGlobal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mapToGlobal</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.mapToParent.html#compas_viewer.components.CameraSettingsDialog.mapToParent" title="compas_viewer.components.CameraSettingsDialog.mapToParent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mapToParent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.mask.html#compas_viewer.components.CameraSettingsDialog.mask" title="compas_viewer.components.CameraSettingsDialog.mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mask</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.maximumHeight.html#compas_viewer.components.CameraSettingsDialog.maximumHeight" title="compas_viewer.components.CameraSettingsDialog.maximumHeight"><code class="xref py py-obj docutils literal notranslate"><span class="pre">maximumHeight</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.maximumSize.html#compas_viewer.components.CameraSettingsDialog.maximumSize" title="compas_viewer.components.CameraSettingsDialog.maximumSize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">maximumSize</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.maximumWidth.html#compas_viewer.components.CameraSettingsDialog.maximumWidth" title="compas_viewer.components.CameraSettingsDialog.maximumWidth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">maximumWidth</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.metaObject.html#compas_viewer.components.CameraSettingsDialog.metaObject" title="compas_viewer.components.CameraSettingsDialog.metaObject"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metaObject</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.metric.html#compas_viewer.components.CameraSettingsDialog.metric" title="compas_viewer.components.CameraSettingsDialog.metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metric</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.minimumHeight.html#compas_viewer.components.CameraSettingsDialog.minimumHeight" title="compas_viewer.components.CameraSettingsDialog.minimumHeight"><code class="xref py py-obj docutils literal notranslate"><span class="pre">minimumHeight</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.minimumSize.html#compas_viewer.components.CameraSettingsDialog.minimumSize" title="compas_viewer.components.CameraSettingsDialog.minimumSize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">minimumSize</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.minimumSizeHint.html#compas_viewer.components.CameraSettingsDialog.minimumSizeHint" title="compas_viewer.components.CameraSettingsDialog.minimumSizeHint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">minimumSizeHint</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.minimumWidth.html#compas_viewer.components.CameraSettingsDialog.minimumWidth" title="compas_viewer.components.CameraSettingsDialog.minimumWidth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">minimumWidth</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.mouseDoubleClickEvent.html#compas_viewer.components.CameraSettingsDialog.mouseDoubleClickEvent" title="compas_viewer.components.CameraSettingsDialog.mouseDoubleClickEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mouseDoubleClickEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.mouseGrabber.html#compas_viewer.components.CameraSettingsDialog.mouseGrabber" title="compas_viewer.components.CameraSettingsDialog.mouseGrabber"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mouseGrabber</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.mouseMoveEvent.html#compas_viewer.components.CameraSettingsDialog.mouseMoveEvent" title="compas_viewer.components.CameraSettingsDialog.mouseMoveEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mouseMoveEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.mousePressEvent.html#compas_viewer.components.CameraSettingsDialog.mousePressEvent" title="compas_viewer.components.CameraSettingsDialog.mousePressEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mousePressEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.mouseReleaseEvent.html#compas_viewer.components.CameraSettingsDialog.mouseReleaseEvent" title="compas_viewer.components.CameraSettingsDialog.mouseReleaseEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mouseReleaseEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.move.html#compas_viewer.components.CameraSettingsDialog.move" title="compas_viewer.components.CameraSettingsDialog.move"><code class="xref py py-obj docutils literal notranslate"><span class="pre">move</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.moveEvent.html#compas_viewer.components.CameraSettingsDialog.moveEvent" title="compas_viewer.components.CameraSettingsDialog.moveEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">moveEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.moveToThread.html#compas_viewer.components.CameraSettingsDialog.moveToThread" title="compas_viewer.components.CameraSettingsDialog.moveToThread"><code class="xref py py-obj docutils literal notranslate"><span class="pre">moveToThread</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.nativeEvent.html#compas_viewer.components.CameraSettingsDialog.nativeEvent" title="compas_viewer.components.CameraSettingsDialog.nativeEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nativeEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.nativeParentWidget.html#compas_viewer.components.CameraSettingsDialog.nativeParentWidget" title="compas_viewer.components.CameraSettingsDialog.nativeParentWidget"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nativeParentWidget</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.nextInFocusChain.html#compas_viewer.components.CameraSettingsDialog.nextInFocusChain" title="compas_viewer.components.CameraSettingsDialog.nextInFocusChain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nextInFocusChain</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.normalGeometry.html#compas_viewer.components.CameraSettingsDialog.normalGeometry" title="compas_viewer.components.CameraSettingsDialog.normalGeometry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">normalGeometry</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.objectName.html#compas_viewer.components.CameraSettingsDialog.objectName" title="compas_viewer.components.CameraSettingsDialog.objectName"><code class="xref py py-obj docutils literal notranslate"><span class="pre">objectName</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.open.html#compas_viewer.components.CameraSettingsDialog.open" title="compas_viewer.components.CameraSettingsDialog.open"><code class="xref py py-obj docutils literal notranslate"><span class="pre">open</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.overrideWindowFlags.html#compas_viewer.components.CameraSettingsDialog.overrideWindowFlags" title="compas_viewer.components.CameraSettingsDialog.overrideWindowFlags"><code class="xref py py-obj docutils literal notranslate"><span class="pre">overrideWindowFlags</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.overrideWindowState.html#compas_viewer.components.CameraSettingsDialog.overrideWindowState" title="compas_viewer.components.CameraSettingsDialog.overrideWindowState"><code class="xref py py-obj docutils literal notranslate"><span class="pre">overrideWindowState</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.paintEngine.html#compas_viewer.components.CameraSettingsDialog.paintEngine" title="compas_viewer.components.CameraSettingsDialog.paintEngine"><code class="xref py py-obj docutils literal notranslate"><span class="pre">paintEngine</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.paintEvent.html#compas_viewer.components.CameraSettingsDialog.paintEvent" title="compas_viewer.components.CameraSettingsDialog.paintEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">paintEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.paintingActive.html#compas_viewer.components.CameraSettingsDialog.paintingActive" title="compas_viewer.components.CameraSettingsDialog.paintingActive"><code class="xref py py-obj docutils literal notranslate"><span class="pre">paintingActive</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.palette.html#compas_viewer.components.CameraSettingsDialog.palette" title="compas_viewer.components.CameraSettingsDialog.palette"><code class="xref py py-obj docutils literal notranslate"><span class="pre">palette</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.parent.html#compas_viewer.components.CameraSettingsDialog.parent" title="compas_viewer.components.CameraSettingsDialog.parent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.parentWidget.html#compas_viewer.components.CameraSettingsDialog.parentWidget" title="compas_viewer.components.CameraSettingsDialog.parentWidget"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parentWidget</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.physicalDpiX.html#compas_viewer.components.CameraSettingsDialog.physicalDpiX" title="compas_viewer.components.CameraSettingsDialog.physicalDpiX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">physicalDpiX</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.physicalDpiY.html#compas_viewer.components.CameraSettingsDialog.physicalDpiY" title="compas_viewer.components.CameraSettingsDialog.physicalDpiY"><code class="xref py py-obj docutils literal notranslate"><span class="pre">physicalDpiY</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.pos.html#compas_viewer.components.CameraSettingsDialog.pos" title="compas_viewer.components.CameraSettingsDialog.pos"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pos</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.previousInFocusChain.html#compas_viewer.components.CameraSettingsDialog.previousInFocusChain" title="compas_viewer.components.CameraSettingsDialog.previousInFocusChain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">previousInFocusChain</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.property.html#compas_viewer.components.CameraSettingsDialog.property" title="compas_viewer.components.CameraSettingsDialog.property"><code class="xref py py-obj docutils literal notranslate"><span class="pre">property</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.raise_.html#compas_viewer.components.CameraSettingsDialog.raise_" title="compas_viewer.components.CameraSettingsDialog.raise_"><code class="xref py py-obj docutils literal notranslate"><span class="pre">raise_</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.receivers.html#compas_viewer.components.CameraSettingsDialog.receivers" title="compas_viewer.components.CameraSettingsDialog.receivers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">receivers</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.rect.html#compas_viewer.components.CameraSettingsDialog.rect" title="compas_viewer.components.CameraSettingsDialog.rect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rect</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.redirected.html#compas_viewer.components.CameraSettingsDialog.redirected" title="compas_viewer.components.CameraSettingsDialog.redirected"><code class="xref py py-obj docutils literal notranslate"><span class="pre">redirected</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.reject.html#compas_viewer.components.CameraSettingsDialog.reject" title="compas_viewer.components.CameraSettingsDialog.reject"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reject</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.releaseKeyboard.html#compas_viewer.components.CameraSettingsDialog.releaseKeyboard" title="compas_viewer.components.CameraSettingsDialog.releaseKeyboard"><code class="xref py py-obj docutils literal notranslate"><span class="pre">releaseKeyboard</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.releaseMouse.html#compas_viewer.components.CameraSettingsDialog.releaseMouse" title="compas_viewer.components.CameraSettingsDialog.releaseMouse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">releaseMouse</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.releaseShortcut.html#compas_viewer.components.CameraSettingsDialog.releaseShortcut" title="compas_viewer.components.CameraSettingsDialog.releaseShortcut"><code class="xref py py-obj docutils literal notranslate"><span class="pre">releaseShortcut</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.removeAction.html#compas_viewer.components.CameraSettingsDialog.removeAction" title="compas_viewer.components.CameraSettingsDialog.removeAction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">removeAction</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.removeEventFilter.html#compas_viewer.components.CameraSettingsDialog.removeEventFilter" title="compas_viewer.components.CameraSettingsDialog.removeEventFilter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">removeEventFilter</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.render.html#compas_viewer.components.CameraSettingsDialog.render" title="compas_viewer.components.CameraSettingsDialog.render"><code class="xref py py-obj docutils literal notranslate"><span class="pre">render</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.repaint.html#compas_viewer.components.CameraSettingsDialog.repaint" title="compas_viewer.components.CameraSettingsDialog.repaint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">repaint</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.resize.html#compas_viewer.components.CameraSettingsDialog.resize" title="compas_viewer.components.CameraSettingsDialog.resize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">resize</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.resizeEvent.html#compas_viewer.components.CameraSettingsDialog.resizeEvent" title="compas_viewer.components.CameraSettingsDialog.resizeEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">resizeEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.restoreGeometry.html#compas_viewer.components.CameraSettingsDialog.restoreGeometry" title="compas_viewer.components.CameraSettingsDialog.restoreGeometry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">restoreGeometry</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.result.html#compas_viewer.components.CameraSettingsDialog.result" title="compas_viewer.components.CameraSettingsDialog.result"><code class="xref py py-obj docutils literal notranslate"><span class="pre">result</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.saveGeometry.html#compas_viewer.components.CameraSettingsDialog.saveGeometry" title="compas_viewer.components.CameraSettingsDialog.saveGeometry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">saveGeometry</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.screen.html#compas_viewer.components.CameraSettingsDialog.screen" title="compas_viewer.components.CameraSettingsDialog.screen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">screen</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.scroll.html#compas_viewer.components.CameraSettingsDialog.scroll" title="compas_viewer.components.CameraSettingsDialog.scroll"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scroll</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.sender.html#compas_viewer.components.CameraSettingsDialog.sender" title="compas_viewer.components.CameraSettingsDialog.sender"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sender</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.senderSignalIndex.html#compas_viewer.components.CameraSettingsDialog.senderSignalIndex" title="compas_viewer.components.CameraSettingsDialog.senderSignalIndex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">senderSignalIndex</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setAcceptDrops.html#compas_viewer.components.CameraSettingsDialog.setAcceptDrops" title="compas_viewer.components.CameraSettingsDialog.setAcceptDrops"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setAcceptDrops</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setAccessibleDescription.html#compas_viewer.components.CameraSettingsDialog.setAccessibleDescription" title="compas_viewer.components.CameraSettingsDialog.setAccessibleDescription"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setAccessibleDescription</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setAccessibleIdentifier.html#compas_viewer.components.CameraSettingsDialog.setAccessibleIdentifier" title="compas_viewer.components.CameraSettingsDialog.setAccessibleIdentifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setAccessibleIdentifier</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setAccessibleName.html#compas_viewer.components.CameraSettingsDialog.setAccessibleName" title="compas_viewer.components.CameraSettingsDialog.setAccessibleName"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setAccessibleName</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setAttribute.html#compas_viewer.components.CameraSettingsDialog.setAttribute" title="compas_viewer.components.CameraSettingsDialog.setAttribute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setAttribute</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setAutoFillBackground.html#compas_viewer.components.CameraSettingsDialog.setAutoFillBackground" title="compas_viewer.components.CameraSettingsDialog.setAutoFillBackground"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setAutoFillBackground</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setBackgroundRole.html#compas_viewer.components.CameraSettingsDialog.setBackgroundRole" title="compas_viewer.components.CameraSettingsDialog.setBackgroundRole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setBackgroundRole</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setBaseSize.html#compas_viewer.components.CameraSettingsDialog.setBaseSize" title="compas_viewer.components.CameraSettingsDialog.setBaseSize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setBaseSize</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setContentsMargins.html#compas_viewer.components.CameraSettingsDialog.setContentsMargins" title="compas_viewer.components.CameraSettingsDialog.setContentsMargins"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setContentsMargins</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setContextMenuPolicy.html#compas_viewer.components.CameraSettingsDialog.setContextMenuPolicy" title="compas_viewer.components.CameraSettingsDialog.setContextMenuPolicy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setContextMenuPolicy</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setCursor.html#compas_viewer.components.CameraSettingsDialog.setCursor" title="compas_viewer.components.CameraSettingsDialog.setCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setCursor</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setDisabled.html#compas_viewer.components.CameraSettingsDialog.setDisabled" title="compas_viewer.components.CameraSettingsDialog.setDisabled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setDisabled</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setEnabled.html#compas_viewer.components.CameraSettingsDialog.setEnabled" title="compas_viewer.components.CameraSettingsDialog.setEnabled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setEnabled</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setFixedHeight.html#compas_viewer.components.CameraSettingsDialog.setFixedHeight" title="compas_viewer.components.CameraSettingsDialog.setFixedHeight"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setFixedHeight</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setFixedSize.html#compas_viewer.components.CameraSettingsDialog.setFixedSize" title="compas_viewer.components.CameraSettingsDialog.setFixedSize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setFixedSize</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setFixedWidth.html#compas_viewer.components.CameraSettingsDialog.setFixedWidth" title="compas_viewer.components.CameraSettingsDialog.setFixedWidth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setFixedWidth</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setFocus.html#compas_viewer.components.CameraSettingsDialog.setFocus" title="compas_viewer.components.CameraSettingsDialog.setFocus"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setFocus</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setFocusPolicy.html#compas_viewer.components.CameraSettingsDialog.setFocusPolicy" title="compas_viewer.components.CameraSettingsDialog.setFocusPolicy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setFocusPolicy</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setFocusProxy.html#compas_viewer.components.CameraSettingsDialog.setFocusProxy" title="compas_viewer.components.CameraSettingsDialog.setFocusProxy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setFocusProxy</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setFont.html#compas_viewer.components.CameraSettingsDialog.setFont" title="compas_viewer.components.CameraSettingsDialog.setFont"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setFont</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setForegroundRole.html#compas_viewer.components.CameraSettingsDialog.setForegroundRole" title="compas_viewer.components.CameraSettingsDialog.setForegroundRole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setForegroundRole</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setGeometry.html#compas_viewer.components.CameraSettingsDialog.setGeometry" title="compas_viewer.components.CameraSettingsDialog.setGeometry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setGeometry</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setGraphicsEffect.html#compas_viewer.components.CameraSettingsDialog.setGraphicsEffect" title="compas_viewer.components.CameraSettingsDialog.setGraphicsEffect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setGraphicsEffect</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setHidden.html#compas_viewer.components.CameraSettingsDialog.setHidden" title="compas_viewer.components.CameraSettingsDialog.setHidden"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setHidden</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setInputMethodHints.html#compas_viewer.components.CameraSettingsDialog.setInputMethodHints" title="compas_viewer.components.CameraSettingsDialog.setInputMethodHints"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setInputMethodHints</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setLayout.html#compas_viewer.components.CameraSettingsDialog.setLayout" title="compas_viewer.components.CameraSettingsDialog.setLayout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setLayout</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setLayoutDirection.html#compas_viewer.components.CameraSettingsDialog.setLayoutDirection" title="compas_viewer.components.CameraSettingsDialog.setLayoutDirection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setLayoutDirection</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setLocale.html#compas_viewer.components.CameraSettingsDialog.setLocale" title="compas_viewer.components.CameraSettingsDialog.setLocale"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setLocale</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setMask.html#compas_viewer.components.CameraSettingsDialog.setMask" title="compas_viewer.components.CameraSettingsDialog.setMask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setMask</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setMaximumHeight.html#compas_viewer.components.CameraSettingsDialog.setMaximumHeight" title="compas_viewer.components.CameraSettingsDialog.setMaximumHeight"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setMaximumHeight</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setMaximumSize.html#compas_viewer.components.CameraSettingsDialog.setMaximumSize" title="compas_viewer.components.CameraSettingsDialog.setMaximumSize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setMaximumSize</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setMaximumWidth.html#compas_viewer.components.CameraSettingsDialog.setMaximumWidth" title="compas_viewer.components.CameraSettingsDialog.setMaximumWidth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setMaximumWidth</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setMinimumHeight.html#compas_viewer.components.CameraSettingsDialog.setMinimumHeight" title="compas_viewer.components.CameraSettingsDialog.setMinimumHeight"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setMinimumHeight</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setMinimumSize.html#compas_viewer.components.CameraSettingsDialog.setMinimumSize" title="compas_viewer.components.CameraSettingsDialog.setMinimumSize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setMinimumSize</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setMinimumWidth.html#compas_viewer.components.CameraSettingsDialog.setMinimumWidth" title="compas_viewer.components.CameraSettingsDialog.setMinimumWidth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setMinimumWidth</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setModal.html#compas_viewer.components.CameraSettingsDialog.setModal" title="compas_viewer.components.CameraSettingsDialog.setModal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setModal</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setMouseTracking.html#compas_viewer.components.CameraSettingsDialog.setMouseTracking" title="compas_viewer.components.CameraSettingsDialog.setMouseTracking"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setMouseTracking</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setObjectName.html#compas_viewer.components.CameraSettingsDialog.setObjectName" title="compas_viewer.components.CameraSettingsDialog.setObjectName"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setObjectName</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setPalette.html#compas_viewer.components.CameraSettingsDialog.setPalette" title="compas_viewer.components.CameraSettingsDialog.setPalette"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setPalette</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setParent.html#compas_viewer.components.CameraSettingsDialog.setParent" title="compas_viewer.components.CameraSettingsDialog.setParent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setParent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setProperty.html#compas_viewer.components.CameraSettingsDialog.setProperty" title="compas_viewer.components.CameraSettingsDialog.setProperty"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setProperty</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setResult.html#compas_viewer.components.CameraSettingsDialog.setResult" title="compas_viewer.components.CameraSettingsDialog.setResult"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setResult</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setScreen.html#compas_viewer.components.CameraSettingsDialog.setScreen" title="compas_viewer.components.CameraSettingsDialog.setScreen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setScreen</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setShortcutAutoRepeat.html#compas_viewer.components.CameraSettingsDialog.setShortcutAutoRepeat" title="compas_viewer.components.CameraSettingsDialog.setShortcutAutoRepeat"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setShortcutAutoRepeat</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setShortcutEnabled.html#compas_viewer.components.CameraSettingsDialog.setShortcutEnabled" title="compas_viewer.components.CameraSettingsDialog.setShortcutEnabled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setShortcutEnabled</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setSizeGripEnabled.html#compas_viewer.components.CameraSettingsDialog.setSizeGripEnabled" title="compas_viewer.components.CameraSettingsDialog.setSizeGripEnabled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setSizeGripEnabled</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setSizeIncrement.html#compas_viewer.components.CameraSettingsDialog.setSizeIncrement" title="compas_viewer.components.CameraSettingsDialog.setSizeIncrement"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setSizeIncrement</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setSizePolicy.html#compas_viewer.components.CameraSettingsDialog.setSizePolicy" title="compas_viewer.components.CameraSettingsDialog.setSizePolicy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setSizePolicy</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setStatusTip.html#compas_viewer.components.CameraSettingsDialog.setStatusTip" title="compas_viewer.components.CameraSettingsDialog.setStatusTip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setStatusTip</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setStyle.html#compas_viewer.components.CameraSettingsDialog.setStyle" title="compas_viewer.components.CameraSettingsDialog.setStyle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setStyle</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setStyleSheet.html#compas_viewer.components.CameraSettingsDialog.setStyleSheet" title="compas_viewer.components.CameraSettingsDialog.setStyleSheet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setStyleSheet</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setTabOrder.html#compas_viewer.components.CameraSettingsDialog.setTabOrder" title="compas_viewer.components.CameraSettingsDialog.setTabOrder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setTabOrder</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setTabletTracking.html#compas_viewer.components.CameraSettingsDialog.setTabletTracking" title="compas_viewer.components.CameraSettingsDialog.setTabletTracking"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setTabletTracking</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setToolTip.html#compas_viewer.components.CameraSettingsDialog.setToolTip" title="compas_viewer.components.CameraSettingsDialog.setToolTip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setToolTip</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setToolTipDuration.html#compas_viewer.components.CameraSettingsDialog.setToolTipDuration" title="compas_viewer.components.CameraSettingsDialog.setToolTipDuration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setToolTipDuration</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setUpdatesEnabled.html#compas_viewer.components.CameraSettingsDialog.setUpdatesEnabled" title="compas_viewer.components.CameraSettingsDialog.setUpdatesEnabled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setUpdatesEnabled</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setVisible.html#compas_viewer.components.CameraSettingsDialog.setVisible" title="compas_viewer.components.CameraSettingsDialog.setVisible"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setVisible</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setWhatsThis.html#compas_viewer.components.CameraSettingsDialog.setWhatsThis" title="compas_viewer.components.CameraSettingsDialog.setWhatsThis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setWhatsThis</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setWindowFilePath.html#compas_viewer.components.CameraSettingsDialog.setWindowFilePath" title="compas_viewer.components.CameraSettingsDialog.setWindowFilePath"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setWindowFilePath</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setWindowFlag.html#compas_viewer.components.CameraSettingsDialog.setWindowFlag" title="compas_viewer.components.CameraSettingsDialog.setWindowFlag"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setWindowFlag</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setWindowFlags.html#compas_viewer.components.CameraSettingsDialog.setWindowFlags" title="compas_viewer.components.CameraSettingsDialog.setWindowFlags"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setWindowFlags</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setWindowIcon.html#compas_viewer.components.CameraSettingsDialog.setWindowIcon" title="compas_viewer.components.CameraSettingsDialog.setWindowIcon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setWindowIcon</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setWindowIconText.html#compas_viewer.components.CameraSettingsDialog.setWindowIconText" title="compas_viewer.components.CameraSettingsDialog.setWindowIconText"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setWindowIconText</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setWindowModality.html#compas_viewer.components.CameraSettingsDialog.setWindowModality" title="compas_viewer.components.CameraSettingsDialog.setWindowModality"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setWindowModality</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setWindowModified.html#compas_viewer.components.CameraSettingsDialog.setWindowModified" title="compas_viewer.components.CameraSettingsDialog.setWindowModified"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setWindowModified</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setWindowOpacity.html#compas_viewer.components.CameraSettingsDialog.setWindowOpacity" title="compas_viewer.components.CameraSettingsDialog.setWindowOpacity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setWindowOpacity</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setWindowRole.html#compas_viewer.components.CameraSettingsDialog.setWindowRole" title="compas_viewer.components.CameraSettingsDialog.setWindowRole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setWindowRole</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setWindowState.html#compas_viewer.components.CameraSettingsDialog.setWindowState" title="compas_viewer.components.CameraSettingsDialog.setWindowState"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setWindowState</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.setWindowTitle.html#compas_viewer.components.CameraSettingsDialog.setWindowTitle" title="compas_viewer.components.CameraSettingsDialog.setWindowTitle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setWindowTitle</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.sharedPainter.html#compas_viewer.components.CameraSettingsDialog.sharedPainter" title="compas_viewer.components.CameraSettingsDialog.sharedPainter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sharedPainter</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.show.html#compas_viewer.components.CameraSettingsDialog.show" title="compas_viewer.components.CameraSettingsDialog.show"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.showEvent.html#compas_viewer.components.CameraSettingsDialog.showEvent" title="compas_viewer.components.CameraSettingsDialog.showEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">showEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.showFullScreen.html#compas_viewer.components.CameraSettingsDialog.showFullScreen" title="compas_viewer.components.CameraSettingsDialog.showFullScreen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">showFullScreen</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.showMaximized.html#compas_viewer.components.CameraSettingsDialog.showMaximized" title="compas_viewer.components.CameraSettingsDialog.showMaximized"><code class="xref py py-obj docutils literal notranslate"><span class="pre">showMaximized</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.showMinimized.html#compas_viewer.components.CameraSettingsDialog.showMinimized" title="compas_viewer.components.CameraSettingsDialog.showMinimized"><code class="xref py py-obj docutils literal notranslate"><span class="pre">showMinimized</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.showNormal.html#compas_viewer.components.CameraSettingsDialog.showNormal" title="compas_viewer.components.CameraSettingsDialog.showNormal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">showNormal</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.signalsBlocked.html#compas_viewer.components.CameraSettingsDialog.signalsBlocked" title="compas_viewer.components.CameraSettingsDialog.signalsBlocked"><code class="xref py py-obj docutils literal notranslate"><span class="pre">signalsBlocked</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.size.html#compas_viewer.components.CameraSettingsDialog.size" title="compas_viewer.components.CameraSettingsDialog.size"><code class="xref py py-obj docutils literal notranslate"><span class="pre">size</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.sizeHint.html#compas_viewer.components.CameraSettingsDialog.sizeHint" title="compas_viewer.components.CameraSettingsDialog.sizeHint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sizeHint</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.sizeIncrement.html#compas_viewer.components.CameraSettingsDialog.sizeIncrement" title="compas_viewer.components.CameraSettingsDialog.sizeIncrement"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sizeIncrement</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.sizePolicy.html#compas_viewer.components.CameraSettingsDialog.sizePolicy" title="compas_viewer.components.CameraSettingsDialog.sizePolicy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sizePolicy</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.stackUnder.html#compas_viewer.components.CameraSettingsDialog.stackUnder" title="compas_viewer.components.CameraSettingsDialog.stackUnder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stackUnder</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.startTimer.html#compas_viewer.components.CameraSettingsDialog.startTimer" title="compas_viewer.components.CameraSettingsDialog.startTimer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">startTimer</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.statusTip.html#compas_viewer.components.CameraSettingsDialog.statusTip" title="compas_viewer.components.CameraSettingsDialog.statusTip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statusTip</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.style.html#compas_viewer.components.CameraSettingsDialog.style" title="compas_viewer.components.CameraSettingsDialog.style"><code class="xref py py-obj docutils literal notranslate"><span class="pre">style</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.styleSheet.html#compas_viewer.components.CameraSettingsDialog.styleSheet" title="compas_viewer.components.CameraSettingsDialog.styleSheet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">styleSheet</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.tabletEvent.html#compas_viewer.components.CameraSettingsDialog.tabletEvent" title="compas_viewer.components.CameraSettingsDialog.tabletEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tabletEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.testAttribute.html#compas_viewer.components.CameraSettingsDialog.testAttribute" title="compas_viewer.components.CameraSettingsDialog.testAttribute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">testAttribute</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.thread.html#compas_viewer.components.CameraSettingsDialog.thread" title="compas_viewer.components.CameraSettingsDialog.thread"><code class="xref py py-obj docutils literal notranslate"><span class="pre">thread</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.timerEvent.html#compas_viewer.components.CameraSettingsDialog.timerEvent" title="compas_viewer.components.CameraSettingsDialog.timerEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">timerEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.toolTip.html#compas_viewer.components.CameraSettingsDialog.toolTip" title="compas_viewer.components.CameraSettingsDialog.toolTip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">toolTip</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.toolTipDuration.html#compas_viewer.components.CameraSettingsDialog.toolTipDuration" title="compas_viewer.components.CameraSettingsDialog.toolTipDuration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">toolTipDuration</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.topLevelWidget.html#compas_viewer.components.CameraSettingsDialog.topLevelWidget" title="compas_viewer.components.CameraSettingsDialog.topLevelWidget"><code class="xref py py-obj docutils literal notranslate"><span class="pre">topLevelWidget</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.tr.html#compas_viewer.components.CameraSettingsDialog.tr" title="compas_viewer.components.CameraSettingsDialog.tr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tr</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.underMouse.html#compas_viewer.components.CameraSettingsDialog.underMouse" title="compas_viewer.components.CameraSettingsDialog.underMouse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">underMouse</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.ungrabGesture.html#compas_viewer.components.CameraSettingsDialog.ungrabGesture" title="compas_viewer.components.CameraSettingsDialog.ungrabGesture"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ungrabGesture</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.unsetCursor.html#compas_viewer.components.CameraSettingsDialog.unsetCursor" title="compas_viewer.components.CameraSettingsDialog.unsetCursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unsetCursor</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.unsetLayoutDirection.html#compas_viewer.components.CameraSettingsDialog.unsetLayoutDirection" title="compas_viewer.components.CameraSettingsDialog.unsetLayoutDirection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unsetLayoutDirection</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.unsetLocale.html#compas_viewer.components.CameraSettingsDialog.unsetLocale" title="compas_viewer.components.CameraSettingsDialog.unsetLocale"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unsetLocale</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.updateGeometry.html#compas_viewer.components.CameraSettingsDialog.updateGeometry" title="compas_viewer.components.CameraSettingsDialog.updateGeometry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">updateGeometry</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.updateMicroFocus.html#compas_viewer.components.CameraSettingsDialog.updateMicroFocus" title="compas_viewer.components.CameraSettingsDialog.updateMicroFocus"><code class="xref py py-obj docutils literal notranslate"><span class="pre">updateMicroFocus</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.updatesEnabled.html#compas_viewer.components.CameraSettingsDialog.updatesEnabled" title="compas_viewer.components.CameraSettingsDialog.updatesEnabled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">updatesEnabled</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.visibleRegion.html#compas_viewer.components.CameraSettingsDialog.visibleRegion" title="compas_viewer.components.CameraSettingsDialog.visibleRegion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">visibleRegion</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.whatsThis.html#compas_viewer.components.CameraSettingsDialog.whatsThis" title="compas_viewer.components.CameraSettingsDialog.whatsThis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">whatsThis</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.wheelEvent.html#compas_viewer.components.CameraSettingsDialog.wheelEvent" title="compas_viewer.components.CameraSettingsDialog.wheelEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wheelEvent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.width.html#compas_viewer.components.CameraSettingsDialog.width" title="compas_viewer.components.CameraSettingsDialog.width"><code class="xref py py-obj docutils literal notranslate"><span class="pre">width</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.widthMM.html#compas_viewer.components.CameraSettingsDialog.widthMM" title="compas_viewer.components.CameraSettingsDialog.widthMM"><code class="xref py py-obj docutils literal notranslate"><span class="pre">widthMM</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.winId.html#compas_viewer.components.CameraSettingsDialog.winId" title="compas_viewer.components.CameraSettingsDialog.winId"><code class="xref py py-obj docutils literal notranslate"><span class="pre">winId</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.window.html#compas_viewer.components.CameraSettingsDialog.window" title="compas_viewer.components.CameraSettingsDialog.window"><code class="xref py py-obj docutils literal notranslate"><span class="pre">window</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.windowFilePath.html#compas_viewer.components.CameraSettingsDialog.windowFilePath" title="compas_viewer.components.CameraSettingsDialog.windowFilePath"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowFilePath</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.windowFlags.html#compas_viewer.components.CameraSettingsDialog.windowFlags" title="compas_viewer.components.CameraSettingsDialog.windowFlags"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowFlags</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.windowHandle.html#compas_viewer.components.CameraSettingsDialog.windowHandle" title="compas_viewer.components.CameraSettingsDialog.windowHandle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowHandle</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.windowIcon.html#compas_viewer.components.CameraSettingsDialog.windowIcon" title="compas_viewer.components.CameraSettingsDialog.windowIcon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowIcon</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.windowIconText.html#compas_viewer.components.CameraSettingsDialog.windowIconText" title="compas_viewer.components.CameraSettingsDialog.windowIconText"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowIconText</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.windowModality.html#compas_viewer.components.CameraSettingsDialog.windowModality" title="compas_viewer.components.CameraSettingsDialog.windowModality"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowModality</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.windowOpacity.html#compas_viewer.components.CameraSettingsDialog.windowOpacity" title="compas_viewer.components.CameraSettingsDialog.windowOpacity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowOpacity</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.windowRole.html#compas_viewer.components.CameraSettingsDialog.windowRole" title="compas_viewer.components.CameraSettingsDialog.windowRole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowRole</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.windowState.html#compas_viewer.components.CameraSettingsDialog.windowState" title="compas_viewer.components.CameraSettingsDialog.windowState"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowState</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.windowTitle.html#compas_viewer.components.CameraSettingsDialog.windowTitle" title="compas_viewer.components.CameraSettingsDialog.windowTitle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowTitle</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.windowType.html#compas_viewer.components.CameraSettingsDialog.windowType" title="compas_viewer.components.CameraSettingsDialog.windowType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">windowType</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.x.html#compas_viewer.components.CameraSettingsDialog.x" title="compas_viewer.components.CameraSettingsDialog.x"><code class="xref py py-obj docutils literal notranslate"><span class="pre">x</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_viewer.components.CameraSettingsDialog.y.html#compas_viewer.components.CameraSettingsDialog.y" title="compas_viewer.components.CameraSettingsDialog.y"><code class="xref py py-obj docutils literal notranslate"><span class="pre">y</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+              
+              
+                <footer class="bd-footer-article">
+                  
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#compas_viewer.components.CameraSettingsDialog"><code class="docutils literal notranslate"><span class="pre">CameraSettingsDialog</span></code></a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+  <p class="copyright">
+    
+      © Copyright COMPAS Association.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item"><p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.13.3.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
