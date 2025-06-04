@@ -316,7 +316,7 @@ class BufferManager:
 
                 # Convert to numpy arrays
                 pos_array = np.array(positions, dtype=np.float32).flatten()
-                col_array = np.array([c.rgba for c in colors] if isinstance(colors[0], Color) else colors, dtype=np.float32).flatten()
+                col_array = np.array([c.rgba for c in colors] if len(colors) > 0 and isinstance(colors[0], Color) else colors, dtype=np.float32).flatten()
 
                 # Find the start and end indices for this object in the buffer
                 start_idx = 0
