@@ -9,16 +9,14 @@ viewer = Viewer()
 
 mesh = Mesh.from_shape(Box.from_width_height_depth(2, 2, 2))
 obj1 = viewer.scene.add(mesh)
-obj2 = viewer.scene.add(mesh)
-obj2.transformation = Translation.from_vector([5, 0, 0])
-
-obj3 = viewer.scene.add(mesh)
-obj3.transformation = Translation.from_vector([-5, 0, 0])
+obj2 = viewer.scene.add(mesh, transformation=Translation.from_vector([5, 0, 0]))
+obj3 = viewer.scene.add(mesh, transformation=Translation.from_vector([-5, 0, 0]))
 
 obj1.opacity = 0.7
 
 @viewer.on(interval=100)
 def deform_mesh(frame):
+    obj1.opacity = (frame / 20) % 1
     for v in mesh.vertices():
         vertex: list = mesh.vertex_attributes(v, "xyz")
         vertex[0] += (random() - 0.5) * 0.1

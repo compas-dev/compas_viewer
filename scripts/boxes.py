@@ -16,8 +16,7 @@ for i in range(N):
                 pointsize=10,
                 facecolor=Color(i / N, j / N, k / N),
                 name=f"Box_{i}_{j}_{k}",
+                transformation = Translation.from_vector([i, j, k])
             )
-
-            obj.transformation = Translation.from_vector([i, j, k])
 
 viewer.show()

@@ -1,4 +1,3 @@
-from typing import Any
 from typing import Optional
 
 import numpy as np
@@ -7,7 +6,6 @@ from numpy import average
 
 from compas.colors import Color
 from compas.geometry import Point
-from compas.geometry import Transformation
 from compas.geometry import transform_points_numpy
 from compas.scene import SceneObject
 from compas_viewer.base import Base
@@ -105,7 +103,6 @@ class ViewerSceneObject(SceneObject, Base):
         self.use_rgba = use_rgba
 
         #  Geometric
-        self.transformation: Optional[Transformation] = None
         self._bounding_box: Optional[list[float]] = None
         self._bounding_box_center: Optional[Point] = None
 
@@ -114,10 +111,6 @@ class ViewerSceneObject(SceneObject, Base):
         self._lines_data: Optional[ShaderDataType] = None
         self._frontfaces_data: Optional[ShaderDataType] = None
         self._backfaces_data: Optional[ShaderDataType] = None
-        self._points_buffer: [dict[str, Any]] = None  # type: ignore
-        self._lines_buffer: [dict[str, Any]] = None  # type: ignore
-        self._frontfaces_buffer: [dict[str, Any]] = None  # type: ignore
-        self._backfaces_buffer: [dict[str, Any]] = None  # type: ignore
 
         self._inited = False
         self.context = "Viewer"
