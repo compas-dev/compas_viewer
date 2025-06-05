@@ -200,4 +200,4 @@ class ColorDialog(QWidget):
     def change_color(self, color):
         rgb = remap_rgb(color.getRgb())[:-1]  # rgba to rgb(0-1)
         setattr(self.obj, self.attr, Color(*rgb))
-        self.obj.update()
+        self.obj.update(update_data=True, update_transform=False)
