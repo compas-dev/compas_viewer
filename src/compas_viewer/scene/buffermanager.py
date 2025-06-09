@@ -177,36 +177,7 @@ class BufferManager:
                 else:
                     self.buffer_ids[buffer_type]["elements"] = make_index_buffer(self.elements[buffer_type])
 
-    def draw(self, shader: Shader, line_shader: Shader, rendermode: str, is_instance: bool = False) -> None:
-        """Draw all objects using the combined buffers.
-
-        Parameters
-        ----------
-        shader : Shader
-            The shader to use for rendering.
-        line_shader : Shader
-            The shader to use for rendering lines.
-        rendermode : str
-            The rendering mode to use, either "wireframe", "lighted", or "ghosted".
-        is_instance : bool
-            Whether the rendering is for an instance.
-        """
-
-        is_wireframe = rendermode == "wireframe"
-        is_lighted = rendermode == "lighted"
-        is_ghosted = rendermode == "ghosted"
-
-        for obj in self.objects:
-            self.update_object_settings(obj)
-
-        shader.bind()
-        shader.uniform1i("is_grid", False)
-        shader.enable_attribute("position")
-        shader.enable_attribute("color")
-        shader.enable_attribute("object_index")
-
-        # Frist Draw all the opaque elements
-        # Draw faces
+    def _draw_faces(self, shader: Shader, is_instance: bool, is_lighted: bool, is_ghosted: bool, is_wireframe: bool):
         GL.glEnable(GL.GL_POLYGON_OFFSET_FILL)
         if not is_wireframe and (not is_ghosted or is_instance):
             shader.uniform1i("is_lighted", is_lighted)
@@ -218,19 +189,18 @@ class BufferManager:
                     shader.bind_attribute("object_index", self.buffer_ids[face_type]["object_indices"], step=1)
                     shader.draw_triangles(elements=self.buffer_ids[face_type]["elements"], n=len(self.elements[face_type]))
                     if is_instance:
-                        # Also include transparent elements when rendering instance map
                         shader.draw_triangles(elements=self.buffer_ids[face_type]["elements_transparent"], n=len(self.elements[face_type + "_transparent"]))
         GL.glDisable(GL.GL_POLYGON_OFFSET_FILL)
 
-        # Draw points
+    def _draw_points(self, shader: Shader):
         shader.uniform1i("element_type", 0)
         if self.buffer_ids["_points_data"]:
             shader.bind_attribute("position", self.buffer_ids["_points_data"]["positions"])
             shader.bind_attribute("color", self.buffer_ids["_points_data"]["colors"], step=4)
             shader.bind_attribute("object_index", self.buffer_ids["_points_data"]["object_indices"], step=1)
-            shader.draw_points(elements=self.buffer_ids["_points_data"]["elements"], n=len(self.elements["_points_data"]), size=10.0)
+            shader.draw_points(elements=self.buffer_ids["_points_data"]["elements"], n=len(self.elements["_points_data"]))
 
-        # Draw lines
+    def _draw_lines(self, line_shader: Shader):
         GL.glDisable(GL.GL_CULL_FACE)
         line_shader.bind()
         line_shader.uniform1i("is_lighted", False)
@@ -246,27 +216,44 @@ class BufferManager:
         line_shader.release()
         GL.glEnable(GL.GL_CULL_FACE)
 
-        if not is_instance and not is_wireframe:
-            # Then Draw all the transparent elements
-            shader.bind()
-            shader.uniform1i("is_lighted", is_lighted)
-            shader.uniform1i("element_type", 2)
-            GL.glDepthMask(GL.GL_FALSE)  # Disable depth writing for transparent objects
-            for face_type in ["_frontfaces_data", "_backfaces_data"]:
-                if self.buffer_ids[face_type]:
-                    shader.bind_attribute("position", self.buffer_ids[face_type]["positions"])
-                    shader.bind_attribute("color", self.buffer_ids[face_type]["colors"], step=4)
-                    shader.bind_attribute("object_index", self.buffer_ids[face_type]["object_indices"], step=1)
-                    shader.draw_triangles(elements=self.buffer_ids[face_type]["elements_transparent"], n=len(self.elements[face_type + "_transparent"]))
-                    if is_ghosted:
-                        # Draw the opaque elements in transparent pass too in ghosted mode
-                        shader.draw_triangles(elements=self.buffer_ids[face_type]["elements"], n=len(self.elements[face_type]))
-            GL.glDepthMask(GL.GL_TRUE)  # Re-enable depth writing
+    def _draw_transparent_faces(self, shader: Shader, is_lighted: bool, is_ghosted: bool):
+        shader.bind()
+        shader.uniform1i("is_lighted", is_lighted)
+        shader.uniform1i("element_type", 2)
+        GL.glDepthMask(GL.GL_FALSE)
+        for face_type in ["_frontfaces_data", "_backfaces_data"]:
+            if self.buffer_ids[face_type]:
+                shader.bind_attribute("position", self.buffer_ids[face_type]["positions"])
+                shader.bind_attribute("color", self.buffer_ids[face_type]["colors"], step=4)
+                shader.bind_attribute("object_index", self.buffer_ids[face_type]["object_indices"], step=1)
+                shader.draw_triangles(elements=self.buffer_ids[face_type]["elements_transparent"], n=len(self.elements[face_type + "_transparent"]))
+                if is_ghosted:
+                    shader.draw_triangles(elements=self.buffer_ids[face_type]["elements"], n=len(self.elements[face_type]))
+        GL.glDepthMask(GL.GL_TRUE)
 
-        shader.disable_attribute("object_index")
-        shader.disable_attribute("position")
-        shader.disable_attribute("color")
+    def draw(self, shader: Shader, line_shader: Shader, rendermode: str, is_instance: bool = False) -> None:
+        """Draw all objects using the combined buffers."""
+        is_wireframe = rendermode == "wireframe"
+        is_lighted = rendermode == "lighted"
+        is_ghosted = rendermode == "ghosted"
+
+        # Draw opaque elements
+        shader.bind()
+        shader.uniform1i("is_grid", False)
+        shader.enable_attribute("position")
+        shader.enable_attribute("color")
+        shader.enable_attribute("object_index")
+
+        self._draw_faces(shader, is_instance, is_lighted, is_ghosted, is_wireframe)
+        self._draw_points(shader)
         shader.release()
+
+        # Draw lines with their own shader
+        self._draw_lines(line_shader)
+
+        # Draw transparent elements if not in instance mode
+        if not is_instance and not is_wireframe:
+            self._draw_transparent_faces(shader, is_lighted, is_ghosted)
 
     def clear(self) -> None:
         """Clear all buffer data."""
@@ -346,6 +333,11 @@ class BufferManager:
                 # Update the color buffer
                 col_byte_offset = start_idx * 4 * 4  # 4 floats per color * 4 bytes per float
                 update_vertex_buffer(col_array, self.buffer_ids[data_type]["colors"], offset=col_byte_offset)
+
+    def update_settings(self):
+        """Update the settings for all objects."""
+        for obj in self.objects:
+            self.update_object_settings(obj)
 
     def update_object_settings(self, obj: Any) -> None:
         """Update the settings for a single object."""

@@ -525,6 +525,9 @@ class Renderer(QOpenGLWidget):
         viewworld = self.camera.viewworld()
         self.update_projection()
 
+        # Update object settings (visibility, selection, etc.)
+        self.buffer_manager.update_settings()
+
         # Update uniforms for both shaders
         for shader in [self.shader_model, self.shader_lines]:
             shader.bind()
@@ -535,10 +538,12 @@ class Renderer(QOpenGLWidget):
             shader.uniform1i("is_instance", is_instance)
             shader.release()
 
+        # Update viewport uniform for line shader
         self.shader_lines.bind()
         self.shader_lines.uniform2f("viewport", (self.width(), self.height()))
         self.shader_lines.release()
 
+        # Draw the grid
         if self.viewer.config.renderer.show_grid:
             self.shader_model.bind()
             self.grid.draw(self.shader_model)
@@ -564,7 +569,7 @@ class Renderer(QOpenGLWidget):
 
         # draw 2D box for multi-selection
         if self.viewer.mouse.is_tracing_a_window:
-            # Ensure the shader is bound before drawing
+            # Ensure the model shader is bound before drawing
             self.shader_model.bind()
 
             # Draw the selection box
