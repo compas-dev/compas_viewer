@@ -207,6 +207,7 @@ class BufferManager:
 
         # Frist Draw all the opaque elements
         # Draw faces
+        GL.glEnable(GL.GL_POLYGON_OFFSET_FILL)
         if not is_wireframe and (not is_ghosted or is_instance):
             shader.uniform1i("is_lighted", is_lighted)
             shader.uniform1i("element_type", 2)
@@ -219,6 +220,7 @@ class BufferManager:
                     if is_instance:
                         # Also include transparent elements when rendering instance map
                         shader.draw_triangles(elements=self.buffer_ids[face_type]["elements_transparent"], n=len(self.elements[face_type + "_transparent"]))
+        GL.glDisable(GL.GL_POLYGON_OFFSET_FILL)
 
         # Draw points
         shader.uniform1i("element_type", 0)

@@ -201,7 +201,6 @@ class Renderer(QOpenGLWidget):
         """
         GL.glClearColor(*self.viewer.config.renderer.backgroundcolor.rgba)
         GL.glPolygonOffset(1.0, 1.0)
-        GL.glEnable(GL.GL_POLYGON_OFFSET_FILL)
         GL.glEnable(GL.GL_CULL_FACE)
         GL.glCullFace(GL.GL_BACK)
         GL.glEnable(GL.GL_DEPTH_TEST)
