@@ -246,7 +246,7 @@ class StatusbarConfig(ConfigBase):
 class SidebarConfig(ConfigBase):
     show: bool = True
     show_widgets: bool = True
-    sceneform: bool = True
+    show_selected_tree: bool = True
     items: list[dict] = field(
         default_factory=lambda: [
             {
