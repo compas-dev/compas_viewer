@@ -220,6 +220,14 @@ class BufferManager:
                         # Also include transparent elements when rendering instance map
                         shader.draw_triangles(elements=self.buffer_ids[face_type]["elements_transparent"], n=len(self.elements[face_type + "_transparent"]))
 
+        # Draw points
+        shader.uniform1i("element_type", 0)
+        if self.buffer_ids["_points_data"]:
+            shader.bind_attribute("position", self.buffer_ids["_points_data"]["positions"])
+            shader.bind_attribute("color", self.buffer_ids["_points_data"]["colors"], step=4)
+            shader.bind_attribute("object_index", self.buffer_ids["_points_data"]["object_indices"], step=1)
+            shader.draw_points(elements=self.buffer_ids["_points_data"]["elements"], n=len(self.elements["_points_data"]), size=10.0)
+
         # Draw lines
         GL.glDisable(GL.GL_CULL_FACE)
         line_shader.bind()
@@ -233,23 +241,12 @@ class BufferManager:
             line_shader.bind_attribute("color", self.buffer_ids["_lines_data"]["colors"], step=4)
             line_shader.bind_attribute("object_index", self.buffer_ids["_lines_data"]["object_indices"], step=1)
             line_shader.draw_lines(elements=self.buffer_ids["_lines_data"]["elements"], n=len(self.elements["_lines_data"]))
-            line_shader.disable_attribute("object_index")
-            line_shader.disable_attribute("position")
-            line_shader.disable_attribute("color")
         line_shader.release()
         GL.glEnable(GL.GL_CULL_FACE)
 
-        # Draw points
-        shader.bind()
-        shader.uniform1i("element_type", 0)
-        if self.buffer_ids["_points_data"]:
-            shader.bind_attribute("position", self.buffer_ids["_points_data"]["positions"])
-            shader.bind_attribute("color", self.buffer_ids["_points_data"]["colors"], step=4)
-            shader.bind_attribute("object_index", self.buffer_ids["_points_data"]["object_indices"], step=1)
-            shader.draw_points(elements=self.buffer_ids["_points_data"]["elements"], n=len(self.elements["_points_data"]), size=10.0)
-
         if not is_instance and not is_wireframe:
             # Then Draw all the transparent elements
+            shader.bind()
             shader.uniform1i("is_lighted", is_lighted)
             shader.uniform1i("element_type", 2)
             GL.glDepthMask(GL.GL_FALSE)  # Disable depth writing for transparent objects
