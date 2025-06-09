@@ -38,6 +38,8 @@ class BufferManager:
         List of transformation matrices for each object
     settings : List[float]
         List of setting values for each object
+    object_settings_cache : Dict[Any, List[float]]
+        Cache for object settings to avoid redundant GPU updates
     """
 
     def __init__(self):
@@ -56,6 +58,7 @@ class BufferManager:
 
         # Settings data
         self.settings: List[float] = []
+        self.object_settings_cache: Dict[Any, List[float]] = {}
 
         # Initialize empty buffers for each geometry type
         for buffer_type in ["_points_data", "_lines_data", "_frontfaces_data", "_backfaces_data"]:
@@ -265,6 +268,7 @@ class BufferManager:
 
         self.transforms = []
         self.settings = []
+        self.object_settings_cache = {}
 
     def update_object_transform(self, obj: Any) -> None:
         """Update the transformation matrix for a single object.
@@ -359,6 +363,13 @@ class BufferManager:
             [*instance_color, obj.is_selected],  # Row 2
             [parent_index, obj.opacity, obj.pointsize, getattr(obj, "linewidth", 1.0)],  # Row 3: parent index and padding
         ]
+
+        # Check against cache to avoid unnecessary GPU updates
+        if self.object_settings_cache.get(obj) == obj_settings:
+            return
+
+        # If settings have changed, update the GPU buffer and the cache
+        self.object_settings_cache[obj] = obj_settings
         index = self.objects[obj]
         self.settings[index] = obj_settings
         byte_offset = index * 4 * 12  # 3 rows * 4 floats per row * 4 bytes per float
