@@ -62,6 +62,7 @@ class Renderer(QOpenGLWidget):
         self.grid = None
 
         self.shader_model: Shader = None
+        self.shader_lines: Shader = None
         self._shader_tag: Shader = None
         self.shader_arrow: Shader = None
         self.shader_instance: Shader = None
@@ -108,6 +109,9 @@ class Renderer(QOpenGLWidget):
             self.shader_model.bind()
             self.shader_model.uniform1f("opacity", self._opacity)
             self.shader_model.release()
+            self.shader_lines.bind()
+            self.shader_lines.uniform1f("opacity", self._opacity)
+            self.shader_lines.release()
             self.update()
 
     @property
@@ -432,6 +436,16 @@ class Renderer(QOpenGLWidget):
         self.shader_model.uniformBuffer("settingsBuffer", self.buffer_manager.settings_texture, unit=1)
         self.shader_model.release()
 
+        self.shader_lines = Shader(name="modellines")
+        self.shader_lines.bind()
+        self.shader_lines.uniform4x4("projection", projection)
+        self.shader_lines.uniform4x4("viewworld", viewworld)
+        self.shader_lines.uniform1f("opacity", self.opacity)
+        self.shader_lines.uniform3f("selection_color", self.viewer.config.renderer.selectioncolor.rgb)
+        self.shader_lines.uniformBuffer("transformBuffer", self.buffer_manager.transform_texture, unit=0)
+        self.shader_lines.uniformBuffer("settingsBuffer", self.buffer_manager.settings_texture, unit=1)
+        self.shader_lines.release()
+
     def update_projection(self, w=None, h=None):
         """
         Update the projection matrix.
@@ -450,6 +464,10 @@ class Renderer(QOpenGLWidget):
         self.shader_model.bind()
         self.shader_model.uniform4x4("projection", projection)
         self.shader_model.release()
+
+        self.shader_lines.bind()
+        self.shader_lines.uniform4x4("projection", projection)
+        self.shader_lines.release()
 
         self.shader_tag.bind()
         self.shader_tag.uniform4x4("projection", projection)
@@ -508,21 +526,29 @@ class Renderer(QOpenGLWidget):
         viewworld = self.camera.viewworld()
         self.update_projection()
 
-        # rebind the model shader
-        self.shader_model.bind()
-        self.shader_model.uniform1f("opacity", self.opacity)
-        self.shader_model.uniformBuffer("transformBuffer", self.buffer_manager.transform_texture, unit=0)
-        self.shader_model.uniformBuffer("settingsBuffer", self.buffer_manager.settings_texture, unit=1)
+        # Update uniforms for both shaders
+        for shader in [self.shader_model, self.shader_lines]:
+            shader.bind()
+            shader.uniform1f("opacity", self.opacity)
+            shader.uniformBuffer("transformBuffer", self.buffer_manager.transform_texture, unit=0)
+            shader.uniformBuffer("settingsBuffer", self.buffer_manager.settings_texture, unit=1)
+            shader.uniform4x4("viewworld", viewworld)
+            shader.uniform1i("is_instance", is_instance)
+            shader.release()
 
-        self.shader_model.uniform4x4("viewworld", viewworld)
-        self.shader_model.uniform1i("is_instance", is_instance)
+        self.shader_lines.bind()
+        self.shader_lines.uniform2f("viewport", (self.width(), self.height()))
+        self.shader_lines.release()
 
         if self.viewer.config.renderer.show_grid:
+            self.shader_model.bind()
             self.grid.draw(self.shader_model)
+            self.shader_model.release()
 
         # Draw all the objects in the buffer manager
         self.buffer_manager.draw(
             self.shader_model,
+            self.shader_lines,
             self.rendermode,
             is_instance=is_instance,
         )
@@ -531,7 +557,6 @@ class Renderer(QOpenGLWidget):
         tag_objs = [obj for obj in self.viewer.scene.objects if isinstance(obj, TagObject)]
         if tag_objs:
             # release the model shader and bind the tag shader
-            self.shader_model.release()
             self.shader_tag.bind()
             self.shader_tag.uniform4x4("viewworld", viewworld)
             for obj in tag_objs:
@@ -554,6 +579,7 @@ class Renderer(QOpenGLWidget):
                 self.width(),
                 self.height(),
             )
+            self.shader_model.release()
 
         # Unbind once we're done
         GL.glBindVertexArray(0)

@@ -95,7 +95,7 @@ class BufferManager:
         obj_settings = [
             [obj.show, obj.show_points, obj.show_lines, obj.show_faces],  # Row 1
             [*instance_color, obj.is_selected],  # Row 2
-            [parent_index, obj.opacity, obj.pointsize, 0.0],  # Row 3: parent index and padding
+            [parent_index, obj.opacity, obj.pointsize, getattr(obj, "linewidth", 1.0)],  # Row 3
         ]
         self.settings.append(obj_settings)
 
@@ -177,13 +177,15 @@ class BufferManager:
                 else:
                     self.buffer_ids[buffer_type]["elements"] = make_index_buffer(self.elements[buffer_type])
 
-    def draw(self, shader: Shader, rendermode: str, is_instance: bool = False) -> None:
+    def draw(self, shader: Shader, line_shader: Shader, rendermode: str, is_instance: bool = False) -> None:
         """Draw all objects using the combined buffers.
 
         Parameters
         ----------
         shader : Shader
             The shader to use for rendering.
+        line_shader : Shader
+            The shader to use for rendering lines.
         rendermode : str
             The rendering mode to use, either "wireframe", "lighted", or "ghosted".
         is_instance : bool
@@ -197,6 +199,7 @@ class BufferManager:
         for obj in self.objects:
             self.update_object_settings(obj)
 
+        shader.bind()
         shader.uniform1i("is_grid", False)
         shader.enable_attribute("position")
         shader.enable_attribute("color")
@@ -218,15 +221,26 @@ class BufferManager:
                         shader.draw_triangles(elements=self.buffer_ids[face_type]["elements_transparent"], n=len(self.elements[face_type + "_transparent"]))
 
         # Draw lines
-        shader.uniform1i("is_lighted", False)
-        shader.uniform1i("element_type", 1)
+        GL.glDisable(GL.GL_CULL_FACE)
+        line_shader.bind()
+        line_shader.uniform1i("is_lighted", False)
+        line_shader.uniform1i("element_type", 1)
         if self.buffer_ids["_lines_data"]:
-            shader.bind_attribute("position", self.buffer_ids["_lines_data"]["positions"])
-            shader.bind_attribute("color", self.buffer_ids["_lines_data"]["colors"], step=4)
-            shader.bind_attribute("object_index", self.buffer_ids["_lines_data"]["object_indices"], step=1)
-            shader.draw_lines(elements=self.buffer_ids["_lines_data"]["elements"], n=len(self.elements["_lines_data"]), width=1.0)
+            line_shader.enable_attribute("position")
+            line_shader.enable_attribute("color")
+            line_shader.enable_attribute("object_index")
+            line_shader.bind_attribute("position", self.buffer_ids["_lines_data"]["positions"])
+            line_shader.bind_attribute("color", self.buffer_ids["_lines_data"]["colors"], step=4)
+            line_shader.bind_attribute("object_index", self.buffer_ids["_lines_data"]["object_indices"], step=1)
+            line_shader.draw_lines(elements=self.buffer_ids["_lines_data"]["elements"], n=len(self.elements["_lines_data"]))
+            line_shader.disable_attribute("object_index")
+            line_shader.disable_attribute("position")
+            line_shader.disable_attribute("color")
+        line_shader.release()
+        GL.glEnable(GL.GL_CULL_FACE)
 
         # Draw points
+        shader.bind()
         shader.uniform1i("element_type", 0)
         if self.buffer_ids["_points_data"]:
             shader.bind_attribute("position", self.buffer_ids["_points_data"]["positions"])
@@ -253,6 +267,7 @@ class BufferManager:
         shader.disable_attribute("object_index")
         shader.disable_attribute("position")
         shader.disable_attribute("color")
+        shader.release()
 
     def clear(self) -> None:
         """Clear all buffer data."""
@@ -351,7 +366,7 @@ class BufferManager:
         obj_settings = [
             [obj.show, obj.show_points, obj.show_lines, obj.show_faces],  # Row 1
             [*instance_color, obj.is_selected],  # Row 2
-            [parent_index, obj.opacity, obj.pointsize, 0.0],  # Row 3: parent index and padding
+            [parent_index, obj.opacity, obj.pointsize, getattr(obj, "linewidth", 1.0)],  # Row 3: parent index and padding
         ]
         index = self.objects[obj]
         self.settings[index] = obj_settings

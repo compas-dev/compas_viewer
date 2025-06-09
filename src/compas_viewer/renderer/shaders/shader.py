@@ -66,6 +66,19 @@ class Shader:
         location = GL.glGetUniformLocation(self.program, name)
         GL.glUniform3f(location, *value)
 
+    def uniform2f(self, name: str, value: Union[tuple[float, float], list[float]]):
+        """Store a uniform list of 2 floats in the shader program at a named location.
+
+        Parameters
+        ----------
+        name : str
+            The name of the location in the shader program.
+        value : Union[tuple[float, float], list[float]]
+            An iterable of 2 floats.
+        """
+        location = GL.glGetUniformLocation(self.program, name)
+        GL.glUniform2f(location, *value)
+
     def uniformText(self, name: str, texture: Any):
         """Store a uniform texture in the shader program at a named location.
 
@@ -357,6 +370,7 @@ def make_shader_program(name: str):
     """
     vsource = Path(Path(__file__).parent, f"{name}.vert")
     fsource = Path(Path(__file__).parent, f"{name}.frag")
+    gsource = Path(Path(__file__).parent, f"{name}.geom")
 
     with open(vsource, "r") as f:
         vertex = compile_vertex_shader(f.read())
@@ -364,9 +378,16 @@ def make_shader_program(name: str):
     with open(fsource, "r") as f:
         fragment = compile_fragment_shader(f.read())
 
+    geometry = None
+    if gsource.exists():
+        with open(gsource, "r") as f:
+            geometry = compile_geometry_shader(f.read())
+
     program = GL.glCreateProgram()
     GL.glAttachShader(program, vertex)
     GL.glAttachShader(program, fragment)
+    if geometry:
+        GL.glAttachShader(program, geometry)
     GL.glLinkProgram(program)
     GL.glValidateProgram(program)
     result = GL.glGetProgramiv(program, GL.GL_LINK_STATUS)
@@ -374,6 +395,8 @@ def make_shader_program(name: str):
         raise RuntimeError(GL.glGetProgramInfoLog(program))
     GL.glDeleteShader(vertex)
     GL.glDeleteShader(fragment)
+    if geometry:
+        GL.glDeleteShader(geometry)
     return program
 
 
@@ -391,6 +414,17 @@ def compile_vertex_shader(source: str):
 def compile_fragment_shader(source: str):
     """Compile a fragment shader."""
     shader = GL.glCreateShader(GL.GL_FRAGMENT_SHADER)
+    GL.glShaderSource(shader, source)
+    GL.glCompileShader(shader)
+    result = GL.glGetShaderiv(shader, GL.GL_COMPILE_STATUS)
+    if not result:
+        raise RuntimeError(GL.glGetShaderInfoLog(shader))
+    return shader
+
+
+def compile_geometry_shader(source: str):
+    """Compile a geometry shader."""
+    shader = GL.glCreateShader(GL.GL_GEOMETRY_SHADER)
     GL.glShaderSource(shader, source)
     GL.glCompileShader(shader)
     result = GL.glGetShaderiv(shader, GL.GL_COMPILE_STATUS)
