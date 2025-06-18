@@ -152,6 +152,7 @@ class ViewerScene(Scene):
         :class:`compas_viewer.scene.ViewerSceneObject`
             The scene object.
         """
+        edgecolor = kwargs.pop("edgecolor", linecolor)
 
         sceneobject: ViewerSceneObject = super().add(  # type: ignore
             item=item,
@@ -164,7 +165,7 @@ class ViewerScene(Scene):
             pointcolor=pointcolor,
             vertexcolor=vertexcolor or pointcolor,
             linecolor=linecolor,
-            edgecolor=linecolor,
+            edgecolor=edgecolor,
             facecolor=facecolor,
             surfacecolor=surfacecolor or facecolor,
             linewidth=linewidth,
