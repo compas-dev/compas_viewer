@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from dataclasses import field
 from dataclasses import is_dataclass
 from typing import Literal
+from typing import Optional
 
 from PySide6.QtCore import QUrl
 from PySide6.QtGui import QDesktopServices
@@ -59,7 +60,7 @@ class ConfigBase:
             field_type = self.__annotations__[field_name]
             if isinstance(field_value, dict) and is_dataclass(field_type):
                 # Convert dict to dataclass if the field type is a dataclass
-                setattr(self, field_name, field_type(**field_value))
+                setattr(self, field_name, field_type(**field_value))  # type: ignore
             elif isinstance(field_value, dict) and not is_dataclass(field_type):
                 raise ValueError(f"Expected dataclass type for field '{field_name}' but got dict.")
 
@@ -109,113 +110,112 @@ class ToolbarConfig(ConfigBase):
 @dataclass
 class MenubarConfig(ConfigBase):
     show: bool = True
-    items: list[dict] = field(
-        default_factory=lambda: [
-            {
-                "title": "View",
-                "items": [
-                    {"title": toggle_toolbar_cmd.title, "type": "checkbox", "checked": lambda viewer: viewer.config.ui.toolbar.show, "action": toggle_toolbar_cmd},
-                    {"title": toggle_sidebar_cmd.title, "type": "checkbox", "checked": lambda viewer: viewer.config.ui.sidebar.show, "action": toggle_sidebar_cmd},
-                    {"title": toggle_sidedock_cmd.title, "type": "checkbox", "checked": lambda viewer: viewer.config.ui.sidedock.show, "action": toggle_sidedock_cmd},
-                    {"title": toggle_statusbar_cmd.title, "type": "checkbox", "checked": lambda viewer: viewer.config.ui.statusbar.show, "action": toggle_statusbar_cmd},
-                    {"type": "separator"},
-                    {
-                        "title": "Set Render Mode",
-                        "type": "group",
-                        "exclusive": True,
-                        "selected": 0,
-                        "items": [
-                            {"title": "Shaded", "action": change_rendermode_cmd, "kwargs": {"mode": "shaded"}},
-                            {"title": "Ghosted", "action": change_rendermode_cmd, "kwargs": {"mode": "ghosted"}},
-                            {"title": "Lighted", "action": change_rendermode_cmd, "kwargs": {"mode": "lighted"}},
-                            {"title": "Wireframe", "action": change_rendermode_cmd, "kwargs": {"mode": "wireframe"}},
-                        ],
-                    },
-                    {
-                        "title": "Set Current View",
-                        "type": "group",
-                        "exclusive": True,
-                        "checked": 0,
-                        "items": [
-                            {"title": "Perspective", "action": change_view_cmd, "kwargs": {"mode": "perspective"}},
-                            {"title": "Top", "action": change_view_cmd, "kwargs": {"mode": "top"}},
-                            {"title": "Front", "action": change_view_cmd, "kwargs": {"mode": "front"}},
-                            {"title": "Right", "action": change_view_cmd, "kwargs": {"mode": "right"}},
-                            {"title": "Ortho", "action": change_view_cmd, "kwargs": {"mode": "ortho"}},
-                        ],
-                    },
-                    {"type": "separator"},
-                    {"title": camera_settings_cmd.title, "action": camera_settings_cmd},
-                    {"title": "Display Settings", "action": lambda: print("Display Settings")},
-                    {"title": capture_view_cmd.title, "action": capture_view_cmd},
-                    {"type": "separator"},
-                ],
-            },
-            {
-                "title": "Edit",
-                "items": [],
-            },
-            {
-                "title": "Select",
-                "items": [
-                    {"title": select_all_cmd.title, "action": select_all_cmd},
-                    {"title": "Invert Selection", "action": lambda: print("invert selection")},
-                    {"type": "separator"},
-                    {"title": deselect_all_cmd.title, "action": deselect_all_cmd},
-                ],
-            },
-            {
-                "title": "Scene",
-                "items": [
-                    {"title": clear_scene_cmd.title, "action": clear_scene_cmd},
-                    {"type": "separator"},
-                    {"title": load_scene_cmd.title, "action": load_scene_cmd},
-                    {"title": save_scene_cmd.title, "action": save_scene_cmd},
-                ],
-            },
-            {
-                "title": "Data",
-                "items": [
-                    {"title": "From JSON", "action": lambda: print("From JSON")},
-                    {"type": "separator"},
-                    {
-                        "title": "Geometry",
-                        "items": [
-                            {"title": "Geometry From OBJ", "action": lambda: print("From OBJ")},
-                            {"title": "Geometry From OFF", "action": lambda: print("From OFF")},
-                            {"title": "Geometry From STP", "action": lambda: print("From STP")},
-                            {"title": "Geometry From STL", "action": lambda: print("From STL")},
-                        ],
-                    },
-                    {
-                        "title": "Pointcloud",
-                        "items": [],
-                    },
-                ],
-            },
-            {
-                "title": "Info",
-                "items": [
-                    {"title": "Selected obj info", "action": obj_settings_cmd},
-                ],
-            },
-            {
-                "title": "Server/Session",
-                "items": [],
-            },
-            {
-                "title": "Help",
-                "items": [
-                    {"title": "Viewer Docs", "action": lambda: QDesktopServices.openUrl(QUrl("https://compas.dev/compas_viewer"))},
-                    {"title": "Viewer Github", "action": lambda: QDesktopServices.openUrl(QUrl("https://github.com/compas-dev/compas_viewer"))},
-                    {"type": "separator"},
-                    {"title": "COMPAS Home", "action": lambda: QDesktopServices.openUrl(QUrl("https://compas.dev/"))},
-                    {"title": "COMPAS Docs", "action": lambda: QDesktopServices.openUrl(QUrl("https://compas.dev/compas"))},
-                    {"title": "COMPAS Github", "action": lambda: QDesktopServices.openUrl(QUrl("https://github.com/compas-dev/compas"))},
-                ],
-            },
-        ]
-    )
+    _items = [
+        {
+            "title": "View",
+            "items": [
+                {"title": toggle_toolbar_cmd.title, "type": "checkbox", "checked": lambda viewer: viewer.config.ui.toolbar.show, "action": toggle_toolbar_cmd},
+                {"title": toggle_sidebar_cmd.title, "type": "checkbox", "checked": lambda viewer: viewer.config.ui.sidebar.show, "action": toggle_sidebar_cmd},
+                {"title": toggle_sidedock_cmd.title, "type": "checkbox", "checked": lambda viewer: viewer.config.ui.sidedock.show, "action": toggle_sidedock_cmd},
+                {"title": toggle_statusbar_cmd.title, "type": "checkbox", "checked": lambda viewer: viewer.config.ui.statusbar.show, "action": toggle_statusbar_cmd},
+                {"type": "separator"},
+                {
+                    "title": "Set Render Mode",
+                    "type": "group",
+                    "exclusive": True,
+                    "selected": 0,
+                    "items": [
+                        {"title": "Shaded", "action": change_rendermode_cmd, "kwargs": {"mode": "shaded"}},
+                        {"title": "Ghosted", "action": change_rendermode_cmd, "kwargs": {"mode": "ghosted"}},
+                        {"title": "Lighted", "action": change_rendermode_cmd, "kwargs": {"mode": "lighted"}},
+                        {"title": "Wireframe", "action": change_rendermode_cmd, "kwargs": {"mode": "wireframe"}},
+                    ],
+                },
+                {
+                    "title": "Set Current View",
+                    "type": "group",
+                    "exclusive": True,
+                    "checked": 0,
+                    "items": [
+                        {"title": "Perspective", "action": change_view_cmd, "kwargs": {"mode": "perspective"}},
+                        {"title": "Top", "action": change_view_cmd, "kwargs": {"mode": "top"}},
+                        {"title": "Front", "action": change_view_cmd, "kwargs": {"mode": "front"}},
+                        {"title": "Right", "action": change_view_cmd, "kwargs": {"mode": "right"}},
+                        {"title": "Ortho", "action": change_view_cmd, "kwargs": {"mode": "ortho"}},
+                    ],
+                },
+                {"type": "separator"},
+                {"title": camera_settings_cmd.title, "action": camera_settings_cmd},
+                {"title": "Display Settings", "action": lambda: print("Display Settings")},
+                {"title": capture_view_cmd.title, "action": capture_view_cmd},
+                {"type": "separator"},
+            ],
+        },
+        # {
+        #     "title": "Edit",
+        #     "items": [],
+        # },
+        {
+            "title": "Select",
+            "items": [
+                {"title": select_all_cmd.title, "action": select_all_cmd},
+                {"title": "Invert Selection", "action": lambda: print("invert selection")},
+                {"type": "separator"},
+                {"title": deselect_all_cmd.title, "action": deselect_all_cmd},
+            ],
+        },
+        {
+            "title": "Scene",
+            "items": [
+                {"title": clear_scene_cmd.title, "action": clear_scene_cmd},
+                {"type": "separator"},
+                {"title": load_scene_cmd.title, "action": load_scene_cmd},
+                {"title": save_scene_cmd.title, "action": save_scene_cmd},
+            ],
+        },
+        # {
+        #     "title": "Data",
+        #     "items": [
+        #         {"title": "From JSON", "action": lambda: print("From JSON")},
+        #         {"type": "separator"},
+        #         {
+        #             "title": "Geometry",
+        #             "items": [
+        #                 {"title": "Geometry From OBJ", "action": lambda: print("From OBJ")},
+        #                 {"title": "Geometry From OFF", "action": lambda: print("From OFF")},
+        #                 {"title": "Geometry From STP", "action": lambda: print("From STP")},
+        #                 {"title": "Geometry From STL", "action": lambda: print("From STL")},
+        #             ],
+        #         },
+        #         {
+        #             "title": "Pointcloud",
+        #             "items": [],
+        #         },
+        #     ],
+        # },
+        # {
+        #     "title": "Info",
+        #     "items": [
+        #         {"title": "Selected obj info", "action": obj_settings_cmd},
+        #     ],
+        # },
+        # {
+        #     "title": "Server/Session",
+        #     "items": [],
+        # },
+        {
+            "title": "Help",
+            "items": [
+                {"title": "Viewer Docs", "action": lambda: QDesktopServices.openUrl(QUrl("https://compas.dev/compas_viewer"))},
+                {"title": "Viewer Github", "action": lambda: QDesktopServices.openUrl(QUrl("https://github.com/compas-dev/compas_viewer"))},
+                {"type": "separator"},
+                {"title": "COMPAS Home", "action": lambda: QDesktopServices.openUrl(QUrl("https://compas.dev/"))},
+                {"title": "COMPAS Docs", "action": lambda: QDesktopServices.openUrl(QUrl("https://compas.dev/compas"))},
+                {"title": "COMPAS Github", "action": lambda: QDesktopServices.openUrl(QUrl("https://github.com/compas-dev/compas"))},
+            ],
+        },
+    ]
+    items: list[dict] = field(default_factory=lambda: MenubarConfig._items)
 
 
 # =============================================================================
@@ -230,7 +230,7 @@ class MenubarConfig(ConfigBase):
 @dataclass
 class StatusbarConfig(ConfigBase):
     show: bool = True
-    items: list[dict[str, str]] = None
+    items: Optional[list[dict[str, str]]] = None
 
 
 # =============================================================================
@@ -284,7 +284,7 @@ class SidebarConfig(ConfigBase):
 @dataclass
 class SidedockConfig(ConfigBase):
     show: bool = False
-    items: list[dict[str, str]] = None
+    items: Optional[list[dict[str, str]]] = None
 
 
 # =============================================================================
