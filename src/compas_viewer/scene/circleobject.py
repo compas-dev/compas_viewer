@@ -1,5 +1,3 @@
-from typing import Optional
-
 from compas.geometry import Circle
 from compas.geometry import Line
 from compas.geometry import Point
@@ -17,13 +15,9 @@ class CircleObject(GeometryObject):
         self.show_lines = True
 
     @property
-    def points(self) -> Optional[list[Point]]:
+    def points(self) -> list[Point]:
         return [self.geometry.center]
 
     @property
-    def lines(self) -> Optional[list[Line]]:
+    def lines(self) -> list[Line]:
         return self.geometry.to_polyline(n=self.u).lines
-
-    @property
-    def viewmesh(self):
-        return None

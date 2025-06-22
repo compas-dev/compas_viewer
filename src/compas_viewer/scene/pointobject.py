@@ -1,6 +1,3 @@
-from typing import Optional
-
-from compas.geometry import Line
 from compas.geometry import Point
 
 from .geometryobject import GeometryObject
@@ -16,13 +13,5 @@ class PointObject(GeometryObject):
         self.show_points = True
 
     @property
-    def points(self) -> Optional[list[Point]]:
+    def points(self) -> list[Point]:
         return [self.geometry]
-
-    @property
-    def lines(self) -> Optional[list[Line]]:
-        return None
-
-    @property
-    def viewmesh(self):
-        return None

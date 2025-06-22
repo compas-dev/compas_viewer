@@ -62,9 +62,6 @@ class VectorObject(ViewerSceneObject, GeometryObject):
 
         self._arrow_colors = [self.linecolor or self.viewer.config.ui.display.linecolor] * len(self._arrow_vertices)
 
-    def _read_points_data(self) -> None:
-        pass
-
     def _read_lines_data(self) -> ShaderDataType:
         positions = self._arrow_vertices
         colors = self._arrow_colors
@@ -76,9 +73,6 @@ class VectorObject(ViewerSceneObject, GeometryObject):
         colors = self._arrow_colors
         elements = self.ARROW_FACE_INDICES
         return positions, colors, elements
-
-    def _read_backfaces_data(self) -> None:
-        pass
 
     def init(self):
         self._calculate_arrow_buffer_data()

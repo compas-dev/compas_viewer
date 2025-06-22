@@ -38,9 +38,3 @@ class GraphObject(ViewerSceneObject, BaseGraphObject):
             elements.append([i + 0, i + 1])
             i += 2
         return positions, colors, elements
-
-    def _read_frontfaces_data(self):
-        pass
-
-    def _read_backfaces_data(self):
-        pass

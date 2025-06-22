@@ -1,6 +1,3 @@
-from typing import Optional
-
-from compas.datastructures import Mesh
 from compas.geometry import Line
 from compas.geometry import Point
 from compas.geometry import Polygon
@@ -15,16 +12,16 @@ class PolygonObject(GeometryObject):
     geometry: Polygon
 
     @property
-    def points(self) -> Optional[list[Point]]:
+    def points(self) -> list[Point]:
         return self.geometry.points
 
     @property
-    def lines(self) -> Optional[list[Line]]:
+    def lines(self) -> list[Line]:
         return self.geometry.lines
 
     @property
-    def viewmesh(self):
+    def viewmesh(self) -> tuple[list[Point], list[list[int]]]:
         vertices = self.geometry.points
         faces = [list(range(len(vertices)))]
         faces = earclip_polygon(self.geometry)
-        return Mesh.from_vertices_and_faces(vertices, faces)
+        return vertices, faces

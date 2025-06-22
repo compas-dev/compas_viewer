@@ -1,6 +1,5 @@
 from typing import Optional
 
-from compas.datastructures import Mesh
 from compas.geometry import Line
 from compas.geometry import NurbsCurve
 from compas.geometry import Point
@@ -25,7 +24,3 @@ class NurbsCurveObject(GeometryObject):
         for pair in pairwise(polyline.points):
             lines.append(Line(*pair))
         return lines
-
-    @property
-    def viewmesh(self) -> Optional[Mesh]:
-        pass

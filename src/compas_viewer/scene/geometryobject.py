@@ -1,10 +1,8 @@
+from typing import Iterable
 from typing import Optional
 
 from compas.colors import Color
-from compas.datastructures import Mesh
 from compas.geometry import Geometry
-from compas.geometry import Line
-from compas.geometry import Point
 from compas.itertools import flatten
 from compas.scene import GeometryObject as BaseGeometryObject
 from compas.scene.descriptors.color import ColorAttribute
@@ -74,16 +72,16 @@ class GeometryObject(ViewerSceneObject, BaseGeometryObject):
         self.surfacecolor = color
 
     @property
-    def points(self) -> Optional[list[Point]]:
-        raise NotImplementedError
+    def points(self) -> Optional[list[Iterable[float]]]:
+        return None
 
     @property
-    def lines(self) -> Optional[list[Line]]:
-        raise NotImplementedError
+    def lines(self) -> Optional[list[Iterable[Iterable[float]]]]:
+        return None
 
     @property
-    def viewmesh(self) -> Mesh:
-        raise NotImplementedError
+    def viewmesh(self) -> Optional[tuple[list[Iterable[float]], list[Iterable[int]]]]:
+        return None
 
     def _read_points_data(self) -> ShaderDataType:
         if self.points is None:
@@ -106,14 +104,14 @@ class GeometryObject(ViewerSceneObject, BaseGeometryObject):
     def _read_frontfaces_data(self) -> ShaderDataType:
         if self.viewmesh is None:
             return [], [], []
-        positions, elements = self.viewmesh.to_vertices_and_faces()
+        positions, elements = self.viewmesh
         colors = [self.facecolor] * len(positions)
         return positions, colors, elements  # type: ignore
 
     def _read_backfaces_data(self) -> ShaderDataType:
         if self.viewmesh is None:
             return [], [], []
-        positions, elements = self.viewmesh.to_vertices_and_faces()
+        positions, elements = self.viewmesh
         for element in elements:
             element.reverse()
         colors = [self.facecolor] * len(positions)

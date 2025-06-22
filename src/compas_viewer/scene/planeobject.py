@@ -1,7 +1,4 @@
-from typing import Optional
-
-from compas.datastructures import Mesh
-from compas.geometry import Line
+from compas.geometry import Frame
 from compas.geometry import Plane
 from compas.geometry import Point
 
@@ -27,30 +24,26 @@ class PlaneObject(GeometryObject):
         super().__init__(**kwargs)
         self.planesize = planesize
 
-        self.vertices = [
-            Point(*self.frame.to_world_coordinates([-self.planesize, -self.planesize, 0])),
-            Point(*self.frame.to_world_coordinates([self.planesize, -self.planesize, 0])),
-            Point(*self.frame.to_world_coordinates([self.planesize, self.planesize, 0])),
-            Point(*self.frame.to_world_coordinates([-self.planesize, self.planesize, 0])),
-        ]
-
     @property
     def plane(self) -> Plane:
         return self.item
 
     @property
-    def points(self) -> Optional[list[Point]]:
-        return None
+    def points(self) -> list[Point]:
+        return [self.plane.point]
 
     @property
-    def lines(self) -> Optional[list[Line]]:
-        return [
-            Line(
-                Point(*self.frame.to_world_coordinates([0, 0, 0])),
-                Point(*self.frame.to_world_coordinates([0, 0, self.planesize])),
-            )
+    def lines(self) -> list[list[Point]]:
+        frame = Frame.from_plane(self.plane)
+        return [[frame.to_world_coordinates([0, 0, 0]), frame.to_world_coordinates([0, 0, self.planesize])]]
+
+    @property
+    def viewmesh(self) -> tuple[list[Point], list[list[int]]]:
+        frame = Frame.from_plane(self.plane)
+        vertices = [
+            frame.to_world_coordinates([-self.planesize, -self.planesize, 0]),
+            frame.to_world_coordinates([self.planesize, -self.planesize, 0]),
+            frame.to_world_coordinates([self.planesize, self.planesize, 0]),
+            frame.to_world_coordinates([-self.planesize, self.planesize, 0]),
         ]
-
-    @property
-    def viewmesh(self) -> Mesh:
-        return Mesh.from_vertices_and_faces(self.vertices, [[0, 1, 2], [0, 2, 3]])
+        return vertices, [[0, 1, 2], [0, 2, 3]]

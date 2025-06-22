@@ -16,11 +16,3 @@ class PointcloudObject(GeometryObject):
     @property
     def points(self) -> list[Point]:
         return self.geometry.points
-
-    @property
-    def lines(self) -> None:
-        return None
-
-    @property
-    def viewmesh(self):
-        return None

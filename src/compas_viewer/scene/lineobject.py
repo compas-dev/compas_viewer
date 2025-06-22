@@ -22,7 +22,3 @@ class LineObject(GeometryObject):
     @property
     def lines(self) -> Optional[list[Line]]:
         return [self.geometry]
-
-    @property
-    def viewmesh(self):
-        return None

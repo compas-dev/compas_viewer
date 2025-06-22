@@ -28,7 +28,7 @@ class FrameObject(ViewerSceneObject):
 
     Attributes
     ----------
-    frame : :class:`compas.geometry.Frame`
+    geometry : :class:`compas.geometry.Frame`
         The frame geometry.
     dx : float
         The size of the grid in the X direction.
@@ -46,16 +46,14 @@ class FrameObject(ViewerSceneObject):
     :class:`compas.geometry.Frame`
     """
 
+    item: Frame
+
     def __init__(self, size: Optional[float] = 1, **kwargs):
         super().__init__(**kwargs)
         self.size = size
 
-    @property
-    def frame(self):
-        return self.item
-
     def _read_lines_data(self) -> ShaderDataType:
-        trans = Transformation.from_frame_to_frame(Frame.worldXY(), self.frame)
+        trans = Transformation.from_frame_to_frame(Frame.worldXY(), self.item)
 
         positions = []
         colors = []
@@ -83,12 +81,3 @@ class FrameObject(ViewerSceneObject):
         elements.append([4, 5])
 
         return positions, colors, elements
-
-    def _read_points_data(self) -> Optional[ShaderDataType]:
-        return None
-
-    def _read_frontfaces_data(self) -> Optional[ShaderDataType]:
-        return None
-
-    def _read_backfaces_data(self) -> Optional[ShaderDataType]:
-        return None
