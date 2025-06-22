@@ -151,58 +151,6 @@ class MenubarConfig(ConfigBase):
                 {"type": "separator"},
             ],
         },
-        # {
-        #     "title": "Edit",
-        #     "items": [],
-        # },
-        {
-            "title": "Select",
-            "items": [
-                {"title": select_all_cmd.title, "action": select_all_cmd},
-                {"title": "Invert Selection", "action": lambda: print("invert selection")},
-                {"type": "separator"},
-                {"title": deselect_all_cmd.title, "action": deselect_all_cmd},
-            ],
-        },
-        {
-            "title": "Scene",
-            "items": [
-                {"title": clear_scene_cmd.title, "action": clear_scene_cmd},
-                {"type": "separator"},
-                {"title": load_scene_cmd.title, "action": load_scene_cmd},
-                {"title": save_scene_cmd.title, "action": save_scene_cmd},
-            ],
-        },
-        # {
-        #     "title": "Data",
-        #     "items": [
-        #         {"title": "From JSON", "action": lambda: print("From JSON")},
-        #         {"type": "separator"},
-        #         {
-        #             "title": "Geometry",
-        #             "items": [
-        #                 {"title": "Geometry From OBJ", "action": lambda: print("From OBJ")},
-        #                 {"title": "Geometry From OFF", "action": lambda: print("From OFF")},
-        #                 {"title": "Geometry From STP", "action": lambda: print("From STP")},
-        #                 {"title": "Geometry From STL", "action": lambda: print("From STL")},
-        #             ],
-        #         },
-        #         {
-        #             "title": "Pointcloud",
-        #             "items": [],
-        #         },
-        #     ],
-        # },
-        # {
-        #     "title": "Info",
-        #     "items": [
-        #         {"title": "Selected obj info", "action": obj_settings_cmd},
-        #     ],
-        # },
-        # {
-        #     "title": "Server/Session",
-        #     "items": [],
-        # },
         {
             "title": "Help",
             "items": [
@@ -229,7 +177,7 @@ class MenubarConfig(ConfigBase):
 
 @dataclass
 class StatusbarConfig(ConfigBase):
-    show: bool = True
+    show: bool = False
     items: Optional[list[dict[str, str]]] = None
 
 
