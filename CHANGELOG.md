@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 * Made `linewidth` working again through `GeometryShader`.
+* Fixed a bug of viewer crashing with empty scene.
 
 ### Removed
 
