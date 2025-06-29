@@ -163,10 +163,20 @@ class BufferManager:
     def create_buffers(self) -> None:
         """Create OpenGL buffers from the collected data."""
         # Create transform buffer and texture
-        transforms_array = np.array(self.transforms, dtype=np.float32)
+        if len(self.transforms) > 0:
+            transforms_array = np.array(self.transforms, dtype=np.float32)
+        else:
+            # Create a dummy transform matrix for empty scenes
+            transforms_array = np.identity(4, dtype=np.float32).flatten().reshape(1, -1)
         self.transform_texture = make_texture_buffer(transforms_array)
 
-        settings_array = np.array(self.settings, dtype=np.float32)
+        if len(self.settings) > 0:
+            settings_array = np.array(self.settings, dtype=np.float32)
+        else:
+            # Create dummy settings for empty scenes
+            # Format: [show, show_points, show_lines, show_faces], [r, g, b, is_selected], [parent_index, opacity, pointsize, linewidth]
+            dummy_settings = [[[False, False, False, False], [0.0, 0.0, 0.0, False], [-1.0, 1.0, 1.0, 1.0]]]
+            settings_array = np.array(dummy_settings, dtype=np.float32)
         self.settings_texture = make_texture_buffer(settings_array)
 
         for buffer_type in self.positions:
@@ -239,6 +249,11 @@ class BufferManager:
         is_wireframe = rendermode == "wireframe"
         is_lighted = rendermode == "lighted"
         is_ghosted = rendermode == "ghosted"
+
+        has_geometry = any(self.buffer_ids[buffer_type] for buffer_type in ["_points_data", "_frontfaces_data", "_backfaces_data", "_lines_data"])
+
+        if not has_geometry:
+            return
 
         # Draw opaque elements
         shader.bind()
