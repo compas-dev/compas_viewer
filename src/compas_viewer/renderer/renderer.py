@@ -621,8 +621,8 @@ class Renderer(QOpenGLWidget):
         self.shader_lines.uniform2f("viewport", (self.width(), self.height()))
         self.shader_lines.release()
 
-        # Draw the grid
-        if self.viewer.config.renderer.show_grid:
+        # Draw the grid (skip during instance rendering since grid doesn't have instance colors)
+        if self.viewer.config.renderer.show_grid and not is_instance:
             self.shader_model.bind()
             self.grid.draw(self.shader_model)
             self.shader_model.release()
