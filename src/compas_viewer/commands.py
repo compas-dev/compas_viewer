@@ -409,11 +409,12 @@ def delete_selected():
 
 def clear_scene(viewer: "Viewer"):
     for obj in viewer.scene.objects:
-        viewer.scene.remove(obj)
+        viewer.scene.remove(obj, rebuild_buffers=False)
         del obj
 
-    viewer.ui.sidebar.update()
+    viewer.renderer.rebuild_buffers()
     viewer.renderer.update()
+    viewer.ui.sidebar.update()
 
 
 clear_scene_cmd = Command(title="Clear Scene", callback=clear_scene)
@@ -431,7 +432,9 @@ def load_scene(viewer: "Viewer"):
     clear_scene(viewer)
 
     viewer.scene = scene
+    viewer.renderer.rebuild_buffers()
     viewer.renderer.update()
+    viewer.ui.sidebar.update()
 
 
 load_scene_cmd = Command(title="Load Scene", callback=load_scene)

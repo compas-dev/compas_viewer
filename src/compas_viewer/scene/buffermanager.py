@@ -275,10 +275,32 @@ class BufferManager:
 
     def clear(self) -> None:
         """Clear all buffer data."""
+        # Delete OpenGL buffers before clearing references
+        for buffer_type in self.buffer_ids:
+            if self.buffer_ids[buffer_type]:
+                buffer_ids_to_delete = []
+                for buffer_name, buffer_id in self.buffer_ids[buffer_type].items():
+                    buffer_ids_to_delete.append(buffer_id)
+                if buffer_ids_to_delete:
+                    GL.glDeleteBuffers(len(buffer_ids_to_delete), buffer_ids_to_delete)
+
+        # Delete OpenGL textures
+        if hasattr(self, "transform_texture"):
+            GL.glDeleteTextures(1, [self.transform_texture])
+            delattr(self, "transform_texture")
+        if hasattr(self, "settings_texture"):
+            GL.glDeleteTextures(1, [self.settings_texture])
+            delattr(self, "settings_texture")
+
+        # Clear numpy arrays and dictionaries
         for buffer_type in self.positions:
             self.positions[buffer_type] = np.array([], dtype=np.float32)
             self.colors[buffer_type] = np.array([], dtype=np.float32)
             self.elements[buffer_type] = np.array([], dtype=np.int32)
+            # Clear transparent elements for face data types
+            if buffer_type == "_frontfaces_data" or buffer_type == "_backfaces_data":
+                self.elements[buffer_type + "_transparent"] = np.array([], dtype=np.int32)
+            self.object_indices[buffer_type] = np.array([], dtype=np.float32)
             self.buffer_ids[buffer_type] = {}
 
         self.objects = {}

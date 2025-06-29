@@ -207,7 +207,7 @@ class ViewerScene(Scene):
         self.add(group, parent=parent)
         return group
 
-    def remove(self, sceneobject: ViewerSceneObject):
+    def remove(self, sceneobject: ViewerSceneObject, rebuild_buffers: bool = True):
         """
         Remove an scene object from the scene.
 
@@ -215,10 +215,13 @@ class ViewerScene(Scene):
         ----------
         sceneobject : :class:`compas_viewer.scene.ViewerSceneObject`
             The scene object to remove.
+        rebuild_buffers : bool, optional
+            Whether to rebuild the buffers.
+            Default to True.
         """
         super().remove(sceneobject)
 
-        if self.viewer.running:
+        if self.viewer.running and rebuild_buffers:
             self.viewer.renderer.rebuild_buffers()
             self.viewer.renderer.update()
             self.viewer.ui.sidebar.update()
