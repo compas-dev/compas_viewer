@@ -438,9 +438,9 @@ class Renderer(QOpenGLWidget):
                 if url.isLocalFile() and url.toLocalFile().lower().endswith(".json"):
                     filepath = url.toLocalFile()
                     # Import here to avoid circular imports
-                    from compas_viewer.commands import load_scene_from_file
+                    from compas_viewer.commands import load_from_file
 
-                    success = load_scene_from_file(self.viewer, filepath)
+                    success = load_from_file(self.viewer, filepath)
                     if success:
                         print(f"Successfully loaded scene from: {filepath}")
                         event.acceptProposedAction()

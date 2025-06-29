@@ -16,6 +16,8 @@ from PySide6.QtGui import QMouseEvent
 from PySide6.QtGui import QWheelEvent
 from PySide6.QtWidgets import QApplication
 from PySide6.QtWidgets import QFileDialog
+from compas.geometry import Geometry
+from compas.datastructures import Datastructure
 
 import compas
 from compas.scene import Scene
@@ -420,8 +422,8 @@ def clear_scene(viewer: "Viewer"):
 clear_scene_cmd = Command(title="Clear Scene", callback=clear_scene)
 
 
-def load_scene_from_file(viewer: "Viewer", filepath: str):
-    """Load a scene from a JSON file.
+def load_from_file(viewer: "Viewer", filepath: str):
+    """Load a scene or geometries from a JSON file.
 
     Parameters
     ----------
@@ -431,20 +433,25 @@ def load_scene_from_file(viewer: "Viewer", filepath: str):
         Path to the JSON file containing the scene.
     """
     try:
-        scene = compas.json_load(filepath)
-        if not isinstance(scene, Scene):
-            print("No scene found in this file.")
-            return False
+        obj = compas.json_load(filepath)
+        if isinstance(obj, Scene):
+            clear_scene(viewer)
+            viewer.scene = obj
+            viewer.renderer.rebuild_buffers()
+            viewer.renderer.update()
+            viewer.ui.sidebar.update()
+        elif isinstance(obj, (Geometry, Datastructure)):
+            viewer.scene.add(obj)
+        elif isinstance(obj, list):
+            for item in obj:
+                if isinstance(item, (Geometry, Datastructure)):
+                    viewer.scene.add(item)
+        else:
+            raise ValueError(f"Unsupported object type: {type(obj)}")
 
-        clear_scene(viewer)
-
-        viewer.scene = scene
-        viewer.renderer.rebuild_buffers()
-        viewer.renderer.update()
-        viewer.ui.sidebar.update()
         return True
     except Exception as e:
-        print(f"Error loading scene: {e}")
+        print(f"Error loading: {e}")
         return False
 
 
@@ -453,7 +460,7 @@ def load_scene(viewer: "Viewer"):
     if not result:
         return
 
-    load_scene_from_file(viewer, result[0])
+    load_from_file(viewer, result[0])
 
 
 load_scene_cmd = Command(title="Load Scene", callback=load_scene)
