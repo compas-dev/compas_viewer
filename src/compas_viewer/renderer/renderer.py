@@ -5,6 +5,9 @@ from numpy import float32
 from numpy import identity
 from OpenGL import GL
 from PySide6 import QtCore
+from PySide6.QtGui import QDragEnterEvent
+from PySide6.QtGui import QDragMoveEvent
+from PySide6.QtGui import QDropEvent
 from PySide6.QtGui import QKeyEvent
 from PySide6.QtGui import QMouseEvent
 from PySide6.QtGui import QWheelEvent
@@ -83,6 +86,7 @@ class Renderer(QOpenGLWidget):
 
         self.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
         self.grabGesture(QtCore.Qt.GestureType.PinchGesture)
+        self.setAcceptDrops(True)
 
         self.buffer_manager = BufferManager()
 
@@ -385,6 +389,64 @@ class Renderer(QOpenGLWidget):
 
         """
         self.viewer.eventmanager.delegate_keyrelease(event)
+
+    def dragEnterEvent(self, event: QDragEnterEvent):
+        """
+        Callback for the drag enter event to handle file drops.
+
+        Parameters
+        ----------
+        event : :PySide6:`PySide6/QtGui/QDragEnterEvent`
+            The Qt drag enter event.
+        """
+        if event.mimeData().hasUrls():
+            # Check if any of the URLs are JSON files
+            for url in event.mimeData().urls():
+                if url.isLocalFile() and url.toLocalFile().lower().endswith(".json"):
+                    event.acceptProposedAction()
+                    return
+        event.ignore()
+
+    def dragMoveEvent(self, event: QDragMoveEvent):
+        """
+        Callback for the drag move event to handle file drops.
+
+        Parameters
+        ----------
+        event : :PySide6:`PySide6/QtGui/QDragMoveEvent`
+            The Qt drag move event.
+        """
+        if event.mimeData().hasUrls():
+            # Check if any of the URLs are JSON files
+            for url in event.mimeData().urls():
+                if url.isLocalFile() and url.toLocalFile().lower().endswith(".json"):
+                    event.acceptProposedAction()
+                    return
+        event.ignore()
+
+    def dropEvent(self, event: QDropEvent):
+        """
+        Callback for the drop event to handle loading scene files.
+
+        Parameters
+        ----------
+        event : :PySide6:`PySide6/QtGui/QDropEvent`
+            The Qt drop event.
+        """
+        if event.mimeData().hasUrls():
+            for url in event.mimeData().urls():
+                if url.isLocalFile() and url.toLocalFile().lower().endswith(".json"):
+                    filepath = url.toLocalFile()
+                    # Import here to avoid circular imports
+                    from compas_viewer.commands import load_scene_from_file
+
+                    success = load_scene_from_file(self.viewer, filepath)
+                    if success:
+                        print(f"Successfully loaded scene from: {filepath}")
+                        event.acceptProposedAction()
+                        return
+            print("No valid scene JSON files found in the dropped files.")
+        event.ignore()
 
     # ==========================================================================
     # view

@@ -420,21 +420,40 @@ def clear_scene(viewer: "Viewer"):
 clear_scene_cmd = Command(title="Clear Scene", callback=clear_scene)
 
 
+def load_scene_from_file(viewer: "Viewer", filepath: str):
+    """Load a scene from a JSON file.
+
+    Parameters
+    ----------
+    viewer : Viewer
+        The viewer instance.
+    filepath : str
+        Path to the JSON file containing the scene.
+    """
+    try:
+        scene = compas.json_load(filepath)
+        if not isinstance(scene, Scene):
+            print("No scene found in this file.")
+            return False
+
+        clear_scene(viewer)
+
+        viewer.scene = scene
+        viewer.renderer.rebuild_buffers()
+        viewer.renderer.update()
+        viewer.ui.sidebar.update()
+        return True
+    except Exception as e:
+        print(f"Error loading scene: {e}")
+        return False
+
+
 def load_scene(viewer: "Viewer"):
     result = QFileDialog.getOpenFileName(parent=viewer.ui.window.widget, filter="JSON files (*.json)")
     if not result:
         return
 
-    scene = compas.json_load(result[0])
-    if not isinstance(scene, Scene):
-        print("No scene found in this file.")
-
-    clear_scene(viewer)
-
-    viewer.scene = scene
-    viewer.renderer.rebuild_buffers()
-    viewer.renderer.update()
-    viewer.ui.sidebar.update()
+    load_scene_from_file(viewer, result[0])
 
 
 load_scene_cmd = Command(title="Load Scene", callback=load_scene)
