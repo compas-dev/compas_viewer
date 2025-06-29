@@ -16,10 +16,10 @@ from PySide6.QtGui import QMouseEvent
 from PySide6.QtGui import QWheelEvent
 from PySide6.QtWidgets import QApplication
 from PySide6.QtWidgets import QFileDialog
-from compas.geometry import Geometry
-from compas.datastructures import Datastructure
 
 import compas
+from compas.datastructures import Datastructure
+from compas.geometry import Geometry
 from compas.scene import Scene
 from compas_viewer.components.camerasetting import CameraSettingsDialog
 from compas_viewer.components.objectsetting import ObjectSettingDialog
@@ -388,16 +388,15 @@ def deselect_window():
 # =============================================================================
 
 
-def delete_selected():
-    from compas_viewer import Viewer
-
-    viewer = Viewer()
-
+def delete_selected(viewer: "Viewer"):
     for obj in viewer.scene.objects:
         if obj.is_selected:
             viewer.scene.remove(obj)
             del obj
     viewer.renderer.update()
+
+
+delete_selected_cmd = Command(title="Delete Selected", callback=delete_selected, keybinding="Delete")
 
 
 # =============================================================================

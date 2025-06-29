@@ -15,6 +15,7 @@ from compas_viewer.commands import capture_view_cmd
 from compas_viewer.commands import change_rendermode_cmd
 from compas_viewer.commands import change_view_cmd
 from compas_viewer.commands import clear_scene_cmd
+from compas_viewer.commands import delete_selected_cmd
 from compas_viewer.commands import deselect_all_cmd
 from compas_viewer.commands import load_scene_cmd
 from compas_viewer.commands import obj_settings_cmd
@@ -414,6 +415,7 @@ class Config(ConfigBase):
             change_rendermode_cmd,
             change_view_cmd,
             clear_scene_cmd,
+            delete_selected_cmd,
             deselect_all_cmd,
             load_scene_cmd,
             pan_view_cmd,
