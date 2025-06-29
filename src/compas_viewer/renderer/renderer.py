@@ -1,6 +1,7 @@
 import time
 from typing import TYPE_CHECKING
 
+import numpy as np
 from numpy import float32
 from numpy import identity
 from OpenGL import GL
@@ -17,6 +18,7 @@ from PySide6.QtWidgets import QGestureEvent
 from compas.geometry import Frame
 from compas.geometry import transform_points_numpy
 from compas.scene import Group
+from compas_viewer.gl import OffscreenBufferContext
 from compas_viewer.scene import TagObject
 from compas_viewer.scene.buffermanager import BufferManager
 from compas_viewer.scene.gridobject import GridObject
@@ -667,126 +669,95 @@ class Renderer(QOpenGLWidget):
         GL.glBindVertexArray(0)
 
     def read_instance_color(self, box: tuple[int, int, int, int]):
-        # TODO: Should be able to massively simplify this.
-        # Get the rectangle area
+        """Read instance colors from the specified screen region.
+
+        Parameters
+        ----------
+        box : tuple[int, int, int, int]
+            Screen coordinates (x1, y1, x2, y2) defining the selection area.
+
+        Returns
+        -------
+        numpy.ndarray
+            Array of RGB color values for each pixel in the selection area.
+        """
+        # Calculate selection area
         x1, y1, x2, y2 = box
         x, y = min(x1, x2), self.height() - max(y1, y2)
         width = max(self.PIXEL_SELECTION_INCREMENTAL, abs(x1 - x2))
         height = max(self.PIXEL_SELECTION_INCREMENTAL, abs(y1 - y2))
 
-        # Store current viewport and FBO
-        viewport = GL.glGetIntegerv(GL.GL_VIEWPORT)
-        previous_fbo = GL.glGetIntegerv(GL.GL_FRAMEBUFFER_BINDING)
+        # Render to offscreen buffer and read pixels
+        with OffscreenBufferContext(self.width(), self.height()) as fbo_context:
+            self._render_instance_map()
+            pixels = self._read_pixels(x, y, width, height)
 
-        # Create an FBO with original window size (not scaled)
-        fbo = GL.glGenFramebuffers(1)
-        GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, fbo)
+            # Debug output if enabled
+            if self.viewer.config.renderer.debug_instance:
+                self._save_debug_images(box, x, y, width, height, fbo_context.viewport)
 
-        # Create a texture to attach to the FBO
-        texture = GL.glGenTextures(1)
-        GL.glBindTexture(GL.GL_TEXTURE_2D, texture)
-        GL.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA8, self.width(), self.height(), 0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, None)
-        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST)
-        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST)
-        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP_TO_EDGE)
-        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP_TO_EDGE)
-        GL.glFramebufferTexture2D(GL.GL_FRAMEBUFFER, GL.GL_COLOR_ATTACHMENT0, GL.GL_TEXTURE_2D, texture, 0)
+        return pixels.reshape(-1, 3)
 
-        # Create and attach depth buffer
-        depth_buffer = GL.glGenRenderbuffers(1)
-        GL.glBindRenderbuffer(GL.GL_RENDERBUFFER, depth_buffer)
-        GL.glRenderbufferStorage(GL.GL_RENDERBUFFER, GL.GL_DEPTH_COMPONENT24, self.width(), self.height())
-        GL.glFramebufferRenderbuffer(GL.GL_FRAMEBUFFER, GL.GL_DEPTH_ATTACHMENT, GL.GL_RENDERBUFFER, depth_buffer)
-
-        # Check if FBO is complete
-        status = GL.glCheckFramebufferStatus(GL.GL_FRAMEBUFFER)
-        if status != GL.GL_FRAMEBUFFER_COMPLETE:
-            GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, previous_fbo)
-            GL.glDeleteRenderbuffers(1, [depth_buffer])
-            GL.glDeleteTextures(1, [texture])
-            GL.glDeleteFramebuffers(1, [fbo])
-            raise Exception(f"Framebuffer is not complete! Status: {status}")
-
-        # Set up rendering state
-        GL.glViewport(0, 0, self.width(), self.height())
+    def _render_instance_map(self):
+        """Render the scene in instance color mode."""
+        # Set up rendering state for instance mode
         GL.glEnable(GL.GL_DEPTH_TEST)
         GL.glDepthFunc(GL.GL_LESS)
         GL.glDepthMask(GL.GL_TRUE)
         GL.glClearColor(0.0, 0.0, 0.0, 1.0)
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
 
-        # Save current render states
-        prev_depth_test = GL.glIsEnabled(GL.GL_DEPTH_TEST)
-        prev_blend = GL.glIsEnabled(GL.GL_BLEND)
-
-        # Disable blending for instance rendering
+        # Temporarily disable blending for clean instance colors
+        was_blend_enabled = GL.glIsEnabled(GL.GL_BLEND)
         GL.glDisable(GL.GL_BLEND)
 
-        # Render the instance map to the FBO
-        self.paintGL(is_instance=True)
-        GL.glFlush()
-        GL.glFinish()
+        try:
+            self.paintGL(is_instance=True)
+            GL.glFlush()
+            GL.glFinish()
+        finally:
+            # Restore blending state
+            if was_blend_enabled:
+                GL.glEnable(GL.GL_BLEND)
 
-        # Debug block
-        if hasattr(self.viewer.config.renderer, "debug_instance") and self.viewer.config.renderer.debug_instance:
-            # Save the full frame
-            GL.glPixelStorei(GL.GL_PACK_ALIGNMENT, 1)
-            full_buffer = GL.glReadPixels(0, 0, self.width(), self.height(), GL.GL_RGBA, GL.GL_UNSIGNED_BYTE)
-
-            import numpy as np
-            from PIL import Image
-
-            # Save full frame
-            full_map = np.frombuffer(full_buffer, dtype=np.uint8).reshape(self.height(), self.width(), 4)
-            full_image = Image.fromarray(full_map)
-            full_image = full_image.transpose(Image.FLIP_TOP_BOTTOM)
-            full_image.save("instance_debug_full.png")
-
-            # Draw a red rectangle on the full image to show the box area
-            from PIL import ImageDraw
-
-            draw = ImageDraw.Draw(full_image)
-            draw.rectangle([x1, y1, x2, y2], outline="red", width=2)
-            full_image.save("instance_debug_full_with_box.png")
-
-            print("Saved debug images:")
-            print("- Full frame: instance_debug_full.png")
-            print("- Full frame with box: instance_debug_full_with_box.png")
-            print(f"Box coordinates: x={x}, y={y}, width={width}, height={height}")
-            print(f"Original box: x1={x1}, y1={y1}, x2={x2}, y2={y2}")
-            print(f"Window size: {self.width()}x{self.height()}")
-            print(f"Viewport: {viewport}")
-
-        # Read the box area
+    def _read_pixels(self, x: int, y: int, width: int, height: int):
+        """Read pixel data from the current framebuffer."""
         GL.glPixelStorei(GL.GL_PACK_ALIGNMENT, 1)
-        box_buffer = GL.glReadPixels(x, y, width, height, GL.GL_RGB, GL.GL_UNSIGNED_BYTE)
+        buffer = GL.glReadPixels(x, y, width, height, GL.GL_RGB, GL.GL_UNSIGNED_BYTE)
+        return np.frombuffer(buffer, dtype=np.uint8).reshape(height, width, 3)
 
-        import numpy as np
+    def _save_debug_images(self, box: tuple[int, int, int, int], x: int, y: int, width: int, height: int, viewport: tuple):
+        """Save debug images when debugging is enabled."""
 
-        box_map = np.frombuffer(box_buffer, dtype=np.uint8).reshape(height, width, 3)
+        from PIL import Image
+        from PIL import ImageDraw
 
-        # Save box image if in debug mode
-        if hasattr(self.viewer.config.renderer, "debug_instance") and self.viewer.config.renderer.debug_instance:
-            from PIL import Image
+        x1, y1, x2, y2 = box
 
-            box_image = Image.fromarray(box_map)
-            box_image = box_image.transpose(Image.FLIP_TOP_BOTTOM)
-            box_image.save("instance_debug_box.png")
-            print("- Box area: instance_debug_box.png")
+        # Read and save full frame
+        GL.glPixelStorei(GL.GL_PACK_ALIGNMENT, 1)
+        full_buffer = GL.glReadPixels(0, 0, self.width(), self.height(), GL.GL_RGBA, GL.GL_UNSIGNED_BYTE)
+        full_map = np.frombuffer(full_buffer, dtype=np.uint8).reshape(self.height(), self.width(), 4)
+        full_image = Image.fromarray(full_map).transpose(Image.FLIP_TOP_BOTTOM)
+        full_image.save("instance_debug_full.png")
 
-        # Restore previous render states
-        if prev_blend:
-            GL.glEnable(GL.GL_BLEND)
-        if not prev_depth_test:
-            GL.glDisable(GL.GL_DEPTH_TEST)
+        # Create version with selection box highlighted
+        full_with_box = full_image.copy()
+        draw = ImageDraw.Draw(full_with_box)
+        draw.rectangle([x1, y1, x2, y2], outline="red", width=2)
+        full_with_box.save("instance_debug_full_with_box.png")
 
-        # Clean up
-        GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, previous_fbo)
-        GL.glDeleteRenderbuffers(1, [depth_buffer])
-        GL.glDeleteTextures(1, [texture])
-        GL.glDeleteFramebuffers(1, [fbo])
+        # Save selection area
+        box_pixels = self._read_pixels(x, y, width, height)
+        box_image = Image.fromarray(box_pixels).transpose(Image.FLIP_TOP_BOTTOM)
+        box_image.save("instance_debug_box.png")
 
-        # Restore viewport
-        GL.glViewport(*viewport)
-
-        return box_map.reshape(-1, 3)
+        # Print debug info
+        print("Saved debug images:")
+        print("- Full frame: instance_debug_full.png")
+        print("- Full frame with box: instance_debug_full_with_box.png")
+        print("- Box area: instance_debug_box.png")
+        print(f"Box coordinates: x={x}, y={y}, width={width}, height={height}")
+        print(f"Original box: x1={x1}, y1={y1}, x2={x2}, y2={y2}")
+        print(f"Window size: {self.width()}x{self.height()}")
+        print(f"Viewport: {viewport}")

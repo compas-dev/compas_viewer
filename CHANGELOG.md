@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added ability to add and remove objects in real-time after viewer starts running.
 * Added option to drag and drop serialized JSON files of scene and geometries.
 * Added shortcut `Del` to remove selected objects in scene.
+* Added `OffscreenBufferContext` for better maintainability on instance rendering pipeline.
 
 ### Changed
 

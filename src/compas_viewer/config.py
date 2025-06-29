@@ -322,6 +322,7 @@ class RendererConfig(ConfigBase):
     view: Literal["perspective", "front", "right", "top"] = "perspective"
     backgroundcolor: Color = field(default_factory=Color.white)
     selectioncolor: Color = field(default_factory=lambda: Color(1.0, 1.0, 0.0, 1.0))
+    debug_instance: bool = False
 
 
 # this should be part of View3D config
