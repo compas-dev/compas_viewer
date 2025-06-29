@@ -281,6 +281,7 @@ class BufferManager:
             self.elements[buffer_type] = np.array([], dtype=np.int32)
             self.buffer_ids[buffer_type] = {}
 
+        self.objects = {}
         self.transforms = []
         self.settings = []
         self.object_settings_cache = {}

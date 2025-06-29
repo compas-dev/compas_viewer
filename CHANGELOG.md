@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Added ability to add and remove objects in real-time after viewer starts running.
+
 ### Changed
 
 * Made `linewidth` working again through `GeometryShader`.

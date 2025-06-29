@@ -177,6 +177,12 @@ class ViewerScene(Scene):
             u=u,
             **kwargs,
         )
+
+        if self.viewer.running:
+            self.viewer.renderer.rebuild_buffers()
+            self.viewer.renderer.update()
+            self.viewer.ui.sidebar.update()
+
         return sceneobject
 
     def add_group(self, name: str = None, parent: Optional[ViewerSceneObject] = None, **kwargs) -> Group:
@@ -200,3 +206,19 @@ class ViewerScene(Scene):
         group = Group(name=name, **kwargs)
         self.add(group, parent=parent)
         return group
+
+    def remove(self, sceneobject: ViewerSceneObject):
+        """
+        Remove an scene object from the scene.
+
+        Parameters
+        ----------
+        sceneobject : :class:`compas_viewer.scene.ViewerSceneObject`
+            The scene object to remove.
+        """
+        super().remove(sceneobject)
+
+        if self.viewer.running:
+            self.viewer.renderer.rebuild_buffers()
+            self.viewer.renderer.update()
+            self.viewer.ui.sidebar.update()

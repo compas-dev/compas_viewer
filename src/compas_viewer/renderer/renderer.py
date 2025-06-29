@@ -445,6 +445,22 @@ class Renderer(QOpenGLWidget):
         self.shader_lines.uniformBuffer("settingsBuffer", self.buffer_manager.settings_texture, unit=1)
         self.shader_lines.release()
 
+    def rebuild_buffers(self):
+        """Rebuild the buffers."""
+        GL.glBindVertexArray(self._vao)
+        self.buffer_manager.clear()
+
+        # Ensure all objects are initialized before adding to buffer
+        for obj in self.viewer.scene.objects:
+            if not isinstance(obj, (Group, TagObject)) and not obj._inited:
+                obj.init()
+
+        for obj in self.viewer.scene.objects:
+            if not isinstance(obj, (Group, TagObject)):
+                self.buffer_manager.add_object(obj)
+        self.buffer_manager.create_buffers()
+        GL.glBindVertexArray(0)
+
     def update_projection(self, w=None, h=None):
         """
         Update the projection matrix.
