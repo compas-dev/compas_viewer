@@ -56,7 +56,7 @@ where = ["src"]
 compas_viewer = ['config.json']
 "compas_viewer.assets" = ["*.svg", "*.png"]
 "compas_viewer.assets.fonts" = ["*.ttf"]
-"compas_viewer.renderer.shaders" = ["*.vert", "*.frag"]
+"compas_viewer.renderer.shaders" = ["*.vert", "*.frag", "*.geom"]
 
 # ============================================================================
 # replace pytest.ini
