@@ -295,7 +295,6 @@ class EventManager:
         for keyevent in self.key_events:
             if keyevent == event:
                 keyevent.triggered.emit()
-                break
 
     def delegate_keyrelease(self, event: QKeyEvent):
         pass
@@ -306,14 +305,13 @@ class EventManager:
             if mouseevent == event:
                 mouseevent.triggered.emit(event)
                 mouseevent.is_active = True
-                break
 
     def delegate_mousemove(self, event: QMouseEvent):
         self.viewer.mouse.pos = event.pos()
         for mouseevent in self.mouse_events:
             if mouseevent == event:
                 mouseevent.triggered.emit(event)
-                break
+
         self.viewer.mouse.last_pos = event.pos()
 
     def delegate_mouserelease(self, event: QMouseEvent):
@@ -321,7 +319,7 @@ class EventManager:
             if mouseevent.is_active or mouseevent == event:
                 mouseevent.triggered.emit(event)
                 mouseevent.is_active = False
-                break
+
         self.viewer.mouse.last_pos = event.pos()
 
     def delegate_wheel(self, event: QWheelEvent):
