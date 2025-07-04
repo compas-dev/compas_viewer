@@ -6,21 +6,22 @@ from PySide6.QtWidgets import QSplitter
 
 from compas_viewer.components import Sceneform
 from compas_viewer.components.objectsetting import ObjectSetting
+from compas_viewer.ui.container import Container
 
 if TYPE_CHECKING:
     from .ui import UI
 
 
-class SideBarRight:
+class SideBarRight(Container):
     def __init__(self, ui: "UI", show: bool, items: list[dict[str, Callable]]) -> None:
-        self.ui = ui
-        self.widget = QSplitter(QtCore.Qt.Orientation.Vertical)
+        super().__init__(ui)
+        self.widget: QSplitter = QSplitter(QtCore.Qt.Orientation.Vertical)
         self.widget.setChildrenCollapsible(True)
+
         self.show = show
-        self.hide_widget = True
         self.items = items
 
-    def add_items(self) -> None:
+    def load_items(self) -> None:
         if not self.items:
             return
 
@@ -32,43 +33,8 @@ class SideBarRight:
                 if columns is None:
                     raise ValueError("Please setup config for Sceneform")
                 self.sceneform = Sceneform(columns=columns)
-                self.widget.addWidget(self.sceneform)
+                self.add(self.sceneform)
 
             elif itemtype == "ObjectSetting":
-                items = item.get("items", None)
-                if items is None:
-                    raise ValueError("Please setup config for ObjectSetting")
-                self.object_setting = ObjectSetting(viewer=self.ui.viewer, items=items)
-                self.widget.addWidget(self.object_setting)
-
-        self.show_sceneform = True
-        self.show_objectsetting = True
-
-    def update(self):
-        self.widget.update()
-        for widget in self.widget.children():
-            widget.update()
-
-    @property
-    def show(self):
-        return self.widget.isVisible()
-
-    @show.setter
-    def show(self, value: bool):
-        self.widget.setVisible(value)
-
-    @property
-    def show_sceneform(self):
-        return self.sceneform.isVisible()
-
-    @show_sceneform.setter
-    def show_sceneform(self, value: bool):
-        self.sceneform.setVisible(value)
-
-    @property
-    def show_objectsetting(self):
-        return self.object_setting.isVisible()
-
-    @show_objectsetting.setter
-    def show_objectsetting(self, value: bool):
-        self.object_setting.setVisible(value)
+                self.object_setting = ObjectSetting()
+                self.add(self.object_setting)
