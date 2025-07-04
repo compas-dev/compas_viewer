@@ -1,167 +1,122 @@
-from typing import TYPE_CHECKING
-
 from PySide6.QtCore import Qt
-from PySide6.QtCore import Signal
-from PySide6.QtWidgets import QDialog
-from PySide6.QtWidgets import QPushButton
+from PySide6.QtWidgets import QHBoxLayout
+from PySide6.QtWidgets import QLabel
 from PySide6.QtWidgets import QScrollArea
 from PySide6.QtWidgets import QVBoxLayout
 from PySide6.QtWidgets import QWidget
 
-from compas_viewer.base import Base
+from compas_viewer.components.color import ColorDialog
+from compas_viewer.components.component import Component
 from compas_viewer.components.double_edit import DoubleEdit
-from compas_viewer.components.label import LabelWidget
-from compas_viewer.components.layout import SettingLayout
 from compas_viewer.components.textedit import TextEdit
 
-if TYPE_CHECKING:
-    from compas_viewer import Viewer
 
-
-class ObjectSetting(QWidget):
+class ObjectSetting(Component):
     """
-    A QWidget to manage the settings of objects in the viewer.
-
-    Parameters
-    ----------
-    viewer : Viewer
-        The viewer instance containing the objects.
-    items : list
-        A list of dictionaries containing the settings for the object.
-
-    Attributes
-    ----------
-    viewer : Viewer
-        The viewer instance.
-    items : list
-        A list of dictionaries containing the settings for the object.
-    layout : QVBoxLayout
-        The main layout for the widget.
-    update_button : QPushButton
-        The button to trigger the object update.
-
-    Methods
-    -------
-    clear_layout(layout)
-        Clears all widgets and sub-layouts from the given layout.
-    update()
-        Updates the layout with the latest object settings.
-    obj_update()
-        Applies the settings from spin boxes to the selected objects.
+    A component to manage the settings of objects in the viewer.
     """
 
-    update_requested = Signal()
-
-    def __init__(self, viewer: "Viewer", items: list[dict]):
+    def __init__(self):
         super().__init__()
-        self.viewer = viewer
-        self.items = items
-        self.setting_layout = SettingLayout(viewer=self.viewer, items=self.items, type="obj_setting")
-        # Main layout
-        self.main_layout = QVBoxLayout(self)
+        self.widget = QScrollArea()
+        self.widget.setWidgetResizable(True)
+        self.reset()
 
-        # Scroll area setup
-        self.scroll_area = QScrollArea(self)
-        self.scroll_area.setWidgetResizable(True)
+    def reset(self):
+        """Reset the content widget and layout to a clean state."""
+        self.sub_widgets = {}
         self.scroll_content = QWidget()
         self.scroll_layout = QVBoxLayout(self.scroll_content)
         self.scroll_layout.setAlignment(Qt.AlignTop)
-        self.scroll_area.setWidget(self.scroll_content)
+        self.widget.setWidget(self.scroll_content)
+        self.settings_layout = QVBoxLayout()
+        self.settings_layout.setSpacing(0)
+        self.settings_layout.setContentsMargins(0, 0, 0, 0)
+        self.scroll_layout.addLayout(self.settings_layout)
 
-        self.main_layout.addWidget(self.scroll_area)
+    @property
+    def selected(self):
+        return [obj for obj in self.scene.objects if obj.is_selected]
 
-    def clear_layout(self, layout):
-        """Clear all widgets from the layout."""
-        while layout.count():
-            item = layout.takeAt(0)
-            widget = item.widget()
-            if widget is not None:
-                widget.deleteLater()
-            else:
-                sub_layout = item.layout()
-                if sub_layout is not None:
-                    self.clear_layout(sub_layout)
+    def add_row(self, attr_name: str, widget: QWidget = None) -> None:
+        """Create a setting row with label and widget, then add it to the layout."""
+        row_layout = QHBoxLayout()
+        row_layout.setSpacing(0)
+        row_layout.setContentsMargins(0, 0, 0, 0)
+
+        label = QLabel(attr_name)
+        row_layout.addWidget(label)
+
+        if widget:
+            row_layout.addWidget(widget)
+            self.sub_widgets[attr_name] = widget
+
+        self.settings_layout.addLayout(row_layout)
+
+    def populate(self) -> None:
+        """Populate the layout with the settings of the selected object."""
+        obj = self.selected[0]
+
+        if not obj:
+            return
+
+        self.add_row("name", TextEdit(text=str(obj.name)))
+
+        if hasattr(obj, "pointcolor") and obj.pointcolor is not None:
+            self.add_row("pointcolor", ColorDialog(obj=obj, attr="pointcolor"))
+
+        if hasattr(obj, "linecolor") and obj.linecolor is not None:
+            self.add_row("linecolor", ColorDialog(obj=obj, attr="linecolor"))
+
+        if hasattr(obj, "facecolor") and obj.facecolor is not None:
+            self.add_row("facecolor", ColorDialog(obj=obj, attr="facecolor"))
+
+        if hasattr(obj, "linewidth") and obj.linewidth is not None:
+            self.add_row("linewidth", DoubleEdit(title=None, value=obj.linewidth, min_val=0.0, max_val=10.0))
+
+        if hasattr(obj, "pointsize") and obj.pointsize is not None:
+            self.add_row("pointsize", DoubleEdit(title=None, value=obj.pointsize, min_val=0.0, max_val=10.0))
+
+        if hasattr(obj, "opacity") and obj.opacity is not None:
+            self.add_row("opacity", DoubleEdit(title=None, value=obj.opacity, min_val=0.0, max_val=1.0))
 
     def update(self):
         """Update the layout with the latest object settings."""
-        self.clear_layout(self.scroll_layout)
-        self.setting_layout.generate_layout()
+        self.reset()
 
-        if len(self.setting_layout.widgets) != 0:
-            self.scroll_layout.addLayout(self.setting_layout.layout)
-            for _, widget in self.setting_layout.widgets.items():
-                if isinstance(widget, DoubleEdit):
-                    widget.spinbox.valueChanged.connect(self.obj_update)
-                elif isinstance(widget, TextEdit):
-                    widget.text_edit.textChanged.connect(self.obj_update)
+        if len(self.selected) == 1:
+            self.populate()
+            self._add_event_listeners()
+        elif len(self.selected) > 1:
+            self.add_row("Multiple objects selected")
         else:
-            self.scroll_layout.addWidget(LabelWidget(text="No object Selected", alignment="center"))
+            self.add_row("No object selected")
 
-    def obj_update(self):
-        """Apply the settings from spin boxes to the selected objects."""
-        for obj in self.viewer.scene.objects:
-            if obj.is_selected:
-                obj.name = self.setting_layout.widgets["Name_text_edit"].text_edit.toPlainText()
-                obj.linewidth = self.setting_layout.widgets["Line_Width_double_edit"].spinbox.value()
-                obj.pointsize = self.setting_layout.widgets["Point_Size_double_edit"].spinbox.value()
-                obj.opacity = self.setting_layout.widgets["Opacity_double_edit"].spinbox.value()
-                obj.update()
+    def _add_event_listeners(self):
+        """Add event listeners to the sub widgets."""
 
+        def _update_obj():
+            if len(self.selected) == 0:
+                return
 
-class ObjectSettingDialog(QDialog, Base):
-    """
-    A dialog for displaying and updating object settings in Qt applications.
-    This dialog allows users to modify object properties such as line width, point size, and opacity,
-    and applies these changes dynamically.
+            obj = self.selected[0]
 
-    Parameters
-    ----------
-    items : list
-        A list of dictionaries containing the settings for the object.
+            for attr_name, widget in self.sub_widgets.items():
+                if not hasattr(obj, attr_name):
+                    continue
+                if isinstance(widget, TextEdit):
+                    value = widget.text_edit.toPlainText()
+                elif isinstance(widget, DoubleEdit):
+                    value = widget.spinbox.value()
+                else:
+                    continue
 
-    Attributes
-    ----------
-    layout : QVBoxLayout
-        The layout of the dialog.
-    items : list
-        A list of dictionaries containing the settings for the object.
-    update_button : QPushButton
-        Button to apply changes to the selected objects.
+                setattr(obj, attr_name, value)
 
-    Methods
-    -------
-    update()
-        Updates the properties of selected objects and closes the dialog.
+            obj.update()
 
-    Example
-    -------
-    >>> dialog = ObjectInfoDialog()
-    >>> dialog.exec()
-    """
-
-    def __init__(self, items: list[dict]) -> None:
-        super().__init__()
-        self.items = items
-        self.setWindowTitle("Object Settings")
-        self.layout = QVBoxLayout(self)
-        self.setting_layout = SettingLayout(viewer=self.viewer, items=self.items, type="obj_setting")
-
-        if self.setting_layout is not None:
-            text = "Update Object"
-            self.layout.addLayout(self.setting_layout.layout)
-        else:
-            text = "No object selected."
-
-        self.update_button = QPushButton(text, self)
-        self.update_button.clicked.connect(self.obj_update)
-        self.layout.addWidget(self.update_button)
-
-    def obj_update(self) -> None:
-        for obj in self.viewer.scene.objects:
-            if obj.is_selected:
-                obj.linewidth = self.setting_layout.widgets["Line_Width_double_edit"].spinbox.value()
-                obj.pointsize = self.setting_layout.widgets["Point_Size_double_edit"].spinbox.value()
-                obj.opacity = self.setting_layout.widgets["Opacity_double_edit"].spinbox.value()
-                obj.update()
-
-        self.accept()
+        for widget in self.sub_widgets.values():
+            if isinstance(widget, TextEdit):
+                widget.text_edit.textChanged.connect(_update_obj)
+            elif isinstance(widget, DoubleEdit):
+                widget.spinbox.valueChanged.connect(_update_obj)
