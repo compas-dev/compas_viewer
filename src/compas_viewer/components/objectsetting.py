@@ -1,10 +1,10 @@
-from .container import Container
+from compas_viewer.scene import ViewerSceneObject
+
 from .booleantoggle import BooleanToggle
 from .colorpicker import ColorPicker
+from .container import Container
 from .numberedit import NumberEdit
 from .textedit import TextEdit
-
-from compas_viewer.scene import ViewerSceneObject
 
 
 class ObjectSetting(Container):

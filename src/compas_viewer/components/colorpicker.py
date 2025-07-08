@@ -3,15 +3,16 @@ from typing import Union
 
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QColorDialog
-from PySide6.QtWidgets import QPushButton
-from PySide6.QtWidgets import QWidget
 from PySide6.QtWidgets import QHBoxLayout
 from PySide6.QtWidgets import QLabel
+from PySide6.QtWidgets import QPushButton
+from PySide6.QtWidgets import QWidget
 
 from compas.colors import Color
 from compas.colors.colordict import ColorDict
-from .component import Component
+
 from .boundcomponent import BoundComponent
+from .component import Component
 
 
 def remap_rgb(value, to_range_one=True):

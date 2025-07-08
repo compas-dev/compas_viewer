@@ -1,7 +1,10 @@
 from PySide6 import QtCore
 from PySide6 import QtWidgets
 from PySide6.QtWidgets import QDockWidget
+
 from compas_viewer.components.container import Container
+
+from .mainwindow import MainWindow
 
 
 class SideDock(Container):
@@ -10,7 +13,7 @@ class SideDock(Container):
         "right": QtCore.Qt.DockWidgetArea.RightDockWidgetArea,
     }
 
-    def __init__(self) -> None:
+    def __init__(self, window: MainWindow) -> None:
         super().__init__(container_type="scrollable")
         self.widget = QDockWidget()
         self.widget.setMinimumWidth(200)
@@ -24,3 +27,4 @@ class SideDock(Container):
         self.layout.setAlignment(QtCore.Qt.AlignTop)
         self.widget.setAllowedAreas(QtCore.Qt.DockWidgetArea.LeftDockWidgetArea | QtCore.Qt.DockWidgetArea.RightDockWidgetArea)
         self.widget.setFeatures(QDockWidget.DockWidgetFeature.DockWidgetFloatable | QDockWidget.DockWidgetFeature.DockWidgetMovable)
+        window.widget.addDockWidget(self.locations["left"], self.widget)

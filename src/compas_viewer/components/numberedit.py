@@ -1,11 +1,13 @@
-from PySide6.QtWidgets import QWidget
-from PySide6.QtWidgets import QHBoxLayout
-from PySide6.QtWidgets import QLabel
-from PySide6.QtWidgets import QDoubleSpinBox
 from typing import Callable
 from typing import Union
-from .component import Component
+
+from PySide6.QtWidgets import QDoubleSpinBox
+from PySide6.QtWidgets import QHBoxLayout
+from PySide6.QtWidgets import QLabel
+from PySide6.QtWidgets import QWidget
+
 from .boundcomponent import BoundComponent
+from .component import Component
 
 
 class NumberEdit(BoundComponent):

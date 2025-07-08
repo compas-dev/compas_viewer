@@ -1,18 +1,17 @@
-from typing import TYPE_CHECKING
+from PySide6.QtWidgets import QSplitter
 
-from PySide6 import QtWidgets
+from compas_viewer.components.component import Component
+from compas_viewer.renderer import Renderer
 
-if TYPE_CHECKING:
-    from compas_viewer.renderer import Renderer
-
-    from .sidebar import SideBarRight
-    from .ui import UI
+from .mainwindow import MainWindow
+from .sidebar import SideBarRight
 
 
-class ViewPort:
-    def __init__(self, ui: "UI", renderer: "Renderer", sidebar: "SideBarRight"):
-        self.ui = ui
-        self.widget = QtWidgets.QSplitter()
+class ViewPort(Component):
+    def __init__(self, window: MainWindow, renderer: Renderer, sidebar: SideBarRight):
+        super().__init__()
+        self.widget = QSplitter()
         self.widget.addWidget(renderer)
         self.widget.addWidget(sidebar.widget)
         self.widget.setSizes([800, 200])
+        window.widget.setCentralWidget(self.widget)

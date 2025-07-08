@@ -20,15 +20,8 @@ class UI:
         self.toolbar = ToolBar(self.window, items=self.viewer.config.ui.toolbar.items)
         self.statusbar = StatusBar(self.window)
         self.sidebar = SideBarRight(items=self.viewer.config.ui.sidebar.items)
-        self.sidedock = SideDock()
-        self.viewport = ViewPort(
-            self,
-            self.viewer.renderer,
-            self.sidebar,
-        )
-
-        self.window.widget.setCentralWidget(self.viewport.widget)
-        self.window.widget.addDockWidget(SideDock.locations["left"], self.sidedock.widget)
+        self.sidedock = SideDock(self.window)
+        self.viewport = ViewPort(self.window, self.viewer.renderer, self.sidebar)
 
     def init(self):
         self.resize(self.viewer.config.window.width, self.viewer.config.window.height)
@@ -39,6 +32,8 @@ class UI:
         self.toolbar.show = self.viewer.config.ui.toolbar.show
         self.sidebar.show = self.viewer.config.ui.sidebar.show
         self.sidedock.show = self.viewer.config.ui.sidedock.show
+
+        self.sidebar.update()
 
     def resize(self, w: int, h: int) -> None:
         self.window.widget.resize(w, h)

@@ -9,8 +9,8 @@ from PySide6.QtWidgets import QLayout
 from PySide6.QtWidgets import QVBoxLayout
 
 from compas_viewer.components.colorpicker import ColorPicker
-from compas_viewer.components.numberedit import NumberEdit
 from compas_viewer.components.label import LabelWidget
+from compas_viewer.components.numberedit import NumberEdit
 from compas_viewer.components.textedit import TextEdit
 
 if TYPE_CHECKING:

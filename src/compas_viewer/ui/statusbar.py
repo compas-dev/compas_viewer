@@ -1,5 +1,7 @@
-from compas_viewer.components.component import Component
 from PySide6.QtWidgets import QLabel
+
+from compas_viewer.components.component import Component
+
 from .mainwindow import MainWindow
 
 

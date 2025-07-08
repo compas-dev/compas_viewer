@@ -1,4 +1,5 @@
 from PySide6.QtWidgets import QWidget
+
 from compas_viewer.base import Base
 
 

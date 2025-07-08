@@ -1,6 +1,7 @@
+from typing import Any
 from typing import Callable
 from typing import Union
-from typing import Any
+
 from .component import Component
 
 

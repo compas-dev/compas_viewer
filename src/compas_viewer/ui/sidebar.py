@@ -1,7 +1,8 @@
 from typing import Callable
+
 from compas_viewer.components import Sceneform
-from compas_viewer.components.objectsetting import ObjectSetting
 from compas_viewer.components.container import Container
+from compas_viewer.components.objectsetting import ObjectSetting
 
 
 class SideBarRight(Container):
