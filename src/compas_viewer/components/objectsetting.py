@@ -1,5 +1,3 @@
-from typing import TYPE_CHECKING
-
 from PySide6.QtCore import Qt
 from PySide6.QtCore import Signal
 from PySide6.QtWidgets import QDialog
@@ -13,9 +11,6 @@ from compas_viewer.components.double_edit import DoubleEdit
 from compas_viewer.components.label import LabelWidget
 from compas_viewer.components.layout import SettingLayout
 from compas_viewer.components.textedit import TextEdit
-
-if TYPE_CHECKING:
-    from compas_viewer import Viewer
 
 
 class ObjectSetting(QWidget):
@@ -52,11 +47,9 @@ class ObjectSetting(QWidget):
 
     update_requested = Signal()
 
-    def __init__(self, viewer: "Viewer", items: list[dict]):
+    def __init__(self, items: list[dict]):
         super().__init__()
-        self.viewer = viewer
         self.items = items
-        self.setting_layout = SettingLayout(viewer=self.viewer, items=self.items, type="obj_setting")
         # Main layout
         self.main_layout = QVBoxLayout(self)
 
@@ -69,6 +62,12 @@ class ObjectSetting(QWidget):
         self.scroll_area.setWidget(self.scroll_content)
 
         self.main_layout.addWidget(self.scroll_area)
+
+    @property
+    def viewer(self):
+        from compas_viewer import Viewer
+
+        return Viewer()
 
     def clear_layout(self, layout):
         """Clear all widgets from the layout."""
@@ -85,6 +84,7 @@ class ObjectSetting(QWidget):
     def update(self):
         """Update the layout with the latest object settings."""
         self.clear_layout(self.scroll_layout)
+        self.setting_layout = SettingLayout(viewer=self.viewer, items=self.items, type="obj_setting")
         self.setting_layout.generate_layout()
 
         if len(self.setting_layout.widgets) != 0:
