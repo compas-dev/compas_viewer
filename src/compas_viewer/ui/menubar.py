@@ -5,7 +5,6 @@ from typing import Optional
 
 from PySide6.QtGui import QAction
 from PySide6.QtGui import QActionGroup
-from PySide6.QtWidgets import QMenuBar
 from PySide6.QtWidgets import QWidget
 
 from compas_viewer.commands import Command
@@ -15,10 +14,13 @@ from .mainwindow import MainWindow
 
 
 class MenuBar(Component):
-    def __init__(self, window: MainWindow, items: list[dict]) -> None:
+    def __init__(self, window: MainWindow) -> None:
         super().__init__()
-        self.items = items
-        self.widget: QMenuBar = window.widget.menuBar()
+        self.widget = window.widget.menuBar()
+
+    @property
+    def items(self):
+        return self.viewer.config.ui.menubar.items
 
     def add_menu(self, items=None, parent=None) -> list[QAction]:
         items = items or self.items

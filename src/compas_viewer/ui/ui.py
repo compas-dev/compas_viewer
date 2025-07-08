@@ -11,13 +11,16 @@ from .viewport import ViewPort
 
 class UI(Base):
     def __init__(self) -> None:
-        self.window = MainWindow(title=self.viewer.config.window.title)
-        self.menubar = MenuBar(self.window, items=self.viewer.config.ui.menubar.items)
-        self.toolbar = ToolBar(self.window, items=self.viewer.config.ui.toolbar.items)
+        self.window = MainWindow()
+        self.menubar = MenuBar(self.window)
+        self.toolbar = ToolBar(self.window)
         self.statusbar = StatusBar(self.window)
-        self.sidebar = SideBarRight(items=self.viewer.config.ui.sidebar.items)
         self.sidedock = SideDock(self.window)
-        self.viewport = ViewPort(self.window, self.sidebar)
+        self.viewport = ViewPort(self.window)
+
+    @property
+    def sidebar(self):
+        return self.viewport.sidebar
 
     def init(self):
         self.resize(self.viewer.config.window.width, self.viewer.config.window.height)

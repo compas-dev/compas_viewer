@@ -21,9 +21,16 @@ class SideBarRight(Container):
         ObjectSetting component, if it is in the items list.
     """
 
-    def __init__(self, items: list[dict[str, Callable]]) -> None:
+    def __init__(self) -> None:
         super().__init__(container_type="splitter")
-        for item in items:
+        self.load_items()
+
+    @property
+    def items(self):
+        return self.viewer.config.ui.sidebar.items
+
+    def load_items(self):
+        for item in self.items:
             itemtype = item.get("type", None)
 
             if itemtype == "Sceneform":

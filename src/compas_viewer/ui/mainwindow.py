@@ -4,10 +4,10 @@ from compas_viewer.components.component import Component
 
 
 class MainWindow(Component):
-    def __init__(self, title: str = "COMPAS Viewer"):
+    def __init__(self):
         super().__init__()
         self.widget = QMainWindow()
-        self.title = title
+        self.title = self.viewer.config.window.title
 
     @property
     def title(self):

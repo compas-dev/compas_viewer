@@ -10,14 +10,20 @@ from .mainwindow import MainWindow
 
 
 class ToolBar(Component):
-    def __init__(self, window: MainWindow, items: list[dict]) -> None:
+    def __init__(self, window: MainWindow) -> None:
         super().__init__()
         self.widget = window.widget.addToolBar("Tools")
         self.widget.clear()
         self.widget.setMovable(False)
         self.widget.setObjectName("Tools")
+        self.load_items()
 
-        for item in items:
+    @property
+    def items(self):
+        return self.viewer.config.ui.toolbar.items
+
+    def load_items(self):
+        for item in self.items:
             text = item.get("title", None)
             tooltip = item.get("tooltip", None)
             itemtype = item.get("type", None)
