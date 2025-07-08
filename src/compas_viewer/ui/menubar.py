@@ -17,12 +17,13 @@ class MenuBar(Component):
     def __init__(self, window: MainWindow) -> None:
         super().__init__()
         self.widget = window.widget.menuBar()
+        self.load_items()
 
     @property
     def items(self):
         return self.viewer.config.ui.menubar.items
 
-    def add_menu(self, items=None, parent=None) -> list[QAction]:
+    def load_items(self, items=None, parent=None) -> list[QAction]:
         items = items or self.items
         parent = parent or self.widget
 
@@ -55,14 +56,14 @@ class MenuBar(Component):
                 if items := item.get("items"):
                     if not itemtype or itemtype == "menu":
                         menu = parent.addMenu(text)
-                        self.add_menu(items=items, parent=menu)
+                        self.load_items(items=items, parent=menu)
 
                     elif itemtype == "group":
                         group = QActionGroup(self.widget)
                         group.setExclusive(item.get("exclusive", True))
 
                         menu = parent.addMenu(text)
-                        for i, a in enumerate(self.add_menu(items=items, parent=menu)):
+                        for i, a in enumerate(self.load_items(items=items, parent=menu)):
                             a.setCheckable(True)
                             if i == item.get("selected", 0):
                                 a.setChecked(True)
@@ -73,7 +74,7 @@ class MenuBar(Component):
 
                 else:
                     menu = parent.addMenu(text)
-                    self.add_menu(items=[{"title": "PLACEHOLDER", "action": lambda: print("PLACEHOLDER")}], parent=menu)
+                    self.load_items(items=[{"title": "PLACEHOLDER", "action": lambda: print("PLACEHOLDER")}], parent=menu)
 
         return actions
 

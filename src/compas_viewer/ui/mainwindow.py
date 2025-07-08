@@ -17,3 +17,10 @@ class MainWindow(Component):
     def title(self, title: str):
         self._title = title
         self.widget.setWindowTitle(title)
+
+    def resize(self, w: int, h: int) -> None:
+        self.widget.resize(w, h)
+        rect = self.viewer.app.primaryScreen().availableGeometry()
+        x = 0.5 * (rect.width() - w)
+        y = 0.5 * (rect.height() - h)
+        self.widget.setGeometry(x, y, w, h)
