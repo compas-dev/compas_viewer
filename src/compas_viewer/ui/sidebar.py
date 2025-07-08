@@ -1,9 +1,4 @@
-from typing import TYPE_CHECKING
 from typing import Callable
-
-from PySide6 import QtCore
-from PySide6.QtWidgets import QSplitter
-
 from compas_viewer.components import Sceneform
 from compas_viewer.components.objectsetting import ObjectSetting
 from compas_viewer.components.container import Container

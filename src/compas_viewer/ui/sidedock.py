@@ -1,21 +1,17 @@
-from typing import TYPE_CHECKING
-
 from PySide6 import QtCore
 from PySide6 import QtWidgets
 from PySide6.QtWidgets import QDockWidget
-
-if TYPE_CHECKING:
-    from .ui import UI
+from compas_viewer.components.container import Container
 
 
-class SideDock:
+class SideDock(Container):
     locations = {
         "left": QtCore.Qt.DockWidgetArea.LeftDockWidgetArea,
         "right": QtCore.Qt.DockWidgetArea.RightDockWidgetArea,
     }
 
-    def __init__(self, ui: "UI", show: bool = False) -> None:
-        self.ui = ui
+    def __init__(self) -> None:
+        super().__init__(container_type="scrollable")
         self.widget = QDockWidget()
         self.widget.setMinimumWidth(200)
         self.scroll = QtWidgets.QScrollArea()
@@ -28,18 +24,3 @@ class SideDock:
         self.layout.setAlignment(QtCore.Qt.AlignTop)
         self.widget.setAllowedAreas(QtCore.Qt.DockWidgetArea.LeftDockWidgetArea | QtCore.Qt.DockWidgetArea.RightDockWidgetArea)
         self.widget.setFeatures(QDockWidget.DockWidgetFeature.DockWidgetFloatable | QDockWidget.DockWidgetFeature.DockWidgetMovable)
-        self.show = show
-
-    @property
-    def show(self):
-        return self.widget.isVisible()
-
-    @show.setter
-    def show(self, value: bool):
-        if value:
-            self.widget.setVisible(True)
-        elif not value:
-            self.widget.setHidden(True)
-
-    def add(self, widget):
-        self.layout.addWidget(widget)

@@ -4,7 +4,7 @@ from .mainwindow import MainWindow
 from .menubar import MenuBar
 from .sidebar import SideBarRight
 from .sidedock import SideDock
-from .statusbar import SatusBar
+from .statusbar import StatusBar
 from .toolbar import ToolBar
 from .viewport import ViewPort
 
@@ -16,31 +16,15 @@ class UI:
     def __init__(self, viewer: "Viewer") -> None:
         self.viewer = viewer
         self.window = MainWindow(title=self.viewer.config.window.title)
-
-        self.menubar = MenuBar(
-            self,
-            items=self.viewer.config.ui.menubar.items,
-        )
-        self.statusbar = SatusBar(
-            self,
-            show=self.viewer.config.ui.statusbar.show,
-        )
-        self.toolbar = ToolBar(
-            self,
-            items=self.viewer.config.ui.toolbar.items,
-            show=self.viewer.config.ui.toolbar.show,
-        )
-        self.sidebar = SideBarRight(
-            items=self.viewer.config.ui.sidebar.items,
-        )
+        self.menubar = MenuBar(self.window, items=self.viewer.config.ui.menubar.items)
+        self.toolbar = ToolBar(self.window, items=self.viewer.config.ui.toolbar.items)
+        self.statusbar = StatusBar(self.window)
+        self.sidebar = SideBarRight(items=self.viewer.config.ui.sidebar.items)
+        self.sidedock = SideDock()
         self.viewport = ViewPort(
             self,
             self.viewer.renderer,
             self.sidebar,
-        )
-        self.sidedock = SideDock(
-            self,
-            show=self.viewer.config.ui.sidedock.show,
         )
 
         self.window.widget.setCentralWidget(self.viewport.widget)
@@ -50,7 +34,11 @@ class UI:
         self.resize(self.viewer.config.window.width, self.viewer.config.window.height)
         self.window.widget.show()
 
+        self.menubar.add_menu()
+        self.menubar.show = self.viewer.config.ui.menubar.show
+        self.toolbar.show = self.viewer.config.ui.toolbar.show
         self.sidebar.show = self.viewer.config.ui.sidebar.show
+        self.sidedock.show = self.viewer.config.ui.sidedock.show
 
     def resize(self, w: int, h: int) -> None:
         self.window.widget.resize(w, h)
