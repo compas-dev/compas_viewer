@@ -8,10 +8,11 @@ from .sidebar import SideBarRight
 
 
 class ViewPort(Component):
-    def __init__(self, window: MainWindow, renderer: Renderer, sidebar: SideBarRight):
+    def __init__(self, window: MainWindow, sidebar: SideBarRight):
         super().__init__()
         self.widget = QSplitter()
-        self.widget.addWidget(renderer)
+        self.renderer = Renderer()
+        self.widget.addWidget(self.renderer)
         self.widget.addWidget(sidebar.widget)
         self.widget.setSizes([800, 200])
         window.widget.setCentralWidget(self.widget)

@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from compas_viewer.base import Base
 
 from .mainwindow import MainWindow
 from .menubar import MenuBar
@@ -8,20 +8,16 @@ from .statusbar import StatusBar
 from .toolbar import ToolBar
 from .viewport import ViewPort
 
-if TYPE_CHECKING:
-    from compas_viewer import Viewer
 
-
-class UI:
-    def __init__(self, viewer: "Viewer") -> None:
-        self.viewer = viewer
+class UI(Base):
+    def __init__(self) -> None:
         self.window = MainWindow(title=self.viewer.config.window.title)
         self.menubar = MenuBar(self.window, items=self.viewer.config.ui.menubar.items)
         self.toolbar = ToolBar(self.window, items=self.viewer.config.ui.toolbar.items)
         self.statusbar = StatusBar(self.window)
         self.sidebar = SideBarRight(items=self.viewer.config.ui.sidebar.items)
         self.sidedock = SideDock(self.window)
-        self.viewport = ViewPort(self.window, self.viewer.renderer, self.sidebar)
+        self.viewport = ViewPort(self.window, self.sidebar)
 
     def init(self):
         self.resize(self.viewer.config.window.width, self.viewer.config.window.height)

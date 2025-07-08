@@ -5,7 +5,6 @@ from typing import Optional
 
 from PySide6.QtCore import QTimer
 from PySide6.QtGui import QIcon
-from PySide6.QtGui import QSurfaceFormat
 from PySide6.QtWidgets import QApplication
 
 from compas.scene import Scene
@@ -21,12 +20,6 @@ from compas_viewer.ui import UI
 
 class Viewer(Singleton):
     def __init__(self, config: Optional[Config] = None, **kwargs):
-        format = QSurfaceFormat()
-        format.setVersion(3, 3)
-        format.setProfile(QSurfaceFormat.CoreProfile)
-        format.setSamples(4)  # Enable 4x MSAA (optional, can be set to 8, etc.)
-        QSurfaceFormat.setDefaultFormat(format)
-
         self.running = False
         self.app = QApplication(sys.argv)
         self.app.setApplicationName("COMPAS Viewer")
@@ -40,12 +33,18 @@ class Viewer(Singleton):
         self.timer = QTimer()
         self.mouse = Mouse()
 
-        self.eventmanager = EventManager(self)
+        self.eventmanager = EventManager()
+        self.ui = UI()
 
-        # renderer should be part of UI
-        self.renderer = Renderer(self)
-        self.ui = UI(self)
+        # TODO: move to init
         self.unit = self.config.unit
+
+    def init(self):
+        self.ui.init()
+
+    @property
+    def renderer(self) -> Renderer:
+        return self.ui.viewport.renderer
 
     @property
     def scene(self) -> ViewerScene:
@@ -87,7 +86,7 @@ class Viewer(Singleton):
 
     def show(self):
         self.running = True
-        self.ui.init()
+        self.init()
         self.app.exec()
 
     def on(self, interval: int, frames: Optional[int] = None) -> Callable:
