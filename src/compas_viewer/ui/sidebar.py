@@ -35,6 +35,13 @@ class SideBarRight(Container):
                 self.sceneform = Sceneform(columns=columns)
                 self.add(self.sceneform)
 
-            elif itemtype == "ObjectSetting":
+            if itemtype == "ObjectSetting":
                 self.object_setting = ObjectSetting()
                 self.add(self.object_setting)
+
+        # Set equal sizes for all children
+        child_count = self.widget.count()
+        if child_count > 0:
+            # Set each child to have equal size (1000 is arbitrary but proportional)
+            equal_sizes = [1000] * child_count
+            self.widget.setSizes(equal_sizes)

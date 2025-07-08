@@ -42,7 +42,7 @@ class BoundComponent(Component):
     >>> component.set_attr(20.0)
     >>> print(component.get_attr())  # prints 20.0
     """
-    
+
     def __init__(self, obj: Union[object, dict], attr: str, callback: Callable[[Component, float], None]):
         super().__init__()
 

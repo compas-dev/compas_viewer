@@ -8,8 +8,7 @@ from PySide6.QtWidgets import QLabel
 from PySide6.QtWidgets import QLayout
 from PySide6.QtWidgets import QVBoxLayout
 
-from compas_viewer.components.color import ColorComboBox
-from compas_viewer.components.color import ColorDialog
+from compas_viewer.components.colorpicker import ColorPicker
 from compas_viewer.components.numberedit import NumberEdit
 from compas_viewer.components.label import LabelWidget
 from compas_viewer.components.textedit import TextEdit
@@ -149,7 +148,7 @@ class SettingLayout:
                     text = action(obj)
                     widget = LabelWidget(text=text, alignment="center")
                 elif type == "color_combobox":
-                    widget = ColorComboBox(obj=obj, attr=attr)
+                    widget = ColorPicker(obj=obj, attr=attr)
                 elif type == "text_edit":
                     text = str(action(obj))
                     widget = TextEdit(text=text)

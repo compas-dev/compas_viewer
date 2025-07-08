@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING
 
 from PySide6.QtWidgets import QLayout
+from PySide6.QtWidgets import QSizePolicy
 
 if TYPE_CHECKING:
     from .ui import UI
