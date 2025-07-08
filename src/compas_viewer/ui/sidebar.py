@@ -6,26 +6,28 @@ from PySide6.QtWidgets import QSplitter
 
 from compas_viewer.components import Sceneform
 from compas_viewer.components.objectsetting import ObjectSetting
-from compas_viewer.ui.container import Container
-
-if TYPE_CHECKING:
-    from .ui import UI
+from compas_viewer.components.container import Container
 
 
 class SideBarRight(Container):
-    def __init__(self, ui: "UI", show: bool, items: list[dict[str, Callable]]) -> None:
-        super().__init__(ui)
-        self.widget: QSplitter = QSplitter(QtCore.Qt.Orientation.Vertical)
-        self.widget.setChildrenCollapsible(True)
+    """Sidebar for the right side of the window, containing commonly used forms like sceneform and objectsetting.
 
-        self.show = show
-        self.items = items
+    Parameters
+    ----------
+    items : list[dict[str, Callable]]
+        List of items to be added to the sidebar.
 
-    def load_items(self) -> None:
-        if not self.items:
-            return
+    Attributes
+    ----------
+    sceneform : Sceneform
+        Sceneform component, if it is in the items list.
+    object_setting : ObjectSetting
+        ObjectSetting component, if it is in the items list.
+    """
 
-        for item in self.items:
+    def __init__(self, items: list[dict[str, Callable]]) -> None:
+        super().__init__(container_type="splitter")
+        for item in items:
             itemtype = item.get("type", None)
 
             if itemtype == "Sceneform":
@@ -38,10 +40,3 @@ class SideBarRight(Container):
             if itemtype == "ObjectSetting":
                 self.object_setting = ObjectSetting()
                 self.add(self.object_setting)
-
-        # Set equal sizes for all children
-        child_count = self.widget.count()
-        if child_count > 0:
-            # Set each child to have equal size (1000 is arbitrary but proportional)
-            equal_sizes = [1000] * child_count
-            self.widget.setSizes(equal_sizes)

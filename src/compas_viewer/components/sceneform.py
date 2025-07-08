@@ -62,10 +62,6 @@ class Sceneform(Component):
         self.widget.itemClicked.connect(self.on_item_clicked)
         self.widget.itemSelectionChanged.connect(self.on_item_selection_changed)
 
-    @property
-    def scene(self):
-        return self.viewer.scene
-
     def update(self, refresh: bool = False):
         if list(self.scene.objects) == self._sceneobjects and not refresh:
             for node in self.scene.traverse("breadthfirst"):

@@ -15,6 +15,16 @@ class Component(Base):
     def __init__(self):
         super().__init__()
         self.widget = QWidget()
+        self._show = True
 
     def update(self):
         self.widget.update()
+
+    @property
+    def show(self):
+        return self._show
+
+    @show.setter
+    def show(self, value: bool):
+        self._show = value
+        self.widget.setVisible(value)

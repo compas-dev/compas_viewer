@@ -1,16 +1,8 @@
-from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QHBoxLayout
-from PySide6.QtWidgets import QLabel
-from PySide6.QtWidgets import QScrollArea
-from PySide6.QtWidgets import QVBoxLayout
-from PySide6.QtWidgets import QWidget
-
 from .container import Container
-from compas_viewer.components.booleantoggle import BooleanToggle
-from compas_viewer.components.colorpicker import ColorPicker
-from compas_viewer.components.component import Component
-from compas_viewer.components.numberedit import NumberEdit
-from compas_viewer.components.textedit import TextEdit
+from .booleantoggle import BooleanToggle
+from .colorpicker import ColorPicker
+from .numberedit import NumberEdit
+from .textedit import TextEdit
 
 from compas_viewer.scene import ViewerSceneObject
 
@@ -21,7 +13,7 @@ class ObjectSetting(Container):
     """
 
     def __init__(self):
-        super().__init__(scrollable=True)
+        super().__init__(container_type="scrollable")
 
     @property
     def selected(self):
