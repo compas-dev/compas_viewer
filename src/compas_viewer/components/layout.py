@@ -10,7 +10,7 @@ from PySide6.QtWidgets import QVBoxLayout
 
 from compas_viewer.components.color import ColorComboBox
 from compas_viewer.components.color import ColorDialog
-from compas_viewer.components.double_edit import DoubleEdit
+from compas_viewer.components.numberedit import NumberEdit
 from compas_viewer.components.label import LabelWidget
 from compas_viewer.components.textedit import TextEdit
 
@@ -144,7 +144,7 @@ class SettingLayout:
 
                 if type == "double_edit":
                     value = action(obj)
-                    widget = DoubleEdit(title=sub_title, value=value, min_val=min_val, max_val=max_val)
+                    widget = NumberEdit(title=sub_title, value=value, min_val=min_val, max_val=max_val)
                 elif type == "label":
                     text = action(obj)
                     widget = LabelWidget(text=text, alignment="center")

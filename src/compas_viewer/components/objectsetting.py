@@ -7,7 +7,7 @@ from PySide6.QtWidgets import QWidget
 
 from compas_viewer.components.color import ColorDialog
 from compas_viewer.components.component import Component
-from compas_viewer.components.double_edit import DoubleEdit
+from compas_viewer.components.numberedit import NumberEdit
 from compas_viewer.components.textedit import TextEdit
 
 
@@ -28,7 +28,7 @@ class ObjectSetting(Component):
 
     def reset(self):
         """Reset the content widget and layout to a clean state."""
-        self.sub_widgets = {}
+        self.children = []
         self.scroll_content = QWidget()
         self.scroll_layout = QVBoxLayout(self.scroll_content)
         self.scroll_layout.setAlignment(Qt.AlignTop)
@@ -43,39 +43,50 @@ class ObjectSetting(Component):
         self.reset()
 
         if len(self.selected) == 1:
-            self._populate()
-            self._add_event_listeners()
+            self._populate(self.selected[0])
+            # self._add_event_listeners()
         elif len(self.selected) > 1:
             self._add_row("Multiple objects selected")
         else:
             self._add_row("No object selected")
 
-    def _populate(self) -> None:
+    def _populate(self, obj: object) -> None:
         """Populate the layout with the settings of the selected object."""
-        obj = self.selected[0]
 
-        if not obj:
-            return
+        def update_obj(_, value):
+            obj.update()
+            self.viewer.renderer.update()
+            self.viewer.ui.sidebar.sceneform.update(refresh=True)
 
-        self._add_row("name", TextEdit(text=str(obj.name)))
 
-        if hasattr(obj, "pointcolor") and obj.pointcolor is not None:
-            self._add_row("pointcolor", ColorDialog(obj=obj, attr="pointcolor"))
+        # if hasattr(obj, "pointcolor") and obj.pointcolor is not None:
+        #     self._add_row("pointcolor", ColorDialog(obj=obj, attr="pointcolor"))
 
-        if hasattr(obj, "linecolor") and obj.linecolor is not None:
-            self._add_row("linecolor", ColorDialog(obj=obj, attr="linecolor"))
+        # if hasattr(obj, "linecolor") and obj.linecolor is not None:
+        #     self._add_row("linecolor", ColorDialog(obj=obj, attr="linecolor"))
 
-        if hasattr(obj, "facecolor") and obj.facecolor is not None:
-            self._add_row("facecolor", ColorDialog(obj=obj, attr="facecolor"))
+        # if hasattr(obj, "facecolor") and obj.facecolor is not None:
+        #     self._add_row("facecolor", ColorDialog(obj=obj, attr="facecolor"))
+
+        if hasattr(obj, "name") and obj.name is not None:
+            name_edit = TextEdit(obj, "name", callback=update_obj)
+            self.add(name_edit)
 
         if hasattr(obj, "linewidth") and obj.linewidth is not None:
-            self._add_row("linewidth", DoubleEdit(title=None, value=obj.linewidth, min_val=0.0, max_val=10.0))
+            linewidth_edit = NumberEdit(obj, "linewidth", title="line width", min_val=0.0, max_val=10.0, callback=update_obj)
+            self.add(linewidth_edit)
 
         if hasattr(obj, "pointsize") and obj.pointsize is not None:
-            self._add_row("pointsize", DoubleEdit(title=None, value=obj.pointsize, min_val=0.0, max_val=10.0))
+            pointsize_edit = NumberEdit(obj, "pointsize", title="point size", min_val=0.0, max_val=10.0, callback=update_obj)
+            self.add(pointsize_edit)
 
         if hasattr(obj, "opacity") and obj.opacity is not None:
-            self._add_row("opacity", DoubleEdit(title=None, value=obj.opacity, min_val=0.0, max_val=1.0))
+            opacity_edit = NumberEdit(obj, "opacity", title="opacity", min_val=0.0, max_val=1.0, callback=update_obj)
+            self.add(opacity_edit)
+
+    def add(self, component: Component) -> None:
+        self.settings_layout.addWidget(component.widget)
+        self.children.append(component)
 
     def _add_row(self, attr_name: str, widget: QWidget = None) -> None:
         """Create a setting row with label and widget, then add it to the layout."""
@@ -88,35 +99,6 @@ class ObjectSetting(Component):
 
         if widget:
             row_layout.addWidget(widget)
-            self.sub_widgets[attr_name] = widget
+            self.children.append(widget)
 
         self.settings_layout.addLayout(row_layout)
-
-    def _add_event_listeners(self):
-        """Add event listeners to the sub widgets."""
-
-        def _update_obj():
-            if len(self.selected) == 0:
-                return
-
-            obj = self.selected[0]
-
-            for attr_name, widget in self.sub_widgets.items():
-                if not hasattr(obj, attr_name):
-                    continue
-                if isinstance(widget, TextEdit):
-                    value = widget.text_edit.toPlainText()
-                elif isinstance(widget, DoubleEdit):
-                    value = widget.spinbox.value()
-                else:
-                    continue
-
-                setattr(obj, attr_name, value)
-
-            obj.update()
-
-        for widget in self.sub_widgets.values():
-            if isinstance(widget, TextEdit):
-                widget.text_edit.textChanged.connect(_update_obj)
-            elif isinstance(widget, DoubleEdit):
-                widget.spinbox.valueChanged.connect(_update_obj)

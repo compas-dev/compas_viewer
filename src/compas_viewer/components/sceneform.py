@@ -66,8 +66,8 @@ class Sceneform(Component):
     def scene(self):
         return self.viewer.scene
 
-    def update(self):
-        if list(self.scene.objects) == self._sceneobjects:
+    def update(self, refresh: bool = False):
+        if list(self.scene.objects) == self._sceneobjects and not refresh:
             for node in self.scene.traverse("breadthfirst"):
                 widget = node.attributes.get("widget")
                 if widget:
