@@ -23,8 +23,8 @@ class Sceneform(Component):
         A list of booleans indicating whether the corresponding column is editable. Defaults to [False].
     show_headers : bool, optional
         Show the header of the tree. Defaults to True.
-    callback : Callable, optional
-        Callback function to execute when an item is clicked or selected.
+    action : Callable, optional
+        action function to execute when an item is clicked or selected.
 
     Attributes
     ----------
@@ -43,7 +43,7 @@ class Sceneform(Component):
         columns: list[dict],
         column_editable: Optional[list[bool]] = None,
         show_headers: bool = True,
-        callback: Optional[Callable] = None,
+        action: Optional[Callable] = None,
     ):
         super().__init__()
 
@@ -57,7 +57,7 @@ class Sceneform(Component):
         self.widget.setSelectionMode(QTreeWidget.SingleSelection)
         self._sceneobjects = []
 
-        self.callback = callback
+        self.action = action
 
         self.widget.itemClicked.connect(self.on_item_clicked)
         self.widget.itemSelectionChanged.connect(self.on_item_selection_changed)
@@ -130,8 +130,8 @@ class Sceneform(Component):
             selected_nodes = {item.node for item in self.widget.selectedItems()}
             for node in self.scene.objects:
                 node.is_selected = node in selected_nodes
-                if self.callback and node.is_selected:
-                    self.callback(self, node)
+                if self.action and node.is_selected:
+                    self.action(self, node)
 
             self.viewer.ui.sidebar.update()
 
@@ -139,8 +139,8 @@ class Sceneform(Component):
 
     def on_item_selection_changed(self):
         for item in self.widget.selectedItems():
-            if self.callback:
-                self.callback(self, item.node)
+            if self.action:
+                self.action(self, item.node)
 
     def adjust_column_widths(self):
         for i in range(self.widget.columnCount()):

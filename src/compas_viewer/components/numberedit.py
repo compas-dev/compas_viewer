@@ -14,7 +14,7 @@ class NumberEdit(BoundComponent):
     """
     This component creates a labeled number spin box that can be bound to an object's attribute
     (either a dictionary key or object attribute). When the value changes, it automatically
-    updates the bound attribute and optionally calls a callback function.
+    updates the bound attribute and optionally calls a action function.
 
     Parameters
     ----------
@@ -32,7 +32,7 @@ class NumberEdit(BoundComponent):
         The step size for the spin box. Defaults to 0.1.
     decimals : int, optional
         The number of decimal places to display. Defaults to 1.
-    callback : Callable[[Component, float], None], optional
+    action : Callable[[Component, float], None], optional
         A function to call when the value changes. Receives the component and new value.
 
     Attributes
@@ -41,8 +41,8 @@ class NumberEdit(BoundComponent):
         The object or dictionary containing the attribute being edited.
     attr : str
         The name of the attribute/key being edited.
-    callback : Callable[[Component, float], None] or None
-        The callback function to call when the value changes.
+    action : Callable[[Component, float], None] or None
+        The action function to call when the value changes.
     widget : QWidget
         The main widget containing the layout.
     layout : QHBoxLayout
@@ -70,9 +70,9 @@ class NumberEdit(BoundComponent):
         max_val: float = None,
         step: float = 0.1,
         decimals: int = 1,
-        callback: Callable[[Component, float], None] = None,
+        action: Callable[[Component, float], None] = None,
     ):
-        super().__init__(obj, attr, callback=callback)
+        super().__init__(obj, attr, action=action)
 
         self.widget = QWidget()
         self.layout = QHBoxLayout()

@@ -10,27 +10,31 @@ viewer = Viewer()
 
 boxobj = viewer.scene.add(box)
 
+import time
+
 
 def toggle_box():
     boxobj.show = not boxobj.show
     viewer.renderer.update()
 
 
-def slider_changed(slider: Slider, value: int):
+def slider_changed1(slider: Slider, value: float):
     global viewer
     global boxobj
 
-    vmin = slider.min_val
-    vmax = slider.max_val
-
-    v = (value - vmin) / (vmax - vmin)
-
-    boxobj.transformation = Translation.from_vector([10 * v, 0, 0])
+    boxobj.transformation = Translation.from_vector([5 * value, 0, 0])
     boxobj.update()
     viewer.renderer.update()
 
+def slider_changed2(slider: Slider, value: float):
+    global boxobj
+
+    boxobj.update()
+    viewer.renderer.update()
 
 viewer.ui.sidedock.show = True
 viewer.ui.sidedock.add(Button(text="Toggle Box", action=toggle_box))
-viewer.ui.sidedock.add(Slider(title="test", min_val=0, max_val=2, step=0.2, action=slider_changed))
+viewer.ui.sidedock.add(Slider(title="Move Box", min_val=0, max_val=2, step=0.2, action=slider_changed1))
+viewer.ui.sidedock.add(Slider(title="Box Opacity", obj=boxobj, attr="opacity", min_val=0, max_val=1, step=0.1, action=slider_changed2))
+
 viewer.show()

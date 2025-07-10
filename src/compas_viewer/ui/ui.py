@@ -17,6 +17,11 @@ class UI(Base):
         self.sidedock = SideDock(self.window)
         self.viewport = ViewPort(self.window)
 
+        self.menubar.show = self.viewer.config.ui.menubar.show
+        self.toolbar.show = self.viewer.config.ui.toolbar.show
+        self.sidebar.show = self.viewer.config.ui.sidebar.show
+        self.sidedock.show = self.viewer.config.ui.sidedock.show
+
     @property
     def sidebar(self):
         return self.viewport.sidebar
@@ -25,9 +30,5 @@ class UI(Base):
         self.window.resize(self.viewer.config.window.width, self.viewer.config.window.height)
         self.window.widget.show()
 
-        self.menubar.show = self.viewer.config.ui.menubar.show
-        self.toolbar.show = self.viewer.config.ui.toolbar.show
-        self.sidebar.show = self.viewer.config.ui.sidebar.show
-        self.sidedock.show = self.viewer.config.ui.sidedock.show
 
         self.sidebar.update()

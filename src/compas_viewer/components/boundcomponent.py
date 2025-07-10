@@ -11,7 +11,7 @@ class BoundComponent(Component):
 
     This class provides common functionality for UI components that need to be bound
     to an attribute of an object or dictionary. It handles getting and setting values
-    from the bound attribute and provides a callback mechanism for when values change.
+    from the bound attribute and provides a action mechanism for when values change.
 
     Parameters
     ----------
@@ -19,7 +19,7 @@ class BoundComponent(Component):
         The object or dictionary containing the attribute to be bound.
     attr : str
         The name of the attribute/key to be bound.
-    callback : Callable[[Component, float], None]
+    action : Callable[[Component, float], None]
         A function to call when the value changes. Receives the component and new value.
 
     Attributes
@@ -28,28 +28,28 @@ class BoundComponent(Component):
         The object or dictionary containing the attribute being bound.
     attr : str
         The name of the attribute/key being bound.
-    callback : Callable[[Component, float], None]
-        The callback function to call when the value changes.
+    action : Callable[[Component, float], None]
+        The action function to call when the value changes.
 
     Example
     -------
     >>> class MyObject:
     ...     def __init__(self):
     ...         self.value = 10.0
-    >>> def my_callback(component, value):
+    >>> def my_action(component, value):
     ...     print(f"Value changed to: {value}")
     >>> obj = MyObject()
-    >>> component = BoundComponent(obj, "value", my_callback)
+    >>> component = BoundComponent(obj, "value", my_action)
     >>> component.set_attr(20.0)
     >>> print(component.get_attr())  # prints 20.0
     """
 
-    def __init__(self, obj: Union[object, dict], attr: str, callback: Callable[[Component, float], None]):
+    def __init__(self, obj: Union[object, dict], attr: str, action: Callable[[Component, float], None]):
         super().__init__()
 
         self.obj = obj
         self.attr = attr
-        self.callback = callback
+        self.action = action
 
     def get_attr(self):
         """
@@ -60,6 +60,8 @@ class BoundComponent(Component):
         float
             The current value of the attribute.
         """
+        if self.obj is None or self.attr is None:
+            return None
         if isinstance(self.obj, dict):
             return self.obj[self.attr]
         else:
@@ -74,6 +76,8 @@ class BoundComponent(Component):
         value : float
             The new value to set.
         """
+        if self.obj is None or self.attr is None:
+            return
         if isinstance(self.obj, dict):
             self.obj[self.attr] = value
         else:
@@ -84,7 +88,7 @@ class BoundComponent(Component):
         Handle value changes for the bound attribute.
 
         This method is called when the component's value changes. It updates the bound
-        attribute and calls the callback function if one was provided.
+        attribute and calls the action function if one was provided.
 
         Parameters
         ----------
@@ -92,5 +96,5 @@ class BoundComponent(Component):
             The new value to set.
         """
         self.set_attr(value)
-        if self.callback is not None:
-            self.callback(self, value)
+        if self.action is not None:
+            self.action(self, value)

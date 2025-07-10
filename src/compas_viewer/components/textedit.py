@@ -16,7 +16,7 @@ class TextEdit(BoundComponent):
     """
     This component creates a labeled text edit widget that can be bound to an object's attribute
     (either a dictionary key or object attribute). When the text changes, it automatically
-    updates the bound attribute and optionally calls a callback function.
+    updates the bound attribute and optionally calls a action function.
 
     Parameters
     ----------
@@ -26,7 +26,7 @@ class TextEdit(BoundComponent):
         The name of the attribute/key to be edited.
     title : str, optional
         The label text to be displayed next to the text edit. If None, uses the attr name.
-    callback : Callable[[Component, str], None], optional
+    action : Callable[[Component, str], None], optional
         A function to call when the text changes. Receives the component and new text value.
 
     Attributes
@@ -35,8 +35,8 @@ class TextEdit(BoundComponent):
         The object or dictionary containing the attribute being edited.
     attr : str
         The name of the attribute/key being edited.
-    callback : Callable[[Component, str], None] or None
-        The callback function to call when the text changes.
+    action : Callable[[Component, str], None] or None
+        The action function to call when the text changes.
     widget : QWidget
         The main widget containing the layout.
     layout : QHBoxLayout
@@ -60,9 +60,9 @@ class TextEdit(BoundComponent):
         obj: Union[object, dict],
         attr: str,
         title: str = None,
-        callback: Callable[[Component, str], None] = None,
+        action: Callable[[Component, str], None] = None,
     ):
-        super().__init__(obj, attr, callback=callback)
+        super().__init__(obj, attr, action=action)
 
         self.widget = QWidget()
         self.layout = QHBoxLayout()
@@ -79,10 +79,10 @@ class TextEdit(BoundComponent):
         self.layout.addWidget(self.text_edit)
         self.widget.setLayout(self.layout)
 
-        # Connect the text change signal to the callback
+        # Connect the text change signal to the action
         self.text_edit.textChanged.connect(self.on_text_changed)
 
     def on_text_changed(self):
-        """Handle text change events by updating the bound attribute and calling the callback."""
+        """Handle text change events by updating the bound attribute and calling the action."""
         new_text = self.text_edit.toPlainText()
         self.on_value_changed(new_text)

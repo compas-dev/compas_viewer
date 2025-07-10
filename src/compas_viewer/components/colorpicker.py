@@ -39,7 +39,7 @@ class ColorPicker(BoundComponent):
     """
     This component creates a labeled color picker button that can be bound to an object's color attribute
     (either a dictionary key or object attribute). When the color changes, it automatically
-    updates the bound attribute and optionally calls a callback function.
+    updates the bound attribute and optionally calls a action function.
 
     Parameters
     ----------
@@ -49,7 +49,7 @@ class ColorPicker(BoundComponent):
         The name of the attribute/key to be edited.
     title : str, optional
         The label text to be displayed next to the color picker. If None, uses the attr name.
-    callback : Callable[[Component, Color], None], optional
+    action : Callable[[Component, Color], None], optional
         A function to call when the color changes. Receives the component and new color value.
 
     Attributes
@@ -58,8 +58,8 @@ class ColorPicker(BoundComponent):
         The object or dictionary containing the color attribute being edited.
     attr : str
         The name of the attribute/key being edited.
-    callback : Callable[[Component, Color], None] or None
-        The callback function to call when the color changes.
+    action : Callable[[Component, Color], None] or None
+        The action function to call when the color changes.
     widget : QWidget
         The main widget containing the layout.
     layout : QHBoxLayout
@@ -85,9 +85,9 @@ class ColorPicker(BoundComponent):
         obj: Union[object, dict],
         attr: str,
         title: str = None,
-        callback: Callable[[Component, Color], None] = None,
+        action: Callable[[Component, Color], None] = None,
     ):
-        super().__init__(obj, attr, callback=callback)
+        super().__init__(obj, attr, action=action)
 
         self.widget = QWidget()
         self.layout = QHBoxLayout()

@@ -14,7 +14,7 @@ class BooleanToggle(BoundComponent):
     """
     This component creates a labeled checkbox that can be bound to an object's boolean attribute
     (either a dictionary key or object attribute). When the checkbox state changes, it automatically
-    updates the bound attribute and optionally calls a callback function.
+    updates the bound attribute and optionally calls a action function.
 
     Parameters
     ----------
@@ -24,7 +24,7 @@ class BooleanToggle(BoundComponent):
         The name of the attribute/key to be edited.
     title : str, optional
         The label text to be displayed next to the checkbox. If None, uses the attr name.
-    callback : Callable[[Component, bool], None], optional
+    action : Callable[[Component, bool], None], optional
         A function to call when the checkbox state changes. Receives the component and new boolean value.
 
     Attributes
@@ -33,8 +33,8 @@ class BooleanToggle(BoundComponent):
         The object or dictionary containing the boolean attribute being edited.
     attr : str
         The name of the attribute/key being edited.
-    callback : Callable[[Component, bool], None] or None
-        The callback function to call when the checkbox state changes.
+    action : Callable[[Component, bool], None] or None
+        The action function to call when the checkbox state changes.
     widget : QWidget
         The main widget containing the layout.
     layout : QHBoxLayout
@@ -58,9 +58,9 @@ class BooleanToggle(BoundComponent):
         obj: Union[object, dict],
         attr: str,
         title: str = None,
-        callback: Callable[[Component, bool], None] = None,
+        action: Callable[[Component, bool], None] = None,
     ):
-        super().__init__(obj, attr, callback=callback)
+        super().__init__(obj, attr, action=action)
 
         self.widget = QWidget()
         self.layout = QHBoxLayout()
@@ -80,13 +80,13 @@ class BooleanToggle(BoundComponent):
         self.layout.addWidget(self.checkbox)
         self.widget.setLayout(self.layout)
 
-        # Connect the checkbox state change signal to the callback
+        # Connect the checkbox state change signal to the action
         self.checkbox.stateChanged.connect(self.on_state_changed)
 
     def on_state_changed(self, state):
-        """Handle checkbox state change events by updating the bound attribute and calling the callback."""
+        """Handle checkbox state change events by updating the bound attribute and calling the action."""
         # Convert Qt checkbox state to boolean
         is_checked = state == 2  # Qt.Checked = 2
         self.set_attr(is_checked)
-        if self.callback:
-            self.callback(self, is_checked)
+        if self.action:
+            self.action(self, is_checked)
