@@ -3,7 +3,8 @@ from PySide6.QtWidgets import QPushButton
 from PySide6.QtWidgets import QVBoxLayout
 
 from compas_viewer.base import Base
-from compas_viewer.components.layout import SettingLayout
+
+# from compas_viewer.components.layout import SettingLayout
 
 
 class CameraSettingsDialog(QDialog, Base):
@@ -44,8 +45,8 @@ class CameraSettingsDialog(QDialog, Base):
         self.setWindowTitle("Camera Settings")
 
         self.layout = QVBoxLayout(self)
-        self.setting_layout = SettingLayout(viewer=self.viewer, items=items, type="camera_setting")
-        self.setting_layout.generate_layout()
+        # self.setting_layout = SettingLayout(viewer=self.viewer, items=items, type="camera_setting")
+        # self.setting_layout.generate_layout()
 
         self.layout.addLayout(self.setting_layout.layout)
 

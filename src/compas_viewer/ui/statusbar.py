@@ -1,25 +1,12 @@
-from typing import TYPE_CHECKING
+from PySide6.QtWidgets import QLabel
 
-from compas_viewer.components.label import LabelWidget
+from compas_viewer.components.component import Component
 
-if TYPE_CHECKING:
-    from .ui import UI
+from .mainwindow import MainWindow
 
 
-class SatusBar:
-    def __init__(self, ui: "UI", show: bool = True) -> None:
-        self.ui = ui
-        self.widget = self.ui.window.widget.statusBar()
-        self.widget.addWidget(LabelWidget(text="Ready..."))
-        self.show = show
-
-    @property
-    def show(self):
-        return self.widget.isVisible()
-
-    @show.setter
-    def show(self, value: bool):
-        if value:
-            self.widget.setVisible(True)
-        elif not value:
-            self.widget.setHidden(True)
+class StatusBar(Component):
+    def __init__(self, window: MainWindow) -> None:
+        super().__init__()
+        self.widget = window.widget.statusBar()
+        self.widget.addWidget(QLabel(text="Ready..."))

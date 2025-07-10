@@ -1,29 +1,35 @@
-from typing import TYPE_CHECKING
 from typing import Callable
 
-from PySide6 import QtCore
-from PySide6.QtWidgets import QSplitter
-
 from compas_viewer.components import Sceneform
+from compas_viewer.components.container import Container
 from compas_viewer.components.objectsetting import ObjectSetting
 
-if TYPE_CHECKING:
-    from .ui import UI
 
+class SideBarRight(Container):
+    """Sidebar for the right side of the window, containing commonly used forms like sceneform and objectsetting.
 
-class SideBarRight:
-    def __init__(self, ui: "UI", show: bool, items: list[dict[str, Callable]]) -> None:
-        self.ui = ui
-        self.widget = QSplitter(QtCore.Qt.Orientation.Vertical)
-        self.widget.setChildrenCollapsible(True)
-        self.show = show
-        self.hide_widget = True
-        self.items = items
+    Parameters
+    ----------
+    items : list[dict[str, Callable]]
+        List of items to be added to the sidebar.
 
-    def add_items(self) -> None:
-        if not self.items:
-            return
+    Attributes
+    ----------
+    sceneform : Sceneform
+        Sceneform component, if it is in the items list.
+    object_setting : ObjectSetting
+        ObjectSetting component, if it is in the items list.
+    """
 
+    def __init__(self) -> None:
+        super().__init__(container_type="splitter")
+        self.load_items()
+
+    @property
+    def items(self):
+        return self.viewer.config.ui.sidebar.items
+
+    def load_items(self):
         for item in self.items:
             itemtype = item.get("type", None)
 
@@ -32,43 +38,8 @@ class SideBarRight:
                 if columns is None:
                     raise ValueError("Please setup config for Sceneform")
                 self.sceneform = Sceneform(columns=columns)
-                self.widget.addWidget(self.sceneform)
+                self.add(self.sceneform)
 
-            elif itemtype == "ObjectSetting":
-                items = item.get("items", None)
-                if items is None:
-                    raise ValueError("Please setup config for ObjectSetting")
-                self.object_setting = ObjectSetting(viewer=self.ui.viewer, items=items)
-                self.widget.addWidget(self.object_setting)
-
-        self.show_sceneform = True
-        self.show_objectsetting = True
-
-    def update(self):
-        self.widget.update()
-        for widget in self.widget.children():
-            widget.update()
-
-    @property
-    def show(self):
-        return self.widget.isVisible()
-
-    @show.setter
-    def show(self, value: bool):
-        self.widget.setVisible(value)
-
-    @property
-    def show_sceneform(self):
-        return self.sceneform.isVisible()
-
-    @show_sceneform.setter
-    def show_sceneform(self, value: bool):
-        self.sceneform.setVisible(value)
-
-    @property
-    def show_objectsetting(self):
-        return self.object_setting.isVisible()
-
-    @show_objectsetting.setter
-    def show_objectsetting(self, value: bool):
-        self.object_setting.setVisible(value)
+            if itemtype == "ObjectSetting":
+                self.object_setting = ObjectSetting()
+                self.add(self.object_setting)
