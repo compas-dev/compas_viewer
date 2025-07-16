@@ -18,3 +18,10 @@ Classes
     Slider
     Treeform
     ViewModeAction
+    mainwindow.MainWindow
+    menubar.MenuBar
+    sidebar.SideBarRight
+    sidedock.SideDock
+    statusbar.StatusBar
+    toolbar.ToolBar
+    viewport.ViewPort

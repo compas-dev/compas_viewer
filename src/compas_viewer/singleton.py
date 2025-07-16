@@ -12,8 +12,12 @@ class SingletonMeta(type):
                 key_class = key_class.__base__
 
         if key_class not in cls._instances:
-            instance = super().__call__(*args, **kwargs)
+            # Create the instance without calling __init__
+            instance = cls.__new__(cls)
+            # Store it immediately so it's available during __init__
             cls._instances[key_class] = instance
+            # Now call __init__ on the stored instance
+            instance.__init__(*args, **kwargs)
         return cls._instances[key_class]
 
 
