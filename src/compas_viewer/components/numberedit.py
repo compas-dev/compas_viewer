@@ -88,8 +88,12 @@ class NumberEdit(BoundComponent):
 
         if min_val is not None:
             self.spinbox.setMinimum(min_val)
+        else:
+            self.spinbox.setMinimum(-float("inf"))
         if max_val is not None:
             self.spinbox.setMaximum(max_val)
+        else:
+            self.spinbox.setMaximum(float("inf"))
 
         self.layout.addWidget(self.label)
         self.layout.addWidget(self.spinbox)

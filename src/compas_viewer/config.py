@@ -10,7 +10,6 @@ from PySide6.QtGui import QDesktopServices
 
 from compas.colors import Color
 from compas_viewer.commands import Command
-from compas_viewer.commands import camera_settings_cmd
 from compas_viewer.commands import capture_view_cmd
 from compas_viewer.commands import change_rendermode_cmd
 from compas_viewer.commands import change_view_cmd
@@ -145,8 +144,6 @@ class MenubarConfig(ConfigBase):
                     ],
                 },
                 {"type": "separator"},
-                {"title": camera_settings_cmd.title, "action": camera_settings_cmd},
-                {"title": "Display Settings", "action": lambda: print("Display Settings")},
                 {"title": capture_view_cmd.title, "action": capture_view_cmd},
                 {"type": "separator"},
             ],
@@ -257,6 +254,7 @@ class SidebarConfig(ConfigBase):
                 ],
             },
             {"type": "ObjectSetting"},
+            {"type": "CameraSetting"},
         ]
     )
 
@@ -325,26 +323,6 @@ class CameraConfig(ConfigBase):
     zoomdelta: float = 0.05
     rotationdelta: float = 0.01
     pandelta: float = 0.05
-    dialog_settings: list[dict] = field(
-        default_factory=lambda: [
-            {
-                "title": "Camera_Target",
-                "items": [
-                    {"type": "double_edit", "title": "X", "action": lambda camera: camera.target.x, "min_val": None, "max_val": None},
-                    {"type": "double_edit", "title": "Y", "action": lambda camera: camera.target.y, "min_val": None, "max_val": None},
-                    {"type": "double_edit", "title": "Z", "action": lambda camera: camera.target.z, "min_val": None, "max_val": None},
-                ],
-            },
-            {
-                "title": "Camera_Position",
-                "items": [
-                    {"type": "double_edit", "title": "X", "action": lambda camera: camera.position.x, "min_val": None, "max_val": None},
-                    {"type": "double_edit", "title": "Y", "action": lambda camera: camera.position.y, "min_val": None, "max_val": None},
-                    {"type": "double_edit", "title": "Z", "action": lambda camera: camera.position.z, "min_val": None, "max_val": None},
-                ],
-            },
-        ]
-    )
 
 
 @dataclass
@@ -400,7 +378,6 @@ class Config(ConfigBase):
     camera: CameraConfig = field(default_factory=CameraConfig)
     commands: list[Command] = field(
         default_factory=lambda: [
-            camera_settings_cmd,
             change_rendermode_cmd,
             change_view_cmd,
             clear_scene_cmd,

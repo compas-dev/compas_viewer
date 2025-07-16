@@ -30,5 +30,4 @@ class UI(Base):
         self.window.resize(self.viewer.config.window.width, self.viewer.config.window.height)
         self.window.widget.show()
 
-
         self.sidebar.update()

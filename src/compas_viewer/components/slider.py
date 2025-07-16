@@ -80,7 +80,7 @@ class Slider(BoundComponent):
     >>> def my_action(component, value):
     ...     print(f"Brightness changed to: {value}")
     >>> component = Slider(obj, "brightness", title="Brightness", min_val=0, max_val=100, action=my_action)
-    
+
     >>> # Standalone slider with initial value
     >>> standalone_slider = Slider(value=25.0, title="Volume", min_val=0, max_val=100)
     """
@@ -98,7 +98,7 @@ class Slider(BoundComponent):
         action: Callable[[Component, float], None] = None,
     ):
         super().__init__(obj, attr, action=action)
-        
+
         self.title = title if title is not None else (attr if attr is not None else "Value")
         self.min_val = min_val
         self.max_val = max_val
@@ -112,7 +112,7 @@ class Slider(BoundComponent):
             initial_value = self.get_attr()
         else:
             initial_value = value
-        
+
         # Clamp initial value to valid range
         initial_value = max(self.min_val, min(self.max_val, initial_value))
 
@@ -186,11 +186,11 @@ class Slider(BoundComponent):
             value = float(self.line_edit.text())
             # Clamp value to valid range
             clamped_value = max(self.min_val, min(self.max_val, value))
-            
+
             # Update the line edit if the value was clamped
             if clamped_value != value:
                 self.line_edit.setText(str(clamped_value))
-            
+
             self.slider.setValue(self._scale_value(clamped_value))
             self.on_value_changed(clamped_value)
         except ValueError:

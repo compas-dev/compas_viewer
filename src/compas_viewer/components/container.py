@@ -56,9 +56,12 @@ class Container(Component):
         if self.container_type == "scrollable":
             self.widget = QScrollArea()
             self.widget.setWidgetResizable(True)
+            self.widget.setContentsMargins(0, 0, 0, 0)
             self._scroll_content = QWidget()
+            self._scroll_content.setContentsMargins(0, 0, 0, 0)
             self._scroll_layout = QVBoxLayout(self._scroll_content)
             self._scroll_layout.setAlignment(Qt.AlignTop)
+            self._scroll_layout.setContentsMargins(0, 0, 0, 0)
             self.widget.setWidget(self._scroll_content)
             self.layout = QVBoxLayout()
             self.layout.setSpacing(0)
@@ -67,9 +70,11 @@ class Container(Component):
         elif self.container_type == "splitter":
             self.widget = QSplitter(Qt.Orientation.Vertical)
             self.widget.setChildrenCollapsible(True)
+            self.widget.setContentsMargins(0, 0, 0, 0)
             self.layout = None  # Splitter doesn't use layout
         else:
             self.widget = QWidget()
+            self.widget.setContentsMargins(0, 0, 0, 0)
             self.layout = QVBoxLayout()
             self.layout.setSpacing(0)
             self.layout.setContentsMargins(0, 0, 0, 0)
@@ -77,6 +82,9 @@ class Container(Component):
 
     def add(self, component: "Component") -> None:
         """Add a component to the container."""
+        if component in self.children:
+            return
+
         if self.container_type == "splitter":
             self.widget.addWidget(component.widget)
             child_count = self.widget.count()
