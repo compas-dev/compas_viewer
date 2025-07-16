@@ -42,6 +42,11 @@ class Slider(BoundComponent):
         Interval between tick marks. No ticks if None. Defaults to None.
     action : Callable[[Component, float], None], optional
         A function to call when the value changes. Receives the component and new value.
+    **kwargs
+        Additional keyword arguments passed to BoundComponent, including:
+        - watch_interval : int, optional
+            Interval in milliseconds to check for changes in the bound object.
+            If None, watching is disabled. Default is 100.
 
     Attributes
     ----------
@@ -96,8 +101,9 @@ class Slider(BoundComponent):
         step: float = 1,
         tick_interval: Optional[float] = None,
         action: Callable[[Component, float], None] = None,
+        **kwargs,
     ):
-        super().__init__(obj, attr, action=action)
+        super().__init__(obj, attr, action=action, **kwargs)
 
         self.title = title if title is not None else (attr if attr is not None else "Value")
         self.min_val = min_val
@@ -196,3 +202,28 @@ class Slider(BoundComponent):
         except ValueError:
             pass  # Handle cases where the text is not a valid number
         self._updating = False
+
+    def sync_from_bound_object(self, value: float):
+        """
+        Sync the slider and text input with the bound object's value.
+
+        This method is called when the bound object's value changes externally.
+
+        Parameters
+        ----------
+        value : float
+            The new value from the bound object.
+        """
+        if self._updating:
+            return
+
+        self._updating = True
+        try:
+            # Clamp value to valid range
+            clamped_value = max(self.min_val, min(self.max_val, value))
+
+            # Update both the slider and the text input
+            self.slider.setValue(self._scale_value(clamped_value))
+            self.line_edit.setText(str(clamped_value))
+        finally:
+            self._updating = False

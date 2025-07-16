@@ -34,6 +34,11 @@ class NumberEdit(BoundComponent):
         The number of decimal places to display. Defaults to 1.
     action : Callable[[Component, float], None], optional
         A function to call when the value changes. Receives the component and new value.
+    **kwargs
+        Additional keyword arguments passed to BoundComponent, including:
+        - watch_interval : int, optional
+            Interval in milliseconds to check for changes in the bound object.
+            If None, watching is disabled. Default is 100.
 
     Attributes
     ----------
@@ -58,7 +63,10 @@ class NumberEdit(BoundComponent):
     ...     def __init__(self):
     ...         self.x = 5.0
     >>> obj = MyObject()
+    >>> # Component with default watcher (100ms)
     >>> component = NumberEdit(obj, "x", title="X Coordinate", min_val=0.0, max_val=10.0)
+    >>> # Component without watcher
+    >>> component = NumberEdit(obj, "x", title="X Coordinate", min_val=0.0, max_val=10.0, watch_interval=None)
     """
 
     def __init__(
@@ -71,8 +79,9 @@ class NumberEdit(BoundComponent):
         step: float = 0.1,
         decimals: int = 1,
         action: Callable[[Component, float], None] = None,
+        **kwargs,
     ):
-        super().__init__(obj, attr, action=action)
+        super().__init__(obj, attr, action=action, **kwargs)
 
         self.widget = QWidget()
         self.layout = QHBoxLayout()
@@ -99,3 +108,22 @@ class NumberEdit(BoundComponent):
         self.layout.addWidget(self.spinbox)
         self.widget.setLayout(self.layout)
         self.spinbox.valueChanged.connect(self.on_value_changed)
+
+    def sync_from_bound_object(self, value: float):
+        """
+        Sync the spinbox value with the bound object's value.
+
+        This method is called when the bound object's value changes externally.
+
+        Parameters
+        ----------
+        value : float
+            The new value from the bound object.
+        """
+        # Temporarily disconnect the signal to prevent infinite loops
+        self.spinbox.valueChanged.disconnect(self.on_value_changed)
+        try:
+            self.spinbox.setValue(value)
+        finally:
+            # Reconnect the signal
+            self.spinbox.valueChanged.connect(self.on_value_changed)
