@@ -12,19 +12,3 @@ Classes
     :nosignatures:
 
     UI
-
-
-Other Classes
-=============
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    mainwindow.MainWindow
-    menubar.MenuBar
-    sidebar.SideBarRight
-    sidedock.SideDock
-    statusbar.StatusBar
-    toolbar.ToolBar
-    viewport.ViewPort
