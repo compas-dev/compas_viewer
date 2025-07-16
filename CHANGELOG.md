@@ -9,9 +9,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Added `Component` base class with standardized `widget` attribute and `update()` method.
+* Added `BoundComponent` class for components bound to object attributes with automatic value synchronization.
+* Added new components: `BooleanToggle`, `ColorPicker`, `NumberEdit`, `Container`, `Tabform`.
+
 ### Changed
 
+* Complete restructuring of compas_viewer UI architecture to implement component-based system.
+* Replaced dialogs with integrated components: `CameraSettingsDialog` → `CameraSetting`, `ObjectSettingDialog` → `ObjectSetting`.
+* Enhanced existing components: Updated `Slider`, `TextEdit`, `Button` to use new component-based system.
+* Moved UI elements to dedicated `components/` folder.
+* Refactored `MenuBar`, `ToolBar`, `SideDock`, `MainWindow`, `StatusBar`, `ViewPort` to use new component system.
+* Updated `UI` class to use new component architecture.
+* All UI components now inherit from `Base` class for consistent structure.
+* Improved data binding with automatic attribute synchronization.
+
 ### Removed
+
+* Removed deprecated components: `ColorComboBox`, `ComboBox`, `DoubleEdit`, `LineEdit`, `LabelWidget`.
+* Removed `CameraSettingsDialog` and `ObjectSettingDialog` (replaced with integrated components).
 
 
 ## [1.6.1] 2025-06-30
