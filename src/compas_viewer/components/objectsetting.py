@@ -57,13 +57,13 @@ class ObjectSetting(Container):
         if hasattr(obj, "show_faces"):
             self.add(BooleanToggle(obj=obj, attr="show_faces", action=_update_obj_settings))
 
-        if hasattr(obj, "pointcolor"):
+        if hasattr(obj, "pointcolor") and obj.pointcolor is not None:
             self.add(ColorPicker(obj=obj, attr="pointcolor", action=_update_obj_settings))
 
-        if hasattr(obj, "linecolor"):
+        if hasattr(obj, "linecolor") and obj.linecolor is not None:
             self.add(ColorPicker(obj=obj, attr="linecolor", action=_update_obj_settings))
 
-        if hasattr(obj, "facecolor"):
+        if hasattr(obj, "facecolor") and obj.facecolor is not None:
             self.add(ColorPicker(obj=obj, attr="facecolor", action=_update_obj_settings))
 
         if hasattr(obj, "linewidth"):

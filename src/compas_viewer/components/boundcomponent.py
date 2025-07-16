@@ -163,7 +163,6 @@ class BoundComponent(Component):
             self._last_watched_value = current_value
             self._updating_from_watch = True
             try:
-                print("sync from bound object", self.obj, self.attr)
                 self.sync_from_bound_object(current_value)
             finally:
                 self._updating_from_watch = False

@@ -1,11 +1,11 @@
 from compas_viewer.base import Base
 
-from .mainwindow import MainWindow
-from .menubar import MenuBar
-from .sidedock import SideDock
-from .statusbar import StatusBar
-from .toolbar import ToolBar
-from .viewport import ViewPort
+from .components.mainwindow import MainWindow
+from .components.menubar import MenuBar
+from .components.sidedock import SideDock
+from .components.statusbar import StatusBar
+from .components.toolbar import ToolBar
+from .components.viewport import ViewPort
 
 
 class UI(Base):

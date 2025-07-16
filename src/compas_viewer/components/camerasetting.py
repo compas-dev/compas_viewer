@@ -79,7 +79,7 @@ class CameraSetting(Container):
         self.far = NumberEdit(camera, "far", title="Far Plane", min_val=10.0, max_val=10000.0, action=_update_camera)
         self.scale = NumberEdit(camera, "scale", title="Scale", min_val=0.1, max_val=10.0, action=_update_camera)
         self.zoomdelta = NumberEdit(camera, "zoomdelta", title="Zoom Delta", min_val=0.001, max_val=1.0, action=_update_camera)
-        self.rotationdelta = NumberEdit(camera, "rotationdelta", title="Rotation Delta", min_val=0.001, max_val=1.0, action=_update_camera)
+        self.rotationdelta = NumberEdit(camera, "rotationdelta", title="Rotation Delta", step=0.01, decimals=2, min_val=0.001, max_val=1.0, action=_update_camera)
         self.pandelta = NumberEdit(camera, "pandelta", title="Pan Delta", min_val=0.001, max_val=1.0, action=_update_camera)
 
         # Add components to the form
