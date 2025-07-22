@@ -8,61 +8,60 @@ from PySide6.QtWidgets import QTreeWidgetItem
 from compas.datastructures import Tree
 from compas.datastructures import TreeNode
 
+from .component import Component
 
-class Treeform(QTreeWidget):
+
+class Treeform(Component):
     """
-    Class for displaying tree-like data.
-    Treeform is an abstract class that could be placed in either the viewport or the sidedock.
+    A component for displaying hierarchical tree-like data in a tree widget.
+
+    This component provides a flexible way to visualize tree structures with
+    customizable columns and background colors. It supports selection callbacks
+    and can be used in various UI layouts.
 
     Parameters
     ----------
-    tree : :class:`compas.datastructures.Tree`
-        The tree to be displayed. An typical example is the scene
-        object tree: :attr:`compas_viewer.viewer.Viewer._tree`.
-    columns : dict[str, callable]
-        A dictionary of column names and their corresponding attributes.
-        Example: ``{"Name": (lambda o: o.name), "Object": (lambda o: o)}``
+    tree : Tree, optional
+        The tree data structure to display. Defaults to an empty tree.
+    columns : dict[str, Callable], optional
+        Dictionary mapping column names to functions that extract values from tree nodes.
+        Defaults to {"Name": lambda node: node.name, "Value": lambda node: node.attributes.get("value", "")}.
     show_headers : bool, optional
-        Show the header of the tree.
-        Defaults to ``True``.
+        Whether to show column headers. Defaults to True.
     stretch : int, optional
-        Stretch factor of the tree in the grid layout.
-        Defaults to ``2``.
-    backgrounds : dict[str, callable], optional
-        A dictionary of column names and their corresponding color.
-        Example: ``{"Object-Color": (lambda o: o.surfacecolor)}``
+        Stretch factor for the tree widget in grid layouts. Defaults to 2.
+    backgrounds : dict[str, Callable], optional
+        Dictionary mapping column names to functions that return background colors.
+    action : Callable, optional
+        Function to call when tree items are selected. Receives the selected node as argument.
 
     Attributes
     ----------
-    tree : :class:`compas.datastructures.Tree`
-        The tree to be displayed.
-
-    See Also
-    --------
-    :class:`compas.datastructures.Tree`
-    :class:`compas.datastructures.tree.TreeNode`
-    :class:`compas_viewer.layout.SidedockLayout`
-
-    References
-    ----------
-    :PySide6:`PySide6/QtWidgets/QTreeWidget`
+    widget : QTreeWidget
+        The Qt tree widget for displaying the data.
+    tree : Tree
+        The tree data structure being displayed.
+    columns : dict[str, Callable]
+        Column definitions for the tree display.
+    stretch : int
+        Stretch factor for layout purposes.
+    action : Callable or None
+        Selection action function.
 
     Examples
     --------
-    .. code-block:: python
+    >>> # Create a simple tree form
+    >>> treeform = Treeform()
+    >>> treeform.update()
 
-        from compas_viewer import Viewer
+    >>> # Create with custom columns
+    >>> columns = {"Name": lambda node: node.name, "Type": lambda node: type(node).__name__}
+    >>> treeform = Treeform(columns=columns)
 
-        viewer = Viewer()
-
-        for i in range(10):
-            for j in range(10):
-                sp = viewer.scene.add(Sphere(0.1, Frame([i, j, 0], [1, 0, 0], [0, 1, 0])), name=f"Sphere_{i}_{j}")
-
-        viewer.layout.sidedock.add_element(Treeform(viewer._tree, {"Name": (lambda o: o.object.name), "Object": (lambda o: o.object)}))
-
-        viewer.show()
-
+    >>> # Create with selection action
+    >>> def on_select(node):
+    ...     print(f"Selected: {node.name}")
+    >>> treeform = Treeform(action=on_select)
     """
 
     def __init__(
@@ -72,22 +71,30 @@ class Treeform(QTreeWidget):
         show_headers: bool = True,
         stretch: int = 2,
         backgrounds: Optional[dict[str, Callable]] = None,
-        callback: Optional[Callable] = None,
+        action: Optional[Callable] = None,
     ):
         super().__init__()
+        self.widget = QTreeWidget()
+
         self.columns = columns or {"Name": lambda node: node.name, "Value": lambda node: node.attributes.get("value", "")}
-        self.setColumnCount(len(self.columns))
-        self.setHeaderLabels(list(self.columns.keys()))
-        self.setHeaderHidden(not show_headers)
+        self.widget.setColumnCount(len(self.columns))
+        self.widget.setHeaderLabels(list(self.columns.keys()))
+        self.widget.setHeaderHidden(not show_headers)
         self.stretch = stretch
         self._backgrounds = backgrounds
 
         self.tree = tree or Tree()
-        self.callback = callback
-        self.itemSelectionChanged.connect(self.on_item_selection_changed)
+        self.action = action
+        self.widget.itemSelectionChanged.connect(self.on_item_selection_changed)
 
     def update(self):
-        self.clear()
+        """Update the tree widget display with the current tree data.
+        
+        This method clears the existing tree widget items and rebuilds the display
+        based on the current tree structure, applying column mappings and background
+        colors as configured.
+        """
+        self.widget.clear()
         for node in self.tree.traverse("breadthfirst"):
             if node.is_root:
                 continue
@@ -95,7 +102,7 @@ class Treeform(QTreeWidget):
             strings = [str(c(node)) for _, c in self.columns.items()]
 
             if node.parent.is_root:  # type: ignore
-                node.attributes["widget_item"] = QTreeWidgetItem(self, strings)  # type: ignore
+                node.attributes["widget_item"] = QTreeWidgetItem(self.widget, strings)  # type: ignore
             else:
                 node.attributes["widget_item"] = QTreeWidgetItem(
                     node.parent.attributes["widget_item"],
@@ -109,6 +116,18 @@ class Treeform(QTreeWidget):
                     node.attributes["widget_item"].setBackground(list(self.columns.keys()).index(col), QColor(*background(node).rgb255))
 
     def tree_from_dict(self, data):
+        """Create a tree structure from a dictionary.
+        
+        Parameters
+        ----------
+        data : dict
+            Dictionary containing the hierarchical data to convert to a tree.
+            
+        Returns
+        -------
+        Tree
+            A new Tree object representing the dictionary structure.
+        """
         tree = Tree()
         root = TreeNode("Root")
         tree.add(root)
@@ -133,10 +152,25 @@ class Treeform(QTreeWidget):
         return tree
 
     def update_from_dict(self, data):
+        """Update the tree display from a dictionary structure.
+        
+        This is a convenience method that converts dictionary data to a tree
+        and updates the display in one step.
+        
+        Parameters
+        ----------
+        data : dict
+            Dictionary containing the hierarchical data to display.
+        """
         self.tree = self.tree_from_dict(data)
         self.update()
 
     def on_item_selection_changed(self):
-        for item in self.selectedItems():
-            if self.callback:
-                self.callback(item.node)
+        """Handle tree item selection changes.
+        
+        This method is called when the selection in the tree widget changes.
+        It calls the action function (if provided) with the selected node as argument.
+        """
+        for item in self.widget.selectedItems():
+            if self.action:
+                self.action(item.node)
