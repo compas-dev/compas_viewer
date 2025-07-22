@@ -172,9 +172,14 @@ class GridObject(Base):
         flat_positions = list(flatten(positions))
         flat_colors = list(flatten([color.rgba for color in colors]))
         flat_elements = list(flatten(elements))
+
+        # Add object_index data (all zeros for grid since it uses is_grid flag)
+        object_indices = [0.0] * (len(flat_positions) // 3)
+
         return {
             "positions": make_vertex_buffer(flat_positions),
             "colors": make_vertex_buffer(flat_colors),
+            "object_indices": make_vertex_buffer(object_indices),
             "elements": make_index_buffer(flat_elements),
             "n": len(flat_elements),
         }
@@ -185,8 +190,11 @@ class GridObject(Base):
         shader.uniform1i("is_grid", True)
         shader.enable_attribute("position")
         shader.enable_attribute("color")
+        shader.enable_attribute("object_index")
         shader.bind_attribute("position", self._lines_buffer["positions"])
         shader.bind_attribute("color", self._lines_buffer["colors"], step=4)
+        shader.bind_attribute("object_index", self._lines_buffer["object_indices"], step=1)
         shader.draw_lines(elements=self._lines_buffer["elements"], n=self._lines_buffer["n"], width=1, background=True)
         shader.disable_attribute("position")
         shader.disable_attribute("color")
+        shader.disable_attribute("object_index")
