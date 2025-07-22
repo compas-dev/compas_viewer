@@ -1,29 +1,28 @@
 from functools import partial
-from typing import TYPE_CHECKING
 from typing import Any
 from typing import Callable
 from typing import Optional
 
 from compas_viewer.components import Button
+from compas_viewer.components.component import Component
 
-if TYPE_CHECKING:
-    from .ui import UI
+from .mainwindow import MainWindow
 
 
-class ToolBar:
-    def __init__(self, ui: "UI", items: list[dict], show: bool = True) -> None:
-        self.ui = ui
-        self.items = items
-
-        self.widget = self.ui.window.widget.addToolBar("Tools")
+class ToolBar(Component):
+    def __init__(self, window: MainWindow) -> None:
+        super().__init__()
+        self.widget = window.widget.addToolBar("Tools")
         self.widget.clear()
         self.widget.setMovable(False)
         self.widget.setObjectName("Tools")
-        self.show = show
+        self.load_items()
 
-        if not self.items:
-            return
+    @property
+    def items(self):
+        return self.viewer.config.ui.toolbar.items
 
+    def load_items(self):
         for item in self.items:
             text = item.get("title", None)
             tooltip = item.get("tooltip", None)
@@ -64,14 +63,3 @@ class ToolBar:
     #         combobox.addItem(item["title"], item.get("value", item["title"]))
     #     combobox.currentIndexChanged.connect(lambda index: action(combobox.itemData(index)))
     #     self.widget.addWidget(combobox)
-
-    @property
-    def show(self):
-        return self.widget.isVisible()
-
-    @show.setter
-    def show(self, value: bool):
-        if value:
-            self.widget.setVisible(True)
-        elif not value:
-            self.widget.setHidden(True)

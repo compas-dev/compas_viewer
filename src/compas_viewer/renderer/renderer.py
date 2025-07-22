@@ -11,6 +11,7 @@ from PySide6.QtGui import QDragMoveEvent
 from PySide6.QtGui import QDropEvent
 from PySide6.QtGui import QKeyEvent
 from PySide6.QtGui import QMouseEvent
+from PySide6.QtGui import QSurfaceFormat
 from PySide6.QtGui import QWheelEvent
 from PySide6.QtOpenGLWidgets import QOpenGLWidget
 from PySide6.QtWidgets import QGestureEvent
@@ -18,6 +19,7 @@ from PySide6.QtWidgets import QGestureEvent
 from compas.geometry import Frame
 from compas.geometry import transform_points_numpy
 from compas.scene import Group
+from compas_viewer.base import Base
 from compas_viewer.gl import OffscreenBufferContext
 from compas_viewer.scene import TagObject
 from compas_viewer.scene.buffermanager import BufferManager
@@ -27,12 +29,11 @@ from .camera import Camera
 from .shaders import Shader
 
 if TYPE_CHECKING:
-    from compas_viewer import Viewer
     from compas_viewer.scene.gridobject import GridObject
     from compas_viewer.scene.meshobject import MeshObject
 
 
-class Renderer(QOpenGLWidget):
+class Renderer(QOpenGLWidget, Base):
     """
     Renderer class for 3D rendering of COMPAS geometry.
     We constantly use OpenGL version 2.1 and GLSL 120 with a Compatibility Profile at the moment.
@@ -52,10 +53,14 @@ class Renderer(QOpenGLWidget):
     # Enhance pixel  width for selection.
     PIXEL_SELECTION_INCREMENTAL = 2
 
-    def __init__(self, viewer: "Viewer"):
-        super().__init__()
+    def __init__(self):
+        format = QSurfaceFormat()
+        format.setVersion(3, 3)
+        format.setProfile(QSurfaceFormat.CoreProfile)
+        format.setSamples(4)  # Enable 4x MSAA (optional, can be set to 8, etc.)
+        QSurfaceFormat.setDefaultFormat(format)
 
-        self.viewer = viewer
+        super().__init__()
 
         self._view = self.viewer.config.renderer.view
         self._rendermode = self.viewer.config.renderer.rendermode

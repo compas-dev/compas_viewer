@@ -1,4 +1,3 @@
-from typing import TYPE_CHECKING
 from typing import Literal
 
 from PySide6.QtCore import QObject
@@ -9,9 +8,7 @@ from PySide6.QtGui import QMouseEvent
 from PySide6.QtGui import QWheelEvent
 from PySide6.QtWidgets import QGestureEvent
 
-if TYPE_CHECKING:
-    from compas_viewer import Viewer
-
+from compas_viewer.base import Base
 
 mousebutton_constant = {
     "LEFT": Qt.MouseButton.LeftButton,
@@ -237,7 +234,7 @@ class WheelEvent(QObject):
         return f"{self.title}"
 
 
-class EventManager:
+class EventManager(Base):
     """Class representing a manager for user inout events.
 
     Parameters
@@ -256,8 +253,7 @@ class EventManager:
 
     """
 
-    def __init__(self, viewer: "Viewer") -> None:
-        self.viewer = viewer
+    def __init__(self) -> None:
         self.key_events: list[KeyEvent] = []
         self.mouse_events: list[MouseEvent] = []
         self.wheel_events: list[WheelEvent] = []
