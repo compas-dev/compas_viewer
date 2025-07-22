@@ -6,6 +6,7 @@ from numpy import float32
 from numpy import identity
 from OpenGL import GL
 from PySide6 import QtCore
+from PySide6.QtCore import QTimer
 from PySide6.QtGui import QDragEnterEvent
 from PySide6.QtGui import QDragMoveEvent
 from PySide6.QtGui import QDropEvent
@@ -96,6 +97,15 @@ class Renderer(QOpenGLWidget, Base):
         self.setAcceptDrops(True)
 
         self.buffer_manager = BufferManager()
+
+        self.set_idle_refresh()
+
+    def set_idle_refresh(self):
+        """Set a low idle refresh rate of 10 FPS. Useful for GPU buffer updates delay."""
+        self._idle_timer = QTimer(self)
+        self._idle_timer.setInterval(100)
+        self._idle_timer.timeout.connect(self.update)
+        self._idle_timer.start()
 
     @property
     def rendermode(self):
