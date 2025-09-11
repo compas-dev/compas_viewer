@@ -89,7 +89,7 @@ class Treeform(Component):
 
     def update(self):
         """Update the tree widget display with the current tree data.
-        
+
         This method clears the existing tree widget items and rebuilds the display
         based on the current tree structure, applying column mappings and background
         colors as configured.
@@ -117,12 +117,12 @@ class Treeform(Component):
 
     def tree_from_dict(self, data):
         """Create a tree structure from a dictionary.
-        
+
         Parameters
         ----------
         data : dict
             Dictionary containing the hierarchical data to convert to a tree.
-            
+
         Returns
         -------
         Tree
@@ -153,10 +153,10 @@ class Treeform(Component):
 
     def update_from_dict(self, data):
         """Update the tree display from a dictionary structure.
-        
+
         This is a convenience method that converts dictionary data to a tree
         and updates the display in one step.
-        
+
         Parameters
         ----------
         data : dict
@@ -167,7 +167,7 @@ class Treeform(Component):
 
     def on_item_selection_changed(self):
         """Handle tree item selection changes.
-        
+
         This method is called when the selection in the tree widget changes.
         It calls the action function (if provided) with the selected node as argument.
         """
