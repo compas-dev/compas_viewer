@@ -1,0 +1,1338 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Index &#8212; COMPAS Viewer</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/css/compas.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/tabs.css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.4cbf315f70debaebd550c87a6162cf0f.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script src="_static/tabs.js"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js"></script>
+    <script src="_static/design-tabs.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'genindex';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/compas-dev/compas_viewer/gh-pages/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '2.0';
+        </script>
+    <link rel="index" title="Index" href="#" />
+    <link rel="search" title="Search" href="search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  <div class="navbar-header-items__start">
+    
+      <div class="navbar-item">
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/compas_icon_white.png" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="_static/compas_icon_white.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+    <p class="title logo__title">COMPAS Viewer</p>
+  
+</a></div>
+    
+  </div>
+  
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item"><nav class="navbar-nav">
+  <!-- <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="index.html">
+                        Introduction
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="installation.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="tutorial.html">
+                        Tutorial
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="examples.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="api.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="license.html">
+                        License
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="acknowledgements.html">
+                        Acknowledgements
+                      </a>
+                    </li>
+                
+
+                <li class="nav-item">
+                  <a class="nav-link nav-external" href="https://compas.dev">
+                    COMPAS Framework
+                  </a>
+                </li>
+                
+                </div>
+            </div>
+            
+  </ul> -->
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+        </div>
+      
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button type="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown">
+      2.0  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div class="version-switcher__menu dropdown-menu list-group-flush py-0">
+    <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/compas-dev/compas_viewer" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-github"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="http://forum.compas-framework.org/" title="Discourse" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-discourse"></i></span>
+            <label class="sr-only">Discourse</label></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/compas_viewer/" title="PyPI" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-python"></i></span>
+            <label class="sr-only">PyPI</label></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+    </div>
+  
+
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item"><nav class="navbar-nav">
+  <!-- <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="index.html">
+                        Introduction
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="installation.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="tutorial.html">
+                        Tutorial
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="examples.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="api.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="license.html">
+                        License
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="acknowledgements.html">
+                        Acknowledgements
+                      </a>
+                    </li>
+                
+
+                <li class="nav-item">
+                  <a class="nav-link nav-external" href="https://compas.dev">
+                    COMPAS Framework
+                  </a>
+                </li>
+                
+                </div>
+            </div>
+            
+  </ul> -->
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button type="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown">
+      2.0  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div class="version-switcher__menu dropdown-menu list-group-flush py-0">
+    <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/compas-dev/compas_viewer" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-github"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="http://forum.compas-framework.org/" title="Discourse" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-discourse"></i></span>
+            <label class="sr-only">Discourse</label></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/compas_viewer/" title="PyPI" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-python"></i></span>
+            <label class="sr-only">PyPI</label></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="tutorial.html">Tutorial</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/000_basics.html">Viewer Basics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/010_scenes.html">Viewer Scenes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/020_configurations.html">Viewer Configurations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/030_controls.html">Viewer Controls</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/040_commands.html">Viewer Commands</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="examples.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples/color.html">Color Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/dynamic.html">Dynamic Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/object.html">Object Examples</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="api.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="generated/compas_viewer.Viewer.html">Viewer</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgements.html">Acknowledgements</a></li>
+</ul>
+
+    </div>
+</nav></div>
+        <div class="sidebar-primary-item"><div class="sidebar-primary-item">
+    <a href="https://compas.dev" target="_blank">
+        COMPAS.dev <i class="fa fa-external-link" aria-hidden="true"></i>
+    </a>
+</div></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article"></div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+
+<h1 id="index">Index</h1>
+
+<div class="genindex-jumpbox">
+ <a href="#A"><strong>A</strong></a>
+ | <a href="#B"><strong>B</strong></a>
+ | <a href="#C"><strong>C</strong></a>
+ | <a href="#D"><strong>D</strong></a>
+ | <a href="#E"><strong>E</strong></a>
+ | <a href="#F"><strong>F</strong></a>
+ | <a href="#G"><strong>G</strong></a>
+ | <a href="#I"><strong>I</strong></a>
+ | <a href="#L"><strong>L</strong></a>
+ | <a href="#M"><strong>M</strong></a>
+ | <a href="#O"><strong>O</strong></a>
+ | <a href="#P"><strong>P</strong></a>
+ | <a href="#R"><strong>R</strong></a>
+ | <a href="#S"><strong>S</strong></a>
+ | <a href="#T"><strong>T</strong></a>
+ | <a href="#U"><strong>U</strong></a>
+ | <a href="#V"><strong>V</strong></a>
+ 
+</div>
+<h2 id="A">A</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/compas_viewer.scene.CircleObject.add.html#compas_viewer.scene.CircleObject.add">add() (CircleObject method)</a>
+
+      <ul>
+        <li><a href="api/generated/compas_viewer.scene.EllipseObject.add.html#compas_viewer.scene.EllipseObject.add">(EllipseObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.FrameObject.add.html#compas_viewer.scene.FrameObject.add">(FrameObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.LineObject.add.html#compas_viewer.scene.LineObject.add">(LineObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.MeshObject.add.html#compas_viewer.scene.MeshObject.add">(MeshObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PlaneObject.add.html#compas_viewer.scene.PlaneObject.add">(PlaneObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PointObject.add.html#compas_viewer.scene.PointObject.add">(PointObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PolygonObject.add.html#compas_viewer.scene.PolygonObject.add">(PolygonObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PolylineObject.add.html#compas_viewer.scene.PolylineObject.add">(PolylineObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.components.sidebar.SideBarRight.add.html#compas_viewer.components.sidebar.SideBarRight.add">(SideBarRight method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.components.sidedock.SideDock.add.html#compas_viewer.components.sidedock.SideDock.add">(SideDock method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.TagObject.add.html#compas_viewer.scene.TagObject.add">(TagObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.VectorObject.add.html#compas_viewer.scene.VectorObject.add">(VectorObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.ViewerSceneObject.add.html#compas_viewer.scene.ViewerSceneObject.add">(ViewerSceneObject method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/compas_viewer.components.menubar.MenuBar.add_action.html#compas_viewer.components.menubar.MenuBar.add_action">add_action() (MenuBar method)</a>
+
+      <ul>
+        <li><a href="api/generated/compas_viewer.components.toolbar.ToolBar.add_action.html#compas_viewer.components.toolbar.ToolBar.add_action">(ToolBar method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="B">B</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/compas_viewer.components.Button.html#compas_viewer.components.Button">Button (class in compas_viewer.components)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="C">C</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/compas_viewer.scene.CircleObject.html#compas_viewer.scene.CircleObject">CircleObject (class in compas_viewer.scene)</a>
+</li>
+      <li><a href="api/generated/compas_viewer.scene.CircleObject.clear.html#compas_viewer.scene.CircleObject.clear">clear() (CircleObject method)</a>
+
+      <ul>
+        <li><a href="api/generated/compas_viewer.scene.EllipseObject.clear.html#compas_viewer.scene.EllipseObject.clear">(EllipseObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.FrameObject.clear.html#compas_viewer.scene.FrameObject.clear">(FrameObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.LineObject.clear.html#compas_viewer.scene.LineObject.clear">(LineObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.MeshObject.clear.html#compas_viewer.scene.MeshObject.clear">(MeshObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PlaneObject.clear.html#compas_viewer.scene.PlaneObject.clear">(PlaneObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PointObject.clear.html#compas_viewer.scene.PointObject.clear">(PointObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PolygonObject.clear.html#compas_viewer.scene.PolygonObject.clear">(PolygonObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PolylineObject.clear.html#compas_viewer.scene.PolylineObject.clear">(PolylineObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.TagObject.clear.html#compas_viewer.scene.TagObject.clear">(TagObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.VectorObject.clear.html#compas_viewer.scene.VectorObject.clear">(VectorObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.ViewerSceneObject.clear.html#compas_viewer.scene.ViewerSceneObject.clear">(ViewerSceneObject method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/compas_viewer.scene.MeshObject.clear_edges.html#compas_viewer.scene.MeshObject.clear_edges">clear_edges() (MeshObject method)</a>
+</li>
+      <li><a href="api/generated/compas_viewer.scene.MeshObject.clear_faces.html#compas_viewer.scene.MeshObject.clear_faces">clear_faces() (MeshObject method)</a>
+</li>
+      <li><a href="api/generated/compas_viewer.scene.MeshObject.clear_vertices.html#compas_viewer.scene.MeshObject.clear_vertices">clear_vertices() (MeshObject method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/compas_viewer.scene.Tag.compute_aabb.html#compas_viewer.scene.Tag.compute_aabb">compute_aabb() (Tag method)</a>
+</li>
+      <li><a href="api/generated/compas_viewer.scene.Tag.compute_obb.html#compas_viewer.scene.Tag.compute_obb">compute_obb() (Tag method)</a>
+</li>
+      <li><a href="api/generated/compas_viewer.scene.CircleObject.copy.html#compas_viewer.scene.CircleObject.copy">copy() (CircleObject method)</a>
+
+      <ul>
+        <li><a href="api/generated/compas_viewer.scene.EllipseObject.copy.html#compas_viewer.scene.EllipseObject.copy">(EllipseObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.FrameObject.copy.html#compas_viewer.scene.FrameObject.copy">(FrameObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.LineObject.copy.html#compas_viewer.scene.LineObject.copy">(LineObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.MeshObject.copy.html#compas_viewer.scene.MeshObject.copy">(MeshObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PlaneObject.copy.html#compas_viewer.scene.PlaneObject.copy">(PlaneObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PointObject.copy.html#compas_viewer.scene.PointObject.copy">(PointObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PolygonObject.copy.html#compas_viewer.scene.PolygonObject.copy">(PolygonObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PolylineObject.copy.html#compas_viewer.scene.PolylineObject.copy">(PolylineObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.Tag.copy.html#compas_viewer.scene.Tag.copy">(Tag method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.TagObject.copy.html#compas_viewer.scene.TagObject.copy">(TagObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.VectorObject.copy.html#compas_viewer.scene.VectorObject.copy">(VectorObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.ViewerSceneObject.copy.html#compas_viewer.scene.ViewerSceneObject.copy">(ViewerSceneObject method)</a>
+</li>
+      </ul></li>
+      <li><a href="generated/compas_viewer.Viewer.create_app.html#compas_viewer.Viewer.create_app">create_app() (Viewer method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="D">D</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/compas_viewer.components.sidebar.SideBarRight.display_text.html#compas_viewer.components.sidebar.SideBarRight.display_text">display_text() (SideBarRight method)</a>
+
+      <ul>
+        <li><a href="api/generated/compas_viewer.components.sidedock.SideDock.display_text.html#compas_viewer.components.sidedock.SideDock.display_text">(SideDock method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/compas_viewer.scene.CircleObject.draw.html#compas_viewer.scene.CircleObject.draw">draw() (CircleObject method)</a>
+
+      <ul>
+        <li><a href="api/generated/compas_viewer.scene.EllipseObject.draw.html#compas_viewer.scene.EllipseObject.draw">(EllipseObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.FrameObject.draw.html#compas_viewer.scene.FrameObject.draw">(FrameObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.LineObject.draw.html#compas_viewer.scene.LineObject.draw">(LineObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.MeshObject.draw.html#compas_viewer.scene.MeshObject.draw">(MeshObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PlaneObject.draw.html#compas_viewer.scene.PlaneObject.draw">(PlaneObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PointObject.draw.html#compas_viewer.scene.PointObject.draw">(PointObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PolygonObject.draw.html#compas_viewer.scene.PolygonObject.draw">(PolygonObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PolylineObject.draw.html#compas_viewer.scene.PolylineObject.draw">(PolylineObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.TagObject.draw.html#compas_viewer.scene.TagObject.draw">(TagObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.VectorObject.draw.html#compas_viewer.scene.VectorObject.draw">(VectorObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.ViewerSceneObject.draw.html#compas_viewer.scene.ViewerSceneObject.draw">(ViewerSceneObject method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/compas_viewer.scene.MeshObject.draw_edges.html#compas_viewer.scene.MeshObject.draw_edges">draw_edges() (MeshObject method)</a>
+</li>
+      <li><a href="api/generated/compas_viewer.scene.MeshObject.draw_faces.html#compas_viewer.scene.MeshObject.draw_faces">draw_faces() (MeshObject method)</a>
+</li>
+      <li><a href="api/generated/compas_viewer.scene.MeshObject.draw_mesh.html#compas_viewer.scene.MeshObject.draw_mesh">draw_mesh() (MeshObject method)</a>
+</li>
+      <li><a href="api/generated/compas_viewer.scene.MeshObject.draw_vertices.html#compas_viewer.scene.MeshObject.draw_vertices">draw_vertices() (MeshObject method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="E">E</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/compas_viewer.scene.EllipseObject.html#compas_viewer.scene.EllipseObject">EllipseObject (class in compas_viewer.scene)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="F">F</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/compas_viewer.scene.FrameObject.html#compas_viewer.scene.FrameObject">FrameObject (class in compas_viewer.scene)</a>
+</li>
+      <li><a href="api/generated/compas_viewer.scene.CircleObject.from_json.html#compas_viewer.scene.CircleObject.from_json">from_json() (CircleObject class method)</a>
+
+      <ul>
+        <li><a href="api/generated/compas_viewer.scene.EllipseObject.from_json.html#compas_viewer.scene.EllipseObject.from_json">(EllipseObject class method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.FrameObject.from_json.html#compas_viewer.scene.FrameObject.from_json">(FrameObject class method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.LineObject.from_json.html#compas_viewer.scene.LineObject.from_json">(LineObject class method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.MeshObject.from_json.html#compas_viewer.scene.MeshObject.from_json">(MeshObject class method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PlaneObject.from_json.html#compas_viewer.scene.PlaneObject.from_json">(PlaneObject class method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PointObject.from_json.html#compas_viewer.scene.PointObject.from_json">(PointObject class method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PolygonObject.from_json.html#compas_viewer.scene.PolygonObject.from_json">(PolygonObject class method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PolylineObject.from_json.html#compas_viewer.scene.PolylineObject.from_json">(PolylineObject class method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.Tag.from_json.html#compas_viewer.scene.Tag.from_json">(Tag class method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.TagObject.from_json.html#compas_viewer.scene.TagObject.from_json">(TagObject class method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.VectorObject.from_json.html#compas_viewer.scene.VectorObject.from_json">(VectorObject class method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.ViewerSceneObject.from_json.html#compas_viewer.scene.ViewerSceneObject.from_json">(ViewerSceneObject class method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/compas_viewer.scene.CircleObject.from_jsonstring.html#compas_viewer.scene.CircleObject.from_jsonstring">from_jsonstring() (CircleObject class method)</a>
+
+      <ul>
+        <li><a href="api/generated/compas_viewer.scene.EllipseObject.from_jsonstring.html#compas_viewer.scene.EllipseObject.from_jsonstring">(EllipseObject class method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.FrameObject.from_jsonstring.html#compas_viewer.scene.FrameObject.from_jsonstring">(FrameObject class method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.LineObject.from_jsonstring.html#compas_viewer.scene.LineObject.from_jsonstring">(LineObject class method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.MeshObject.from_jsonstring.html#compas_viewer.scene.MeshObject.from_jsonstring">(MeshObject class method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PlaneObject.from_jsonstring.html#compas_viewer.scene.PlaneObject.from_jsonstring">(PlaneObject class method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PointObject.from_jsonstring.html#compas_viewer.scene.PointObject.from_jsonstring">(PointObject class method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PolygonObject.from_jsonstring.html#compas_viewer.scene.PolygonObject.from_jsonstring">(PolygonObject class method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PolylineObject.from_jsonstring.html#compas_viewer.scene.PolylineObject.from_jsonstring">(PolylineObject class method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.Tag.from_jsonstring.html#compas_viewer.scene.Tag.from_jsonstring">(Tag class method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.TagObject.from_jsonstring.html#compas_viewer.scene.TagObject.from_jsonstring">(TagObject class method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.VectorObject.from_jsonstring.html#compas_viewer.scene.VectorObject.from_jsonstring">(VectorObject class method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.ViewerSceneObject.from_jsonstring.html#compas_viewer.scene.ViewerSceneObject.from_jsonstring">(ViewerSceneObject class method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="G">G</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/compas_viewer.components.Slider.get_attr.html#compas_viewer.components.Slider.get_attr">get_attr() (Slider method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="I">I</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/compas_viewer.scene.CircleObject.init.html#compas_viewer.scene.CircleObject.init">init() (CircleObject method)</a>
+
+      <ul>
+        <li><a href="api/generated/compas_viewer.scene.EllipseObject.init.html#compas_viewer.scene.EllipseObject.init">(EllipseObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.FrameObject.init.html#compas_viewer.scene.FrameObject.init">(FrameObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.LineObject.init.html#compas_viewer.scene.LineObject.init">(LineObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.MeshObject.init.html#compas_viewer.scene.MeshObject.init">(MeshObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PlaneObject.init.html#compas_viewer.scene.PlaneObject.init">(PlaneObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PointObject.init.html#compas_viewer.scene.PointObject.init">(PointObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PolygonObject.init.html#compas_viewer.scene.PolygonObject.init">(PolygonObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PolylineObject.init.html#compas_viewer.scene.PolylineObject.init">(PolylineObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.TagObject.init.html#compas_viewer.scene.TagObject.init">(TagObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.ui.UI.init.html#compas_viewer.ui.UI.init">(UI method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.VectorObject.init.html#compas_viewer.scene.VectorObject.init">(VectorObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.ViewerSceneObject.init.html#compas_viewer.scene.ViewerSceneObject.init">(ViewerSceneObject method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="L">L</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/compas_viewer.scene.LineObject.html#compas_viewer.scene.LineObject">LineObject (class in compas_viewer.scene)</a>
+</li>
+      <li><a href="api/generated/compas_viewer.components.menubar.MenuBar.load_items.html#compas_viewer.components.menubar.MenuBar.load_items">load_items() (MenuBar method)</a>
+
+      <ul>
+        <li><a href="api/generated/compas_viewer.components.sidebar.SideBarRight.load_items.html#compas_viewer.components.sidebar.SideBarRight.load_items">(SideBarRight method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.components.toolbar.ToolBar.load_items.html#compas_viewer.components.toolbar.ToolBar.load_items">(ToolBar method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="M">M</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/compas_viewer.components.mainwindow.MainWindow.html#compas_viewer.components.mainwindow.MainWindow">MainWindow (class in compas_viewer.components.mainwindow)</a>
+</li>
+      <li><a href="api/generated/compas_viewer.scene.TagObject.make_buffers.html#compas_viewer.scene.TagObject.make_buffers">make_buffers() (TagObject method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/compas_viewer.scene.TagObject.make_text_texture.html#compas_viewer.scene.TagObject.make_text_texture">make_text_texture() (TagObject method)</a>
+</li>
+      <li><a href="api/generated/compas_viewer.components.menubar.MenuBar.html#compas_viewer.components.menubar.MenuBar">MenuBar (class in compas_viewer.components.menubar)</a>
+</li>
+      <li><a href="api/generated/compas_viewer.scene.MeshObject.html#compas_viewer.scene.MeshObject">MeshObject (class in compas_viewer.scene)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="O">O</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/compas_viewer.Viewer.on.html#compas_viewer.Viewer.on">on() (Viewer method)</a>
+</li>
+      <li><a href="api/generated/compas_viewer.components.Treeform.on_item_selection_changed.html#compas_viewer.components.Treeform.on_item_selection_changed">on_item_selection_changed() (Treeform method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/compas_viewer.components.Slider.on_slider_changed.html#compas_viewer.components.Slider.on_slider_changed">on_slider_changed() (Slider method)</a>
+</li>
+      <li><a href="api/generated/compas_viewer.components.Slider.on_text_changed.html#compas_viewer.components.Slider.on_text_changed">on_text_changed() (Slider method)</a>
+</li>
+      <li><a href="api/generated/compas_viewer.components.Slider.on_value_changed.html#compas_viewer.components.Slider.on_value_changed">on_value_changed() (Slider method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="P">P</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/compas_viewer.scene.PlaneObject.html#compas_viewer.scene.PlaneObject">PlaneObject (class in compas_viewer.scene)</a>
+</li>
+      <li><a href="api/generated/compas_viewer.scene.PointObject.html#compas_viewer.scene.PointObject">PointObject (class in compas_viewer.scene)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/compas_viewer.scene.PolygonObject.html#compas_viewer.scene.PolygonObject">PolygonObject (class in compas_viewer.scene)</a>
+</li>
+      <li><a href="api/generated/compas_viewer.scene.PolylineObject.html#compas_viewer.scene.PolylineObject">PolylineObject (class in compas_viewer.scene)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="R">R</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/compas_viewer.scene.CircleObject.remove.html#compas_viewer.scene.CircleObject.remove">remove() (CircleObject method)</a>
+
+      <ul>
+        <li><a href="api/generated/compas_viewer.scene.EllipseObject.remove.html#compas_viewer.scene.EllipseObject.remove">(EllipseObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.FrameObject.remove.html#compas_viewer.scene.FrameObject.remove">(FrameObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.LineObject.remove.html#compas_viewer.scene.LineObject.remove">(LineObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.MeshObject.remove.html#compas_viewer.scene.MeshObject.remove">(MeshObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PlaneObject.remove.html#compas_viewer.scene.PlaneObject.remove">(PlaneObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PointObject.remove.html#compas_viewer.scene.PointObject.remove">(PointObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PolygonObject.remove.html#compas_viewer.scene.PolygonObject.remove">(PolygonObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PolylineObject.remove.html#compas_viewer.scene.PolylineObject.remove">(PolylineObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.components.sidebar.SideBarRight.remove.html#compas_viewer.components.sidebar.SideBarRight.remove">(SideBarRight method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.components.sidedock.SideDock.remove.html#compas_viewer.components.sidedock.SideDock.remove">(SideDock method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.TagObject.remove.html#compas_viewer.scene.TagObject.remove">(TagObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.VectorObject.remove.html#compas_viewer.scene.VectorObject.remove">(VectorObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.ViewerSceneObject.remove.html#compas_viewer.scene.ViewerSceneObject.remove">(ViewerSceneObject method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/compas_viewer.components.sidebar.SideBarRight.reset.html#compas_viewer.components.sidebar.SideBarRight.reset">reset() (SideBarRight method)</a>
+
+      <ul>
+        <li><a href="api/generated/compas_viewer.components.sidedock.SideDock.reset.html#compas_viewer.components.sidedock.SideDock.reset">(SideDock method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/compas_viewer.components.mainwindow.MainWindow.resize.html#compas_viewer.components.mainwindow.MainWindow.resize">resize() (MainWindow method)</a>
+</li>
+      <li><a href="api/generated/compas_viewer.scene.Tag.rotate.html#compas_viewer.scene.Tag.rotate">rotate() (Tag method)</a>
+</li>
+      <li><a href="api/generated/compas_viewer.scene.Tag.rotated.html#compas_viewer.scene.Tag.rotated">rotated() (Tag method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="S">S</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/compas_viewer.scene.Tag.scale.html#compas_viewer.scene.Tag.scale">scale() (Tag method)</a>
+</li>
+      <li><a href="api/generated/compas_viewer.scene.Tag.scaled.html#compas_viewer.scene.Tag.scaled">scaled() (Tag method)</a>
+</li>
+      <li><a href="api/generated/compas_viewer.components.Slider.set_attr.html#compas_viewer.components.Slider.set_attr">set_attr() (Slider method)</a>
+</li>
+      <li><a href="api/generated/compas_viewer.components.Slider.set_watch_interval.html#compas_viewer.components.Slider.set_watch_interval">set_watch_interval() (Slider method)</a>
+</li>
+      <li><a href="api/generated/compas_viewer.scene.CircleObject.sha256.html#compas_viewer.scene.CircleObject.sha256">sha256() (CircleObject method)</a>
+
+      <ul>
+        <li><a href="api/generated/compas_viewer.scene.EllipseObject.sha256.html#compas_viewer.scene.EllipseObject.sha256">(EllipseObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.FrameObject.sha256.html#compas_viewer.scene.FrameObject.sha256">(FrameObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.LineObject.sha256.html#compas_viewer.scene.LineObject.sha256">(LineObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.MeshObject.sha256.html#compas_viewer.scene.MeshObject.sha256">(MeshObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PlaneObject.sha256.html#compas_viewer.scene.PlaneObject.sha256">(PlaneObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PointObject.sha256.html#compas_viewer.scene.PointObject.sha256">(PointObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PolygonObject.sha256.html#compas_viewer.scene.PolygonObject.sha256">(PolygonObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PolylineObject.sha256.html#compas_viewer.scene.PolylineObject.sha256">(PolylineObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.Tag.sha256.html#compas_viewer.scene.Tag.sha256">(Tag method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.TagObject.sha256.html#compas_viewer.scene.TagObject.sha256">(TagObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.VectorObject.sha256.html#compas_viewer.scene.VectorObject.sha256">(VectorObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.ViewerSceneObject.sha256.html#compas_viewer.scene.ViewerSceneObject.sha256">(ViewerSceneObject method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="generated/compas_viewer.Viewer.show.html#compas_viewer.Viewer.show">show() (Viewer method)</a>
+</li>
+      <li><a href="api/generated/compas_viewer.components.sidebar.SideBarRight.html#compas_viewer.components.sidebar.SideBarRight">SideBarRight (class in compas_viewer.components.sidebar)</a>
+</li>
+      <li><a href="api/generated/compas_viewer.components.sidedock.SideDock.html#compas_viewer.components.sidedock.SideDock">SideDock (class in compas_viewer.components.sidedock)</a>
+</li>
+      <li><a href="api/generated/compas_viewer.components.Slider.html#compas_viewer.components.Slider">Slider (class in compas_viewer.components)</a>
+</li>
+      <li><a href="api/generated/compas_viewer.components.Slider.start_watching.html#compas_viewer.components.Slider.start_watching">start_watching() (Slider method)</a>
+</li>
+      <li><a href="api/generated/compas_viewer.components.statusbar.StatusBar.html#compas_viewer.components.statusbar.StatusBar">StatusBar (class in compas_viewer.components.statusbar)</a>
+</li>
+      <li><a href="api/generated/compas_viewer.components.Slider.stop_watching.html#compas_viewer.components.Slider.stop_watching">stop_watching() (Slider method)</a>
+</li>
+      <li><a href="api/generated/compas_viewer.components.Slider.sync_from_bound_object.html#compas_viewer.components.Slider.sync_from_bound_object">sync_from_bound_object() (Slider method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="T">T</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/compas_viewer.scene.Tag.html#compas_viewer.scene.Tag">Tag (class in compas_viewer.scene)</a>
+</li>
+      <li><a href="api/generated/compas_viewer.scene.TagObject.html#compas_viewer.scene.TagObject">TagObject (class in compas_viewer.scene)</a>
+</li>
+      <li><a href="api/generated/compas_viewer.scene.CircleObject.to_json.html#compas_viewer.scene.CircleObject.to_json">to_json() (CircleObject method)</a>
+
+      <ul>
+        <li><a href="api/generated/compas_viewer.scene.EllipseObject.to_json.html#compas_viewer.scene.EllipseObject.to_json">(EllipseObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.FrameObject.to_json.html#compas_viewer.scene.FrameObject.to_json">(FrameObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.LineObject.to_json.html#compas_viewer.scene.LineObject.to_json">(LineObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.MeshObject.to_json.html#compas_viewer.scene.MeshObject.to_json">(MeshObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PlaneObject.to_json.html#compas_viewer.scene.PlaneObject.to_json">(PlaneObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PointObject.to_json.html#compas_viewer.scene.PointObject.to_json">(PointObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PolygonObject.to_json.html#compas_viewer.scene.PolygonObject.to_json">(PolygonObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PolylineObject.to_json.html#compas_viewer.scene.PolylineObject.to_json">(PolylineObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.Tag.to_json.html#compas_viewer.scene.Tag.to_json">(Tag method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.TagObject.to_json.html#compas_viewer.scene.TagObject.to_json">(TagObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.VectorObject.to_json.html#compas_viewer.scene.VectorObject.to_json">(VectorObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.ViewerSceneObject.to_json.html#compas_viewer.scene.ViewerSceneObject.to_json">(ViewerSceneObject method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/compas_viewer.scene.CircleObject.to_jsonstring.html#compas_viewer.scene.CircleObject.to_jsonstring">to_jsonstring() (CircleObject method)</a>
+
+      <ul>
+        <li><a href="api/generated/compas_viewer.scene.EllipseObject.to_jsonstring.html#compas_viewer.scene.EllipseObject.to_jsonstring">(EllipseObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.FrameObject.to_jsonstring.html#compas_viewer.scene.FrameObject.to_jsonstring">(FrameObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.LineObject.to_jsonstring.html#compas_viewer.scene.LineObject.to_jsonstring">(LineObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.MeshObject.to_jsonstring.html#compas_viewer.scene.MeshObject.to_jsonstring">(MeshObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PlaneObject.to_jsonstring.html#compas_viewer.scene.PlaneObject.to_jsonstring">(PlaneObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PointObject.to_jsonstring.html#compas_viewer.scene.PointObject.to_jsonstring">(PointObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PolygonObject.to_jsonstring.html#compas_viewer.scene.PolygonObject.to_jsonstring">(PolygonObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PolylineObject.to_jsonstring.html#compas_viewer.scene.PolylineObject.to_jsonstring">(PolylineObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.Tag.to_jsonstring.html#compas_viewer.scene.Tag.to_jsonstring">(Tag method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.TagObject.to_jsonstring.html#compas_viewer.scene.TagObject.to_jsonstring">(TagObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.VectorObject.to_jsonstring.html#compas_viewer.scene.VectorObject.to_jsonstring">(VectorObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.ViewerSceneObject.to_jsonstring.html#compas_viewer.scene.ViewerSceneObject.to_jsonstring">(ViewerSceneObject method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/compas_viewer.components.toolbar.ToolBar.html#compas_viewer.components.toolbar.ToolBar">ToolBar (class in compas_viewer.components.toolbar)</a>
+</li>
+      <li><a href="api/generated/compas_viewer.scene.CircleObject.ToString.html#compas_viewer.scene.CircleObject.ToString">ToString() (CircleObject method)</a>
+
+      <ul>
+        <li><a href="api/generated/compas_viewer.scene.EllipseObject.ToString.html#compas_viewer.scene.EllipseObject.ToString">(EllipseObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.FrameObject.ToString.html#compas_viewer.scene.FrameObject.ToString">(FrameObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.LineObject.ToString.html#compas_viewer.scene.LineObject.ToString">(LineObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.MeshObject.ToString.html#compas_viewer.scene.MeshObject.ToString">(MeshObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PlaneObject.ToString.html#compas_viewer.scene.PlaneObject.ToString">(PlaneObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PointObject.ToString.html#compas_viewer.scene.PointObject.ToString">(PointObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PolygonObject.ToString.html#compas_viewer.scene.PolygonObject.ToString">(PolygonObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PolylineObject.ToString.html#compas_viewer.scene.PolylineObject.ToString">(PolylineObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.Tag.ToString.html#compas_viewer.scene.Tag.ToString">(Tag method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.TagObject.ToString.html#compas_viewer.scene.TagObject.ToString">(TagObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.VectorObject.ToString.html#compas_viewer.scene.VectorObject.ToString">(VectorObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.ViewerSceneObject.ToString.html#compas_viewer.scene.ViewerSceneObject.ToString">(ViewerSceneObject method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/compas_viewer.scene.Tag.transform.html#compas_viewer.scene.Tag.transform">transform() (Tag method)</a>
+</li>
+      <li><a href="api/generated/compas_viewer.scene.Tag.transformed.html#compas_viewer.scene.Tag.transformed">transformed() (Tag method)</a>
+</li>
+      <li><a href="api/generated/compas_viewer.scene.Tag.translate.html#compas_viewer.scene.Tag.translate">translate() (Tag method)</a>
+</li>
+      <li><a href="api/generated/compas_viewer.scene.Tag.translated.html#compas_viewer.scene.Tag.translated">translated() (Tag method)</a>
+</li>
+      <li><a href="api/generated/compas_viewer.scene.CircleObject.traverse.html#compas_viewer.scene.CircleObject.traverse">traverse() (CircleObject method)</a>
+
+      <ul>
+        <li><a href="api/generated/compas_viewer.scene.EllipseObject.traverse.html#compas_viewer.scene.EllipseObject.traverse">(EllipseObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.FrameObject.traverse.html#compas_viewer.scene.FrameObject.traverse">(FrameObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.LineObject.traverse.html#compas_viewer.scene.LineObject.traverse">(LineObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.MeshObject.traverse.html#compas_viewer.scene.MeshObject.traverse">(MeshObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PlaneObject.traverse.html#compas_viewer.scene.PlaneObject.traverse">(PlaneObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PointObject.traverse.html#compas_viewer.scene.PointObject.traverse">(PointObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PolygonObject.traverse.html#compas_viewer.scene.PolygonObject.traverse">(PolygonObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PolylineObject.traverse.html#compas_viewer.scene.PolylineObject.traverse">(PolylineObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.TagObject.traverse.html#compas_viewer.scene.TagObject.traverse">(TagObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.VectorObject.traverse.html#compas_viewer.scene.VectorObject.traverse">(VectorObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.ViewerSceneObject.traverse.html#compas_viewer.scene.ViewerSceneObject.traverse">(ViewerSceneObject method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/compas_viewer.components.Treeform.tree_from_dict.html#compas_viewer.components.Treeform.tree_from_dict">tree_from_dict() (Treeform method)</a>
+</li>
+      <li><a href="api/generated/compas_viewer.components.Treeform.html#compas_viewer.components.Treeform">Treeform (class in compas_viewer.components)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="U">U</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/compas_viewer.ui.UI.html#compas_viewer.ui.UI">UI (class in compas_viewer.ui)</a>
+</li>
+      <li><a href="api/generated/compas_viewer.components.Button.update.html#compas_viewer.components.Button.update">update() (Button method)</a>
+
+      <ul>
+        <li><a href="api/generated/compas_viewer.scene.CircleObject.update.html#compas_viewer.scene.CircleObject.update">(CircleObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.EllipseObject.update.html#compas_viewer.scene.EllipseObject.update">(EllipseObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.FrameObject.update.html#compas_viewer.scene.FrameObject.update">(FrameObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.LineObject.update.html#compas_viewer.scene.LineObject.update">(LineObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.components.mainwindow.MainWindow.update.html#compas_viewer.components.mainwindow.MainWindow.update">(MainWindow method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.components.menubar.MenuBar.update.html#compas_viewer.components.menubar.MenuBar.update">(MenuBar method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.MeshObject.update.html#compas_viewer.scene.MeshObject.update">(MeshObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PlaneObject.update.html#compas_viewer.scene.PlaneObject.update">(PlaneObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PointObject.update.html#compas_viewer.scene.PointObject.update">(PointObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PolygonObject.update.html#compas_viewer.scene.PolygonObject.update">(PolygonObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PolylineObject.update.html#compas_viewer.scene.PolylineObject.update">(PolylineObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.components.sidebar.SideBarRight.update.html#compas_viewer.components.sidebar.SideBarRight.update">(SideBarRight method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.components.sidedock.SideDock.update.html#compas_viewer.components.sidedock.SideDock.update">(SideDock method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.components.Slider.update.html#compas_viewer.components.Slider.update">(Slider method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.components.statusbar.StatusBar.update.html#compas_viewer.components.statusbar.StatusBar.update">(StatusBar method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.TagObject.update.html#compas_viewer.scene.TagObject.update">(TagObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.components.toolbar.ToolBar.update.html#compas_viewer.components.toolbar.ToolBar.update">(ToolBar method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.components.Treeform.update.html#compas_viewer.components.Treeform.update">(Treeform method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.VectorObject.update.html#compas_viewer.scene.VectorObject.update">(VectorObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.ViewerSceneObject.update.html#compas_viewer.scene.ViewerSceneObject.update">(ViewerSceneObject method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.components.viewport.ViewPort.update.html#compas_viewer.components.viewport.ViewPort.update">(ViewPort method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/compas_viewer.components.Treeform.update_from_dict.html#compas_viewer.components.Treeform.update_from_dict">update_from_dict() (Treeform method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="V">V</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/compas_viewer.scene.CircleObject.validate_data.html#compas_viewer.scene.CircleObject.validate_data">validate_data() (CircleObject class method)</a>
+
+      <ul>
+        <li><a href="api/generated/compas_viewer.scene.EllipseObject.validate_data.html#compas_viewer.scene.EllipseObject.validate_data">(EllipseObject class method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.FrameObject.validate_data.html#compas_viewer.scene.FrameObject.validate_data">(FrameObject class method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.LineObject.validate_data.html#compas_viewer.scene.LineObject.validate_data">(LineObject class method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.MeshObject.validate_data.html#compas_viewer.scene.MeshObject.validate_data">(MeshObject class method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PlaneObject.validate_data.html#compas_viewer.scene.PlaneObject.validate_data">(PlaneObject class method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PointObject.validate_data.html#compas_viewer.scene.PointObject.validate_data">(PointObject class method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PolygonObject.validate_data.html#compas_viewer.scene.PolygonObject.validate_data">(PolygonObject class method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.PolylineObject.validate_data.html#compas_viewer.scene.PolylineObject.validate_data">(PolylineObject class method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.Tag.validate_data.html#compas_viewer.scene.Tag.validate_data">(Tag class method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.TagObject.validate_data.html#compas_viewer.scene.TagObject.validate_data">(TagObject class method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.VectorObject.validate_data.html#compas_viewer.scene.VectorObject.validate_data">(VectorObject class method)</a>
+</li>
+        <li><a href="api/generated/compas_viewer.scene.ViewerSceneObject.validate_data.html#compas_viewer.scene.ViewerSceneObject.validate_data">(ViewerSceneObject class method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/compas_viewer.scene.VectorObject.html#compas_viewer.scene.VectorObject">VectorObject (class in compas_viewer.scene)</a>
+</li>
+      <li><a href="generated/compas_viewer.Viewer.html#compas_viewer.Viewer">Viewer (class in compas_viewer)</a>
+</li>
+      <li><a href="api/generated/compas_viewer.scene.ViewerSceneObject.html#compas_viewer.scene.ViewerSceneObject">ViewerSceneObject (class in compas_viewer.scene)</a>
+</li>
+      <li><a href="api/generated/compas_viewer.components.viewport.ViewPort.html#compas_viewer.components.viewport.ViewPort">ViewPort (class in compas_viewer.components.viewport)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+
+
+                </article>
+              
+              
+              
+                <footer class="bd-footer-article">
+                  
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+  <p class="copyright">
+    
+      © Copyright COMPAS Association.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item"><p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.13.3.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
