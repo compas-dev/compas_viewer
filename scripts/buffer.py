@@ -3,14 +3,17 @@ import numpy as np
 from compas_viewer import Viewer
 from compas_viewer.scene import BufferGeometry
 
+# One vertex per point
 points = np.random.rand(1000, 3) * 10
 pointcolor = np.random.rand(1000, 4)
 
-lines = np.random.rand(1000 * 6, 3) * 10
-linecolor = np.random.rand(1000 * 6, 4)
+# Two vertices per line
+lines = np.random.rand(1000 * 2, 3) * 10
+linecolor = np.random.rand(1000 * 2, 4)
 
-faces = np.random.rand(1000 * 9, 3) * 10
-facecolor = np.random.rand(1000 * 9, 4)
+# Three vertices per face
+faces = np.random.rand(1000 * 3, 3) * 10
+facecolor = np.random.rand(1000 * 3, 4)
 
 geometry = BufferGeometry(points=points, pointcolor=pointcolor, lines=lines, linecolor=linecolor, faces=faces, facecolor=facecolor)
 
@@ -23,10 +26,10 @@ def update(frame):
 
     geometry.points = np.random.rand(1000, 3) * 10
     geometry.pointcolor = np.random.rand(1000, 4)
-    geometry.lines = np.random.rand(1000 * 6, 3) * 10
-    geometry.linecolor = np.random.rand(1000 * 6, 4)
-    geometry.faces = np.random.rand(1000 * 9, 3) * 10
-    geometry.facecolor = np.random.rand(1000 * 9, 4)
+    geometry.lines = np.random.rand(1000 * 2, 3) * 10
+    geometry.linecolor = np.random.rand(1000 * 2, 4)
+    geometry.faces = np.random.rand(1000 * 3, 3) * 10
+    geometry.facecolor = np.random.rand(1000 * 3, 4)
 
     obj.update(update_data=True)
 

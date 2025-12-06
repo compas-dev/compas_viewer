@@ -122,13 +122,24 @@ class BufferObject(ViewerSceneObject):
     def buffergeometry(self) -> BufferGeometry:
         return self.item
 
+    def _get_num_vertices(self, positions: NDArray) -> int:
+        """Get the number of vertices from positions array.
+
+        Handles both flat 1D arrays [x1, y1, z1, x2, y2, z2, ...] and
+        2D arrays with shape (N, 3).
+        """
+        if positions.ndim == 1:
+            return positions.shape[0] // 3
+        else:
+            return positions.shape[0]
+
     def _read_points_data(self):
         """Read points data from the object."""
         if self.buffergeometry.points is None:
             return None
         positions = self.buffergeometry.points
         colors = self.buffergeometry.pointcolor
-        elements = np.arange(positions.shape[0] // 3, dtype=int)
+        elements = np.arange(self._get_num_vertices(positions), dtype=int)
         return positions, colors, elements
 
     def _read_lines_data(self):
@@ -137,7 +148,7 @@ class BufferObject(ViewerSceneObject):
             return None
         positions = self.buffergeometry.lines
         colors = self.buffergeometry.linecolor
-        elements = np.arange(positions.shape[0] // 3, dtype=int)
+        elements = np.arange(self._get_num_vertices(positions), dtype=int)
         return positions, colors, elements
 
     def _read_frontfaces_data(self):
@@ -146,7 +157,7 @@ class BufferObject(ViewerSceneObject):
             return None
         positions = self.buffergeometry.faces
         colors = self.buffergeometry.facecolor
-        elements = np.arange(positions.shape[0] // 3, dtype=int)
+        elements = np.arange(self._get_num_vertices(positions), dtype=int)
         return positions, colors, elements
 
     def _read_backfaces_data(self):
@@ -155,5 +166,5 @@ class BufferObject(ViewerSceneObject):
             return None
         positions = self.buffergeometry.faces
         colors = self.buffergeometry.facecolor
-        elements = np.flip(np.arange(positions.shape[0] // 3, dtype=int))
+        elements = np.flip(np.arange(self._get_num_vertices(positions), dtype=int))
         return positions, colors, elements
