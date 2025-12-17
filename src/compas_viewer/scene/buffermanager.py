@@ -60,6 +60,9 @@ class BufferManager:
         self.settings: List[float] = []
         self.object_settings_cache: Dict[Any, List[float]] = {}
 
+        # Dirty tracking for settings updates
+        self._dirty_settings: set = set()
+
         # Initialize empty buffers for each geometry type
         for buffer_type in ["_points_data", "_lines_data", "_frontfaces_data", "_backfaces_data"]:
             self.positions[buffer_type] = np.array([], dtype=np.float32)
@@ -106,31 +109,60 @@ class BufferManager:
         """Add buffer data for a specific geometry type."""
         positions, colors, elements = getattr(obj, buffer_type)
 
-        if len(colors) > len(positions):
+        # Handle numpy arrays from optimized path
+        is_numpy_positions = isinstance(positions, np.ndarray)
+        is_numpy_colors = isinstance(colors, np.ndarray)
+
+        # Get number of vertices (handle both list and numpy)
+        n_positions = len(positions) if not is_numpy_positions else positions.shape[0]
+        n_colors = len(colors) if not is_numpy_colors else colors.shape[0]
+
+        if n_colors > n_positions:
             print(
-                f"WARNING: Buffer type: {buffer_type} colors length: {len(colors)} greater than positions length: {len(positions)} for {obj},"
+                f"WARNING: Buffer type: {buffer_type} colors length: {n_colors} greater than positions length: {n_positions} for {obj},"
                 "the remaining colors will be ignored"
             )
-            colors = colors[: len(positions)]
-        elif len(colors) < len(positions):
-            print(f"WARNING: Buffer type: {buffer_type} colors length: {len(colors)} less than positions length: {len(positions)} for {obj}, last color will be repeated")
-            colors = colors + [colors[-1]] * (len(positions) - len(colors))
+            colors = colors[:n_positions]
+        elif n_colors < n_positions:
+            if is_numpy_colors:
+                # Repeat last color row to match positions
+                last_color = colors[-1:] if len(colors.shape) > 1 else colors[-1]
+                padding = np.tile(last_color, (n_positions - n_colors, 1)) if len(colors.shape) > 1 else np.full(n_positions - n_colors, last_color)
+                colors = np.vstack([colors, padding]) if len(colors.shape) > 1 else np.append(colors, padding)
+            else:
+                print(f"WARNING: Buffer type: {buffer_type} colors length: {n_colors} less than positions length: {n_positions} for {obj}, last color will be repeated")
+                colors = colors + [colors[-1]] * (n_positions - n_colors)
 
-        # Convert to numpy arrays
-        pos_array = np.array(positions, dtype=np.float32).flatten()
-        col_array = np.array([c.rgba for c in colors] if len(colors) > 0 and isinstance(colors[0], Color) else colors, dtype=np.float32).flatten()
-        elem_array = np.array(elements, dtype=np.int32).flatten()
+        # Convert to numpy arrays (skip if already numpy)
+        if is_numpy_positions:
+            pos_array = positions.astype(np.float32).flatten()
+        else:
+            pos_array = np.array(positions, dtype=np.float32).flatten()
+
+        if is_numpy_colors:
+            col_array = colors.astype(np.float32).flatten()
+        else:
+            col_array = np.array([c.rgba for c in colors] if len(colors) > 0 and isinstance(colors[0], Color) else colors, dtype=np.float32).flatten()
+
+        if isinstance(elements, np.ndarray):
+            elem_array = elements.astype(np.int32).flatten()
+        else:
+            elem_array = np.array(elements, dtype=np.int32).flatten()
 
         if buffer_type == "_frontfaces_data" or buffer_type == "_backfaces_data":
             opaque_elements = []
             transparent_elements = []
             for e in elem_array:
-                if e >= len(colors):
+                if e >= n_colors:
                     # print("WARNING: Element index out of range", obj) # TODO: Fix BREP from IFC
                     continue
 
                 color = colors[e]
-                alpha = color.a if isinstance(color, Color) else color[3]
+                if is_numpy_colors:
+                    # Numpy array: access 4th element (alpha) directly
+                    alpha = color[3] if len(color) > 3 else 1.0
+                else:
+                    alpha = color.a if isinstance(color, Color) else color[3]
                 if alpha < 1.0 or obj.opacity < 1.0:
                     transparent_elements.append(e)
                 else:
@@ -142,7 +174,7 @@ class BufferManager:
 
         # Create vertex indices
         object_index = len(self.transforms)
-        obj_indices = np.full(len(positions), object_index, dtype=np.float32)
+        obj_indices = np.full(n_positions, object_index, dtype=np.float32)
 
         # Append to existing buffers
         self.positions[buffer_type] = np.append(self.positions[buffer_type], pos_array)
@@ -269,6 +301,7 @@ class BufferManager:
         self.transforms = []
         self.settings = []
         self.object_settings_cache = {}
+        self._dirty_settings.clear()
 
     def update_object_transform(self, obj: Any) -> None:
         """Update the transformation matrix for a single object.
@@ -338,10 +371,28 @@ class BufferManager:
                 col_byte_offset = start_idx * 4 * 4  # 4 floats per color * 4 bytes per float
                 update_vertex_buffer(col_array, self.buffer_ids[data_type]["colors"], offset=col_byte_offset)
 
+    def mark_settings_dirty(self, obj: Any) -> None:
+        """Mark an object's settings as needing GPU update.
+
+        Parameters
+        ----------
+        obj : Any
+            The object whose settings should be marked dirty.
+        """
+        self._dirty_settings.add(obj)
+
+    def mark_all_settings_dirty(self) -> None:
+        """Mark all objects' settings as needing GPU update."""
+        self._dirty_settings.update(self.objects.keys())
+
     def update_settings(self):
-        """Update the settings for all objects."""
-        for obj in self.objects:
-            self.update_object_settings(obj)
+        """Update the settings for dirty objects only."""
+        if not self._dirty_settings:
+            return
+        for obj in self._dirty_settings:
+            if obj in self.objects:
+                self.update_object_settings(obj)
+        self._dirty_settings.clear()
 
     def update_object_settings(self, obj: Any) -> None:
         """Update the settings for a single object."""

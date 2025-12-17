@@ -395,15 +395,16 @@ class Camera:
 
         """
         aspect = width / height
+        scale = max(self.scale, 1e-6)  # Prevent near == far when scale is 0
 
         if self.renderer.view == "perspective":
-            P = self.perspective(self.fov, aspect, self.near * self.scale, self.far * self.scale)
+            P = self.perspective(self.fov, aspect, self.near * scale, self.far * scale)
         else:
             left = -self.distance
             right = self.distance
             bottom = -self.distance / aspect
             top = self.distance / aspect
-            P = self.ortho(left, right, bottom, top, self.near * self.scale, self.far * self.scale)
+            P = self.ortho(left, right, bottom, top, self.near * scale, self.far * scale)
 
         return asfortranarray(P, dtype=float32)
 

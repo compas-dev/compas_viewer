@@ -86,6 +86,12 @@ class Renderer(QOpenGLWidget):
 
         self.buffer_manager = BufferManager()
 
+        # Cached FBO for instance color picking
+        self._instance_fbo = None
+        self._instance_texture = None
+        self._instance_depth = None
+        self._instance_fbo_size = (0, 0)
+
     @property
     def rendermode(self):
         """
@@ -588,8 +594,53 @@ class Renderer(QOpenGLWidget):
         # Unbind once we're done
         GL.glBindVertexArray(0)
 
+    def _ensure_instance_fbo(self, width: int, height: int):
+        """Create or resize instance picking FBO as needed."""
+        if self._instance_fbo_size == (width, height) and self._instance_fbo is not None:
+            return  # Already have correct size FBO
+
+        # Clean up old resources if they exist
+        if self._instance_fbo is not None:
+            GL.glDeleteFramebuffers(1, [self._instance_fbo])
+            GL.glDeleteTextures(1, [self._instance_texture])
+            GL.glDeleteRenderbuffers(1, [self._instance_depth])
+
+        # Create new FBO
+        self._instance_fbo = GL.glGenFramebuffers(1)
+        GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, self._instance_fbo)
+
+        # Create texture
+        self._instance_texture = GL.glGenTextures(1)
+        GL.glBindTexture(GL.GL_TEXTURE_2D, self._instance_texture)
+        GL.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA8, width, height, 0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, None)
+        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST)
+        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST)
+        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP_TO_EDGE)
+        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP_TO_EDGE)
+        GL.glFramebufferTexture2D(GL.GL_FRAMEBUFFER, GL.GL_COLOR_ATTACHMENT0, GL.GL_TEXTURE_2D, self._instance_texture, 0)
+
+        # Create depth buffer
+        self._instance_depth = GL.glGenRenderbuffers(1)
+        GL.glBindRenderbuffer(GL.GL_RENDERBUFFER, self._instance_depth)
+        GL.glRenderbufferStorage(GL.GL_RENDERBUFFER, GL.GL_DEPTH_COMPONENT24, width, height)
+        GL.glFramebufferRenderbuffer(GL.GL_FRAMEBUFFER, GL.GL_DEPTH_ATTACHMENT, GL.GL_RENDERBUFFER, self._instance_depth)
+
+        # Check if FBO is complete
+        status = GL.glCheckFramebufferStatus(GL.GL_FRAMEBUFFER)
+        if status != GL.GL_FRAMEBUFFER_COMPLETE:
+            GL.glDeleteRenderbuffers(1, [self._instance_depth])
+            GL.glDeleteTextures(1, [self._instance_texture])
+            GL.glDeleteFramebuffers(1, [self._instance_fbo])
+            self._instance_fbo = None
+            self._instance_texture = None
+            self._instance_depth = None
+            self._instance_fbo_size = (0, 0)
+            raise Exception(f"Framebuffer is not complete! Status: {status}")
+
+        self._instance_fbo_size = (width, height)
+        GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, 0)
+
     def read_instance_color(self, box: tuple[int, int, int, int]):
-        # TODO: Should be able to massively simplify this.
         # Get the rectangle area
         x1, y1, x2, y2 = box
         x, y = min(x1, x2), self.height() - max(y1, y2)
@@ -600,34 +651,9 @@ class Renderer(QOpenGLWidget):
         viewport = GL.glGetIntegerv(GL.GL_VIEWPORT)
         previous_fbo = GL.glGetIntegerv(GL.GL_FRAMEBUFFER_BINDING)
 
-        # Create an FBO with original window size (not scaled)
-        fbo = GL.glGenFramebuffers(1)
-        GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, fbo)
-
-        # Create a texture to attach to the FBO
-        texture = GL.glGenTextures(1)
-        GL.glBindTexture(GL.GL_TEXTURE_2D, texture)
-        GL.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA8, self.width(), self.height(), 0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, None)
-        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST)
-        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST)
-        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP_TO_EDGE)
-        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP_TO_EDGE)
-        GL.glFramebufferTexture2D(GL.GL_FRAMEBUFFER, GL.GL_COLOR_ATTACHMENT0, GL.GL_TEXTURE_2D, texture, 0)
-
-        # Create and attach depth buffer
-        depth_buffer = GL.glGenRenderbuffers(1)
-        GL.glBindRenderbuffer(GL.GL_RENDERBUFFER, depth_buffer)
-        GL.glRenderbufferStorage(GL.GL_RENDERBUFFER, GL.GL_DEPTH_COMPONENT24, self.width(), self.height())
-        GL.glFramebufferRenderbuffer(GL.GL_FRAMEBUFFER, GL.GL_DEPTH_ATTACHMENT, GL.GL_RENDERBUFFER, depth_buffer)
-
-        # Check if FBO is complete
-        status = GL.glCheckFramebufferStatus(GL.GL_FRAMEBUFFER)
-        if status != GL.GL_FRAMEBUFFER_COMPLETE:
-            GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, previous_fbo)
-            GL.glDeleteRenderbuffers(1, [depth_buffer])
-            GL.glDeleteTextures(1, [texture])
-            GL.glDeleteFramebuffers(1, [fbo])
-            raise Exception(f"Framebuffer is not complete! Status: {status}")
+        # Ensure we have a properly sized FBO
+        self._ensure_instance_fbo(self.width(), self.height())
+        GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, self._instance_fbo)
 
         # Set up rendering state
         GL.glViewport(0, 0, self.width(), self.height())
@@ -702,13 +728,8 @@ class Renderer(QOpenGLWidget):
         if not prev_depth_test:
             GL.glDisable(GL.GL_DEPTH_TEST)
 
-        # Clean up
+        # Restore previous FBO and viewport (FBO resources are cached, not deleted)
         GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, previous_fbo)
-        GL.glDeleteRenderbuffers(1, [depth_buffer])
-        GL.glDeleteTextures(1, [texture])
-        GL.glDeleteFramebuffers(1, [fbo])
-
-        # Restore viewport
         GL.glViewport(*viewport)
 
         return box_map.reshape(-1, 3)

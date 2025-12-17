@@ -3,6 +3,8 @@ from typing import Dict
 from typing import Optional
 from typing import Union
 
+import numpy as np
+
 from compas.colors import Color
 from compas.datastructures import Mesh
 from compas.geometry import centroid_points
@@ -102,7 +104,9 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
 
     @show_points.setter
     def show_points(self, show: bool):
-        self.show_vertices = show
+        if not hasattr(self, 'show_vertices') or self.show_vertices != show:
+            self.show_vertices = show
+            self._mark_settings_dirty()
 
     @property
     def show_lines(self) -> bool:
@@ -110,7 +114,9 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
 
     @show_lines.setter
     def show_lines(self, show: bool):
-        self.show_edges = show
+        if not hasattr(self, 'show_edges') or self.show_edges != show:
+            self.show_edges = show
+            self._mark_settings_dirty()
 
     @property
     def pointsize(self) -> float:
@@ -118,7 +124,9 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
 
     @pointsize.setter
     def pointsize(self, size: float):
-        self.vertexsize = size
+        if not hasattr(self, 'vertexsize') or self.vertexsize != size:
+            self.vertexsize = size
+            self._mark_settings_dirty()
 
     @property
     def linewidth(self) -> float:
@@ -126,7 +134,93 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
 
     @linewidth.setter
     def linewidth(self, size: float):
-        self.edgesize = size
+        if not hasattr(self, 'edgesize') or self.edgesize != size:
+            self.edgesize = size
+            self._mark_settings_dirty()
+
+    def _is_triangulated(self) -> bool:
+        """Check if mesh contains only triangular faces."""
+        for face in self.mesh.faces():
+            if len(self.mesh.face_vertices(face)) != 3:
+                return False
+        return True
+
+    def _read_frontfaces_data_numpy(self) -> ShaderDataType:
+        """Numpy-optimized face data reading for triangulated meshes."""
+        # Get vertex coordinates as numpy array
+        vertices = np.array([self.mesh.vertex_coordinates(v) for v in self.mesh.vertices()], dtype=np.float32)
+
+        # Build vertex index mapping for efficient lookup
+        vertex_list = list(self.mesh.vertices())
+        vertex_to_idx = {v: i for i, v in enumerate(vertex_list)}
+
+        # Get face vertex indices
+        faces = list(self.mesh.faces())
+        face_indices = np.array(
+            [[vertex_to_idx[v] for v in self.mesh.face_vertices(f)] for f in faces],
+            dtype=np.int32
+        )
+
+        # Gather positions: (n_faces, 3 vertices, 3 coords) -> flatten to (n_verts, 3)
+        positions = vertices[face_indices].reshape(-1, 3)
+
+        # Handle colors - build numpy array directly
+        n_face_verts = len(faces) * 3
+        if self.use_vertexcolors:
+            # Per-vertex colors
+            colors_list = []
+            for f in faces:
+                verts = self.mesh.face_vertices(f)
+                for v in verts:
+                    colors_list.append(self.vertexcolor[v].rgba)
+            colors = np.array(colors_list, dtype=np.float32)
+        else:
+            # Per-face colors - use numpy broadcasting
+            face_colors = np.array([self.facecolor[f].rgba for f in faces], dtype=np.float32)
+            colors = np.repeat(face_colors, 3, axis=0)
+
+        # Elements: sequential triangle indices as numpy
+        n_triangles = len(faces)
+        elements = np.arange(n_triangles * 3, dtype=np.int32).reshape(-1, 3)
+
+        return positions, colors, elements
+
+    def _read_backfaces_data_numpy(self) -> ShaderDataType:
+        """Numpy-optimized backface data reading for triangulated meshes (reversed winding)."""
+        # Get vertex coordinates as numpy array
+        vertices = np.array([self.mesh.vertex_coordinates(v) for v in self.mesh.vertices()], dtype=np.float32)
+
+        # Build vertex index mapping
+        vertex_list = list(self.mesh.vertices())
+        vertex_to_idx = {v: i for i, v in enumerate(vertex_list)}
+
+        # Get face vertex indices (reversed for backfaces)
+        faces = list(self.mesh.faces())
+        face_indices = np.array(
+            [[vertex_to_idx[v] for v in self.mesh.face_vertices(f)[::-1]] for f in faces],
+            dtype=np.int32
+        )
+
+        # Gather positions
+        positions = vertices[face_indices].reshape(-1, 3)
+
+        # Handle colors - build numpy array directly
+        if self.use_vertexcolors:
+            colors_list = []
+            for f in faces:
+                verts = self.mesh.face_vertices(f)[::-1]
+                for v in verts:
+                    colors_list.append(self.vertexcolor[v].rgba)
+            colors = np.array(colors_list, dtype=np.float32)
+        else:
+            face_colors = np.array([self.facecolor[f].rgba for f in faces], dtype=np.float32)
+            colors = np.repeat(face_colors, 3, axis=0)
+
+        # Elements: sequential triangle indices as numpy
+        n_triangles = len(faces)
+        elements = np.arange(n_triangles * 3, dtype=np.int32).reshape(-1, 3)
+
+        return positions, colors, elements
 
     def _read_points_data(self) -> ShaderDataType:
         positions = []
@@ -169,6 +263,10 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
         return positions, colors, elements
 
     def _read_frontfaces_data(self) -> ShaderDataType:
+        # Use numpy fast path for triangulated meshes
+        if self._is_triangulated():
+            return self._read_frontfaces_data_numpy()
+
         positions = []
         colors = []
         elements = []
@@ -238,6 +336,10 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
         return positions, colors, elements
 
     def _read_backfaces_data(self) -> ShaderDataType:
+        # Use numpy fast path for triangulated meshes
+        if self._is_triangulated():
+            return self._read_backfaces_data_numpy()
+
         positions = []
         colors = []
         elements = []

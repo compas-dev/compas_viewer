@@ -9,9 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Added numpy fast path for triangulated mesh data (`_read_frontfaces_data_numpy`, `_read_backfaces_data_numpy`).
+* Added dirty flag tracking for settings updates in `BufferManager`.
+
 ### Changed
 
 * Made `linewidth` working again through `GeometryShader`.
+* Cached uniform locations in `Shader` to avoid per-frame lookups.
+* Cached instance color FBO in `Renderer` to avoid per-selection allocation.
+* `BufferManager._add_buffer_data` now accepts numpy arrays directly.
+* Scene object settings converted to properties with dirty tracking for efficient GPU updates.
+* Fixed assertion error in `Camera.projection` when scale is 0.
 
 ### Removed
 

@@ -85,18 +85,27 @@ class ViewerSceneObject(SceneObject, Base):
         use_rgba: bool = False,
         **kwargs,
     ):
-        #  Basic
-        super().__init__(**kwargs)
-        self.show = show
-        self.show_points = show_points if show_points is not None else False
-        self.show_lines = show_lines if show_lines is not None else True
-        self.show_faces = show_faces if show_faces is not None else True
-        self.linewidth = linewidth if linewidth is not None else self.viewer.config.ui.display.linewidth
-        self.pointsize = pointsize if pointsize is not None else self.viewer.config.ui.display.pointsize
-        self.opacity = opacity if opacity is not None else self.viewer.config.ui.display.opacity
+        # Initialize private attributes BEFORE super().__init__() because
+        # base classes may set properties that trigger our setters
+        self._inited = False
+        self._show = show
+        self._show_points = show_points if show_points is not None else False
+        self._show_lines = show_lines if show_lines is not None else True
+        self._show_faces = show_faces if show_faces is not None else True
+        self._linewidth = linewidth
+        self._pointsize = pointsize
+        self._opacity = opacity
+        self._is_selected = is_selected
 
-        #  Selection
-        self.is_selected = is_selected
+        super().__init__(**kwargs)
+
+        # Apply defaults after super().__init__() when self.viewer is available
+        if self._linewidth is None:
+            self._linewidth = self.viewer.config.ui.display.linewidth
+        if self._pointsize is None:
+            self._pointsize = self.viewer.config.ui.display.pointsize
+        if self._opacity is None:
+            self._opacity = self.viewer.config.ui.display.opacity
 
         #  Visual
         self.background: bool = False
@@ -112,8 +121,92 @@ class ViewerSceneObject(SceneObject, Base):
         self._frontfaces_data: Optional[ShaderDataType] = None
         self._backfaces_data: Optional[ShaderDataType] = None
 
-        self._inited = False
         self.context = "Viewer"
+
+    def _mark_settings_dirty(self):
+        """Mark this object's settings as needing GPU update."""
+        if self._inited:
+            self.buffer_manager.mark_settings_dirty(self)
+
+    @property
+    def show(self) -> bool:
+        return self._show
+
+    @show.setter
+    def show(self, value: bool):
+        if self._show != value:
+            self._show = value
+            self._mark_settings_dirty()
+
+    @property
+    def show_points(self) -> bool:
+        return self._show_points
+
+    @show_points.setter
+    def show_points(self, value: bool):
+        if self._show_points != value:
+            self._show_points = value
+            self._mark_settings_dirty()
+
+    @property
+    def show_lines(self) -> bool:
+        return self._show_lines
+
+    @show_lines.setter
+    def show_lines(self, value: bool):
+        if self._show_lines != value:
+            self._show_lines = value
+            self._mark_settings_dirty()
+
+    @property
+    def show_faces(self) -> bool:
+        return self._show_faces
+
+    @show_faces.setter
+    def show_faces(self, value: bool):
+        if self._show_faces != value:
+            self._show_faces = value
+            self._mark_settings_dirty()
+
+    @property
+    def linewidth(self) -> float:
+        return self._linewidth
+
+    @linewidth.setter
+    def linewidth(self, value: float):
+        if self._linewidth != value:
+            self._linewidth = value
+            self._mark_settings_dirty()
+
+    @property
+    def pointsize(self) -> float:
+        return self._pointsize
+
+    @pointsize.setter
+    def pointsize(self, value: float):
+        if self._pointsize != value:
+            self._pointsize = value
+            self._mark_settings_dirty()
+
+    @property
+    def opacity(self) -> float:
+        return self._opacity
+
+    @opacity.setter
+    def opacity(self, value: float):
+        if self._opacity != value:
+            self._opacity = value
+            self._mark_settings_dirty()
+
+    @property
+    def is_selected(self) -> bool:
+        return self._is_selected
+
+    @is_selected.setter
+    def is_selected(self, value: bool):
+        if self._is_selected != value:
+            self._is_selected = value
+            self._mark_settings_dirty()
 
     @property
     def bounding_box(self):
@@ -156,6 +249,7 @@ class ViewerSceneObject(SceneObject, Base):
         self._update_bounding_box()
         self.instance_color = Color.from_rgb255(*next(self.viewer.scene._instance_colors_generator))
         self.viewer.scene.instance_colors[self.instance_color.rgb255] = self
+        self._inited = True
 
     def update(self, update_transform: bool = True, update_data: bool = False):
         """Update the object.

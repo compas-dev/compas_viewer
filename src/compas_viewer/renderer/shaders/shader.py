@@ -12,6 +12,13 @@ class Shader:
     def __init__(self, name: str = "mesh"):
         self.program = make_shader_program(name)
         self.locations = {}
+        self._uniform_locations = {}
+
+    def _get_uniform_location(self, name: str) -> int:
+        """Get cached uniform location, looking up only once per uniform name."""
+        if name not in self._uniform_locations:
+            self._uniform_locations[name] = GL.glGetUniformLocation(self.program, name)
+        return self._uniform_locations[name]
 
     def uniform4x4(self, name: str, value: list[list[float]]):
         """Store a uniform 4x4 transformation matrix in the shader program at a named location.
@@ -24,7 +31,7 @@ class Shader:
             A 4x4 transformation matrix.
         """
         _value = array(value)
-        location = GL.glGetUniformLocation(self.program, name)
+        location = self._get_uniform_location(name)
         GL.glUniformMatrix4fv(location, 1, True, _value)
 
     def uniform1i(self, name: str, value: int):
@@ -37,7 +44,7 @@ class Shader:
         value : int
             An integer value.
         """
-        location = GL.glGetUniformLocation(self.program, name)
+        location = self._get_uniform_location(name)
         GL.glUniform1i(location, value)
 
     def uniform1f(self, name: str, value: float):
@@ -50,7 +57,7 @@ class Shader:
         value : float
             A float value.
         """
-        location = GL.glGetUniformLocation(self.program, name)
+        location = self._get_uniform_location(name)
         GL.glUniform1f(location, value)
 
     def uniform3f(self, name: str, value: Union[tuple[float, float, float], list[float]]):
@@ -63,7 +70,7 @@ class Shader:
         value : Union[tuple[float, float, float], list[float]]
             An iterable of 3 floats.
         """
-        location = GL.glGetUniformLocation(self.program, name)
+        location = self._get_uniform_location(name)
         GL.glUniform3f(location, *value)
 
     def uniform2f(self, name: str, value: Union[tuple[float, float], list[float]]):
@@ -76,7 +83,7 @@ class Shader:
         value : Union[tuple[float, float], list[float]]
             An iterable of 2 floats.
         """
-        location = GL.glGetUniformLocation(self.program, name)
+        location = self._get_uniform_location(name)
         GL.glUniform2f(location, *value)
 
     def uniformText(self, name: str, texture: Any):
@@ -106,7 +113,7 @@ class Shader:
         unit : int
             The texture unit to use (0-15 typically available)
         """
-        location = GL.glGetUniformLocation(self.program, name)
+        location = self._get_uniform_location(name)
         GL.glUniform1i(location, unit)  # Use specified texture unit
         GL.glActiveTexture(GL.GL_TEXTURE0 + unit)
         GL.glBindTexture(GL.GL_TEXTURE_BUFFER, buffer)
