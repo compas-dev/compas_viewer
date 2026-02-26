@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* Fixed `invalid enumerant` error (1280) on call to `Viewer.show()` which occurs due to lingering OpenGL errors.
+
 ### Removed
 
 
