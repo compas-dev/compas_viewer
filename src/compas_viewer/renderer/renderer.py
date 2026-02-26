@@ -205,6 +205,13 @@ class Renderer(QOpenGLWidget, Base):
         """
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)  # type: ignore
 
+    def _clear_opengl_errors(self):
+        while True:
+            error = GL.glGetError()
+            if error == GL.GL_NO_ERROR:
+                break
+            print(f"Cleared stale OpenGL error: {error}")
+
     def initializeGL(self):
         """
         Initialize the OpenGL canvas.
@@ -220,6 +227,9 @@ class Renderer(QOpenGLWidget, Base):
         * https://doc.qt.io/qtforpython-6/PySide6/QtOpenGL/QOpenGLWindow.html#PySide6.QtOpenGL.PySide6.QtOpenGL.QOpenGLWindow.initializeGL
 
         """
+        # any stale errors caused e.g. by the windowing framework and were not cleared may trigger a crash as soon as we start issuing GL calls.
+        self._clear_opengl_errors()
+
         GL.glClearColor(*self.viewer.config.renderer.backgroundcolor.rgba)
         GL.glPolygonOffset(1.0, 1.0)
         GL.glEnable(GL.GL_CULL_FACE)
