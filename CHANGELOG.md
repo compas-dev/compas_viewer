@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
+* Added a check before applying circular mask on points to be rendered, because with some drivers, gl_PointCoords can be invalid and thus no point is rendered (problem detected on Fedora 43 with intel igpu)
 
 ### Changed
 
