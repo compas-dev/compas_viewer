@@ -7,8 +7,9 @@ t3 = Tag("Align to right", (0, 10, 0), height=50, horizontal_align="right", vert
 t4 = Tag("Absolute height", (5, 0, 0), absolute_height=True, height=100)
 
 viewer = Viewer()
-viewer.scene.add(t1)
-viewer.scene.add(t2)
-viewer.scene.add(t3)
-viewer.scene.add(t4)
+tag_group = viewer.scene.add_group(name="tags")
+tag_group.add(t1)
+tag_group.add(t2)
+tag_group.add(t3)
+tag_group.add(t4)
 viewer.show()
