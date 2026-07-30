@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* Fixed tag visibility. Tags would still show even if group visibility was turned off. 
+* Fixed tag missing text_aspect error when opening a viewer a second time in a script.
+
 ### Removed
 
 
