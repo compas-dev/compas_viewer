@@ -665,6 +665,12 @@ class Renderer(QOpenGLWidget, Base):
         # Draw text tag sprites if there are any
         tag_objs = [obj for obj in self.viewer.scene.objects if isinstance(obj, TagObject)]
         if tag_objs:
+            # Tag objects are not part of the buffer manager, so they are not initialized by
+            # rebuild_buffers(). Initialize them here, where the GL context is guaranteed to be current.
+            for obj in tag_objs:
+                if not obj._inited:
+                    obj.init()
+
             # release the model shader and bind the tag shader
             self.shader_tag.bind()
             self.shader_tag.uniform4x4("viewworld", viewworld)

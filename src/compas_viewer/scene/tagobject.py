@@ -118,6 +118,7 @@ class TagObject(ViewerSceneObject, GeometryObject):
 
     def init(self):
         self.make_buffers()
+        self._inited = True
 
     def make_buffers(self):
         positions = [
