@@ -1,0 +1,155 @@
+site_name: COMPAS Viewer
+site_url: https://compas.dev/compas_viewer/
+repo_name: compas-dev/compas_viewer
+repo_url: https://github.com/compas-dev/compas_viewer/
+copyright: Copyright &copy; COMPAS Association
+
+theme:
+  name: material
+  logo: assets/logos/compas_icon_white.png
+  features:
+    - content.code.copy
+    - navigation.footer
+    - navigation.sections
+    - navigation.tabs
+    - navigation.top
+    - search.highlight
+    - search.suggest
+    - toc.follow
+  palette:
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: blue
+      accent: light blue
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: blue
+      accent: light blue
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - footnotes
+  - md_in_html
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets:
+      check_paths: true
+  - pymdownx.superfences
+  - toc:
+      permalink: true
+
+plugins:
+  - search
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          paths: [src]
+          options:
+            docstring_options:
+              warn_missing_types: false
+              warn_unknown_params: false
+            docstring_style: numpy
+            docstring_section_style: table
+            inherited_members: false
+            merge_init_into_class: true
+            modernize_annotations: true
+            separate_signature: true
+            show_bases: false
+            show_if_no_docstring: false
+            show_root_full_path: true
+            show_signature_annotations: true
+            show_source: false
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            signature_crossrefs: true
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Installation: installation.md
+      - Hello World: hello-world.md
+  - Guides:
+      - User Guide: user-guide.md
+      - Developer Guide: developer-guide.md
+      - Building the Documentation: building-docs.md
+  - Examples:
+      - Overview: examples.md
+      - Objects:
+          - Overview: examples/object.md
+          - Additional Geometry: examples/object/additional_geometry.md
+          - Arrows: examples/object/arrows.md
+          - Buffer Geometry: examples/object/buffer_geometry.md
+          - Breps: examples/object/brep.md
+          - Frames: examples/object/frames.md
+          - Geometries: examples/object/geometries.md
+          - Lines: examples/object/lines.md
+          - Mesh Display: examples/object/mesh_display.md
+          - NURBS: examples/object/nurbs.md
+          - Point Clouds: examples/object/pointcloud.md
+          - Points: examples/object/points.md
+          - Polylines: examples/object/polyline.md
+          - Scale: examples/object/scale.md
+          - Text Annotations: examples/object/text_annotations.md
+          - Vectors: examples/object/vector.md
+      - Scenes:
+          - Overview: examples/scene.md
+          - Groups: examples/scene/groups.md
+          - Collections: examples/scene/collections.md
+          - Serialization: examples/scene/serialization.md
+          - Dynamic Changes: examples/scene/dynamic_scene.md
+      - Colors:
+          - Overview: examples/color.md
+          - Blending: examples/color/blending.md
+          - Colors: examples/color/colors.md
+          - Face and Vertex Colors: examples/color/face_vertext_color.md
+      - Dynamic:
+          - Overview: examples/dynamic.md
+          - Dynamic Objects: examples/dynamic/dynamic.md
+          - Dynamic Meshes: examples/dynamic/dynamic_mesh.md
+          - Orbiting: examples/dynamic/orbiting.md
+          - Shared Geometry: examples/dynamic/shared_geometry.md
+          - Transformations: examples/dynamic/transform.md
+      - UI:
+          - Overview: examples/ui.md
+          - Side-dock Controls: examples/ui/sidedock.md
+          - Camera Controls: examples/ui/camera.md
+      - Configuration:
+          - Overview: examples/configuration.md
+          - Units and Grid Scale: examples/configuration/units.md
+      - Legacy Examples:
+          - Overview: examples/__temp/basics.md
+          - Messages: examples/__temp/basics/messages.md
+          - Layout Overview: examples/__temp/layout.md
+          - Property Form: examples/__temp/layout/property_form.md
+          - Slider: examples/__temp/layout/slider.md
+          - Tree: examples/__temp/layout/tree.md
+          - Tree View: examples/__temp/layout/tree_view.md
+          - Object Overview: examples/__temp/object.md
+          - Fonts: examples/__temp/object/fonts.md
+          - Robot: examples/__temp/object/robot.md
+          - Text: examples/__temp/object/texts.md
+  - API Reference:
+      - Overview: api.md
+      - compas_viewer: api/compas_viewer.md
+      - Commands: api/compas_viewer.commands.md
+      - Components: api/compas_viewer.components.md
+      - Events: api/compas_viewer.events.md
+      - Renderer: api/compas_viewer.renderer.md
+      - Scene: api/compas_viewer.scene.md
+      - UI: api/compas_viewer.ui.md
+  - Project:
+      - Acknowledgements: acknowledgements.md
+      - License: license.md

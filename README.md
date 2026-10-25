@@ -2,7 +2,7 @@
 
 A standalone, high-performance 3D viewer for COMPAS 2.0, built with PySide6 and OpenGL.
 
-[![Version](https://img.shields.io/badge/version-1.6.0-blue.svg)](https://github.com/compas-dev/compas_viewer)
+[![PyPI version](https://img.shields.io/pypi/v/compas_viewer.svg)](https://pypi.org/project/compas_viewer/)
 [![Documentation](https://img.shields.io/badge/docs-compas.dev-green.svg)](https://compas.dev/compas_viewer/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
@@ -42,7 +42,7 @@ More information is available in the docs: <https://compas.dev/compas_viewer/>
 ## Installation
 
 ### Requirements
-- Python >= 3.9
+- Python >= 3.12
 - COMPAS >= 2.2.0
 
 ### Quick Install
@@ -54,10 +54,10 @@ pip install compas_viewer
 ```bash
 git clone https://github.com/compas-dev/compas_viewer.git
 cd compas_viewer
-pip install -e .
+python -m pip install -e ".[dev,docs]"
 ```
 
-See the [Getting Started](https://compas.dev/compas_viewer/latest/installation.html) instructions in the docs for detailed installation guidelines.
+See the [Getting Started](https://compas.dev/compas_viewer/latest/installation/) instructions in the docs for detailed installation guidelines.
 
 ## Quick Start
 
@@ -80,6 +80,75 @@ viewer.scene.add(sphere, name="My Sphere")
 viewer.show()
 ```
 
+To generate an image without opening the interactive viewer or entering the Qt
+event loop, use `save_image` instead:
+
+```python
+from compas.geometry import Sphere
+from compas_viewer import Viewer
+
+viewer = Viewer()
+viewer.scene.add(Sphere(1.0))
+viewer.save_image("sphere.png", width=1600, height=900, zoom_extents=True)
+```
+
+Animations can be recorded with deterministic frame updates and presets for
+common output targets:
+
+```python
+def orbit(frame):
+    viewer.renderer.camera.rotation.z = frame * 0.05
+
+viewer.record_animation(
+    "orbit.gif",
+    update=orbit,
+    frames=120,
+    preset="documentation",  # preview, documentation, or presentation
+    zoom_extents=True,
+)
+```
+
+The presets provide the following defaults:
+
+| Preset | Resolution | FPS | Intended use |
+| --- | --- | ---: | --- |
+| `preview` | 640 × 360 | 15 | Fast iteration and small files |
+| `documentation` | 960 × 540 | 24 | Documentation and web pages |
+| `presentation` | 1280 × 720 | 30 | Slides and high-quality demos |
+
+Pass `width`, `height`, or `fps` to override individual preset values. GIF and
+animated WebP output are supported.
+
+Text and arrow annotations use screen-scaled styling, making them suitable for
+captures and animation overlays:
+
+```python
+from compas.colors import Color
+from compas_viewer.scene import ArrowOverlay
+from compas_viewer.scene import TextAnnotation
+
+viewer.scene.add(
+    ArrowOverlay(
+        start=(0, 0, 0),
+        end=(1, 1, 0),
+        color=Color.red(),
+        linewidth=4,
+        head_length=18,
+        head_width=14,
+        on_top=True,
+    )
+)
+viewer.scene.add(
+    TextAnnotation(
+        "Resultant force",
+        position=(1, 1, 0),
+        offset=(8, 8),
+        backgroundcolor=Color(1, 1, 1, 0.8),
+        padding=4,
+    )
+)
+```
+
 ### Command Line Usage
 ```bash
 # Launch with a empty scene
@@ -90,6 +159,9 @@ python -m compas_viewer -f path/to/geometry.json
 
 # Launch with multiple files from a directory
 python -m compas_viewer --files path/to/directory/
+
+# Render without opening the interactive viewer
+python -m compas_viewer -f geometry.json -o geometry.png --width 1600 --height 900 --zoom-extents
 ```
 
 ### Dynamic Animations
@@ -117,15 +189,16 @@ viewer.show()
 | Zoom | Mouse wheel |
 | Select object | Left-click |
 | Select multiple | Left-click + shift + drag |
+| Deselect all | Escape |
 | Delete selected | Delete key |
 | Zoom to selected | F key (with selection) |
 | Zoom to All | F key (without selection) |
 
 ## Documentation
 
-- **[Tutorial](https://compas.dev/compas_viewer/latest/tutorial.html)**: Basic concepts, configuration, and software architecture
-- **[Examples](https://compas.dev/compas_viewer/latest/examples.html)**: Comprehensive examples covering all features
-- **[API Reference](https://compas.dev/compas_viewer/latest/api.html)**: Complete API documentation
+- **[Tutorial](https://compas.dev/compas_viewer/latest/tutorial/)**: Basic concepts, configuration, and software architecture
+- **[Examples](https://compas.dev/compas_viewer/latest/examples/)**: Comprehensive examples covering all features
+- **[API Reference](https://compas.dev/compas_viewer/latest/api/)**: Complete API documentation
 
 ## Contributing
 
