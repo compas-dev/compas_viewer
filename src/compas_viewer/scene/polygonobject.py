@@ -1,27 +1,24 @@
+from typing import cast
+
 from compas.geometry import Line
 from compas.geometry import Point
 from compas.geometry import Polygon
-from compas.geometry import earclip_polygon
+from compas.geometry import Tessellation
 
-from .geometryobject import GeometryObject
+from .tessellationobject import TessellationObject
 
 
-class PolygonObject(GeometryObject):
+class PolygonObject(TessellationObject):
     """Viewer scene object for displaying COMPAS Polygon geometry."""
-
-    geometry: Polygon
 
     @property
     def points(self) -> list[Point]:
-        return self.geometry.points
+        return cast(Polygon, self.geometry).points
 
     @property
     def lines(self) -> list[Line]:
-        return self.geometry.lines
+        return cast(Polygon, self.geometry).lines
 
     @property
-    def viewmesh(self) -> tuple[list[Point], list[list[int]]]:
-        vertices = self.geometry.points
-        faces = [list(range(len(vertices)))]
-        faces = earclip_polygon(self.geometry)
-        return vertices, faces
+    def tessellation(self) -> Tessellation:
+        return cast(Polygon, self.geometry).tessellation

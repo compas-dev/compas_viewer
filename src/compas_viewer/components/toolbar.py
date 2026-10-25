@@ -1,15 +1,27 @@
+from collections.abc import Callable
 from functools import partial
 from typing import Any
-from typing import Callable
-from typing import Optional
+from typing import cast
+
+from PySide6.QtGui import QAction
 
 from compas_viewer.components import Button
 from compas_viewer.components.component import Component
+from compas_viewer.uidefinitions import UIItem
 
 from .mainwindow import MainWindow
 
 
 class ToolBar(Component):
+    """Build the configured toolbar for a main window.
+
+    Parameters
+    ----------
+    window
+        Main window that owns the toolbar.
+
+    """
+
     def __init__(self, window: MainWindow) -> None:
         super().__init__()
         self.widget = window.widget.addToolBar("Tools")
@@ -19,15 +31,18 @@ class ToolBar(Component):
         self.load_items()
 
     @property
-    def items(self):
-        return self.viewer.config.ui.toolbar.items
+    def items(self) -> list[UIItem]:
+        """list[UIItem]: Runtime toolbar definitions."""
+        return self.viewer.toolbar_items
 
-    def load_items(self):
+    def load_items(self) -> None:
+        """Populate the toolbar from the viewer configuration."""
         for item in self.items:
             text = item.get("title", None)
             tooltip = item.get("tooltip", None)
             itemtype = item.get("type", None)
-            action = item.get("action", None)
+            command_id = item.get("command", None)
+            action = self.viewer.commands[command_id] if command_id else None
             icon = item.get("icon", None)
             args = item.get("args") or []
             kwargs = item.get("kwargs") or {}
@@ -35,9 +50,9 @@ class ToolBar(Component):
             if itemtype == "separator":
                 raise NotImplementedError
             elif itemtype == "button":
-                self.add_action(tooltip=tooltip, icon=icon, action=action, args=args, kwargs=kwargs)
+                self.add_action(tooltip=tooltip, icon=icon, action=cast(Callable[..., object], action), args=args, kwargs=kwargs)
             elif itemtype == "action":
-                self.add_action(text=text, action=action, args=args, kwargs=kwargs)
+                self.add_action(text=text, action=cast(Callable[..., object], action), args=args, kwargs=kwargs)
             # elif itemtype == "select":
             #     self.add_combobox(item["items"], item["action"])
             elif action:
@@ -46,13 +61,36 @@ class ToolBar(Component):
     def add_action(
         self,
         *,
-        tooltip: str,
-        text: Optional[str] = None,
-        action: Callable,
-        args: Optional[list[Any]] = None,
-        kwargs: Optional[dict] = None,
-        icon: Optional[str] = None,
-    ):
+        tooltip: str | None = None,
+        text: str | None = None,
+        action: Callable[..., object],
+        args: list[Any] | None = None,
+        kwargs: dict[str, Any] | None = None,
+        icon: str | None = None,
+    ) -> QAction:
+        """Add a configured action widget to the toolbar.
+
+        Parameters
+        ----------
+        tooltip
+            Optional hover text.
+        text
+            Optional button label.
+        action
+            Callback invoked by the button.
+        args
+            Positional callback arguments.
+        kwargs
+            Keyword callback arguments.
+        icon
+            Optional icon filename.
+
+        Returns
+        -------
+        QAction
+            Toolbar action representing the button widget.
+
+        """
         args = args or []
         kwargs = kwargs or {}
         return self.widget.addWidget(Button(text=text, tooltip=tooltip, icon_path=icon, action=partial(action, *args, **kwargs)))

@@ -1,168 +1,193 @@
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Any
-from typing import Union
+from typing import cast
 
 from numpy import array
+from numpy.typing import ArrayLike
 from OpenGL import GL
 
 
 class Shader:
     """The shader used by the OpenGL view."""
 
-    def __init__(self, name: str = "mesh"):
-        self.program = make_shader_program(name)
-        self.locations = {}
+    def __init__(self, name: str = "mesh") -> None:
+        """Compile and link a named shader program.
 
-    def uniform4x4(self, name: str, value: list[list[float]]):
+        Parameters
+        ----------
+        name
+            Stem of the shader source filenames.
+
+        """
+        self.program = make_shader_program(name)
+        self.locations: dict[str, int] = {}
+
+    def uniform4x4(self, name: str, value: ArrayLike) -> None:
         """Store a uniform 4x4 transformation matrix in the shader program at a named location.
 
         Parameters
         ----------
-        name : str
+        name
             The name of the location in the shader program.
-        value : list[list[float]]
+        value
             A 4x4 transformation matrix.
+
         """
         _value = array(value)
         location = GL.glGetUniformLocation(self.program, name)
         GL.glUniformMatrix4fv(location, 1, True, _value)
 
-    def uniform1i(self, name: str, value: int):
+    def uniform1i(self, name: str, value: int) -> None:
         """Store a uniform integer in the shader program at a named location.
 
         Parameters
         ----------
-        name : str
+        name
             The name of the location in the shader program.
-        value : int
+        value
             An integer value.
+
         """
         location = GL.glGetUniformLocation(self.program, name)
         GL.glUniform1i(location, value)
 
-    def uniform1f(self, name: str, value: float):
+    def uniform1f(self, name: str, value: float) -> None:
         """Store a uniform float in the shader program at a named location.
 
         Parameters
         ----------
-        name : str
+        name
             The name of the location in the shader program.
-        value : float
+        value
             A float value.
+
         """
         location = GL.glGetUniformLocation(self.program, name)
         GL.glUniform1f(location, value)
 
-    def uniform3f(self, name: str, value: Union[tuple[float, float, float], list[float]]):
+    def uniform3f(self, name: str, value: Sequence[float]) -> None:
         """Store a uniform list of 3 floats in the shader program at a named location.
 
         Parameters
         ----------
-        name : str
+        name
             The name of the location in the shader program.
-        value : Union[tuple[float, float, float], list[float]]
+        value
             An iterable of 3 floats.
+
         """
         location = GL.glGetUniformLocation(self.program, name)
         GL.glUniform3f(location, *value)
 
-    def uniform2f(self, name: str, value: Union[tuple[float, float], list[float]]):
+    def uniform2f(self, name: str, value: Sequence[float]) -> None:
         """Store a uniform list of 2 floats in the shader program at a named location.
 
         Parameters
         ----------
-        name : str
+        name
             The name of the location in the shader program.
-        value : Union[tuple[float, float], list[float]]
+        value
             An iterable of 2 floats.
+
         """
         location = GL.glGetUniformLocation(self.program, name)
         GL.glUniform2f(location, *value)
 
-    def uniformText(self, name: str, texture: Any):
+    def uniformText(self, name: str, texture: int) -> None:
         """Store a uniform texture in the shader program at a named location.
 
         Parameters
         ----------
-        name : str
+        name
             The name of the location in the shader program.
-        texture : Any
+        texture
             The texture to store.
+
         """
         # location = GL.glGetUniformLocation(self.program, name)
         # print(location)
-        GL.glActiveTexture(GL.GL_TEXTURE0 + 0)  # type: ignore
+        GL.glActiveTexture(cast(int, GL.GL_TEXTURE0))
         GL.glBindTexture(GL.GL_TEXTURE_2D, texture)
 
-    def uniformBuffer(self, name: str, buffer: Any, unit: int = 0):
+    def uniformBuffer(self, name: str, buffer: int, unit: int = 0) -> None:
         """Store a uniform buffer in the shader program at a named location.
 
         Parameters
         ----------
-        name : str
+        name
             The name of the location in the shader program.
-        buffer : Any
+        buffer
             The buffer to store.
-        unit : int
+        unit
             The texture unit to use (0-15 typically available)
+
         """
         location = GL.glGetUniformLocation(self.program, name)
         GL.glUniform1i(location, unit)  # Use specified texture unit
-        GL.glActiveTexture(GL.GL_TEXTURE0 + unit)
+        GL.glActiveTexture(cast(int, GL.GL_TEXTURE0) + unit)
         GL.glBindTexture(GL.GL_TEXTURE_BUFFER, buffer)
 
-    def bind(self):
+    def bind(self) -> None:
         """Bind the shader program."""
         GL.glUseProgram(self.program)
 
-    def release(self):
+    def release(self) -> None:
         """Release (unbind) the shader program."""
         GL.glBindBuffer(GL.GL_ARRAY_BUFFER, 0)
         GL.glUseProgram(0)
 
-    def enable_attribute(self, name: str):
+    def enable_attribute(self, name: str) -> None:
         """Enable a named attribute in the shader program.
 
         Parameters
         ----------
-        name : str
+        name
             The name of the attribute.
+
         """
         location = GL.glGetAttribLocation(self.program, name)
         GL.glEnableVertexAttribArray(location)
         self.locations[name] = location
 
-    def bind_attribute(self, name: str, value: Any, step: int = 3):
+    def bind_attribute(self, name: str, value: int, step: int = 3) -> None:
         """Bind a named attribute to a buffer.
 
         Parameters
         ----------
-        name : str
+        name
             The name of the attribute.
-        value : Any
+        value
             The buffer to bind to the attribute.
-        step : int, optional
+        step
             The step size of the attribute.
+
         """
         location = self.locations[name]
         GL.glBindBuffer(GL.GL_ARRAY_BUFFER, value)
         GL.glVertexAttribPointer(location, step, GL.GL_FLOAT, False, 0, None)
 
-    def disable_attribute(self, name: str):
-        GL.glDisableVertexAttribArray(self.locations[name])
-        del self.locations[name]
-
-    def draw_triangles(self, elements: Any = None, n: int = 0, background: bool = False):
-        """
-        Draw triangles.
+    def disable_attribute(self, name: str) -> None:
+        """Disable and forget a named vertex attribute.
 
         Parameters
         ----------
-        elements : Any, optional
+        name
+            Attribute name previously enabled on this shader.
+
+        """
+        GL.glDisableVertexAttribArray(self.locations[name])
+        del self.locations[name]
+
+    def draw_triangles(self, elements: int | None = None, n: int = 0, background: bool = False) -> None:
+        """Draw triangles.
+
+        Parameters
+        ----------
+        elements
             The buffer elements.
-        n : int, optional
+        n
             The number of elements.
-        background : bool, optional
+        background
             Draw in background.
 
         """
@@ -174,20 +199,20 @@ class Shader:
         else:
             GL.glDrawArrays(GL.GL_TRIANGLES, 0, GL.GL_BUFFER_SIZE)
 
-    def draw_lines(self, elements: Any = None, n: int = 0, width: float = 1, background: bool = False):
-        """
-        Draw lines.
+    def draw_lines(self, elements: int | None = None, n: int = 0, width: float = 1, background: bool = False) -> None:
+        """Draw lines.
 
         Parameters
         ----------
-        elements : Any, optional
+        elements
             The buffer elements.
-        n : int, optional
+        n
             The number of elements.
-        width : float, optional
+        width
             The width of the lines.
-        background : bool, optional
+        background
             Draw in background.
+
         """
         if elements:
             if background:
@@ -199,20 +224,20 @@ class Shader:
         else:
             GL.glDrawArrays(GL.GL_LINES, 0, GL.GL_BUFFER_SIZE)
 
-    def draw_points(self, size: float = 1, elements: Any = None, n: int = 0, background: bool = False):
-        """
-        Draw points.
+    def draw_points(self, size: float = 1, elements: int | None = None, n: int = 0, background: bool = False) -> None:
+        """Draw points.
 
         Parameters
         ----------
-        size : float, optional
+        size
             The size of the points.
-        elements : Any, optional
+        elements
             The buffer elements.
-        n : int, optional
+        n
             The number of elements.
-        background : bool, optional
+        background
             Draw in background.
+
         """
         GL.glPointSize(size)
         if elements:
@@ -223,16 +248,16 @@ class Shader:
         else:
             GL.glDrawArrays(GL.GL_POINTS, 0, GL.GL_BUFFER_SIZE)
 
-    def draw_texts(self, elements: Any = None, n: int = 0):
-        """
-        Draw texts.
+    def draw_texts(self, elements: int | None = None, n: int = 0) -> None:
+        """Draw text quads.
 
         Parameters
         ----------
-        elements : Any, optional
+        elements
             The buffer elements.
-        n : int, optional
+        n
             The number of elements.
+
         """
         if elements:
             GL.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, elements)
@@ -240,20 +265,20 @@ class Shader:
         else:
             GL.glDrawArrays(GL.GL_TRIANGLE_STRIP, 0, GL.GL_BUFFER_SIZE)
 
-    def draw_arrows(self, elements: Any, n: int, width: float, background: bool = False):
-        """
-        Draw arrows.
+    def draw_arrows(self, elements: int | None, n: int, width: float, background: bool = False) -> None:
+        """Draw arrows.
 
         Parameters
         ----------
-        elements : Any
+        elements
             The buffer elements.
-        n : int
+        n
             The number of elements.
-        width : float
+        width
             The width of the arrows.
-        background : bool, optional
+        background
             Draw in background.
+
         """
         GL.glDisable(GL.GL_POINT_SMOOTH)
 
@@ -268,17 +293,18 @@ class Shader:
             GL.glDrawArrays(GL.GL_LINES, 0, GL.GL_BUFFER_SIZE)
         GL.glEnable(GL.GL_POINT_SMOOTH)
 
-    def draw_2d_box(self, box_coords: tuple[float, float, float, float], width: int, height: int):
+    def draw_2d_box(self, box_coords: tuple[float, float, float, float], width: int, height: int) -> None:
         """Draw a 2D box. Mostly used for box selection.
 
         Parameters
         ----------
-        box_coords : tuple[float, float, float, float]
+        box_coords
             The coordinates of the box. The coordinates are in the format of (x1, y1, x2, y2).
-        width : int
+        width
             The width of the viewport.
-        height : int
+        height
             The height of the viewport.
+
         """
         # Save current OpenGL state
         depth_test_enabled = GL.glIsEnabled(GL.GL_DEPTH_TEST)
@@ -360,28 +386,32 @@ class Shader:
         GL.glPolygonMode(GL.GL_FRONT_AND_BACK, GL.GL_FILL)  # Reset polygon mode
 
 
-def make_shader_program(name: str):
+def make_shader_program(name: str) -> int:
     """Make a shader program.
 
     Parameters
     ----------
-    name : str
+    name
         The name of the shader.
+
+    Returns
+    -------
+    int
+        Linked OpenGL program identifier.
+
     """
-    vsource = Path(Path(__file__).parent, f"{name}.vert")
-    fsource = Path(Path(__file__).parent, f"{name}.frag")
-    gsource = Path(Path(__file__).parent, f"{name}.geom")
+    shader_directory = Path(__file__).resolve().parent
+    vsource = shader_directory / f"{name}.vert"
+    fsource = shader_directory / f"{name}.frag"
+    gsource = shader_directory / f"{name}.geom"
 
-    with open(vsource, "r") as f:
-        vertex = compile_vertex_shader(f.read())
+    vertex = compile_vertex_shader(vsource.read_text(encoding="utf-8"))
 
-    with open(fsource, "r") as f:
-        fragment = compile_fragment_shader(f.read())
+    fragment = compile_fragment_shader(fsource.read_text(encoding="utf-8"))
 
     geometry = None
     if gsource.exists():
-        with open(gsource, "r") as f:
-            geometry = compile_geometry_shader(f.read())
+        geometry = compile_geometry_shader(gsource.read_text(encoding="utf-8"))
 
     program = GL.glCreateProgram()
     GL.glAttachShader(program, vertex)
@@ -397,37 +427,73 @@ def make_shader_program(name: str):
     GL.glDeleteShader(fragment)
     if geometry:
         GL.glDeleteShader(geometry)
-    return program
+    return cast(int, program)
 
 
-def compile_vertex_shader(source: str):
-    """Compile a vertex shader."""
+def compile_vertex_shader(source: str) -> int:
+    """Compile a vertex shader from GLSL source.
+
+    Parameters
+    ----------
+    source
+        GLSL vertex-shader source.
+
+    Returns
+    -------
+    int
+        Compiled OpenGL shader identifier.
+
+    """
     shader = GL.glCreateShader(GL.GL_VERTEX_SHADER)
     GL.glShaderSource(shader, source)
     GL.glCompileShader(shader)
     result = GL.glGetShaderiv(shader, GL.GL_COMPILE_STATUS)
     if not result:
         raise RuntimeError(GL.glGetShaderInfoLog(shader))
-    return shader
+    return cast(int, shader)
 
 
-def compile_fragment_shader(source: str):
-    """Compile a fragment shader."""
+def compile_fragment_shader(source: str) -> int:
+    """Compile a fragment shader from GLSL source.
+
+    Parameters
+    ----------
+    source
+        GLSL fragment-shader source.
+
+    Returns
+    -------
+    int
+        Compiled OpenGL shader identifier.
+
+    """
     shader = GL.glCreateShader(GL.GL_FRAGMENT_SHADER)
     GL.glShaderSource(shader, source)
     GL.glCompileShader(shader)
     result = GL.glGetShaderiv(shader, GL.GL_COMPILE_STATUS)
     if not result:
         raise RuntimeError(GL.glGetShaderInfoLog(shader))
-    return shader
+    return cast(int, shader)
 
 
-def compile_geometry_shader(source: str):
-    """Compile a geometry shader."""
+def compile_geometry_shader(source: str) -> int:
+    """Compile a geometry shader from GLSL source.
+
+    Parameters
+    ----------
+    source
+        GLSL geometry-shader source.
+
+    Returns
+    -------
+    int
+        Compiled OpenGL shader identifier.
+
+    """
     shader = GL.glCreateShader(GL.GL_GEOMETRY_SHADER)
     GL.glShaderSource(shader, source)
     GL.glCompileShader(shader)
     result = GL.glGetShaderiv(shader, GL.GL_COMPILE_STATUS)
     if not result:
         raise RuntimeError(GL.glGetShaderInfoLog(shader))
-    return shader
+    return cast(int, shader)

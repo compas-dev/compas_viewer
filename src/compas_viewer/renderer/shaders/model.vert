@@ -11,6 +11,7 @@ uniform mat4 viewworld;
 uniform samplerBuffer transformBuffer;
 uniform samplerBuffer settingsBuffer;
 uniform bool is_grid;
+uniform bool is_instance;
 uniform int element_type;
 
 // Outputs
@@ -109,5 +110,6 @@ void main() {
         ec_pos = vec3(viewPos);
     }
     
-    gl_PointSize = pointSize;
+    // Make small points easier to acquire without changing visible rendering.
+    gl_PointSize = is_instance ? max(pointSize, 12.0) : pointSize;
 }

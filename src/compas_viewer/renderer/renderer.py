@@ -1,11 +1,17 @@
 import time
+from collections.abc import Sequence
 from typing import TYPE_CHECKING
+from typing import Literal
+from typing import cast
 
 import numpy as np
 from numpy import float32
 from numpy import identity
+from numpy import uint8
+from numpy.typing import NDArray
 from OpenGL import GL
-from PySide6 import QtCore
+from PySide6.QtCore import QEvent
+from PySide6.QtCore import Qt
 from PySide6.QtCore import QTimer
 from PySide6.QtGui import QDragEnterEvent
 from PySide6.QtGui import QDragMoveEvent
@@ -22,6 +28,7 @@ from compas.geometry import transform_points_numpy
 from compas.scene import Group
 from compas_viewer.base import Base
 from compas_viewer.gl import OffscreenBufferContext
+from compas_viewer.scene import ArrowOverlayObject
 from compas_viewer.scene import TagObject
 from compas_viewer.scene.buffermanager import BufferManager
 from compas_viewer.scene.gridobject import GridObject
@@ -30,22 +37,20 @@ from .camera import Camera
 from .shaders import Shader
 
 if TYPE_CHECKING:
+    from compas_viewer.scene import ViewerSceneObject
     from compas_viewer.scene.gridobject import GridObject
     from compas_viewer.scene.meshobject import MeshObject
 
+type RenderMode = Literal["ghosted", "shaded", "lighted", "wireframe", "instance"]
+type ViewMode = Literal["perspective", "front", "right", "top", "ortho"]
+
 
 class Renderer(QOpenGLWidget, Base):
-    """
-    Renderer class for 3D rendering of COMPAS geometry.
+    """Render COMPAS geometry with OpenGL in a Qt widget.
+
     We constantly use OpenGL version 2.1 and GLSL 120 with a Compatibility Profile at the moment.
     The width and height are not in its configuration since they are set by the parent layout.
 
-    Parameters
-    ----------
-    viewer : :class:`compas_viewer.viewer.Viewer`
-        The viewer instance.
-    config : :class:`compas_viewer.configurations.RendererConfig`
-        The renderer configuration.
     """
 
     # The anti-aliasing factor for the drag selection.
@@ -54,7 +59,7 @@ class Renderer(QOpenGLWidget, Base):
     # Enhance pixel  width for selection.
     PIXEL_SELECTION_INCREMENTAL = 2
 
-    def __init__(self):
+    def __init__(self) -> None:
         format = QSurfaceFormat()
         format.setVersion(3, 3)
         format.setProfile(QSurfaceFormat.CoreProfile)
@@ -63,21 +68,22 @@ class Renderer(QOpenGLWidget, Base):
 
         super().__init__()
 
-        self._view = self.viewer.config.renderer.view
-        self._rendermode = self.viewer.config.renderer.rendermode
+        self._view: ViewMode = cast(ViewMode, self.viewer.config.renderer.view)
+        self._rendermode: RenderMode = cast(RenderMode, self.viewer.config.renderer.rendermode)
         self._opacity = self.viewer.config.renderer.ghostopacity if self.rendermode == "ghosted" else 1.0
 
         self._frames = 0
         self._now = time.time()
 
-        self.grid = None
+        self.grid: GridObject | None = None
 
-        self.shader_model: Shader = None
-        self.shader_lines: Shader = None
-        self._shader_tag: Shader = None
-        self.shader_arrow: Shader = None
-        self.shader_instance: Shader = None
-        self.shader_grid: Shader = None
+        self.shader_model: Shader = None  # type: ignore[assignment]
+        self.shader_lines: Shader = None  # type: ignore[assignment]
+        self._shader_tag: Shader | None = None
+        self._shader_arrow_overlay: Shader | None = None
+        self.shader_arrow: Shader = None  # type: ignore[assignment]
+        self.shader_instance: Shader = None  # type: ignore[assignment]
+        self.shader_grid: Shader = None  # type: ignore[assignment]
 
         self.camera = Camera(
             self,
@@ -92,36 +98,43 @@ class Renderer(QOpenGLWidget, Base):
             pandelta=self.viewer.config.camera.pandelta,
         )
 
-        self.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
-        self.grabGesture(QtCore.Qt.GestureType.PinchGesture)
+        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        self.grabGesture(Qt.GestureType.PinchGesture)
         self.setAcceptDrops(True)
 
         self.buffer_manager = BufferManager()
+        self.viewer.state.changed.connect(self._on_state_changed)
 
         self.set_idle_refresh()
 
-    def set_idle_refresh(self):
+    def _on_state_changed(self, path: str, value: object) -> None:
+        """Apply renderer-owned effects for global viewer-state changes."""
+        if path == "renderer.rendermode" and value != self._rendermode:
+            self.rendermode = cast(RenderMode, value)
+        elif path == "renderer.view" and value != self._view:
+            self.view = cast(ViewMode, value)
+        elif path in {"renderer.show_grid", "renderer.show_gridz", "renderer.gridmode", "renderer.gridcolor", "renderer.gridsize"}:
+            self.rebuild_grid()
+        elif path == "renderer.selectioncolor":
+            self.update_selection_color()
+        elif path == "renderer.backgroundcolor":
+            self.update()
+
+    def set_idle_refresh(self) -> None:
         """Set a low idle refresh rate of 10 FPS. Useful for GPU buffer updates delay."""
         self._idle_timer = QTimer(self)
         self._idle_timer.setInterval(100)
         self._idle_timer.timeout.connect(self.update)
-        self._idle_timer.start()
 
     @property
-    def rendermode(self):
-        """
-        The renderer mode of the view.
-
-        Returns
-        -------
-            The renderer mode of the view.
-        """
+    def rendermode(self) -> RenderMode:
+        """RenderMode: Rendering mode used to draw scene objects."""
         return self._rendermode
 
     @rendermode.setter
-    def rendermode(self, rendermode):
+    def rendermode(self, rendermode: RenderMode) -> None:
         self._rendermode = rendermode
-        self.viewer.config.renderer.rendermode = rendermode
+        self.viewer.state.set("renderer.rendermode", rendermode)
         if rendermode == "ghosted":
             self._opacity = self.viewer.config.renderer.ghostopacity
         else:
@@ -136,19 +149,14 @@ class Renderer(QOpenGLWidget, Base):
             self.update()
 
     @property
-    def view(self):
-        """
-        The view mode of the view.
-
-        Returns
-        -------
-            The view mode of the view.
-        """
+    def view(self) -> ViewMode:
+        """ViewMode: Active predefined camera view."""
         return self._view
 
     @view.setter
-    def view(self, view):
+    def view(self, view: ViewMode) -> None:
         self._view = view
+        self.viewer.state.set("renderer.view", view)
         self.camera.reset_position()
         if self.viewer.running:
             self.shader_model.bind()
@@ -159,14 +167,7 @@ class Renderer(QOpenGLWidget, Base):
 
     @property
     def opacity(self) -> float:
-        """
-        The opacity of the view.
-
-        Returns
-        -------
-        float
-            The opacity of the view.
-        """
+        """float: Effective opacity for the active rendering mode."""
         return self._opacity
 
     @property
@@ -177,11 +178,12 @@ class Renderer(QOpenGLWidget, Base):
         -------
         Shader
             The tag shader, initialized on first access.
+
         """
         if self._shader_tag is None:
             projection = self.camera.projection(self.width(), self.height())
             viewworld = self.camera.viewworld()
-            transform = list(identity(4, dtype=float32))
+            transform = identity(4, dtype=float32)
 
             self._shader_tag = Shader(name="tag")
             self._shader_tag.bind()
@@ -189,20 +191,37 @@ class Renderer(QOpenGLWidget, Base):
             self._shader_tag.uniform4x4("viewworld", viewworld)
             self._shader_tag.uniform4x4("transform", transform)
             self._shader_tag.uniform1f("opacity", self.opacity)
+            self._shader_tag.uniform3f("selection_color", self.viewer.config.renderer.selectioncolor.rgb)
             self._shader_tag.release()
         return self._shader_tag
+
+    @property
+    def shader_arrow_overlay(self) -> Shader:
+        """Lazy initialization of the screen-scaled arrow shader.
+
+        Returns
+        -------
+        Shader
+            Arrow-overlay shader initialized on first access.
+
+        """
+        if self._shader_arrow_overlay is None:
+            self._shader_arrow_overlay = Shader(name="arrowoverlay")
+            self._shader_arrow_overlay.bind()
+            self._shader_arrow_overlay.uniform4x4("projection", self.camera.projection(self.width(), self.height()))
+            self._shader_arrow_overlay.uniform4x4("viewworld", self.camera.viewworld())
+            self._shader_arrow_overlay.uniform4x4("transform", identity(4, dtype=float32))
+            self._shader_arrow_overlay.uniform3f("selection_color", self.viewer.config.renderer.selectioncolor.rgb)
+            self._shader_arrow_overlay.release()
+        return self._shader_arrow_overlay
 
     # ==========================================================================
     # GL
     # ==========================================================================
 
-    def clear(self):
-        """Clear the view.
-
-        See Also
-        --------
-        :GL:`glClear`
-        """
+    def clear(self) -> None:
+        """Clear the color and depth buffers."""
+        GL.glClearColor(*self.viewer.config.renderer.backgroundcolor.rgba)
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)  # type: ignore
 
     def _clear_opengl_errors(self):
@@ -242,16 +261,17 @@ class Renderer(QOpenGLWidget, Base):
         GL.glEnable(GL.GL_FRAMEBUFFER_SRGB)
         GL.glEnable(GL.GL_PROGRAM_POINT_SIZE)
         self.init()
+        self._idle_timer.start()
 
-    def resizeGL(self, w: int, h: int):
+    def resizeGL(self, w: int, h: int) -> None:
         """
         Resize the OpenGL canvas.
 
         Parameters
         ----------
-        w : int
+        w
             The width of the canvas.
-        h : int
+        h
             The height of the canvas.
 
         Notes
@@ -266,8 +286,15 @@ class Renderer(QOpenGLWidget, Base):
         GL.glViewport(0, 0, w, h)
         self.resize(w, h)
 
-    def paintGL(self, is_instance: bool = False):
-        """Paint the OpenGL canvas."""
+    def paintGL(self, is_instance: bool = False) -> None:
+        """Paint the OpenGL canvas.
+
+        Parameters
+        ----------
+        is_instance
+            Render unique object colors for selection instead of display colors.
+
+        """
         self.clear()
 
         if is_instance or self.rendermode == "instance":
@@ -287,87 +314,93 @@ class Renderer(QOpenGLWidget, Base):
     # Event
     # ==========================================================================
 
-    def event(self, event: QtCore.QEvent):
+    def event(self, event: QEvent) -> bool:
         """
         Event handler for the renderer. Customised to capture multi-touch gestures.
 
         Parameters
         ----------
-        event : :PySide6:`PySide6/QtCore/QEvent`
+        event
             The Qt event.
 
+        Returns
+        -------
+        bool
+            Whether the event was handled.
+
         """
-        if event.type() == QtCore.QEvent.Type.Gesture:
+        if isinstance(event, QGestureEvent):
             return self.gestureEvent(event)
         return super().event(event)
 
-    def mouseMoveEvent(self, event: QMouseEvent):
+    def mouseMoveEvent(self, event: QMouseEvent) -> None:
         """
         Callback for the mouse move event which passes the event to the controller.
 
         Parameters
         ----------
-        event : :PySide6:`PySide6/QtGui/QMouseEvent`
+        event
             The Qt event.
 
         """
         if self.isActiveWindow() and self.underMouse():
             self.viewer.eventmanager.delegate_mousemove(event)
 
-    def mousePressEvent(self, event: QMouseEvent):
+    def mousePressEvent(self, event: QMouseEvent) -> None:
         """
         Callback for the mouse press event which passes the event to the controller.
 
         Parameters
         ----------
-        event : :PySide6:`PySide6/QtGui/QMouseEvent`
+        event
             The Qt event.
 
         """
         if self.isActiveWindow() and self.underMouse():
             self.viewer.eventmanager.delegate_mousepress(event)
 
-    def mouseReleaseEvent(self, event: QMouseEvent):
+    def mouseReleaseEvent(self, event: QMouseEvent) -> None:
         """
         Callback for the release press event which passes the event to the controller.
 
         Parameters
         ----------
-        event : :PySide6:`PySide6/QtGui/QMouseEvent`
+        event
             The Qt event.
 
         """
         if self.isActiveWindow() and self.underMouse():
             self.viewer.eventmanager.delegate_mouserelease(event)
 
-    def gestureEvent(self, event: QGestureEvent):
+    def gestureEvent(self, event: QGestureEvent) -> bool:
         """
         Callback for the gesture event which passes the event to the controller.
 
         Parameters
         ----------
-        event : :PySide6:`PySide6/QtCore/QEvent`
+        event
             The Qt event.
 
+        Returns
+        -------
+        bool
+            Whether a pinch gesture was handled.
+
         """
-        pinch = event.gesture(QtCore.Qt.GestureType.PinchGesture)
+        pinch = event.gesture(Qt.GestureType.PinchGesture)
         if pinch:
             self.viewer.eventmanager.delegate_pinch(pinch)
             return True
         return False
 
-    def wheelEvent(self, event: QWheelEvent):
+    def wheelEvent(self, event: QWheelEvent) -> None:
         """
         Callback for the mouse wheel event which passes the event to the controller.
 
         Parameters
         ----------
-        event : :PySide6:`PySide6/QtGui/QWheelEvent`
+        event
             The Qt event.
-
-        See Also
-        --------
-        :func:`compas_viewer.controller.Controller.wheel_action`
 
         References
         ----------
@@ -377,18 +410,14 @@ class Renderer(QOpenGLWidget, Base):
         if self.isActiveWindow() and self.underMouse():
             self.viewer.eventmanager.delegate_wheel(event)
 
-    def keyPressEvent(self, event: QKeyEvent):
+    def keyPressEvent(self, event: QKeyEvent) -> None:
         """
         Callback for the key press event which passes the event to the controller.
 
         Parameters
         ----------
-        event : :PySide6:`PySide6/QtGui/QKeyEvent`
+        event
             The Qt event.
-
-        See Also
-        --------
-        :func:`compas_viewer.controller.Controller.key_press_action`
 
         References
         ----------
@@ -397,18 +426,14 @@ class Renderer(QOpenGLWidget, Base):
         """
         self.viewer.eventmanager.delegate_keypress(event)
 
-    def keyReleaseEvent(self, event: QKeyEvent):
+    def keyReleaseEvent(self, event: QKeyEvent) -> None:
         """
         Callback for the key release event which passes the event to the controller.
 
         Parameters
         ----------
-        event : :PySide6:`PySide6/QtGui/QKeyEvent`
+        event
             The Qt event.
-
-        See Also
-        --------
-        :func:`compas_viewer.controller.Controller.key_release_action`
 
         References
         ----------
@@ -417,14 +442,15 @@ class Renderer(QOpenGLWidget, Base):
         """
         self.viewer.eventmanager.delegate_keyrelease(event)
 
-    def dragEnterEvent(self, event: QDragEnterEvent):
+    def dragEnterEvent(self, event: QDragEnterEvent) -> None:
         """
         Callback for the drag enter event to handle file drops.
 
         Parameters
         ----------
-        event : :PySide6:`PySide6/QtGui/QDragEnterEvent`
+        event
             The Qt drag enter event.
+
         """
         if event.mimeData().hasUrls():
             # Check if any of the URLs are JSON files
@@ -434,14 +460,15 @@ class Renderer(QOpenGLWidget, Base):
                     return
         event.ignore()
 
-    def dragMoveEvent(self, event: QDragMoveEvent):
+    def dragMoveEvent(self, event: QDragMoveEvent) -> None:
         """
         Callback for the drag move event to handle file drops.
 
         Parameters
         ----------
-        event : :PySide6:`PySide6/QtGui/QDragMoveEvent`
+        event
             The Qt drag move event.
+
         """
         if event.mimeData().hasUrls():
             # Check if any of the URLs are JSON files
@@ -451,14 +478,15 @@ class Renderer(QOpenGLWidget, Base):
                     return
         event.ignore()
 
-    def dropEvent(self, event: QDropEvent):
+    def dropEvent(self, event: QDropEvent) -> None:
         """
         Callback for the drop event to handle loading scene files.
 
         Parameters
         ----------
-        event : :PySide6:`PySide6/QtGui/QDropEvent`
+        event
             The Qt drop event.
+
         """
         if event.mimeData().hasUrls():
             for url in event.mimeData().urls():
@@ -479,7 +507,7 @@ class Renderer(QOpenGLWidget, Base):
     # view
     # ==========================================================================
 
-    def init(self):
+    def init(self) -> None:
         """Initialize the renderer."""
         # Create and bind a VAO (required in core-profile OpenGL).
         self._vao = GL.glGenVertexArrays(1)
@@ -497,12 +525,12 @@ class Renderer(QOpenGLWidget, Base):
         )
         self.grid.init()
 
-        for obj in self.viewer.scene.objects:
+        for obj in cast(list["ViewerSceneObject"], self.viewer.scene.objects):
             if not isinstance(obj, Group):
                 obj.init()
 
-        for obj in self.viewer.scene.objects:
-            if not isinstance(obj, TagObject):
+        for obj in cast(list["ViewerSceneObject"], self.viewer.scene.objects):
+            if not isinstance(obj, (TagObject, ArrowOverlayObject)):
                 self.buffer_manager.add_object(obj)
 
         self.buffer_manager.create_buffers()
@@ -534,32 +562,70 @@ class Renderer(QOpenGLWidget, Base):
         self.shader_lines.uniformBuffer("settingsBuffer", self.buffer_manager.settings_texture, unit=1)
         self.shader_lines.release()
 
-    def rebuild_buffers(self):
+    def rebuild_buffers(self) -> None:
         """Rebuild the buffers."""
         GL.glBindVertexArray(self._vao)
         self.buffer_manager.clear()
 
         # Ensure all objects are initialized before adding to buffer
-        for obj in self.viewer.scene.objects:
-            if not isinstance(obj, (Group, TagObject)) and not obj._inited:
+        for obj in cast(list["ViewerSceneObject"], self.viewer.scene.objects):
+            if not isinstance(obj, Group) and not obj._inited:
                 obj.init()
 
-        for obj in self.viewer.scene.objects:
-            if not isinstance(obj, (Group, TagObject)):
+        for obj in cast(list["ViewerSceneObject"], self.viewer.scene.objects):
+            if not isinstance(obj, (Group, TagObject, ArrowOverlayObject)):
                 self.buffer_manager.add_object(obj)
         self.buffer_manager.create_buffers()
         GL.glBindVertexArray(0)
 
-    def update_projection(self, w=None, h=None):
+    def rebuild_grid(self) -> None:
+        """Rebuild the grid from the current renderer configuration."""
+        if not self.viewer.running:
+            return
+        self.makeCurrent()
+        try:
+            if self.grid is not None:
+                self.grid.clear()
+            self.grid = GridObject(
+                Frame.worldXY(),
+                gridmode=self.viewer.config.renderer.gridmode,
+                framesize=self.viewer.config.renderer.gridsize,
+                linecolor=self.viewer.config.renderer.gridcolor,
+                show_framez=self.viewer.config.renderer.show_gridz,
+                show=self.viewer.config.renderer.show_grid,
+            )
+            self.grid.init()
+        finally:
+            self.doneCurrent()
+        self.update()
+
+    def update_selection_color(self) -> None:
+        """Upload the configured selection color to initialized shaders."""
+        if not self.viewer.running:
+            return
+        self.makeCurrent()
+        try:
+            shaders = [self.shader_model, self.shader_lines, self._shader_tag, self._shader_arrow_overlay]
+            for shader in shaders:
+                if shader is not None:
+                    shader.bind()
+                    shader.uniform3f("selection_color", self.viewer.config.renderer.selectioncolor.rgb)
+                    shader.release()
+        finally:
+            self.doneCurrent()
+        self.update()
+
+    def update_projection(self, w: int | None = None, h: int | None = None) -> None:
         """
         Update the projection matrix.
 
         Parameters
         ----------
-        w : int, optional
+        w
             The width of the renderer, by default None.
-        h : int, optional
+        h
             The height of the renderer, by default None.
+
         """
         w = w or self.width()
         h = h or self.height()
@@ -577,33 +643,35 @@ class Renderer(QOpenGLWidget, Base):
         self.shader_tag.uniform4x4("projection", projection)
         self.shader_tag.release()
 
-    def resize(self, w: int, h: int):
+    def resize(self, w: int, h: int) -> None:
         """
         Resize the renderer.
 
         Parameters
         ----------
-        w : int
+        w
             The width of the renderer.
-        h : int
+        h
             The height of the renderer.
+
         """
         self.update_projection(w, h)
 
-    def sort_objects_from_viewworld(self, objects: list["MeshObject"], viewworld: list[list[float]]):
+    def sort_objects_from_viewworld(self, objects: list["MeshObject"], viewworld: NDArray[np.floating]) -> list["MeshObject"]:
         """Sort objects by the distances from their bounding box centers to camera location
 
         Parameters
         ----------
-        objects : list[:class:`compas_viewer.scene.meshobject.MeshObject`]
+        objects
             The objects to be sorted.
-        viewworld : list[list[float]]
+        viewworld
             The viewworld matrix.
 
         Returns
         -------
-        list
+        list[MeshObject]
             A list of sorted objects.
+
         """
         opaque_objects = []
         transparent_objects = []
@@ -612,7 +680,7 @@ class Renderer(QOpenGLWidget, Base):
         for obj in objects:
             if obj.opacity * self.opacity < 1 and obj.bounding_box_center is not None:
                 transparent_objects.append(obj)
-                centers.append(transform_points_numpy([obj.bounding_box_center], obj.worldtransformation)[0])
+                centers.append(transform_points_numpy([obj.bounding_box_center], obj.worldtransformation)[0])  # type: ignore[arg-type]
             else:
                 opaque_objects.append(obj)
         if transparent_objects:
@@ -621,8 +689,15 @@ class Renderer(QOpenGLWidget, Base):
             transparent_objects, _ = zip(*transparent_objects)
         return opaque_objects + list(transparent_objects)
 
-    def paint(self, is_instance: bool = False):
-        """Paint all the items in the render"""
+    def paint(self, is_instance: bool = False) -> None:
+        """Paint all scene items.
+
+        Parameters
+        ----------
+        is_instance
+            Render unique object colors for selection instead of display colors.
+
+        """
 
         # Bind the same VAO created in init()
         GL.glBindVertexArray(self._vao)
@@ -650,6 +725,7 @@ class Renderer(QOpenGLWidget, Base):
 
         # Draw the grid (skip during instance rendering since grid doesn't have instance colors)
         if self.viewer.config.renderer.show_grid and not is_instance:
+            assert self.grid is not None
             self.shader_model.bind()
             self.grid.draw(self.shader_model)
             self.shader_model.release()
@@ -664,16 +740,27 @@ class Renderer(QOpenGLWidget, Base):
 
         # Draw text tag sprites if there are any
         tag_objs = [obj for obj in self.viewer.scene.objects if isinstance(obj, TagObject)]
-        if tag_objs:
+        if tag_objs and not is_instance:
             # release the model shader and bind the tag shader
             self.shader_tag.bind()
             self.shader_tag.uniform4x4("viewworld", viewworld)
             for obj in tag_objs:
-                obj.draw(self.shader_tag, self.camera.position, self.width(), self.height())
+                obj.draw_annotation(self.shader_tag, self.camera.position, self.width(), self.height())
             self.shader_tag.release()
+
+        arrow_overlays = [obj for obj in self.viewer.scene.objects if isinstance(obj, ArrowOverlayObject)]
+        if arrow_overlays and not is_instance:
+            self.shader_arrow_overlay.bind()
+            self.shader_arrow_overlay.uniform4x4("projection", self.camera.projection(self.width(), self.height()))
+            self.shader_arrow_overlay.uniform4x4("viewworld", viewworld)
+            for obj in arrow_overlays:
+                obj.draw_overlay(self.shader_arrow_overlay, self.width(), self.height())
+            self.shader_arrow_overlay.release()
 
         # draw 2D box for multi-selection
         if self.viewer.mouse.is_tracing_a_window:
+            assert self.viewer.mouse.window_start_point is not None
+            assert self.viewer.mouse.last_pos is not None
             # Ensure the model shader is bound before drawing
             self.shader_model.bind()
 
@@ -693,44 +780,66 @@ class Renderer(QOpenGLWidget, Base):
         # Unbind once we're done
         GL.glBindVertexArray(0)
 
-    def read_instance_color(self, box: tuple[int, int, int, int]):
+    def read_instance_color(self, box: tuple[int, int, int, int]) -> NDArray[uint8]:
         """Read instance colors from the specified screen region.
 
         Parameters
         ----------
-        box : tuple[int, int, int, int]
+        box
             Screen coordinates (x1, y1, x2, y2) defining the selection area.
 
         Returns
         -------
         numpy.ndarray
             Array of RGB color values for each pixel in the selection area.
-        """
-        # Calculate selection area
-        x1, y1, x2, y2 = box
-        x, y = min(x1, x2), self.height() - max(y1, y2)
-        width = max(self.PIXEL_SELECTION_INCREMENTAL, abs(x1 - x2))
-        height = max(self.PIXEL_SELECTION_INCREMENTAL, abs(y1 - y2))
 
-        # Render to offscreen buffer and read pixels
+        """
+        return self.read_instance_colors([box])[0]
+
+    def read_instance_colors(self, boxes: Sequence[tuple[int, int, int, int]]) -> list[NDArray[uint8]]:
+        """Read several screen regions from one rendered instance map.
+
+        Parameters
+        ----------
+        boxes
+            Screen-coordinate regions in `(x1, y1, x2, y2)` form.
+
+        Returns
+        -------
+        list[numpy.ndarray]
+            Flattened RGB pixels for each requested region.
+
+        """
+        regions = [self._instance_region(box) for box in boxes]
+        results = []
+
         with OffscreenBufferContext(self.width(), self.height()) as fbo_context:
             self._render_instance_map()
-            pixels = self._read_pixels(x, y, width, height)
+            for box, (x, y, width, height) in zip(boxes, regions, strict=True):
+                results.append(self._read_pixels(x, y, width, height).reshape(-1, 3))
+                if self.viewer.config.renderer.debug_instance:
+                    assert fbo_context.viewport is not None
+                    self._save_debug_images(box, x, y, width, height, fbo_context.viewport)
 
-            # Debug output if enabled
-            if self.viewer.config.renderer.debug_instance:
-                self._save_debug_images(box, x, y, width, height, fbo_context.viewport)
+        return results
 
-        return pixels.reshape(-1, 3)
+    def _instance_region(self, box: tuple[int, int, int, int]) -> tuple[int, int, int, int]:
+        """Convert a screen-coordinate box to an OpenGL pixel region."""
+        x1, y1, x2, y2 = box
+        x = min(x1, x2)
+        y = self.height() - max(y1, y2)
+        width = max(self.PIXEL_SELECTION_INCREMENTAL, abs(x1 - x2))
+        height = max(self.PIXEL_SELECTION_INCREMENTAL, abs(y1 - y2))
+        return x, y, width, height
 
-    def _render_instance_map(self):
+    def _render_instance_map(self) -> None:
         """Render the scene in instance color mode."""
         # Set up rendering state for instance mode
         GL.glEnable(GL.GL_DEPTH_TEST)
         GL.glDepthFunc(GL.GL_LESS)
         GL.glDepthMask(GL.GL_TRUE)
         GL.glClearColor(0.0, 0.0, 0.0, 1.0)
-        GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
+        GL.glClear(cast(int, GL.GL_COLOR_BUFFER_BIT) | cast(int, GL.GL_DEPTH_BUFFER_BIT))
 
         # Temporarily disable blending for clean instance colors
         was_blend_enabled = GL.glIsEnabled(GL.GL_BLEND)
@@ -745,13 +854,21 @@ class Renderer(QOpenGLWidget, Base):
             if was_blend_enabled:
                 GL.glEnable(GL.GL_BLEND)
 
-    def _read_pixels(self, x: int, y: int, width: int, height: int):
+    def _read_pixels(self, x: int, y: int, width: int, height: int) -> NDArray[uint8]:
         """Read pixel data from the current framebuffer."""
         GL.glPixelStorei(GL.GL_PACK_ALIGNMENT, 1)
         buffer = GL.glReadPixels(x, y, width, height, GL.GL_RGB, GL.GL_UNSIGNED_BYTE)
-        return np.frombuffer(buffer, dtype=np.uint8).reshape(height, width, 3)
+        return np.frombuffer(cast(bytes, buffer), dtype=np.uint8).reshape(height, width, 3)
 
-    def _save_debug_images(self, box: tuple[int, int, int, int], x: int, y: int, width: int, height: int, viewport: tuple):
+    def _save_debug_images(
+        self,
+        box: tuple[int, int, int, int],
+        x: int,
+        y: int,
+        width: int,
+        height: int,
+        viewport: tuple[int, int, int, int],
+    ) -> None:
         """Save debug images when debugging is enabled."""
 
         from PIL import Image
@@ -762,8 +879,8 @@ class Renderer(QOpenGLWidget, Base):
         # Read and save full frame
         GL.glPixelStorei(GL.GL_PACK_ALIGNMENT, 1)
         full_buffer = GL.glReadPixels(0, 0, self.width(), self.height(), GL.GL_RGBA, GL.GL_UNSIGNED_BYTE)
-        full_map = np.frombuffer(full_buffer, dtype=np.uint8).reshape(self.height(), self.width(), 4)
-        full_image = Image.fromarray(full_map).transpose(Image.FLIP_TOP_BOTTOM)
+        full_map = np.frombuffer(cast(bytes, full_buffer), dtype=np.uint8).reshape(self.height(), self.width(), 4)
+        full_image = Image.fromarray(full_map).transpose(Image.Transpose.FLIP_TOP_BOTTOM)
         full_image.save("instance_debug_full.png")
 
         # Create version with selection box highlighted
@@ -774,7 +891,7 @@ class Renderer(QOpenGLWidget, Base):
 
         # Save selection area
         box_pixels = self._read_pixels(x, y, width, height)
-        box_image = Image.fromarray(box_pixels).transpose(Image.FLIP_TOP_BOTTOM)
+        box_image = Image.fromarray(box_pixels).transpose(Image.Transpose.FLIP_TOP_BOTTOM)
         box_image.save("instance_debug_box.png")
 
         # Print debug info

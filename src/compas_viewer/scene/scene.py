@@ -1,32 +1,35 @@
+from collections.abc import Generator
 from random import randint
 from random import seed
+from typing import TYPE_CHECKING
 from typing import Any
-from typing import Generator
-from typing import Optional
-from typing import Union
+from typing import cast
 
 from compas.colors import Color
-from compas.datastructures import Datastructure
-from compas.geometry import Geometry
+from compas.data import Data
 from compas.scene import Scene
+from compas.scene import SceneObject
 
 from .group import Group
 from .sceneobject import ViewerSceneObject
 
+if TYPE_CHECKING:
+    from compas_viewer import Viewer
 
-def instance_colors_generator(i: int = 0) -> Generator:
-    """
-    Generate a set of non-repetitive random colors for instance colors.
+
+def instance_colors_generator(i: int = 0) -> Generator[tuple[int, int, int], None, None]:
+    """Generate non-repeating pseudo-random instance colors.
 
     Parameters
     ----------
-    i : int, optional
-        Seed for the random number generator. Default is ``0``.
+    i
+        Seed for the random number generator.
 
     Yields
     ------
-    tuple of int
-        A tuple of three integers representing the RGB color of the instance.
+    tuple[int, int, int]
+        RGB colors with components in the range 0--254.
+
     """
 
     dim = 255
@@ -49,30 +52,24 @@ def instance_colors_generator(i: int = 0) -> Generator:
 
 
 class ViewerScene(Scene):
-    """The ViewerScene class is a wrapper for the compas.Scene class,
-    providing additional functionality for the viewer.
+    """Manage viewer scene objects and their instance-selection colors.
 
     Parameters
     ----------
-    viewer : :class:`compas_viewer.Viewer`
-        The viewer object.
-    name : str, optional
-        The name of the scene.
-    context : str, optional
-        The context of the scene.
+    name
+        Name of the scene.
+    context
+        Scene-object registration context.
 
-    See Also
-    --------
-    :class:`compas.scene.Scene`
     """
 
-    def __init__(self, name: str = "ViewerScene", context: str = "Viewer"):
+    def __init__(self, name: str = "ViewerScene", context: str = "Viewer") -> None:
         super().__init__(name=name, context=context)
         self.instance_colors: dict[tuple[int, int, int], ViewerSceneObject] = {}
         self._instance_colors_generator = instance_colors_generator()
 
     @property
-    def viewer(self):
+    def viewer(self) -> "Viewer":
         from compas_viewer import Viewer
 
         return Viewer()
@@ -80,37 +77,34 @@ class ViewerScene(Scene):
     # TODO: These fixed kwargs could be moved to COMPAS core.
     def add(
         self,
-        item: Union[Geometry, Datastructure, ViewerSceneObject, list],
-        parent: Optional[ViewerSceneObject] = None,
+        item: Data | SceneObject,
+        parent: SceneObject | None = None,
         is_selected: bool = False,
         show: bool = True,
-        show_points: Optional[bool] = None,
-        show_lines: Optional[bool] = None,
-        show_faces: Optional[bool] = None,
-        vertexcolor: Optional[Union[Color, dict[Any, Color]]] = None,
-        pointcolor: Optional[Union[Color, dict[Any, Color]]] = None,
-        linecolor: Optional[Union[Color, dict[Any, Color]]] = None,
-        facecolor: Optional[Union[Color, dict[Any, Color]]] = None,
-        surfacecolor: Optional[Union[Color, dict[Any, Color]]] = None,
-        linewidth: Optional[float] = None,
-        pointsize: Optional[float] = None,
-        opacity: Optional[float] = None,
-        hide_coplanaredges: Optional[bool] = None,
-        use_vertexcolors: Optional[bool] = None,
-        v: int = 16,
-        u: int = 16,
-        **kwargs,
+        show_points: bool | None = None,
+        show_lines: bool | None = None,
+        show_faces: bool | None = None,
+        vertexcolor: Color | dict[Any, Color] | None = None,
+        pointcolor: Color | dict[Any, Color] | None = None,
+        linecolor: Color | dict[Any, Color] | None = None,
+        facecolor: Color | dict[Any, Color] | None = None,
+        surfacecolor: Color | dict[Any, Color] | None = None,
+        linewidth: float | None = None,
+        pointsize: float | None = None,
+        opacity: float | None = None,
+        hide_coplanaredges: bool | None = None,
+        use_vertexcolors: bool | None = None,
+        v: int | None = None,
+        u: int | None = None,
+        **kwargs: Any,
     ) -> ViewerSceneObject:
-        """
-        Add an item to the scene.
-        This function is inherent from :class:`compas.scene.Scene` with additional functionalities.
+        """Add an item to the scene.
 
         Parameters
         ----------
-        item : Union[:class:`compas.geometry.Geometry`, :class:`compas.datastructures.Datastructure`,
-            :class:`compas_viewer.scene.ViewerSceneObject`]
-            The geometry to add to the scene.
-        parent : :class:`compas_viewer.scene.ViewerSceneObject`, optional
+        item
+            Geometry, data structure, scene object, or collection to add.
+        parent
             The parent of the item.
         is_selected : bool, optional
             Whether the object is selected.
@@ -141,21 +135,24 @@ class ViewerScene(Scene):
         use_vertexcolors : bool, optional
             Whether to use vertex color.
         v : int, optional
-            The number of vertices in the u-direction of non-OCC geometries. Default is 16.
+            The resolution in the V direction. By default, use the geometry's
+            existing resolution.
         u : int, optional
-            The number of vertices in the v-direction of non-OCC geometries. Default is 16.
-        **kwargs : dict, optional
-            The other possible parameters to be passed to the object.
+            The resolution in the U direction. By default, use the geometry's
+            existing resolution.
+        **kwargs
+            Additional options passed to the scene-object constructor.
 
         Returns
         -------
-        :class:`compas_viewer.scene.ViewerSceneObject`
+        ViewerSceneObject
             The scene object.
+
         """
         edgecolor = kwargs.pop("edgecolor", linecolor)
 
-        sceneobject: ViewerSceneObject = super().add(  # type: ignore
-            item=item,
+        sceneobject = super().add(
+            item=cast(Data, item),
             parent=parent,
             is_selected=is_selected,
             show=show,
@@ -183,41 +180,41 @@ class ViewerScene(Scene):
             self.viewer.renderer.update()
             self.viewer.ui.sidebar.update()
 
-        return sceneobject
+        return cast(ViewerSceneObject, sceneobject)
 
-    def add_group(self, name: str = None, parent: Optional[ViewerSceneObject] = None, **kwargs) -> Group:
-        """
-        Add a group to the scene.
+    def add_group(self, name: str = "Group", parent: SceneObject | None = None, **kwargs: Any) -> Group:
+        """Add a group to the scene.
 
         Parameters
         ----------
-        name : str, optional
+        name
             The name of the group.
-        parent : :class:`compas_viewer.scene.ViewerSceneObject`, optional
+        parent
             The parent of the group.
-        **kwargs : dict, optional
+        **kwargs
             The other possible parameters to be passed to the group.
 
         Returns
         -------
-        :class:`compas_viewer.scene.Group`
+        Group
             The group.
+
         """
         group = Group(name=name, **kwargs)
         self.add(group, parent=parent)
         return group
 
-    def remove(self, sceneobject: ViewerSceneObject, rebuild_buffers: bool = True):
-        """
-        Remove an scene object from the scene.
+    def remove(self, sceneobject: SceneObject, rebuild_buffers: bool = True) -> None:
+        """Remove a scene object from the scene.
 
         Parameters
         ----------
-        sceneobject : :class:`compas_viewer.scene.ViewerSceneObject`
+        sceneobject
             The scene object to remove.
-        rebuild_buffers : bool, optional
+        rebuild_buffers
             Whether to rebuild the buffers.
             Default to True.
+
         """
         super().remove(sceneobject)
 

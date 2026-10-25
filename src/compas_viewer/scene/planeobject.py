@@ -1,3 +1,5 @@
+from typing import cast
+
 from compas.geometry import Frame
 from compas.geometry import Plane
 from compas.geometry import Point
@@ -18,15 +20,16 @@ class PlaneObject(GeometryObject):
     See Also
     --------
     :class:`compas.geometry.Plane`
+
     """
 
-    def __init__(self, planesize: float = 1, **kwargs):
+    def __init__(self, planesize: float = 1, **kwargs) -> None:
         super().__init__(**kwargs)
         self.planesize = planesize
 
     @property
     def plane(self) -> Plane:
-        return self.item
+        return cast(Plane, self.item)
 
     @property
     def points(self) -> list[Point]:

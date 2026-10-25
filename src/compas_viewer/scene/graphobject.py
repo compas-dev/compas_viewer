@@ -1,14 +1,19 @@
-from compas.datastructures import Graph
+from typing import Protocol
+from typing import cast
+
+from compas.colors import Color
 from compas.scene import GraphObject as BaseGraphObject
 
 from .sceneobject import ShaderDataType
 from .sceneobject import ViewerSceneObject
 
 
+class ColorLookup(Protocol):
+    def __getitem__(self, key: object) -> Color: ...
+
+
 class GraphObject(ViewerSceneObject, BaseGraphObject):
     """Viewer scene object for displaying COMPAS Graph data."""
-
-    graph: Graph
 
     def _read_points_data(self) -> ShaderDataType:
         positions = []
@@ -16,9 +21,10 @@ class GraphObject(ViewerSceneObject, BaseGraphObject):
         elements = []
         i = 0
 
+        nodecolors = cast(ColorLookup, self.nodecolor)
         for node in self.graph.nodes():
             positions.append(self.graph.node_coordinates(node))
-            colors.append(self.nodecolor.default)
+            colors.append(nodecolors[node])
             elements.append([i])
             i += 1
         return positions, colors, elements
@@ -29,8 +35,9 @@ class GraphObject(ViewerSceneObject, BaseGraphObject):
         elements = []
         i = 0
 
+        edgecolors = cast(ColorLookup, self.edgecolor)
         for u, v in self.graph.edges():
-            color = self.edgecolor.default
+            color = edgecolors[(u, v)]
             positions.append(self.graph.node_coordinates(u))
             positions.append(self.graph.node_coordinates(v))
             colors.append(color)

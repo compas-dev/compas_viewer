@@ -4,50 +4,17 @@ from .numberedit import NumberEdit
 
 
 class CameraSetting(Container):
-    """
-    A form component for displaying and updating camera settings in the viewer.
-    This component allows users to modify the camera's target and position
-    with real-time updates.
+    """Display and update camera settings with bound numeric controls.
 
-    Attributes
-    ----------
-    target_x : NumberEdit
-        Number editor for camera target X coordinate.
-    target_y : NumberEdit
-        Number editor for camera target Y coordinate.
-    target_z : NumberEdit
-        Number editor for camera target Z coordinate.
-    position_x : NumberEdit
-        Number editor for camera position X coordinate.
-    position_y : NumberEdit
-        Number editor for camera position Y coordinate.
-    position_z : NumberEdit
-        Number editor for camera position Z coordinate.
-    fov : NumberEdit
-        Number editor for camera field of view.
-    near : NumberEdit
-        Number editor for camera near plane.
-    far : NumberEdit
-        Number editor for camera far plane.
-    scale : NumberEdit
-        Number editor for camera scale.
-    zoomdelta : NumberEdit
-        Number editor for camera zoom delta.
-    rotationdelta : NumberEdit
-        Number editor for camera rotation delta.
-    pandelta : NumberEdit
-        Number editor for camera pan delta.
-    reset_button : Button
-        Button to reset camera to default position.
-
-    Example
-    -------
+    Examples
+    --------
     >>> camera_setting = CameraSetting()
     >>> camera_setting.update()
+
     """
 
     def __init__(self) -> None:
-        super().__init__(container_type="scrollable")
+        super().__init__(container_type="scrollable", compact=True)
         self.populate()
 
     def populate(self) -> None:
@@ -58,7 +25,7 @@ class CameraSetting(Container):
             # If the ui is not initialized, don't populate the form
             return
 
-        def _update_camera(*args):
+        def _update_camera(*args: object) -> None:
             self.viewer.renderer.update()
 
         camera = self.viewer.renderer.camera
@@ -98,14 +65,14 @@ class CameraSetting(Container):
         self.add(self.pandelta)
 
         # Add reset button
-        def _reset_camera():
+        def _reset_camera() -> None:
             """Reset camera to default settings."""
             camera = self.viewer.renderer.camera
             config = self.viewer.config.camera
 
             # Reset all camera properties to config defaults
-            camera.target.set(*config.target)
-            camera.position.set(*config.position)
+            camera.target.set(*config.target)  # type: ignore[arg-type]
+            camera.position.set(*config.position)  # type: ignore[arg-type]
             camera.fov = config.fov
             camera.near = config.near
             camera.far = config.far

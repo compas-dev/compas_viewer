@@ -1,5 +1,7 @@
 from typing import Any
-from typing import Optional
+from typing import cast
+
+from OpenGL import GL
 
 from compas.colors import Color
 from compas.geometry import Frame
@@ -59,18 +61,19 @@ class GridObject(Base):
     --------
     :class:`compas_viewer.scene.FrameObject`
     :class:`compas.geometry.Frame`
+
     """
 
     def __init__(
         self,
-        frame: Frame = Frame.worldXY(),
-        framesize: Optional[tuple[float, int, float, int]] = None,
-        gridmode: Optional[str] = "full",
-        linecolor: Optional[Color] = None,
-        show_framez: Optional[bool] = None,
+        frame: Frame | None = None,
+        framesize: tuple[float, int, float, int] | None = None,
+        gridmode: str | None = "full",
+        linecolor: Color | None = None,
+        show_framez: bool | None = None,
         **kwargs,
-    ):
-        self.frame = frame
+    ) -> None:
+        self.frame = frame or Frame.worldXY()
         self.linecolor = linecolor if linecolor else self.viewer.config.renderer.gridcolor
         self.gridmode = gridmode
         self.dx = framesize[0] if framesize else 10.0
@@ -78,8 +81,12 @@ class GridObject(Base):
         self.dy = framesize[2] if framesize else 10.0
         self.ny = framesize[3] if framesize else 10
         self.show_framez = show_framez if show_framez else False
-        if self.nx % 2 != 0 or self.ny % 2 != 0:
-            raise ValueError("The number of grid cells in the X and Y directions must be even numbers.")
+        if self.dx <= 0 or self.dy <= 0:
+            raise ValueError("Grid extents must be positive.")
+        if self.nx < 1 or self.ny < 1:
+            raise ValueError("Grid divisions must be positive.")
+        if self.gridmode not in {"full", "quadrant"}:
+            raise ValueError("Grid mode must be 'full' or 'quadrant'.")
         self.show_lines = True
         self._lines_data = None
 
@@ -103,6 +110,8 @@ class GridObject(Base):
             x_bound = (0, self.dx)
             y_bound = (0, self.dy)
             base_index = (self.nx + 1) * 4
+        else:
+            raise ValueError("Grid mode must be 'full' or 'quadrant'.")
 
         # X direction
         for i, x in enumerate(x_positions):
@@ -144,16 +153,25 @@ class GridObject(Base):
 
         return positions, colors, elements
 
-    def init(self):
+    def init(self) -> None:
         """Initialize the object"""
         self._lines_data = self._read_lines_data()
         self.make_buffers()
 
-    def make_buffers(self):
+    def make_buffers(self) -> None:
         """Create all buffers from object's data"""
         if self._lines_data is not None:
             data = self._lines_data
             self._lines_buffer = self.make_buffer_from_data(data)
+
+    def clear(self) -> None:
+        """Delete the grid's OpenGL buffers."""
+        if not hasattr(self, "_lines_buffer"):
+            return
+        buffers = [buffer for name, buffer in self._lines_buffer.items() if name != "n"]
+        if buffers:
+            GL.glDeleteBuffers(len(buffers), buffers)
+        self._lines_buffer = {}
 
     def make_buffer_from_data(self, data: ShaderDataType) -> dict[str, Any]:
         """Create buffers from point/line/face data.
@@ -167,8 +185,10 @@ class GridObject(Base):
         -------
         buffer_dict : dict[str, Any]
             A dict with created buffer indexes.
+
         """
         positions, colors, elements = data
+        colors = cast(list[Color], colors)
         flat_positions = list(flatten(positions))
         flat_colors = list(flatten([color.rgba for color in colors]))
         flat_elements = list(flatten(elements))
@@ -184,7 +204,15 @@ class GridObject(Base):
             "n": len(flat_elements),
         }
 
-    def draw(self, shader: Shader):
+    def draw(self, shader: Shader) -> None:
+        """Draw the grid lines.
+
+        Parameters
+        ----------
+        shader
+            Shader configured for line rendering.
+
+        """
         shader.uniform1f("object_opacity", 1)
         shader.uniform1i("element_type", 1)
         shader.uniform1i("is_grid", True)

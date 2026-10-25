@@ -1,4 +1,5 @@
-from typing import Optional
+from typing import Any
+from typing import cast
 
 import numpy as np
 from numpy.typing import NDArray
@@ -6,51 +7,38 @@ from numpy.typing import NDArray
 from compas.geometry import Geometry
 from compas_viewer.scene import ViewerSceneObject
 
+from .sceneobject import ShaderDataType
+
 
 class BufferGeometry(Geometry):
     """A geometry defined directly from the buffer data.
 
     Parameters
     ----------
-    points : Optional[NDArray], optional
+    points
         The flat list of point locations, in the form of [x1, y1, z1, x2, y2, z2, ...].
-    lines : Optional[NDArray], optional
+    lines
         The flat list of line segment vertices, in the form of [x1, y1, z1, x2, y2, z2, ...].
-    faces : Optional[NDArray], optional
+    faces
         The flat list of face vertices, in the form of [x1, y1, z1, x2, y2, z2, ...].
-    pointcolor : Optional[NDArray], optional
+    pointcolor
         The flat list of point colors, in the form of [r1, g1, b1, a1, r2, g2, b2, a2, ...].
-    linecolor : Optional[NDArray], optional
+    linecolor
         The flat list of line vertices colors, in the form of [r1, g1, b1, a1, r2, g2, b2, a2, ...].
-    facecolor : Optional[NDArray], optional
-        The flat list of face vertices colors, in the form of [r1, g1, b1, a1, r2, g2, b2, a2, ...].
-
-    Attributes
-    ----------
-    points : NDArray
-        The flat list of point locations, in the form of [x1, y1, z1, x2, y2, z2, ...].
-    lines : NDArray
-        The flat list of line segment vertices, in the form of [x1, y1, z1, x2, y2, z2, ...].
-    faces : NDArray
-        The flat list of face vertices, in the form of [x1, y1, z1, x2, y2, z2, ...].
-    pointcolor : NDArray
-        The flat list of point colors, in the form of [r1, g1, b1, a1, r2, g2, b2, a2, ...].
-    linecolor : NDArray
-        The flat list of line vertices colors, in the form of [r1, g1, b1, a1, r2, g2, b2, a2, ...].
-    facecolor : NDArray
+    facecolor
         The flat list of face vertices colors, in the form of [r1, g1, b1, a1, r2, g2, b2, a2, ...].
 
     """
 
     def __init__(
         self,
-        points: Optional[NDArray] = None,
-        lines: Optional[NDArray] = None,
-        faces: Optional[NDArray] = None,
-        pointcolor: Optional[NDArray] = None,
-        linecolor: Optional[NDArray] = None,
-        facecolor: Optional[NDArray] = None,
-        **kwargs,
+        points: NDArray | None = None,
+        lines: NDArray | None = None,
+        faces: NDArray | None = None,
+        pointcolor: NDArray | None = None,
+        linecolor: NDArray | None = None,
+        facecolor: NDArray | None = None,
+        **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.points = points
@@ -62,57 +50,22 @@ class BufferGeometry(Geometry):
 
 
 class BufferObject(ViewerSceneObject):
-    """The SceneObject for the BufferGeometry.
+    """Display geometry supplied directly as render-buffer arrays.
 
     Parameters
     ----------
-    show_points : Optional[bool], optional
+    show_points
         Whether to show the points or not.
-    show_lines : Optional[bool], optional
+    show_lines
         Whether to show the lines or not.
-    show_faces : Optional[bool], optional
+    show_faces
         Whether to show the faces or not.
-    pointsize : Optional[float], optional
-        The size of the points.
-    linewidth : Optional[float], optional
-        The width of the lines.
-    opacity : Optional[float], optional
-        The opacity of the object.
-    doublesided : Optional[bool], optional
-        Whether to show the backfaces or not.
-    is_visiable : Optional[bool], optional
-        Whether the object is visible or not.
-    kwargs : dict
+    **kwargs
         Additional keyword arguments.
-
-    Attributes
-    ----------
-    buffergeometry : BufferGeometry
-        The buffer geometry to be displayed.
-    show_points : bool
-        Whether to show the points or not.
-    show_lines : bool
-        Whether to show the lines or not.
-    show_faces : bool
-        Whether to show the faces or not.
-    pointsize : float
-        The size of the points.
-    linewidth : float
-        The width of the lines.
-    opacity : float
-        The opacity of the object.
-    doublesided : bool
-        Whether to show the backfaces or not.
-    is_visible : bool
-        Whether the object is visible or not.
-    is_selected : bool
-        Whether the object is selected or not.
-    background : bool
-        Whether the object is in the background or not.
 
     """
 
-    def __init__(self, *args, show_points: bool = True, show_lines: bool = True, show_faces: bool = True, **kwargs):
+    def __init__(self, *args: Any, show_points: bool = True, show_lines: bool = True, show_faces: bool = True, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.show_points = show_points if show_points is not None else self.buffergeometry.points is not None
         self.show_lines = show_lines if show_lines is not None else self.buffergeometry.lines is not None
@@ -120,7 +73,7 @@ class BufferObject(ViewerSceneObject):
 
     @property
     def buffergeometry(self) -> BufferGeometry:
-        return self.item
+        return cast(BufferGeometry, self.item)
 
     def _get_num_vertices(self, positions: NDArray) -> int:
         """Get the number of vertices from positions array.
@@ -133,7 +86,7 @@ class BufferObject(ViewerSceneObject):
         else:
             return positions.shape[0]
 
-    def _read_points_data(self):
+    def _read_points_data(self) -> ShaderDataType | None:
         """Read points data from the object."""
         if self.buffergeometry.points is None:
             return None
@@ -142,7 +95,7 @@ class BufferObject(ViewerSceneObject):
         elements = np.arange(self._get_num_vertices(positions), dtype=int)
         return positions, colors, elements
 
-    def _read_lines_data(self):
+    def _read_lines_data(self) -> ShaderDataType | None:
         """Read lines data from the object."""
         if self.buffergeometry.lines is None:
             return None
@@ -151,7 +104,7 @@ class BufferObject(ViewerSceneObject):
         elements = np.arange(self._get_num_vertices(positions), dtype=int)
         return positions, colors, elements
 
-    def _read_frontfaces_data(self):
+    def _read_frontfaces_data(self) -> ShaderDataType | None:
         """Read frontfaces data from the object."""
         if self.buffergeometry.faces is None:
             return None
@@ -160,7 +113,7 @@ class BufferObject(ViewerSceneObject):
         elements = np.arange(self._get_num_vertices(positions), dtype=int)
         return positions, colors, elements
 
-    def _read_backfaces_data(self):
+    def _read_backfaces_data(self) -> ShaderDataType | None:
         """Read backfaces data from the object."""
         if self.buffergeometry.faces is None:
             return None

@@ -1,30 +1,29 @@
-from typing import Callable
+from collections.abc import Callable
 
 from PySide6.QtCore import QTimer
 
 
 class Timer:
-    """
-    A simple timer that calls a function at specified intervals.
+    """Call a function at a fixed interval using a Qt timer.
 
     Parameters
     ----------
-    interval : int
+    interval
         Interval between subsequent calls to this function, in milliseconds.
-    callback : Callable
+    callback
         The function to call.
-    singleshot : bool, optional
+    singleshot
         If True, the timer is a singleshot timer.
-        Default is False.
 
     """
 
-    def __init__(self, interval: int, callback: Callable, singleshot: bool = False):
+    def __init__(self, interval: int, callback: Callable[[], object], singleshot: bool = False) -> None:
         self.timer = QTimer()
         self.timer.setInterval(interval)
         self.timer.timeout.connect(callback)
         self.timer.setSingleShot(singleshot)
         self.timer.start()
 
-    def stop(self):
+    def stop(self) -> None:
+        """Stop the timer."""
         self.timer.stop()

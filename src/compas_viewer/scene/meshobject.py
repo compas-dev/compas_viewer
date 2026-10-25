@@ -1,10 +1,7 @@
 from typing import Any
-from typing import Dict
-from typing import Optional
-from typing import Union
+from typing import cast
 
 from compas.colors import Color
-from compas.datastructures import Mesh
 from compas.geometry import centroid_points
 from compas.geometry import is_coplanar
 from compas.itertools import pairwise
@@ -14,7 +11,7 @@ from compas.scene.descriptors.colordict import ColorDictAttribute
 from .sceneobject import ShaderDataType
 from .sceneobject import ViewerSceneObject
 
-ColorDictValueType = Optional[Union[Dict[Any, Color], Color]]
+ColorDictValueType = dict[Any, Color] | Color | None
 
 
 class MeshObject(ViewerSceneObject, BaseMeshObject):
@@ -49,24 +46,21 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
     See Also
     --------
     :class:`compas.datastructures.Mesh`
-    """
 
-    mesh: Mesh
+    """
 
     vertexcolor = ColorDictAttribute(default=Color(0.2, 0.2, 0.2))
     edgecolor = ColorDictAttribute(default=Color(0.2, 0.2, 0.2))
     facecolor = ColorDictAttribute(default=Color(0.9, 0.9, 0.9))
 
-    mesh: Mesh
-
     def __init__(
         self,
-        show_points: Optional[bool] = None,
-        show_lines: Optional[bool] = None,
-        pointsize: Optional[float] = None,
-        linewidth: Optional[int] = None,
-        hide_coplanaredges: Optional[bool] = None,
-        use_vertexcolors: Optional[bool] = None,
+        show_points: bool | None = None,
+        show_lines: bool | None = None,
+        pointsize: float | None = None,
+        linewidth: int | None = None,
+        hide_coplanaredges: bool | None = None,
+        use_vertexcolors: bool | None = None,
         **kwargs,
     ):
         super().__init__(**kwargs)
@@ -82,18 +76,18 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
 
     @property
     def pointcolor(self) -> Color:
-        return self.vertexcolor
+        return cast(Color, self.vertexcolor)
 
     @pointcolor.setter
-    def pointcolor(self, color: Color):
+    def pointcolor(self, color: Color) -> None:
         self.vertexcolor = color
 
     @property
     def linecolor(self) -> Color:
-        return self.edgecolor
+        return cast(Color, self.edgecolor)
 
     @linecolor.setter
-    def linecolor(self, color: Color):
+    def linecolor(self, color: Color) -> None:
         self.edgecolor = color
 
     @property
@@ -101,7 +95,7 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
         return self.show_vertices
 
     @show_points.setter
-    def show_points(self, show: bool):
+    def show_points(self, show: bool) -> None:
         self.show_vertices = show
 
     @property
@@ -109,7 +103,7 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
         return self.show_edges
 
     @show_lines.setter
-    def show_lines(self, show: bool):
+    def show_lines(self, show: bool) -> None:
         self.show_edges = show
 
     @property
@@ -117,7 +111,7 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
         return self.vertexsize
 
     @pointsize.setter
-    def pointsize(self, size: float):
+    def pointsize(self, size: float) -> None:
         self.vertexsize = size
 
     @property
@@ -125,7 +119,7 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
         return self.edgesize
 
     @linewidth.setter
-    def linewidth(self, size: float):
+    def linewidth(self, size: float) -> None:
         self.edgesize = size
 
     def _read_points_data(self) -> ShaderDataType:
@@ -147,15 +141,19 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
         elements = []
         i = 0
 
+        edgecolors = cast(dict[tuple[Any, Any], Color], self.edgecolor)
         for u, v in self.mesh.edges():
-            color = self.edgecolor[(u, v)]
+            color = edgecolors[(u, v)]
             if self.hide_coplanaredges:
                 # hide the edge if neighbor faces are coplanar
                 fkeys = self.mesh.edge_faces((u, v))
                 if not self.mesh.is_edge_on_boundary((u, v)):
+                    fkey1, fkey2 = fkeys
+                    if fkey1 is None or fkey2 is None:
+                        continue
                     ps = [
-                        self.mesh.face_center(fkeys[0]),
-                        self.mesh.face_center(fkeys[1]),
+                        self.mesh.face_center(fkey1),
+                        self.mesh.face_center(fkey2),
                         *self.mesh.edge_coordinates((u, v)),
                     ]
                     if is_coplanar(ps, tol=1e-5):
@@ -305,11 +303,11 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
                     i += 3
         return positions, colors, elements
 
-    def draw_vertices(self):
-        return None
+    def draw_vertices(self) -> list[object]:
+        return []
 
-    def draw_edges(self):
-        return None
+    def draw_edges(self) -> list[object]:
+        return []
 
-    def draw_faces(self):
-        return None
+    def draw_faces(self) -> list[object]:
+        return []

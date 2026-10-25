@@ -1,25 +1,26 @@
-class SingletonMeta(type):
-    _instances = {}
+from typing import Any
+from typing import cast
 
-    def __call__(cls, *args, **kwargs):
+
+class SingletonMeta(type):
+    """Cache one instance for each direct subclass of `Singleton`."""
+
+    _instances: dict[type, Any] = {}
+
+    def __call__(cls, *args: Any, **kwargs: Any) -> Any:
         # Check if this class is a direct subclass of Singleton
-        if cls.__base__ is Singleton:
-            key_class = cls
-        else:
-            # Walk up the chain to find the first subclass of Singleton
-            key_class = cls
-            while key_class.__base__ is not Singleton:
-                key_class = key_class.__base__
+        key_class: type = cls
+        base_class = key_class.__base__
+        while base_class is not Singleton and base_class is not None:
+            key_class = base_class
+            base_class = key_class.__base__
 
         if key_class not in cls._instances:
-            # Create the instance without calling __init__
-            instance = cls.__new__(cls)
-            # Store it immediately so it's available during __init__
+            instance = cast(Any, cls.__new__)(cls)
             cls._instances[key_class] = instance
-            # Now call __init__ on the stored instance
             instance.__init__(*args, **kwargs)
         return cls._instances[key_class]
 
 
 class Singleton(metaclass=SingletonMeta):
-    """Singleton base class."""
+    """Base class for objects that have one shared instance per class family."""

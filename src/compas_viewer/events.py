@@ -1,4 +1,6 @@
+from typing import TYPE_CHECKING
 from typing import Literal
+from typing import cast
 
 from PySide6.QtCore import QObject
 from PySide6.QtCore import Qt
@@ -10,14 +12,21 @@ from PySide6.QtWidgets import QGestureEvent
 
 from compas_viewer.base import Base
 
-mousebutton_constant = {
+if TYPE_CHECKING:
+    from compas_viewer.commands import Command
+
+type ModifierName = Literal["CTRL", "SHIFT", "ALT"]
+type MouseButtonName = Literal["LEFT", "RIGHT", "MIDDLE"]
+
+
+mousebutton_constant: dict[MouseButtonName, Qt.MouseButton] = {
     "LEFT": Qt.MouseButton.LeftButton,
     "RIGHT": Qt.MouseButton.RightButton,
     "MIDDLE": Qt.MouseButton.MiddleButton,
 }
 
 
-modifier_constant = {
+modifier_constant: dict[ModifierName, Qt.KeyboardModifier] = {
     "CTRL": Qt.KeyboardModifier.ControlModifier,
     "SHIFT": Qt.KeyboardModifier.ShiftModifier,
     "ALT": Qt.KeyboardModifier.AltModifier,
@@ -25,31 +34,16 @@ modifier_constant = {
 
 
 class KeyEvent(QObject):
-    """Class representing a key(board) event with a signal that can be registered to a slot by the event manager.
+    """Represent a keyboard binding registered with the event manager.
 
     Parameters
     ----------
-    title : str
+    title
         The name of the command that is triggered by the event.
-    key : str
+    key
         The string representation of the key that triggers the event.
-    modifier : {'CTRL', 'SHIFT', 'ALT'}, optional
+    modifier
         The string representation of the modifier combined with the key.
-
-    Attributes
-    ----------
-    title : str
-        The name of the command that is triggered by the event.
-    key : str
-        The string representation of the key that triggers the event.
-    keycode : int, readonly
-        The unique numerical value corresponding to the key.
-    modifier : Literal['CTRL', 'SHIFT', 'ALT'] | None, readonly
-        The name of the modifier combined with the key.
-    modifierconstant : Qt.KeyboardModifier, readonly
-        The Qt type corresponding to the modifier.
-    triggered : Signal, readonly
-        The signal associated with the event.
 
     Examples
     --------
@@ -61,18 +55,19 @@ class KeyEvent(QObject):
 
     triggered = Signal()
 
-    def __init__(self, title: str, key: str, modifier: Literal["CTRL", "SHIFT", "ALT"] = None) -> None:
+    def __init__(self, title: str, key: str, modifier: ModifierName | None = None) -> None:
         super().__init__()
-        self._key = None
-        self._keycode = None
-        self._modifier = None
-        self._modifierconstant = None
+        self._key: str
+        self._keycode: Qt.Key | None
+        self._modifier: ModifierName | None
+        self._modifierconstant: Qt.KeyboardModifier
         self.title = title
         self.key = key
         self.modifier = modifier
 
     @property
     def key(self) -> str:
+        """str: The key name used by the binding."""
         return self._key
 
     @key.setter
@@ -84,17 +79,18 @@ class KeyEvent(QObject):
                 self._keycode = value
 
     @property
-    def keycode(self) -> int:
+    def keycode(self) -> Qt.Key | None:
+        """Qt.Key | None: The corresponding Qt key value."""
         return self._keycode
 
     @property
-    def modifier(self) -> str:
+    def modifier(self) -> ModifierName | None:
+        """ModifierName | None: The modifier combined with the key."""
         return self._modifier
 
     @modifier.setter
-    def modifier(self, name: str) -> None:
+    def modifier(self, name: ModifierName | None) -> None:
         self._modifier = name
-        self._modifierconstant = None
         if not name:
             self._modifierconstant = Qt.KeyboardModifier.NoModifier
         else:
@@ -102,9 +98,10 @@ class KeyEvent(QObject):
 
     @property
     def modifierconstant(self) -> Qt.KeyboardModifier:
+        """Qt.KeyboardModifier: The corresponding Qt modifier value."""
         return self._modifierconstant
 
-    def __str__(self):
+    def __str__(self) -> str:
         if self.modifier:
             return f"{self.title}: {self.key} + {self.modifier}"
         return f"{self.title}: {self.key}"
@@ -114,31 +111,16 @@ class KeyEvent(QObject):
 
 
 class MouseEvent(QObject):
-    """Class representing a mouse event with a signal that can be registered to a slot by the event manager.
+    """Represent a mouse binding registered with the event manager.
 
     Parameters
     ----------
-    title : str
+    title
         The name of the command that is triggered by the mouse.
-    button : {'LEFT', 'RIGHT', 'MIDDLE'}
+    button
         The string representation of the button that triggers the event.
-    modifier : {'CTRL', 'SHIFT', 'ALT'}, optional
+    modifier
         The string representation of the modifier combined with the button.
-
-    Attributes
-    ----------
-    title : str
-        The name of the command that is triggered by the mouse.
-    button : {'LEFT', 'RIGHT', 'MIDDLE'}
-        The string representation of the mouse button.
-    buttonconstant : int, readonly
-        The unique numerical value corresponding to the key.
-    modifier : Literal['CTRL', 'SHIFT', 'ALT'] | None, readonly
-        The name of the modifier combined with the button.
-    modifierconstant : Qt.KeyboardModifier, readonly
-        The Qt type corresponding to the modifier.
-    triggered : Signal, readonly
-        The signal associated with the event.
 
     Examples
     --------
@@ -150,12 +132,12 @@ class MouseEvent(QObject):
 
     triggered = Signal(QMouseEvent)
 
-    def __init__(self, title, button, modifier, context=None):
+    def __init__(self, title: str, button: MouseButtonName, modifier: ModifierName | None, context: object | None = None) -> None:
         super().__init__()
-        self._button = None
-        self._buttonconstant = None
-        self._modifier = None
-        self._modifierconstant = None
+        self._button: MouseButtonName
+        self._buttonconstant: Qt.MouseButton
+        self._modifier: ModifierName | None
+        self._modifierconstant: Qt.KeyboardModifier
         self.title = title
         self.button = button
         self.modifier = modifier
@@ -163,26 +145,28 @@ class MouseEvent(QObject):
         self.is_active = False
 
     @property
-    def button(self) -> str:
+    def button(self) -> MouseButtonName:
+        """MouseButtonName: The button name used by the binding."""
         return self._button
 
     @button.setter
-    def button(self, name: str) -> None:
+    def button(self, name: MouseButtonName) -> None:
         self._button = name
         self._buttonconstant = mousebutton_constant[name]
 
     @property
     def buttonconstant(self) -> Qt.MouseButton:
+        """Qt.MouseButton: The corresponding Qt mouse-button value."""
         return self._buttonconstant
 
     @property
-    def modifier(self) -> str:
+    def modifier(self) -> ModifierName | None:
+        """ModifierName | None: The modifier combined with the button."""
         return self._modifier
 
     @modifier.setter
-    def modifier(self, name: str) -> None:
+    def modifier(self, name: ModifierName | None) -> None:
         self._modifier = name
-        self._modifierconstant = None
         if not name:
             self._modifierconstant = Qt.KeyboardModifier.NoModifier
         else:
@@ -190,9 +174,10 @@ class MouseEvent(QObject):
 
     @property
     def modifierconstant(self) -> Qt.KeyboardModifier:
+        """Qt.KeyboardModifier: The corresponding Qt modifier value."""
         return self._modifierconstant
 
-    def __str__(self):
+    def __str__(self) -> str:
         if self.modifier:
             return f"{self.title}: {self.button} + {self.modifier}"
         return f"{self.title}: {self.button}"
@@ -202,19 +187,12 @@ class MouseEvent(QObject):
 
 
 class WheelEvent(QObject):
-    """Class representing a wheel event with a signal that can be registered to a slot by the event manager.
+    """Represent a wheel binding registered with the event manager.
 
     Parameters
     ----------
-    title : str
+    title
         The name of the command that is triggered by the wheel.
-
-    Attributes
-    ----------
-    title : str
-        The name of the command that is triggered by the wheel.
-    triggered : Signal, readonly
-        The signal associated with the event.
 
     Examples
     --------
@@ -226,32 +204,16 @@ class WheelEvent(QObject):
 
     triggered = Signal(QWheelEvent)
 
-    def __init__(self, title):
+    def __init__(self, title: str) -> None:
         super().__init__()
         self.title = title
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.title}"
 
 
 class EventManager(Base):
-    """Class representing a manager for user inout events.
-
-    Parameters
-    ----------
-    viewer : :class:`compas_viewer.Viewer`
-        The parent viewer of the event manager.
-
-    Attributes
-    ----------
-    key_events : list[:class:`KeyEvent`]
-        The registered key events.
-    mouse_events : list[:class:`MouseEvent`]
-        The registered mouse events.
-    wheel_events : list[:class:`WheelEvent`]
-        The registered wheel events.
-
-    """
+    """Register viewer input bindings and dispatch matching Qt events."""
 
     def __init__(self) -> None:
         self.key_events: list[KeyEvent] = []
@@ -259,50 +221,99 @@ class EventManager(Base):
         self.wheel_events: list[WheelEvent] = []
         self.register_bindings()
 
-    def register_bindings(self):
-        for cmd in self.viewer.config.commands:
-            if cmd.mousebinding is not None:
-                binding = cmd.mousebinding.split("+")
-                button = binding[0].strip()
-                modifier = None
-                if len(binding) > 1:
-                    modifier = binding[1].strip()
-                mouseevent = MouseEvent(title=cmd.title, button=button, modifier=modifier)
-                mouseevent.triggered.connect(cmd)
-                self.mouse_events.append(mouseevent)
+    def register_bindings(self) -> None:
+        for cmd in self.viewer.commands:
+            self.register_command(cmd)
 
-            if cmd.keybinding is not None:
-                binding = cmd.keybinding.split("+")
-                key = binding[0].strip()
-                modifier = None
-                if len(binding) > 1:
-                    modifier = binding[1].strip()
-                keyevent = KeyEvent(title=cmd.title, key=key, modifier=modifier)
-                keyevent.triggered.connect(cmd)
-                self.key_events.append(keyevent)
+    def reload_bindings(self) -> None:
+        """Rebuild all input bindings from the runtime command registry."""
+        self.key_events.clear()
+        self.mouse_events.clear()
+        self.wheel_events.clear()
+        self.register_bindings()
 
-            if cmd.wheelbinding is not None:
-                binding = cmd.wheelbinding.split("+")
-                wheelevent = WheelEvent(title=cmd.title)
-                wheelevent.triggered.connect(cmd)
-                self.wheel_events.append(wheelevent)
+    def register_command(self, command: "Command") -> None:
+        """Register the input bindings declared by a runtime command.
 
-    def delegate_keypress(self, event: QKeyEvent):
+        Parameters
+        ----------
+        command
+            Command whose keyboard, mouse, and wheel bindings should be added.
+
+        """
+        if command.mousebinding is not None:
+            binding = command.mousebinding.split("+")
+            button = cast(MouseButtonName, binding[0].strip())
+            modifier: ModifierName | None = None
+            if len(binding) > 1:
+                modifier = cast(ModifierName, binding[1].strip())
+            mouseevent = MouseEvent(title=command.title, button=button, modifier=modifier)
+            mouseevent.triggered.connect(command)
+            self.mouse_events.append(mouseevent)
+
+        if command.keybinding is not None:
+            binding = command.keybinding.split("+")
+            key = binding[0].strip()
+            modifier = None
+            if len(binding) > 1:
+                modifier = cast(ModifierName, binding[1].strip())
+            keyevent = KeyEvent(title=command.title, key=key, modifier=modifier)
+            keyevent.triggered.connect(command)
+            self.key_events.append(keyevent)
+
+        if command.wheelbinding is not None:
+            wheelevent = WheelEvent(title=command.title)
+            wheelevent.triggered.connect(command)
+            self.wheel_events.append(wheelevent)
+
+    def delegate_keypress(self, event: QKeyEvent) -> None:
+        """Dispatch a key-press event to matching bindings.
+
+        Parameters
+        ----------
+        event
+            Qt key event to dispatch.
+
+        """
         for keyevent in self.key_events:
             if keyevent == event:
                 keyevent.triggered.emit()
 
-    def delegate_keyrelease(self, event: QKeyEvent):
+    def delegate_keyrelease(self, event: QKeyEvent) -> None:
+        """Handle a key-release event.
+
+        Parameters
+        ----------
+        event
+            Qt key event to dispatch.
+
+        """
         pass
 
-    def delegate_mousepress(self, event: QMouseEvent):
-        self.viewer.mouse.last_pos = event.pos()
+    def delegate_mousepress(self, event: QMouseEvent) -> None:
+        """Dispatch a mouse-press event to matching bindings.
+
+        Parameters
+        ----------
+        event
+            Qt mouse event to dispatch.
+
+        """
+        self.viewer.mouse.begin(event.pos())
         for mouseevent in self.mouse_events:
             if mouseevent == event:
                 mouseevent.triggered.emit(event)
                 mouseevent.is_active = True
 
-    def delegate_mousemove(self, event: QMouseEvent):
+    def delegate_mousemove(self, event: QMouseEvent) -> None:
+        """Dispatch a mouse-move event to matching bindings.
+
+        Parameters
+        ----------
+        event
+            Qt mouse event to dispatch.
+
+        """
         self.viewer.mouse.pos = event.pos()
         for mouseevent in self.mouse_events:
             if mouseevent == event:
@@ -310,17 +321,41 @@ class EventManager(Base):
 
         self.viewer.mouse.last_pos = event.pos()
 
-    def delegate_mouserelease(self, event: QMouseEvent):
+    def delegate_mouserelease(self, event: QMouseEvent) -> None:
+        """Dispatch a mouse-release event to matching bindings.
+
+        Parameters
+        ----------
+        event
+            Qt mouse event to dispatch.
+
+        """
         for mouseevent in self.mouse_events:
             if mouseevent.is_active or mouseevent == event:
                 mouseevent.triggered.emit(event)
                 mouseevent.is_active = False
 
-        self.viewer.mouse.last_pos = event.pos()
+        self.viewer.mouse.end(event.pos())
 
-    def delegate_wheel(self, event: QWheelEvent):
+    def delegate_wheel(self, event: QWheelEvent) -> None:
+        """Dispatch a wheel event to registered bindings.
+
+        Parameters
+        ----------
+        event
+            Qt wheel event to dispatch.
+
+        """
         for wheelevent in self.wheel_events:
             wheelevent.triggered.emit(event)
 
-    def delegate_pinch(self, event: QGestureEvent):
+    def delegate_pinch(self, event: QGestureEvent) -> None:
+        """Handle a pinch gesture event.
+
+        Parameters
+        ----------
+        event
+            Qt gesture event to dispatch.
+
+        """
         pass

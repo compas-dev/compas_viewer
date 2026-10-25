@@ -2,8 +2,6 @@
 This package provides scene object plugins for visualizing COMPAS objects in `compas_viewer`.
 """
 
-from compas.scene import register
-from compas.plugins import plugin
 from compas.datastructures import Mesh
 from compas.datastructures import Graph
 from compas.geometry import (
@@ -24,17 +22,23 @@ from compas.geometry import (
     Capsule,
     Polyhedron,
     Frame,
+    Brep,
+    NurbsCurve,
     NurbsSurface,
+    PolygonalSurface,
+    Surface,
 )
 
 from .sceneobject import ViewerSceneObject
+from .parameters import ObjectParameter, inspect_object_parameters, modify_object_parameters, object_parameter_values
+from .arrowoverlayobject import ArrowOverlay, ArrowOverlayObject
 from .meshobject import MeshObject
 from .graphobject import GraphObject
 from .pointobject import PointObject
 from .pointcloudobject import PointcloudObject
 from .lineobject import LineObject
 from .vectorobject import VectorObject
-from .tagobject import TagObject, Tag
+from .tagobject import Tag, TagObject, TextAnnotation
 from .frameobject import FrameObject
 from .circleobject import CircleObject
 from .polylineobject import PolylineObject
@@ -50,70 +54,32 @@ from .collectionobject import CollectionObject
 from .bufferobject import BufferGeometry
 from .bufferobject import BufferObject
 from .scene import ViewerScene
-
-
-@plugin(category="drawing-utils", requires=["compas_viewer"])
-def clear(guids: list[str]):
-    for obj in guids:
-        del obj
-
-
-@plugin(category="drawing-utils", requires=["compas_viewer"])
-def redraw():
-    pass
-
-
-@plugin(category="factories", requires=["compas_viewer"])
-def register_scene_objects():
-    register(Mesh, MeshObject, context="Viewer")
-    register(Graph, GraphObject, context="Viewer")
-    register(Point, PointObject, context="Viewer")
-    register(Pointcloud, PointcloudObject, context="Viewer")
-    register(Line, LineObject, context="Viewer")
-    register(Tag, TagObject, context="Viewer")
-    register(Frame, FrameObject, context="Viewer")
-    register(Vector, VectorObject, context="Viewer")
-    register(Circle, CircleObject, context="Viewer")
-    register(Box, ShapeObject, context="Viewer")
-    register(Polyline, PolylineObject, context="Viewer")
-    register(Torus, ShapeObject, context="Viewer")
-    register(Polygon, PolygonObject, context="Viewer")
-    register(Sphere, ShapeObject, context="Viewer")
-    register(Plane, PlaneObject, context="Viewer")
-    register(Cylinder, ShapeObject, context="Viewer")
-    register(Ellipse, EllipseObject, context="Viewer")
-    register(Cone, ShapeObject, context="Viewer")
-    register(Capsule, ShapeObject, context="Viewer")
-    register(Polyhedron, PolyhedronObject, context="Viewer")
-    register(Collection, CollectionObject, context="Viewer")
-    register(BufferGeometry, BufferObject, context="Viewer")
-
-    try:
-        from compas.geometry import NurbsCurve
-        from compas_occ.brep import OCCBrep
-
-        from .brepobject import BRepObject
-        from .nurbssurfaceobject import NurbsSurfaceObject
-        from .nurbscurveobject import NurbsCurveObject
-
-        register(OCCBrep, BRepObject, context="Viewer")
-        register(NurbsSurface, NurbsSurfaceObject, context="Viewer")
-        register(NurbsCurve, NurbsCurveObject, context="Viewer")
-
-    except ImportError:
-        pass
+from .brepobject import BRepObject
+from .nurbscurveobject import NurbsCurveObject
+from .nurbssurfaceobject import NurbsSurfaceObject
+from .polygonalsurfaceobject import PolygonalSurfaceObject
+from .surfaceobject import SurfaceObject
+from .tessellationobject import TessellationObject
 
 
 __all__ = [
+    "ArrowOverlay",
+    "ArrowOverlayObject",
+    "ObjectParameter",
     "ViewerSceneObject",
     "Mesh",
     "MeshObject",
+    "Graph",
+    "GraphObject",
     "Point",
     "PointObject",
+    "Pointcloud",
+    "PointcloudObject",
     "Line",
     "LineObject",
     "Tag",
     "TagObject",
+    "TextAnnotation",
     "Frame",
     "FrameObject",
     "Vector",
@@ -134,8 +100,19 @@ __all__ = [
     "EllipseObject",
     "Cone",
     "Capsule",
+    "Polyhedron",
+    "PolyhedronObject",
+    "Brep",
+    "BRepObject",
+    "NurbsCurve",
+    "NurbsCurveObject",
     "NurbsSurface",
     "NurbsSurfaceObject",
+    "PolygonalSurface",
+    "PolygonalSurfaceObject",
+    "Surface",
+    "SurfaceObject",
+    "TessellationObject",
     "GeometryObject",
     "ShapeObject",
     "Group",
@@ -144,4 +121,7 @@ __all__ = [
     "BufferGeometry",
     "BufferObject",
     "ViewerScene",
+    "inspect_object_parameters",
+    "modify_object_parameters",
+    "object_parameter_values",
 ]

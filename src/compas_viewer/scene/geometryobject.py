@@ -1,8 +1,9 @@
-from typing import Iterable
-from typing import Optional
+from collections.abc import Iterable
+from collections.abc import Sequence
+from typing import Any
+from typing import cast
 
 from compas.colors import Color
-from compas.geometry import Geometry
 from compas.itertools import flatten
 from compas.scene import GeometryObject as BaseGeometryObject
 from compas.scene.descriptors.color import ColorAttribute
@@ -16,71 +17,50 @@ class GeometryObject(ViewerSceneObject, BaseGeometryObject):
 
     Parameters
     ----------
-    geometry : :class:`compas.geometry.Geometry`
+    geometry
         A COMPAS geometry.
-    v : int, optional
+    v
         The number of vertices in the u-direction of non-OCC geometries.
-    u : int, optional
+    u
         The number of vertices in the v-direction of non-OCC geometries.
-    pointcolor : :class:`compas.colors.Color`, optional
+    pointcolor
         The color of the points. Default is the value of `pointcolor` in `viewer.config`.
-    linecolor : :class:`compas.colors.Color`, optional
+    linecolor
         The color of the lines. Default is the value of `linecolor` in `viewer.config`.
-    surfacecolor : :class:`compas.colors.Color`, optional
+    surfacecolor
         The color of the surfaces. Default is the value of `surfacecolor` in `viewer.config`.
-    **kwargs : dict, optional
-        Additional options for the :class:`compas_viewer.scene.ViewerSceneObject`
-        and :class:`compas.scene.GeometryObject`.
+    **kwargs
+        Additional scene-object options.
 
-    Attributes
-    ----------
-    geometry : :class:`compas.geometry.Geometry`
-        The COMPAS geometry.
-    pointcolor : :class:`compas.colors.Color`
-        The color of the points.
-    linecolor : :class:`compas.colors.Color`
-        The color of the lines.
-    surfacecolor : :class:`compas.colors.Color`
-        The color of the surfaces.
-    mesh : :class:`compas.datastructures.Mesh`
-        The triangulated mesh representation of the geometry.
-    LINEARDEFLECTION : float
-        The default linear deflection for the geometry.
-
-    See Also
-    --------
-    :class:`compas.geometry.Geometry`
     """
 
     pointcolor = ColorAttribute(default=Color(0.2, 0.2, 0.2))
     linecolor = ColorAttribute(default=Color(0.2, 0.2, 0.2))
     surfacecolor = ColorAttribute(default=Color(0.9, 0.9, 0.9))
 
-    geometry: Geometry
-
-    def __init__(self, u: Optional[int] = 16, v: Optional[int] = 16, **kwargs):
+    def __init__(self, u: int | None = 16, v: int | None = 16, **kwargs: Any) -> None:
         super().__init__(**kwargs)
-        self.u = u
-        self.v = v
+        self.u = 16 if u is None else u
+        self.v = 16 if v is None else v
 
     @property
     def facecolor(self) -> Color:
-        return self.surfacecolor
+        return cast(Color, self.surfacecolor)
 
     @facecolor.setter
     def facecolor(self, color: Color) -> None:
         self.surfacecolor = color
 
     @property
-    def points(self) -> Optional[list[Iterable[float]]]:
+    def points(self) -> Sequence[Iterable[float]] | None:
         return None
 
     @property
-    def lines(self) -> Optional[list[Iterable[Iterable[float]]]]:
+    def lines(self) -> Sequence[Iterable[Iterable[float]]] | None:
         return None
 
     @property
-    def viewmesh(self) -> Optional[tuple[list[Iterable[float]], list[Iterable[int]]]]:
+    def viewmesh(self) -> tuple[Sequence[Iterable[float]], Sequence[Sequence[int]]] | None:
         return None
 
     def _read_points_data(self) -> ShaderDataType:
@@ -106,13 +86,12 @@ class GeometryObject(ViewerSceneObject, BaseGeometryObject):
             return [], [], []
         positions, elements = self.viewmesh
         colors = [self.facecolor] * len(positions)
-        return positions, colors, elements  # type: ignore
+        return positions, colors, elements
 
     def _read_backfaces_data(self) -> ShaderDataType:
         if self.viewmesh is None:
             return [], [], []
-        positions, elements = self.viewmesh
-        for element in elements:
-            element.reverse()
+        positions, source_elements = self.viewmesh
+        elements = [list(reversed(element)) for element in source_elements]
         colors = [self.facecolor] * len(positions)
-        return positions, colors, elements  # type: ignore
+        return positions, colors, elements

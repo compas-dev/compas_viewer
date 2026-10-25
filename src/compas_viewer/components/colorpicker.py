@@ -1,5 +1,5 @@
-from typing import Callable
-from typing import Union
+from collections.abc import Callable
+from collections.abc import Sequence
 
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QColorDialog
@@ -15,78 +15,59 @@ from .boundcomponent import BoundComponent
 from .component import Component
 
 
-def remap_rgb(value, to_range_one=True):
-    """
-    Remap an RGB value between the range (0, 255) and (0, 1).
+def remap_rgb(value: Sequence[float], to_range_one: bool = True) -> tuple[float, ...]:
+    """Remap RGB channels between the ranges 0–255 and 0–1.
 
     Parameters
     ----------
-    value : tuple
+    value
         The RGB value to remap.
-    to_range_one : bool, optional
+    to_range_one
         If True, remap from (0, 255) to (0, 1). If False, remap from (0, 1) to (0, 255).
 
     Returns
     -------
-    tuple
+    tuple[float, ...]
         The remapped RGB value.
+
     """
     factor = 1 / 255 if to_range_one else 255
     return tuple(v * factor for v in value)
 
 
-class ColorPicker(BoundComponent):
-    """
-    This component creates a labeled color picker button that can be bound to an object's color attribute
+class ColorPicker(BoundComponent[Color]):
+    """Create a labeled color picker bound to a COMPAS color value.
     (either a dictionary key or object attribute). When the color changes, it automatically
     updates the bound attribute and optionally calls a action function.
 
     Parameters
     ----------
-    obj : Union[object, dict]
+    obj
         The object or dictionary containing the color attribute to be edited.
-    attr : str
+    attr
         The name of the attribute/key to be edited.
-    title : str, optional
+    title
         The label text to be displayed next to the color picker. If None, uses the attr name.
-    action : Callable[[Component, Color], None], optional
+    action
         A function to call when the color changes. Receives the component and new color value.
 
-    Attributes
-    ----------
-    obj : Union[object, dict]
-        The object or dictionary containing the color attribute being edited.
-    attr : str
-        The name of the attribute/key being edited.
-    action : Callable[[Component, Color], None] or None
-        The action function to call when the color changes.
-    widget : QWidget
-        The main widget containing the layout.
-    layout : QHBoxLayout
-        The horizontal layout containing the label and the color picker button.
-    label : QLabel
-        The label displaying the title.
-    color_button : QPushButton
-        The button that displays the current color and opens the color dialog when clicked.
-    current_color : QColor
-        The currently selected color.
-
-    Example
-    -------
+    Examples
+    --------
     >>> class MyObject:
     ...     def __init__(self):
     ...         self.color = Color(1.0, 0.0, 0.0)  # Red color
     >>> obj = MyObject()
     >>> component = ColorPicker(obj, "color", title="Object Color")
+
     """
 
     def __init__(
         self,
-        obj: Union[object, dict],
+        obj: object | dict[str, Color],
         attr: str,
-        title: str = None,
-        action: Callable[[Component, Color], None] = None,
-    ):
+        title: str | None = None,
+        action: Callable[[Component, Color], None] | None = None,
+    ) -> None:
         super().__init__(obj, attr, action=action)
 
         self.widget = QWidget()
@@ -116,16 +97,23 @@ class ColorPicker(BoundComponent):
         self.color_button.clicked.connect(self.open_color_dialog)
         self.set_button_color(default_color)
 
-    def open_color_dialog(self):
-        """Opens a QColorDialog for the user to select a new color."""
+    def open_color_dialog(self) -> None:
+        """Open a color dialog and apply a valid selection."""
         color = QColorDialog.getColor()
 
         if color.isValid():
             self.change_color(color)
             self.set_button_color(color)
 
-    def set_button_color(self, color: QColor):
-        """Sets the button's background and text to the provided color."""
+    def set_button_color(self, color: QColor) -> None:
+        """Update the button styling for a Qt color.
+
+        Parameters
+        ----------
+        color
+            Color used for the button background and contrast-aware text.
+
+        """
         luminance = (0.299 * color.red() + 0.587 * color.green() + 0.114 * color.blue()) / 255
         if luminance < 0.5:
             self.color_button.setStyleSheet(f"background-color: {color.name()}; color: white;")
@@ -134,8 +122,19 @@ class ColorPicker(BoundComponent):
         self.color_button.setText(color.name())
         self.current_color = color
 
-    def change_color(self, color: QColor):
-        """Changes the color attribute of the object to the provided color and updates the object."""
+    def change_color(self, color: QColor) -> None:
+        """Update the bound COMPAS color from a Qt color.
+
+        Parameters
+        ----------
+        color
+            Qt color selected by the user.
+
+        """
         rgb = remap_rgb(color.getRgb())[:-1]  # rgba to rgb(0-1)
-        new_color = Color(*rgb)
+        new_color = Color(red=rgb[0], green=rgb[1], blue=rgb[2])
         self.on_value_changed(new_color)
+
+    def sync_from_bound_object(self, value: Color) -> None:
+        """Synchronize the button with a changed COMPAS color."""
+        self.set_button_color(QColor(*remap_rgb(value.rgb, to_range_one=False)))

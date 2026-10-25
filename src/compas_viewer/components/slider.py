@@ -1,6 +1,6 @@
-from typing import Callable
-from typing import Optional
-from typing import Union
+from collections.abc import Callable
+from typing import Any
+from typing import cast
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QHBoxLayout
@@ -14,69 +14,39 @@ from .boundcomponent import BoundComponent
 from .component import Component
 
 
-class Slider(BoundComponent):
-    """
-    This component creates a customizable slider widget that can be bound to an object's attribute
+class Slider(BoundComponent[float]):
+    """Create a numeric slider bound to a value or used standalone.
     (either a dictionary key or object attribute). When the value changes, it automatically
     updates the bound attribute and optionally calls a action function.
 
     Parameters
     ----------
-    obj : Union[object, dict], optional
+    obj
         The object or dictionary containing the attribute to be edited. If None, the slider
         operates with the provided value parameter.
-    attr : str, optional
+    attr
         The name of the attribute/key to be edited. If None, the slider operates with the
         provided value parameter.
-    value : float, optional
+    value
         The initial value for the slider when not bound to an object attribute. Defaults to 0.
-    title : str, optional
+    title
         Label displayed above the slider. If None, uses the attr name or "Value" if attr is None.
-    min_val : float, optional
+    min_val
         Minimum value of the slider. Defaults to 0.
-    max_val : float, optional
+    max_val
         Maximum value of the slider. Defaults to 100.
-    step : float, optional
+    step
         Step size of the slider. Defaults to 1.
-    tick_interval : float, optional
+    tick_interval
         Interval between tick marks. No ticks if None. Defaults to None.
-    action : Callable[[Component, float], None], optional
+    action
         A function to call when the value changes. Receives the component and new value.
     **kwargs
         Additional keyword arguments passed to BoundComponent, including:
-        - watch_interval : int, optional
-            Interval in milliseconds to check for changes in the bound object.
-            If None, watching is disabled. Default is 100.
+        - `watch_interval`: interval in milliseconds, or `None` to disable watching.
 
-    Attributes
-    ----------
-    obj : Union[object, dict]
-        The object or dictionary containing the attribute being edited.
-    attr : str
-        The name of the attribute/key being edited.
-    action : Callable[[Component, float], None] or None
-        The action function to call when the value changes.
-    widget : QWidget
-        The main widget containing the slider layout.
-    title : str
-        Label displayed above the slider.
-    min_val : float
-        Minimum value of the slider.
-    max_val : float
-        Maximum value of the slider.
-    step : float
-        Step size of the slider.
-    layout : QVBoxLayout
-        Layout of the widget.
-    slider : QSlider
-        Slider widget.
-    value_label : QLabel
-        Label displaying the current value of the slider.
-    line_edit : QLineEdit
-        Text input field for direct value entry.
-
-    Example
-    -------
+    Examples
+    --------
     >>> # Bound to an object attribute
     >>> class MyObject:
     ...     def __init__(self):
@@ -88,21 +58,22 @@ class Slider(BoundComponent):
 
     >>> # Standalone slider with initial value
     >>> standalone_slider = Slider(value=25.0, title="Volume", min_val=0, max_val=100)
+
     """
 
     def __init__(
         self,
-        obj: Union[object, dict] = None,
-        attr: str = None,
+        obj: object | dict[str, float] | None = None,
+        attr: str | None = None,
         value: float = 0,
-        title: str = None,
+        title: str | None = None,
         min_val: float = 0,
         max_val: float = 100,
         step: float = 1,
-        tick_interval: Optional[float] = None,
-        action: Callable[[Component, float], None] = None,
-        **kwargs,
-    ):
+        tick_interval: float | None = None,
+        action: Callable[[Component, float], None] | None = None,
+        **kwargs: Any,
+    ) -> None:
         super().__init__(obj, attr, action=action, **kwargs)
 
         self.title = title if title is not None else (attr if attr is not None else "Value")
@@ -115,7 +86,7 @@ class Slider(BoundComponent):
 
         # Determine the initial value consistently
         if obj is not None and attr is not None:
-            initial_value = self.get_attr()
+            initial_value = cast(float, self.get_attr())
         else:
             initial_value = value
 
@@ -158,11 +129,11 @@ class Slider(BoundComponent):
         self.widget.setLayout(self.layout)
 
     @property
-    def _scaled_min_val(self):
+    def _scaled_min_val(self) -> int:
         return int(self.min_val / self.step)
 
     @property
-    def _scaled_max_val(self):
+    def _scaled_max_val(self) -> int:
         return int(self.max_val / self.step)
 
     def _scale_value(self, value: float) -> int:
@@ -173,8 +144,15 @@ class Slider(BoundComponent):
         """Unscale a slider integer value to real value."""
         return round(scaled_value * self.step, 2)
 
-    def on_slider_changed(self, scaled_value: int):
-        """Handle slider value changes."""
+    def on_slider_changed(self, scaled_value: int) -> None:
+        """Handle a slider value change.
+
+        Parameters
+        ----------
+        scaled_value
+            Integer slider value to convert to the configured numeric range.
+
+        """
         if self._updating:
             return
         self._updating = True
@@ -183,7 +161,7 @@ class Slider(BoundComponent):
         self.on_value_changed(real_value)
         self._updating = False
 
-    def on_text_changed(self):
+    def on_text_changed(self) -> None:
         """Handle text input changes."""
         if self._updating:
             return
@@ -203,16 +181,16 @@ class Slider(BoundComponent):
             pass  # Handle cases where the text is not a valid number
         self._updating = False
 
-    def sync_from_bound_object(self, value: float):
-        """
-        Sync the slider and text input with the bound object's value.
+    def sync_from_bound_object(self, value: float) -> None:
+        """Synchronize the slider and text input with the bound value.
 
         This method is called when the bound object's value changes externally.
 
         Parameters
         ----------
-        value : float
+        value
             The new value from the bound object.
+
         """
         if self._updating:
             return

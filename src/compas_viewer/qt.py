@@ -1,45 +1,48 @@
 from typing import Literal
-from typing import Union
+from typing import overload
 
 from PySide6.QtCore import Qt
+
+
+@overload
+def key_mapper(key: str, type: Literal[0]) -> Qt.Key: ...
+
+
+@overload
+def key_mapper(key: str, type: Literal[1]) -> Qt.KeyboardModifier: ...
+
+
+@overload
+def key_mapper(key: str, type: Literal[2]) -> Qt.MouseButton: ...
 
 
 def key_mapper(
     key: str,
     type: Literal[0, 1, 2],
-) -> Union[Qt.Key, Qt.KeyboardModifier, Qt.MouseButton]:
-    """
-    Map the key string to the Qt key.
+) -> Qt.Key | Qt.KeyboardModifier | Qt.MouseButton:
+    """Map a normalized name to a Qt input enum.
 
     Parameters
     ----------
-    key : str
-        The key string which is the same as what it was called in the :QtCore:`PySide6.QtCore.Qt`,
-        with **lowercases and with prefix&underscores removed**.
-        Check out the reference page to find out the supported keys and the original names.
-    type : Literal[0, 1, 2]
-        The type of the key for mapping.
-
-        * 0 for :QtCore:`PySide6.QtCore.Qt.Key`,
-        * 1 for :QtCore:`PySide6.QtCore.Qt.KeyboardModifier`,
-        * 2 for :QtCore:`PySide6.QtCore.Qt.MouseButton`.
+    key
+        Lowercase Qt enum name with its prefix and underscores removed.
+    type
+        Enum family: `0` for keys, `1` for keyboard modifiers, or `2` for
+        mouse buttons.
 
     Returns
     -------
-    Literal[:QtCore:`PySide6.QtCore.Qt.Key`, :QtCore:`PySide6.QtCore.Qt.KeyboardModifier`,
-    :QtCore:`PySide6.QtCore.Qt.MouseButton`]
-        The mapped Qt key.
+    Qt.Key | Qt.KeyboardModifier | Qt.MouseButton
+        The matching Qt enum value.
+
+    Raises
+    ------
+    ValueError
+        If the enum family is invalid or no matching enum value exists.
 
     Notes
     -----
-    This function provides the possibility to use all the supported keys in Qt for the viewer
-    by mapping the key string to the Qt key.
-
-    This function handles:
-
-    * :QtCore:`PySide6.QtCore.Qt.Key`
-    * :QtCore:`PySide6.QtCore.Qt.KeyboardModifier`
-    * :QtCore:`PySide6.QtCore.Qt.MouseButton`
+    Names are matched against the corresponding Qt enum after normalization.
 
     Examples
     --------
@@ -73,11 +76,6 @@ def key_mapper(
     >>> key_mapper("extra4", 2)
     <MouseButton.ExtraButton4: 64>
 
-    References
-    ----------
-    * https://doc.qt.io/qtforpython-6/PySide6/QtCore/Qt.html#PySide6.QtCore.PySide6.QtCore.Qt.Key
-    * https://doc.qt.io/qtforpython-6/PySide6/QtCore/Qt.html#PySide6.QtCore.PySide6.QtCore.Qt.KeyboardModifier
-    * https://doc.qt.io/qtforpython-6/PySide6/QtCore/Qt.html#PySide6.QtCore.PySide6.QtCore.Qt.MouseButton
     """
 
     if type == 0:

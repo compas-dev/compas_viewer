@@ -1,5 +1,4 @@
-from typing import Callable
-from typing import Union
+from collections.abc import Callable
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QHBoxLayout
@@ -12,56 +11,39 @@ from .boundcomponent import BoundComponent
 from .component import Component
 
 
-class TextEdit(BoundComponent):
-    """
-    This component creates a labeled text edit widget that can be bound to an object's attribute
+class TextEdit(BoundComponent[str]):
+    """Create a labeled text editor bound to a string value.
     (either a dictionary key or object attribute). When the text changes, it automatically
     updates the bound attribute and optionally calls a action function.
 
     Parameters
     ----------
-    obj : Union[object, dict]
+    obj
         The object or dictionary containing the attribute to be edited.
-    attr : str
+    attr
         The name of the attribute/key to be edited.
-    title : str, optional
+    title
         The label text to be displayed next to the text edit. If None, uses the attr name.
-    action : Callable[[Component, str], None], optional
+    action
         A function to call when the text changes. Receives the component and new text value.
 
-    Attributes
-    ----------
-    obj : Union[object, dict]
-        The object or dictionary containing the attribute being edited.
-    attr : str
-        The name of the attribute/key being edited.
-    action : Callable[[Component, str], None] or None
-        The action function to call when the text changes.
-    widget : QWidget
-        The main widget containing the layout.
-    layout : QHBoxLayout
-        The horizontal layout containing the label and the text edit.
-    label : QLabel
-        The label displaying the title.
-    text_edit : QTextEdit
-        The text edit widget for editing the text.
-
-    Example
-    -------
+    Examples
+    --------
     >>> class MyObject:
     ...     def __init__(self):
     ...         self.name = "Hello World"
     >>> obj = MyObject()
     >>> component = TextEdit(obj, "name", title="Name")
+
     """
 
     def __init__(
         self,
-        obj: Union[object, dict],
+        obj: object | dict[str, str],
         attr: str,
-        title: str = None,
-        action: Callable[[Component, str], None] = None,
-    ):
+        title: str | None = None,
+        action: Callable[[Component, str], None] | None = None,
+    ) -> None:
         super().__init__(obj, attr, action=action)
 
         self.widget = QWidget()
@@ -82,7 +64,7 @@ class TextEdit(BoundComponent):
         # Connect the text change signal to the action
         self.text_edit.textChanged.connect(self.on_text_changed)
 
-    def on_text_changed(self):
+    def on_text_changed(self) -> None:
         """Handle text change events by updating the bound attribute and calling the action."""
         new_text = self.text_edit.toPlainText()
         self.on_value_changed(new_text)
