@@ -9,10 +9,10 @@ In short, this is how that works.
 
 1. Fork [the repository](https://github.com/compas.dev/compas_viewer) and clone the fork.
 2. Create a virtual environment using your tool of choice (e.g. `virtualenv`, `conda`, etc).
-3. Install development dependencies:
+3. Install the project with development and documentation dependencies:
 
    ```bash
-   pip install -r requirements-dev.txt
+   python -m pip install -e ".[dev,docs]"
    ```
 
 4. Make sure all tests pass:
@@ -40,6 +40,10 @@ command line to ease recurring operations:
 * `invoke docs`: Generate documentation.
 * `invoke test`: Run all tests and checks in one swift command.
 * `invoke`: Show available tasks.
+
+For documentation setup, local preview, strict builds, examples, assets, and
+API-page conventions, see the
+[documentation build guide](docs/building-docs.md).
 
 ## Bug reports
 

@@ -8,8 +8,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "compas_viewer"
-description = "Standalone viewer for COMPAS 2 based on PyOpenGL and PyQt6."
-keywords = ['visualisation', 'compas', 'pyopengl', 'pyqt6']
+description = "A standalone, high-performance 3D viewer for COMPAS."
+keywords = ["architecture", "engineering", "visualization", "opengl", "qt"]
 authors = [
     { name = "tom van mele", email = "tom.v.mele@gmail.com" },
     { name = "Li Chen", email = "li.chen@arch.ethz.ch" },
@@ -17,16 +17,44 @@ authors = [
 ]
 license = { file = "LICENSE" }
 readme = "README.md"
-requires-python = ">=3.9"
-dynamic = ['dependencies', 'optional-dependencies', 'version']
+requires-python = ">=3.12"
+dynamic = ["version"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Topic :: Scientific/Engineering",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+dependencies = [
+    "compas >=2.2.0",
+    "freetype-py",
+    "PyOpenGL",
+    "Pillow",
+    "PySide6",
+]
+
+[project.optional-dependencies]
+dev = [
+    "build",
+    "bump-my-version",
+    "compas_invocations2",
+    "invoke >=0.14",
+    "pyright",
+    "pytest",
+    "pytest-cov",
+    "ruff",
+    "twine",
+    "wheel",
+]
+docs = [
+    "compas_invocations2",
+    "invoke >=0.14",
+    "mkdocs >=1.6",
+    "mkdocs-material >=9.5",
+    "mkdocstrings[python]",
 ]
 
 [project.urls]
@@ -34,6 +62,11 @@ Homepage = "https://compas-dev.github.io/compas_viewer"
 Documentation = "https://compas-dev.github.io/compas_viewer"
 Repository = "https://github.com/compas-dev/compas_viewer.git"
 Changelog = "https://github.com/compas-dev/compas_viewer/blob/main/CHANGELOG.md"
+Issues = "https://github.com/compas-dev/compas_viewer/issues"
+Forum = "https://forum.compas-framework.org/"
+
+[project.entry-points."compas.plugins"]
+compas_viewer = "compas_viewer.plugins"
 
 # ============================================================================
 # setuptools config
@@ -46,17 +79,19 @@ zip-safe = false
 
 [tool.setuptools.dynamic]
 version = { attr = "compas_viewer.__version__" }
-dependencies = { file = "requirements.txt" }
-optional-dependencies = { dev = { file = "requirements-dev.txt" } }
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools.package-data]
-compas_viewer = ['config.json']
-"compas_viewer.assets" = ["*.svg", "*.png"]
-"compas_viewer.assets.fonts" = ["*.ttf"]
-"compas_viewer.renderer.shaders" = ["*.vert", "*.frag", "*.geom"]
+compas_viewer = [
+    "assets/fonts/*.ttf",
+    "assets/icons/*.png",
+    "assets/icons/*.svg",
+    "renderer/shaders/*.frag",
+    "renderer/shaders/*.geom",
+    "renderer/shaders/*.vert",
+]
 
 # ============================================================================
 # replace pytest.ini
@@ -66,7 +101,7 @@ compas_viewer = ['config.json']
 minversion = "6.0"
 testpaths = ["tests", "src/compas_viewer"]
 python_files = ["test_*.py", "*_test.py", "test.py"]
-addopts = ["-ra", "--strict-markers", "--doctest-glob=*.rst", "--tb=short"]
+addopts = ["-ra", "--strict-markers", "--doctest-glob=*.md", "--tb=short"]
 doctest_optionflags = [
     "NORMALIZE_WHITESPACE",
     "IGNORE_EXCEPTION_DETAIL",
@@ -105,7 +140,7 @@ line-length = 179
 [tool.ruff]
 line-length = 179
 indent-width = 4
-target-version = "py39"
+target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "I"]
@@ -128,3 +163,7 @@ max-doc-length = 179
 [tool.ruff.format]
 docstring-code-format = true
 docstring-code-line-length = "dynamic"
+
+[tool.pyright]
+include = ["src/compas_viewer"]
+pythonVersion = "3.12"

@@ -1,4 +1,0 @@
-compas >= 2.2.0
-freetype-py
-PyOpenGL
-PySide6

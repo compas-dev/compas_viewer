@@ -9,10 +9,122 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Added multi-object selection, directional window selection, selection
+  inversion, and selection by type, color, or name. Left-to-right windows
+  require full containment, while right-to-left windows select intersections.
+* Added Zoom Extents, Zoom Selected, Isolate Selected, Show All, grid
+  visibility, and Escape-to-deselect commands together with corresponding menu
+  entries and shortcuts.
+* Added UI commands for creating common primitives, curves, surfaces, and
+  shapes directly in the viewer.
+* Added a visible-by-default scene sidebar with a hierarchical object tree,
+  synchronized selection, object information, and compact display controls.
+* Exposed the underlying data or geometry and inspected constructor parameters
+  on every viewer scene object.
+* Added **Edit → Modify Parameters…** with a dedicated form for writable scalar
+  parameters of the selected object's underlying data. Parameter application is
+  transactional and refreshes render data and bounds.
+* Added System, Light, and Dark application appearances. System mode follows
+  operating-system color-scheme changes while the viewer is running.
+* Added configurable units, grid extents and divisions, grid styling,
+  selection color, and viewport background controls.
+* Added camera-facing multiline text annotations with alignment, padding,
+  backgrounds, offsets, and screen- or world-space sizing.
+* Added screen-scaled arrow overlays with configurable shaft and arrowhead
+  styling and optional on-top rendering.
+* Added `Viewer.save_image` for rendering still images without launching the
+  visible viewer or entering its event loop.
+* Added deterministic GIF and WebP animation recording with `preview`,
+  `documentation`, and `presentation` presets.
+* Added a stable runtime command registry, namespaced command identifiers, live
+  input-binding registration, and menu contributions for applications and
+  plugins.
+* Added versioned configuration serialization and migration of supported legacy
+  configuration layouts.
+* Added MkDocs user and developer guides, a Hello World tutorial, documentation
+  build instructions, modernized examples, and a generated API reference.
+
 ### Changed
+
+* Migrated plugin discovery from `__all_plugins__` package scanning to a
+  lightweight `compas_viewer.plugins` module in the `compas.plugins` entry-point
+  group, with scene imports deferred until registration.
+* Updated scene hooks to the current `clear`, `before_draw`, and `after_draw`
+  extension points and registered the stable core `Brep`, `NurbsCurve`, and
+  `NurbsSurface` wrappers instead of backend-specific OCC classes.
+* Raised the minimum Python version to 3.12 to match COMPAS core.
+* Consolidated runtime, development, and documentation dependencies in
+  `pyproject.toml` and removed the legacy requirements files.
+* Updated package metadata, static asset inclusion, Pyright configuration, and
+  CI version matrices for Python 3.12 through 3.14.
+* Migrated CI, pull-request checks, coverage, and releases to the composable
+  `compas-actions` v1 workflows with `uv` environments and trusted PyPI
+  publishing.
+* Added a focused `invoke typecheck` task and removed obsolete release and
+  Grasshopper component tasks from the viewer task collection.
+* Modernized type annotations across the top-level `compas_viewer` modules,
+  including commands, configuration, events, OpenGL helpers, Qt mappings,
+  singleton state, timers, UI access, and the viewer lifecycle.
+* Avoided instance-level `QEvent.type()` lookup in the renderer event override,
+  which fails for nested paint events with PySide6 6.11.
+* Updated shape rendering to use the public cached vertices and edges together
+  with `to_tessellation()` instead of removed private discretization data and
+  triangle properties.
+* Updated the scene-tree UI for the composition-based `Scene.tree` API.
+* Modernized the scene package and geometry adapters with Python 3.12 type
+  annotations, explicit geometry properties, consistent public exports, and
+  safer buffer-data contracts.
+* Modernized docstrings throughout the package to MkDocs-compatible NumPy style
+  and documented missing parameters and return values.
+* Switched filesystem APIs to `pathlib.Path` and removed argument unpacking from
+  point and vector constructor calls.
+* Separated persistent configuration from runtime commands and UI composition.
+  Configuration now contains serializable values only; menus and sidebar
+  definitions resolve commands through stable runtime IDs.
+* Moved default scene-object presentation settings from `config.ui.display` to
+  `config.display` and added migration for existing JSON configuration files.
+* Made callback serialization an explicit error instead of silently omitting
+  runtime data from configuration files.
+* Reworked scene hierarchy display so parenting, groups, visibility, and
+  selection are represented consistently in the object tree.
+* Centralized compact form margins, spacing, and row heights for the Object,
+  Camera, and Display sidebar controls.
+* Added an observable `ViewerState` as the single source of truth for
+  viewer-wide UI state. Menus, forms, component visibility, the viewport, and
+  renderer settings now synchronize through named state paths.
+* Improved point and line picking by sampling their visible instance-rendering
+  footprints.
+* Updated scene-object parameter changes to regenerate render data and rebuild
+  combined buffers when topology may have changed.
+* Moved documentation images and logos into structured `assets/images` and
+  `assets/logos` directories and converted the documentation site to MkDocs
+  Material.
+* Integrated useful scripts into the maintained example collection.
+
+### Fixed
+
+* Fixed scene-object registration not being triggered when another package had
+  already populated the global COMPAS scene registry or when running from a
+  source checkout without installed entry-point metadata.
+* Fixed camera projection failures caused by degenerate near and far clipping
+  distances after adding or framing very small scenes.
+* Fixed type and runtime inconsistencies in `BufferManager`, `CircleObject`, and
+  the other geometry scene-object adapters instead of masking incompatible
+  property overrides.
+* Fixed the selected-object information panel overflowing its sidebar frame and
+  reduced excessive vertical whitespace in inspector controls.
+* Fixed visibility commands so toolbar, sidebar, status-bar, and side-dock state
+  remains synchronized with persistent configuration.
+* Fixed buffer refresh behavior after editing underlying geometry parameters,
+  including changes that affect vertex or element counts.
+* Fixed small pointer jitter during a click being interpreted as a camera pan
+  or rotation by adding a shared drag threshold to navigation gestures.
 
 ### Removed
 
+* Removed legacy Sphinx documentation sources, obsolete requirements files,
+  stale scripts superseded by maintained examples, and unused configuration
+  structures that mixed callbacks with persistent settings.
 
 ## [2.0.2] 2026-02-26
 
