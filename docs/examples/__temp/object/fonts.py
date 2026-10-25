@@ -1,4 +1,4 @@
-from os import PathLike
+from pathlib import Path
 
 from compas_viewer import Viewer
 from compas_viewer.scene import Tag
@@ -6,13 +6,12 @@ from compas_viewer.scene import Tag
 viewer = Viewer()
 
 
-def find_sys_font(font_name: str) -> PathLike:  # type: ignore
+def find_sys_font(font_name: str) -> Path | None:
     from matplotlib import font_manager
 
     for font in font_manager.fontManager.ttflist:
         if font.name == font_name:
-            font_dir = font.fname
-            return font_dir  # type: ignore
+            return Path(font.fname)
 
 
 # By default, the text is rendered using the FreeSans font from the library.

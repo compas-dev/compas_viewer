@@ -1,7 +1,6 @@
-from compas_occ.brep import OCCBrep
-
 from compas.colors import Color
 from compas.geometry import Box
+from compas.geometry import Brep
 from compas.geometry import Capsule
 from compas.geometry import Circle
 from compas.geometry import Cone
@@ -18,7 +17,7 @@ from compas.geometry import Translation
 from compas.geometry import Vector
 from compas_viewer import Viewer
 
-viewer = Viewer(rendermode="lighted", fullscreen=True)
+viewer = Viewer()
 
 points = [
     [Point(0, 0, 0), Point(1, 0, 0), Point(2, 0, 0), Point(3, 0, 0)],
@@ -57,21 +56,21 @@ cone = Cone.from_circle_and_height(circle, 1.5)
 obj = viewer.scene.add(cone, surfacecolor=Color(0.5, 0.5, 0.0))
 obj.transformation = Translation.from_vector(Vector(5, 5, 0))
 
-box = OCCBrep.from_box(Box(1.5))
-cx = OCCBrep.from_cylinder(Cylinder(0.5, 8, frame=Frame.worldYZ()))
-cy = OCCBrep.from_cylinder(Cylinder(0.5, 8, frame=Frame.worldZX()))
-cz = OCCBrep.from_cylinder(Cylinder(0.5, 8, frame=Frame.worldXY()))
+box = Brep.from_box(Box(1.5))
+cx = Brep.from_cylinder(Cylinder(0.5, 8, frame=Frame.worldYZ()))
+cy = Brep.from_cylinder(Cylinder(0.5, 8, frame=Frame.worldZX()))
+cz = Brep.from_cylinder(Cylinder(0.5, 8, frame=Frame.worldXY()))
 result = box - (cx + cy + cz)
-obj = viewer.scene.add(item=result, surfacecolor=Color(0.0, 0.5, 0.5), use_vertexcolors=False)
+obj = viewer.scene.add(result, surfacecolor=Color(0.0, 0.5, 0.5), use_vertexcolors=False)
 obj.transformation = Translation.from_vector(Vector(10, 5, 0))
 
 capsule = Capsule(0.8, 1)
-obj = viewer.scene.add(item=capsule, surfacecolor=Color(0.0, 0.0, 0.5), show_lines=False)
+obj = viewer.scene.add(capsule, surfacecolor=Color(0.0, 0.0, 0.5), show_lines=False)
 obj.transformation = Translation.from_vector(Vector(0, 10, 0))
 
 box = Box(1, 1, 1, Frame.worldXY())
 obj = viewer.scene.add(
-    item=box,
+    box,
     surfacecolor=Color(0.0, 0.0, 0.5),
     linecolor=Color(0.5, 0.0, 0.0),
     pointcolor=Color(0.0, 0.5, 0.0),
