@@ -5,11 +5,12 @@ in vec3 position;
 uniform mat4 projection;
 uniform mat4 viewworld;
 uniform mat4 transform;
-uniform float screen_aspect;
-uniform float screen_height;
+uniform bool screen_space;
+uniform vec2 screen_size;
 uniform float text_aspect;
 uniform float text_height;
 uniform vec3 text_position;
+uniform vec2 text_offset;
 uniform int vertical_align;
 uniform int horizontal_align;
 
@@ -35,9 +36,17 @@ void main()
         position.y -= 1.0;
     }
 
-    vec4 screen_position = projection * viewworld * transform * vec4(text_position, 1.0);
-    vec2 adjustedPos = vec2(position.x / screen_aspect * text_aspect, position.y) * text_height / screen_height;
-    vec4 offset = vec4(adjustedPos * screen_position.w, 0.0, 0.0);
-    screen_position += offset;
-    gl_Position = screen_position;
+    vec4 view_position = viewworld * transform * vec4(text_position, 1.0);
+    vec2 size = vec2(text_height * text_aspect, text_height);
+
+    if (screen_space) {
+        vec4 screen_position = projection * view_position;
+        vec2 pixel_position = position * size + text_offset;
+        screen_position.xy += 2.0 * pixel_position / screen_size * screen_position.w;
+        gl_Position = screen_position;
+    }
+    else {
+        view_position.xy += position * size + text_offset;
+        gl_Position = projection * view_position;
+    }
 }

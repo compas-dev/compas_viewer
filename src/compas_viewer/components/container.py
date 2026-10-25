@@ -1,6 +1,9 @@
+from typing import Literal
+
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QLabel
 from PySide6.QtWidgets import QScrollArea
+from PySide6.QtWidgets import QSizePolicy
 from PySide6.QtWidgets import QSplitter
 from PySide6.QtWidgets import QVBoxLayout
 from PySide6.QtWidgets import QWidget
@@ -17,21 +20,15 @@ class Container(Component):
 
     Parameters
     ----------
-    container_type : str, optional
+    container_type
         Type of container to create. Options are:
         - None or "standard": Creates a standard container with QWidget
         - "scrollable": Creates a scrollable container using QScrollArea
         - "splitter": Creates a resizable splitter container using QSplitter
         Default is None.
-
-    Attributes
-    ----------
-    container_type : str
-        The type of container.
-    widget : QWidget, QScrollArea, or QSplitter
-        The main widget that contains all child components.
-    layout : QVBoxLayout or None
-        The vertical layout that arranges child components (None for splitter).
+    compact
+        Whether child components should use the shared compact control-row
+        spacing and height.
 
     Examples
     --------
@@ -48,11 +45,19 @@ class Container(Component):
     >>> splitter_container = Container(container_type="splitter")
     >>> splitter_container.add(component1)
     >>> splitter_container.add(component2)
+
     """
 
-    def __init__(self, container_type=None):
+    COMPACT_CONTENT_MARGINS = (6, 6, 6, 6)
+    COMPACT_LAYOUT_SPACING = 2
+    COMPACT_ROW_MARGINS = (6, 2, 6, 2)
+    COMPACT_ROW_SPACING = 8
+    COMPACT_ROW_MAXIMUM_HEIGHT = 34
+
+    def __init__(self, container_type: Literal["standard", "scrollable", "splitter"] | None = None, *, compact: bool = False) -> None:
         self.container_type = container_type
-        self.children = []
+        self.compact = compact
+        self.children: list[Component] = []
         if self.container_type == "scrollable":
             self.widget = QScrollArea()
             self.widget.setWidgetResizable(True)
@@ -80,8 +85,19 @@ class Container(Component):
             self.layout.setContentsMargins(0, 0, 0, 0)
             self.widget.setLayout(self.layout)
 
+        if self.compact and self.layout is not None:
+            self.layout.setContentsMargins(*self.COMPACT_CONTENT_MARGINS)
+            self.layout.setSpacing(self.COMPACT_LAYOUT_SPACING)
+
     def add(self, component: "Component") -> None:
-        """Add a component to the container."""
+        """Add a component to the container.
+
+        Parameters
+        ----------
+        component
+            Component to append.
+
+        """
         if component in self.children:
             return
 
@@ -93,24 +109,51 @@ class Container(Component):
                 equal_sizes = [height // child_count] * child_count
                 self.widget.setSizes(equal_sizes)
         else:
+            assert self.layout is not None
+            if self.compact:
+                self._compact_component(component)
             self.layout.addWidget(component.widget)
         self.children.append(component)
 
+    def _compact_component(self, component: Component) -> None:
+        """Apply the shared compact sidebar style to a child component.
+
+        Parameters
+        ----------
+        component
+            Component whose widget and internal layout should be compacted.
+
+        """
+        layout = component.widget.layout()
+        if layout is not None:
+            layout.setContentsMargins(*self.COMPACT_ROW_MARGINS)
+            layout.setSpacing(self.COMPACT_ROW_SPACING)
+        component.widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        component.widget.setMaximumHeight(self.COMPACT_ROW_MAXIMUM_HEIGHT)
+
     def remove(self, component: "Component") -> None:
-        """Remove a component from the container."""
+        """Remove a component from the container.
+
+        Parameters
+        ----------
+        component
+            Component to remove.
+
+        """
         if self.container_type == "splitter":
             component.widget.setParent(None)
         else:
+            assert self.layout is not None
             self.layout.removeWidget(component.widget)
         self.children.remove(component)
 
-    def update(self):
+    def update(self) -> None:
         """Update the container and its children."""
         self.widget.update()
         for child in self.children:
             child.update()
 
-    def reset(self):
+    def reset(self) -> None:
         """Reset the container to its initial state."""
         self.children = []
         if self.container_type == "splitter":
@@ -121,13 +164,21 @@ class Container(Component):
                     child.setParent(None)
         else:
             # For layout-based containers
+            assert self.layout is not None
             while self.layout.count():
                 child = self.layout.takeAt(0)
                 if child.widget():
                     child.widget().setParent(None)
 
     def display_text(self, text: str) -> None:
-        """Display a text when there is nothing else to show."""
+        """Replace the container contents with a text label.
+
+        Parameters
+        ----------
+        text
+            Text to display.
+
+        """
         self.reset()
         label = QLabel(text)
         label.setAlignment(Qt.AlignCenter)
@@ -135,4 +186,5 @@ class Container(Component):
         if self.container_type == "splitter":
             self.widget.addWidget(label)
         else:
+            assert self.layout is not None
             self.layout.addWidget(label)

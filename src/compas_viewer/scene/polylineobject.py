@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import cast
 
 from compas.geometry import Line
 from compas.geometry import Point
@@ -10,16 +10,14 @@ from .geometryobject import GeometryObject
 class PolylineObject(GeometryObject):
     """Viewer scene object for displaying COMPAS Polyline geometry."""
 
-    geometry: Polyline
-
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
         self.show_lines = True
 
     @property
-    def points(self) -> Optional[list[Point]]:
-        return self.geometry.points
+    def points(self) -> list[Point] | None:
+        return cast(Polyline, self.geometry).points
 
     @property
-    def lines(self) -> Optional[list[Line]]:
-        return self.geometry.lines
+    def lines(self) -> list[Line] | None:
+        return cast(Polyline, self.geometry).lines

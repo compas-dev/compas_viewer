@@ -1,9 +1,8 @@
 from typing import Any
-from typing import Dict
-from typing import List
 
 import numpy as np
 import OpenGL.GL as GL
+from numpy.typing import NDArray
 
 from compas.colors import Color
 from compas_viewer.gl import make_index_buffer
@@ -13,52 +12,32 @@ from compas_viewer.gl import update_texture_buffer
 from compas_viewer.gl import update_vertex_buffer
 from compas_viewer.renderer.shaders import Shader
 
+type FloatArray = NDArray[np.float32]
+type IntArray = NDArray[np.int32]
+type SettingsRow = list[float | bool]
+type ObjectSettings = list[SettingsRow]
+
 
 class BufferManager:
-    """A class to manage and combine buffers from multiple objects for efficient rendering.
+    """Combine object buffers to reduce rendering state changes and draw calls."""
 
-    The BufferManager combines vertex data from multiple objects into consolidated buffers
-    to minimize draw calls and state changes during rendering.
-
-    Attributes
-    ----------
-    positions : Dict[str, np.ndarray]
-        Combined position buffers for different geometry types (points, lines, faces)
-    colors : Dict[str, np.ndarray]
-        Combined color buffers for different geometry types
-    elements : Dict[str, np.ndarray]
-        Combined element index buffers for different geometry types
-    object_indices : Dict[str, np.ndarray]
-        Combined object index buffers for different geometry types
-    objects : Dict[Any, int]
-        Dictionary mapping objects to their indices in the buffer
-    buffer_ids : Dict[str, Dict[str, int]]
-        Dictionary mapping buffer types to their IDs
-    transforms : List[float]
-        List of transformation matrices for each object
-    settings : List[float]
-        List of setting values for each object
-    object_settings_cache : Dict[Any, List[float]]
-        Cache for object settings to avoid redundant GPU updates
-    """
-
-    def __init__(self):
+    def __init__(self) -> None:
         # Shader buffer data
-        self.positions: Dict[str, np.ndarray] = {}
-        self.colors: Dict[str, np.ndarray] = {}
-        self.elements: Dict[str, np.ndarray] = {}
-        self.object_indices: Dict[str, np.ndarray] = {}
-        self.objects: Dict[Any, int] = {}
+        self.positions: dict[str, FloatArray] = {}
+        self.colors: dict[str, FloatArray] = {}
+        self.elements: dict[str, IntArray] = {}
+        self.object_indices: dict[str, FloatArray] = {}
+        self.objects: dict[Any, int] = {}
 
         # OpenGL buffer IDs
-        self.buffer_ids: Dict[str, Dict[str, int]] = {}
+        self.buffer_ids: dict[str, dict[str, int]] = {}
 
         # Transform data
-        self.transforms: List[float] = []
+        self.transforms: list[FloatArray] = []
 
         # Settings data
-        self.settings: List[float] = []
-        self.object_settings_cache: Dict[Any, List[float]] = {}
+        self.settings: list[ObjectSettings] = []
+        self.object_settings_cache: dict[Any, ObjectSettings] = {}
 
         # Initialize empty buffers for each geometry type
         for buffer_type in ["_points_data", "_lines_data", "_frontfaces_data", "_backfaces_data"]:
@@ -71,7 +50,14 @@ class BufferManager:
             self.buffer_ids[buffer_type] = {}
 
     def add_object(self, obj: Any) -> None:
-        """Add an object's buffer data to the combined buffers."""
+        """Add an object's data to the combined buffers.
+
+        Parameters
+        ----------
+        obj
+            Viewer scene object whose render data should be buffered.
+
+        """
         self.objects[obj] = len(self.transforms)
 
         # Process geometry data
@@ -120,9 +106,9 @@ class BufferManager:
         col_array = np.array([c.rgba for c in colors] if len(colors) > 0 and isinstance(colors[0], Color) else colors, dtype=np.float32).flatten()
         elem_array = np.array(elements, dtype=np.int32).flatten()
 
+        opaque_element_indices: list[int] = []
+        transparent_element_indices: list[int] = []
         if buffer_type == "_frontfaces_data" or buffer_type == "_backfaces_data":
-            opaque_elements = []
-            transparent_elements = []
             for e in elem_array:
                 if e >= len(colors):
                     # print("WARNING: Element index out of range", obj) # TODO: Fix BREP from IFC
@@ -131,9 +117,9 @@ class BufferManager:
                 color = colors[e]
                 alpha = color.a if isinstance(color, Color) else color[3]
                 if alpha < 1.0 or obj.opacity < 1.0:
-                    transparent_elements.append(e)
+                    transparent_element_indices.append(int(e))
                 else:
-                    opaque_elements.append(e)
+                    opaque_element_indices.append(int(e))
 
         # Update elements to account for offset
         start_idx = len(self.positions[buffer_type]) // 3
@@ -149,8 +135,8 @@ class BufferManager:
         self.object_indices[buffer_type] = np.append(self.object_indices[buffer_type], obj_indices)
 
         if buffer_type == "_frontfaces_data" or buffer_type == "_backfaces_data":
-            opaque_elements = np.array(opaque_elements, dtype=np.int32)
-            transparent_elements = np.array(transparent_elements, dtype=np.int32)
+            opaque_elements = np.array(opaque_element_indices, dtype=np.int32)
+            transparent_elements = np.array(transparent_element_indices, dtype=np.int32)
             opaque_elements += start_idx
             transparent_elements += start_idx
 
@@ -189,7 +175,7 @@ class BufferManager:
                 else:
                     self.buffer_ids[buffer_type]["elements"] = make_index_buffer(self.elements[buffer_type])
 
-    def _draw_faces(self, shader: Shader, is_instance: bool, is_lighted: bool, is_ghosted: bool, is_wireframe: bool):
+    def _draw_faces(self, shader: Shader, is_instance: bool, is_lighted: bool, is_ghosted: bool, is_wireframe: bool) -> None:
         GL.glEnable(GL.GL_POLYGON_OFFSET_FILL)
         if not is_wireframe and (not is_ghosted or is_instance):
             shader.uniform1i("is_lighted", is_lighted)
@@ -204,7 +190,7 @@ class BufferManager:
                         shader.draw_triangles(elements=self.buffer_ids[face_type]["elements_transparent"], n=len(self.elements[face_type + "_transparent"]))
         GL.glDisable(GL.GL_POLYGON_OFFSET_FILL)
 
-    def _draw_points(self, shader: Shader):
+    def _draw_points(self, shader: Shader) -> None:
         shader.uniform1i("element_type", 0)
         if self.buffer_ids["_points_data"]:
             shader.bind_attribute("position", self.buffer_ids["_points_data"]["positions"])
@@ -212,7 +198,7 @@ class BufferManager:
             shader.bind_attribute("object_index", self.buffer_ids["_points_data"]["object_indices"], step=1)
             shader.draw_points(elements=self.buffer_ids["_points_data"]["elements"], n=len(self.elements["_points_data"]))
 
-    def _draw_lines(self, line_shader: Shader):
+    def _draw_lines(self, line_shader: Shader) -> None:
         GL.glDisable(GL.GL_CULL_FACE)
         line_shader.bind()
         line_shader.uniform1i("is_lighted", False)
@@ -228,7 +214,7 @@ class BufferManager:
         line_shader.release()
         GL.glEnable(GL.GL_CULL_FACE)
 
-    def _draw_transparent_faces(self, shader: Shader, is_lighted: bool, is_ghosted: bool):
+    def _draw_transparent_faces(self, shader: Shader, is_lighted: bool, is_ghosted: bool) -> None:
         shader.bind()
         shader.uniform1i("is_lighted", is_lighted)
         shader.uniform1i("element_type", 2)
@@ -244,7 +230,20 @@ class BufferManager:
         GL.glDepthMask(GL.GL_TRUE)
 
     def draw(self, shader: Shader, line_shader: Shader, rendermode: str, is_instance: bool = False) -> None:
-        """Draw all objects using the combined buffers."""
+        """Draw all objects using the combined buffers.
+
+        Parameters
+        ----------
+        shader
+            Shader used for points and faces.
+        line_shader
+            Shader used for line geometry.
+        rendermode
+            Active renderer display mode.
+        is_instance
+            Draw unique instance colors for selection.
+
+        """
         is_wireframe = rendermode == "wireframe"
         is_lighted = rendermode == "lighted"
         is_ghosted = rendermode == "ghosted"
@@ -314,6 +313,7 @@ class BufferManager:
         ----------
         obj : Any
             The object whose transform should be updated.
+
         """
         if obj not in self.objects:
             return
@@ -328,7 +328,14 @@ class BufferManager:
         update_texture_buffer(matrix, self.transform_texture, offset=byte_offset)
 
     def update_object_data(self, obj: Any) -> None:
-        """Update the position and color buffers for a single object."""
+        """Update the position and color buffers for a single object.
+
+        Parameters
+        ----------
+        obj
+            Buffered viewer scene object to update.
+
+        """
         if obj not in self.objects:
             return
 
@@ -375,13 +382,20 @@ class BufferManager:
                 col_byte_offset = start_idx * 4 * 4  # 4 floats per color * 4 bytes per float
                 update_vertex_buffer(col_array, self.buffer_ids[data_type]["colors"], offset=col_byte_offset)
 
-    def update_settings(self):
+    def update_settings(self) -> None:
         """Update the settings for all objects."""
         for obj in self.objects:
             self.update_object_settings(obj)
 
     def update_object_settings(self, obj: Any) -> None:
-        """Update the settings for a single object."""
+        """Update the settings for a single object.
+
+        Parameters
+        ----------
+        obj
+            Buffered viewer scene object whose settings changed.
+
+        """
         if obj not in self.objects:
             return
 

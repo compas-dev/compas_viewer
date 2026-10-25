@@ -1,20 +1,6 @@
-"""
-********************************************************************************
-compas_viewer
-********************************************************************************
+"""Standalone OpenGL and Qt viewer for COMPAS geometry and data structures."""
 
-.. currentmodule:: compas_viewer
-
-
-.. toctree::
-    :maxdepth: 1
-
-
-"""
-
-from __future__ import print_function
-
-import os
+from pathlib import Path
 
 
 __author__ = ["Li Chen"]
@@ -24,18 +10,16 @@ __email__ = "li.chen@arch.ethz.ch"
 __version__ = "2.0.2"
 
 
-HERE = os.path.dirname(__file__)
+HERE = Path(__file__).resolve().parent
+HOME = HERE.parents[1]
+DATA = HOME / "data"
+DOCS = HOME / "docs"
+TEMP = HOME / "temp"
 
-HOME = os.path.abspath(os.path.join(HERE, "../../"))
-DATA = os.path.abspath(os.path.join(HOME, "data"))
-DOCS = os.path.abspath(os.path.join(HOME, "docs"))
-TEMP = os.path.abspath(os.path.join(HOME, "temp"))
-
-
-__all__ = ["HOME", "DATA", "DOCS", "TEMP"]
-
-__all_plugins__ = [
-    "compas_viewer.scene",
-]
 
 from .viewer import Viewer  # noqa: F401, E402
+from .animation import ANIMATION_PRESETS, AnimationPreset  # noqa: F401, E402
+from .commandregistry import CommandRegistry  # noqa: F401, E402
+from .state import ViewerState  # noqa: F401, E402
+
+__all__ = ["ANIMATION_PRESETS", "DATA", "DOCS", "HOME", "TEMP", "AnimationPreset", "CommandRegistry", "Viewer", "ViewerState"]

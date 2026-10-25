@@ -1,5 +1,5 @@
-from typing import Callable
-from typing import Optional
+from collections.abc import Callable
+from typing import Any
 
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QTreeWidget
@@ -21,32 +21,19 @@ class Treeform(Component):
 
     Parameters
     ----------
-    tree : Tree, optional
+    tree
         The tree data structure to display. Defaults to an empty tree.
-    columns : dict[str, Callable], optional
+    columns
         Dictionary mapping column names to functions that extract values from tree nodes.
         Defaults to {"Name": lambda node: node.name, "Value": lambda node: node.attributes.get("value", "")}.
-    show_headers : bool, optional
+    show_headers
         Whether to show column headers. Defaults to True.
-    stretch : int, optional
+    stretch
         Stretch factor for the tree widget in grid layouts. Defaults to 2.
-    backgrounds : dict[str, Callable], optional
+    backgrounds
         Dictionary mapping column names to functions that return background colors.
-    action : Callable, optional
+    action
         Function to call when tree items are selected. Receives the selected node as argument.
-
-    Attributes
-    ----------
-    widget : QTreeWidget
-        The Qt tree widget for displaying the data.
-    tree : Tree
-        The tree data structure being displayed.
-    columns : dict[str, Callable]
-        Column definitions for the tree display.
-    stretch : int
-        Stretch factor for layout purposes.
-    action : Callable or None
-        Selection action function.
 
     Examples
     --------
@@ -62,17 +49,18 @@ class Treeform(Component):
     >>> def on_select(node):
     ...     print(f"Selected: {node.name}")
     >>> treeform = Treeform(action=on_select)
+
     """
 
     def __init__(
         self,
-        tree: Tree = None,
-        columns: dict[str, Callable] = None,
+        tree: Tree | None = None,
+        columns: dict[str, Callable[[TreeNode], object]] | None = None,
         show_headers: bool = True,
         stretch: int = 2,
-        backgrounds: Optional[dict[str, Callable]] = None,
-        action: Optional[Callable] = None,
-    ):
+        backgrounds: dict[str, Callable[[TreeNode], Any]] | None = None,
+        action: Callable[[TreeNode], None] | None = None,
+    ) -> None:
         super().__init__()
         self.widget = QTreeWidget()
 
@@ -87,7 +75,7 @@ class Treeform(Component):
         self.action = action
         self.widget.itemSelectionChanged.connect(self.on_item_selection_changed)
 
-    def update(self):
+    def update(self) -> None:
         """Update the tree widget display with the current tree data.
 
         This method clears the existing tree widget items and rebuilds the display
@@ -115,34 +103,35 @@ class Treeform(Component):
                 for col, background in self._backgrounds.items():
                     node.attributes["widget_item"].setBackground(list(self.columns.keys()).index(col), QColor(*background(node).rgb255))
 
-    def tree_from_dict(self, data):
+    def tree_from_dict(self, data: dict[object, Any]) -> Tree:
         """Create a tree structure from a dictionary.
 
         Parameters
         ----------
-        data : dict
+        data
             Dictionary containing the hierarchical data to convert to a tree.
 
         Returns
         -------
         Tree
             A new Tree object representing the dictionary structure.
+
         """
         tree = Tree()
         root = TreeNode("Root")
         tree.add(root)
 
-        def add_children(key, data, parent):
+        def add_children(key: object, data: Any, parent: TreeNode) -> None:
             if isinstance(data, dict):
-                node = TreeNode(name=key)
+                node = TreeNode(name=str(key))
                 for child_key, child_data in data.items():
                     add_children(child_key, child_data, node)
             elif isinstance(data, (list, tuple)):
-                node = TreeNode(name=key)
+                node = TreeNode(name=str(key))
                 for child_index, child_data in enumerate(data):
                     add_children(child_index, child_data, node)
             else:
-                node = TreeNode(name=key, value=data)
+                node = TreeNode(name=str(key), value=data)
 
             parent.add(node)
 
@@ -151,7 +140,7 @@ class Treeform(Component):
 
         return tree
 
-    def update_from_dict(self, data):
+    def update_from_dict(self, data: dict[object, Any]) -> None:
         """Update the tree display from a dictionary structure.
 
         This is a convenience method that converts dictionary data to a tree
@@ -159,13 +148,14 @@ class Treeform(Component):
 
         Parameters
         ----------
-        data : dict
+        data
             Dictionary containing the hierarchical data to display.
+
         """
         self.tree = self.tree_from_dict(data)
         self.update()
 
-    def on_item_selection_changed(self):
+    def on_item_selection_changed(self) -> None:
         """Handle tree item selection changes.
 
         This method is called when the selection in the tree widget changes.

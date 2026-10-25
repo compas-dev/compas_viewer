@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import cast
 
 from compas.colors import Color
 from compas.geometry import Frame
@@ -44,16 +44,16 @@ class FrameObject(ViewerSceneObject):
     See Also
     --------
     :class:`compas.geometry.Frame`
+
     """
 
-    item: Frame
-
-    def __init__(self, size: Optional[float] = 1, **kwargs):
+    def __init__(self, size: float | None = 1, **kwargs) -> None:
         super().__init__(**kwargs)
         self.size = size
 
     def _read_lines_data(self) -> ShaderDataType:
-        trans = Transformation.from_frame_to_frame(Frame.worldXY(), self.item)
+        trans = Transformation.from_frame_to_frame(Frame.worldXY(), cast(Frame, self.item))
+        size = cast(float, self.size)
 
         positions = []
         colors = []
@@ -63,21 +63,21 @@ class FrameObject(ViewerSceneObject):
         colors.append(Color.red())
         colors.append(Color.red())
         positions.append(Point(0, 0, 0).transformed(trans))
-        positions.append(Point(self.size, 0, 0).transformed(trans))
+        positions.append(Point(size, 0, 0).transformed(trans))
         elements.append([0, 1])
 
         # Y direction
         colors.append(Color.green())
         colors.append(Color.green())
         positions.append(Point(0, 0, 0).transformed(trans))
-        positions.append(Point(0, self.size, 0).transformed(trans))
+        positions.append(Point(0, size, 0).transformed(trans))
         elements.append([2, 3])
 
         # Z direction
         colors.append(Color.blue())
         colors.append(Color.blue())
         positions.append(Point(0, 0, 0).transformed(trans))
-        positions.append(Point(0, 0, self.size).transformed(trans))
+        positions.append(Point(0, 0, size).transformed(trans))
         elements.append([4, 5])
 
         return positions, colors, elements

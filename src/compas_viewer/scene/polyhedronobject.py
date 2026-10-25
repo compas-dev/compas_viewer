@@ -1,23 +1,24 @@
+from typing import cast
+
 from compas.geometry import Line
 from compas.geometry import Point
 from compas.geometry import Polyhedron
+from compas.geometry import Tessellation
 
-from .geometryobject import GeometryObject
+from .tessellationobject import TessellationObject
 
 
-class PolyhedronObject(GeometryObject):
+class PolyhedronObject(TessellationObject):
     """Viewer scene object for displaying COMPAS Polyhedron geometry."""
-
-    geometry: Polyhedron
 
     @property
     def points(self) -> list[Point]:
-        return self.geometry.points
+        return cast(Polyhedron, self.geometry).points
 
     @property
     def lines(self) -> list[Line]:
-        return self.geometry.lines
+        return cast(Polyhedron, self.geometry).lines
 
     @property
-    def viewmesh(self) -> tuple[list[Point], list[list[int]]]:
-        return self.geometry.to_vertices_and_faces(triangulated=True)
+    def tessellation(self) -> Tessellation:
+        return cast(Polyhedron, self.geometry).to_tessellation()

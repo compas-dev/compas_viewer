@@ -11,6 +11,7 @@ uniform mat4 viewworld;
 uniform samplerBuffer transformBuffer;
 uniform samplerBuffer settingsBuffer;
 uniform bool is_grid;
+uniform bool is_instance;
 uniform int element_type;
 
 // Outputs
@@ -113,5 +114,6 @@ void main() {
     }
     
     gl_PointSize = pointSize;
-    linewidth = line_width;
-} 
+    // Make thin lines easier to acquire without changing visible rendering.
+    linewidth = is_instance ? max(line_width, 8.0) : line_width;
+}

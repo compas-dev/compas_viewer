@@ -6,6 +6,15 @@ from .mainwindow import MainWindow
 
 
 class StatusBar(Component):
+    """Create the status bar owned by a main window.
+
+    Parameters
+    ----------
+    window
+        Main window that owns the status bar.
+
+    """
+
     def __init__(self, window: MainWindow) -> None:
         super().__init__()
         self.widget = window.widget.statusBar()

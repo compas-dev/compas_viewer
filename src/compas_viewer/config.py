@@ -1,67 +1,133 @@
 import json
 from dataclasses import dataclass
 from dataclasses import field
-from dataclasses import is_dataclass
+from dataclasses import fields
+from pathlib import Path
+from typing import Any
 from typing import Literal
-from typing import Optional
-
-from PySide6.QtCore import QUrl
-from PySide6.QtGui import QDesktopServices
+from typing import Self
+from typing import get_args
+from typing import get_origin
+from typing import get_type_hints
 
 from compas.colors import Color
-from compas_viewer.commands import Command
-from compas_viewer.commands import capture_view_cmd
-from compas_viewer.commands import change_rendermode_cmd
-from compas_viewer.commands import change_view_cmd
-from compas_viewer.commands import clear_scene_cmd
-from compas_viewer.commands import delete_selected_cmd
-from compas_viewer.commands import deselect_all_cmd
-from compas_viewer.commands import load_scene_cmd
-from compas_viewer.commands import pan_view_cmd
-from compas_viewer.commands import rotate_view_cmd
-from compas_viewer.commands import save_scene_cmd
-from compas_viewer.commands import select_all_cmd
-from compas_viewer.commands import select_object_cmd
-from compas_viewer.commands import select_window_cmd
-from compas_viewer.commands import toggle_sidebar_cmd
-from compas_viewer.commands import toggle_sidedock_cmd
-from compas_viewer.commands import toggle_statusbar_cmd
-from compas_viewer.commands import toggle_toolbar_cmd
-from compas_viewer.commands import zoom_selected_cmd
-from compas_viewer.commands import zoom_view_cmd
+
+type Unit = Literal["m", "cm", "mm"]
+type Appearance = Literal["system", "light", "dark"]
+
+
+def _default_backgroundcolor() -> Color:
+    return Color.white()
+
+
+def _serialize_config_value(value: Any) -> Any:
+    if isinstance(value, ConfigBase):
+        return value.to_dict()
+    if isinstance(value, Color):
+        return {"__color__": list(value.rgba)}
+    if callable(value):
+        raise TypeError("Runtime callbacks cannot be stored in viewer configuration.")
+    if isinstance(value, dict):
+        data: dict[str, Any] = {}
+        for key, item in value.items():
+            data[str(key)] = _serialize_config_value(item)
+        return data
+    if isinstance(value, (list, tuple)):
+        items: list[Any] = []
+        for item in value:
+            items.append(_serialize_config_value(item))
+        return items
+    return value
+
+
+def _deserialize_config_value(annotation: Any, value: Any) -> Any:
+    if isinstance(value, dict) and "__color__" in value:
+        red, green, blue, alpha = value["__color__"]
+        return Color(red=red, green=green, blue=blue, alpha=alpha)
+
+    origin = get_origin(annotation)
+    args = get_args(annotation)
+    if origin is tuple and isinstance(value, list):
+        return tuple(value)
+    if origin is list and isinstance(value, list) and args:
+        return [_deserialize_config_value(args[0], item) for item in value]
+    if isinstance(annotation, type) and issubclass(annotation, ConfigBase) and isinstance(value, dict):
+        return annotation.from_dict(value)
+    return value
 
 
 class ConfigBase:
-    @classmethod
-    def from_json(cls, filepath):
-        with open(filepath) as fp:
-            data: dict = json.load(fp)
-        config = cls(**data)
-        return config
+    """Provide JSON and dictionary serialization for viewer configuration."""
 
-    def to_json(self, filepath):
-        with open(filepath, "w") as fp:
+    @classmethod
+    def from_json(cls, filepath: str | Path) -> Self:
+        """Create a configuration from a JSON file.
+
+        Parameters
+        ----------
+        filepath
+            Path to the JSON configuration file.
+
+        Returns
+        -------
+        ConfigBase
+            A configuration of the requested class.
+
+        """
+        with Path(filepath).open(encoding="utf-8") as fp:
+            data: dict[str, Any] = json.load(fp)
+        return cls.from_dict(data)
+
+    def to_json(self, filepath: str | Path) -> None:
+        """Write the configuration to a JSON file.
+
+        Parameters
+        ----------
+        filepath
+            Destination path for the JSON configuration file.
+
+        """
+        with Path(filepath).open("w", encoding="utf-8") as fp:
             json.dump(self.to_dict(), fp, indent=4)
 
     @classmethod
-    def from_dict(cls, data):
+    def from_dict(cls, data: dict[str, Any]) -> Self:
+        """Create a configuration from a dictionary.
+
+        Parameters
+        ----------
+        data
+            Configuration values keyed by field name.
+
+        Returns
+        -------
+        ConfigBase
+            A configuration of the requested class.
+
+        """
         return cls(**data)
 
-    def to_dict(self):
-        data = {}
+    def to_dict(self) -> dict[str, Any]:
+        """Convert the configuration to a dictionary.
+
+        Returns
+        -------
+        dict[str, Any]
+            Public configuration values keyed by field name.
+
+        """
+        data: dict[str, Any] = {}
         for key, value in self.__dict__.items():
             if not key.startswith("_"):
-                data[key] = value.to_dict() if hasattr(value, "to_dict") else value
+                data[key] = _serialize_config_value(value)
         return data
 
-    def __post_init__(self):
-        for field_name, field_value in self.__dict__.items():
-            field_type = self.__annotations__[field_name]
-            if isinstance(field_value, dict) and is_dataclass(field_type):
-                # Convert dict to dataclass if the field type is a dataclass
-                setattr(self, field_name, field_type(**field_value))  # type: ignore
-            elif isinstance(field_value, dict) and not is_dataclass(field_type):
-                raise ValueError(f"Expected dataclass type for field '{field_name}' but got dict.")
+    def __post_init__(self) -> None:
+        annotations = get_type_hints(type(self))
+        for config_field in fields(self):  # type: ignore[arg-type]
+            value = getattr(self, config_field.name)
+            annotation = annotations.get(config_field.name, config_field.type)
+            setattr(self, config_field.name, _deserialize_config_value(annotation, value))
 
 
 # =============================================================================
@@ -75,6 +141,8 @@ class ConfigBase:
 
 @dataclass
 class WindowConfig(ConfigBase):
+    """Configure the main viewer window."""
+
     title: str = "COMPAS Viewer"
     width: int = 1280
     height: int = 720
@@ -93,8 +161,9 @@ class WindowConfig(ConfigBase):
 
 @dataclass
 class ToolbarConfig(ConfigBase):
+    """Configure the viewer toolbar."""
+
     show: bool = False
-    items: list[dict] = field(default_factory=lambda: [])
 
 
 # =============================================================================
@@ -108,111 +177,9 @@ class ToolbarConfig(ConfigBase):
 
 @dataclass
 class MenubarConfig(ConfigBase):
+    """Configure the viewer menu bar."""
+
     show: bool = True
-    _items = [
-        {
-            "title": "View",
-            "items": [
-                {"title": toggle_toolbar_cmd.title, "type": "checkbox", "checked": lambda viewer: viewer.config.ui.toolbar.show, "action": toggle_toolbar_cmd},
-                {"title": toggle_sidebar_cmd.title, "type": "checkbox", "checked": lambda viewer: viewer.config.ui.sidebar.show, "action": toggle_sidebar_cmd},
-                {"title": toggle_sidedock_cmd.title, "type": "checkbox", "checked": lambda viewer: viewer.config.ui.sidedock.show, "action": toggle_sidedock_cmd},
-                {"title": toggle_statusbar_cmd.title, "type": "checkbox", "checked": lambda viewer: viewer.config.ui.statusbar.show, "action": toggle_statusbar_cmd},
-                {"type": "separator"},
-                {
-                    "title": "Set Render Mode",
-                    "type": "group",
-                    "exclusive": True,
-                    "selected": 0,
-                    "items": [
-                        {"title": "Shaded", "action": change_rendermode_cmd, "kwargs": {"mode": "shaded"}},
-                        {"title": "Ghosted", "action": change_rendermode_cmd, "kwargs": {"mode": "ghosted"}},
-                        {"title": "Lighted", "action": change_rendermode_cmd, "kwargs": {"mode": "lighted"}},
-                        {"title": "Wireframe", "action": change_rendermode_cmd, "kwargs": {"mode": "wireframe"}},
-                    ],
-                },
-                {
-                    "title": "Set Current View",
-                    "type": "group",
-                    "exclusive": True,
-                    "checked": 0,
-                    "items": [
-                        {"title": "Perspective", "action": change_view_cmd, "kwargs": {"mode": "perspective"}},
-                        {"title": "Top", "action": change_view_cmd, "kwargs": {"mode": "top"}},
-                        {"title": "Front", "action": change_view_cmd, "kwargs": {"mode": "front"}},
-                        {"title": "Right", "action": change_view_cmd, "kwargs": {"mode": "right"}},
-                        {"title": "Ortho", "action": change_view_cmd, "kwargs": {"mode": "ortho"}},
-                    ],
-                },
-                {"type": "separator"},
-                {"title": capture_view_cmd.title, "action": capture_view_cmd},
-                {"type": "separator"},
-            ],
-        },
-        # {
-        #     "title": "Edit",
-        #     "items": [],
-        # },
-        {
-            "title": "Select",
-            "items": [
-                {"title": select_all_cmd.title, "action": select_all_cmd},
-                {"title": "Invert Selection", "action": lambda: print("invert selection")},
-                {"type": "separator"},
-                {"title": deselect_all_cmd.title, "action": deselect_all_cmd},
-            ],
-        },
-        {
-            "title": "Scene",
-            "items": [
-                {"title": clear_scene_cmd.title, "action": clear_scene_cmd},
-                {"type": "separator"},
-                {"title": load_scene_cmd.title, "action": load_scene_cmd},
-                {"title": save_scene_cmd.title, "action": save_scene_cmd},
-            ],
-        },
-        # {
-        #     "title": "Data",
-        #     "items": [
-        #         {"title": "From JSON", "action": lambda: print("From JSON")},
-        #         {"type": "separator"},
-        #         {
-        #             "title": "Geometry",
-        #             "items": [
-        #                 {"title": "Geometry From OBJ", "action": lambda: print("From OBJ")},
-        #                 {"title": "Geometry From OFF", "action": lambda: print("From OFF")},
-        #                 {"title": "Geometry From STP", "action": lambda: print("From STP")},
-        #                 {"title": "Geometry From STL", "action": lambda: print("From STL")},
-        #             ],
-        #         },
-        #         {
-        #             "title": "Pointcloud",
-        #             "items": [],
-        #         },
-        #     ],
-        # },
-        # {
-        #     "title": "Info",
-        #     "items": [
-        #         {"title": "Selected obj info", "action": obj_settings_cmd},
-        #     ],
-        # },
-        # {
-        #     "title": "Server/Session",
-        #     "items": [],
-        # },
-        {
-            "title": "Help",
-            "items": [
-                {"title": "Viewer Docs", "action": lambda: QDesktopServices.openUrl(QUrl("https://compas.dev/compas_viewer"))},
-                {"title": "Viewer Github", "action": lambda: QDesktopServices.openUrl(QUrl("https://github.com/compas-dev/compas_viewer"))},
-                {"type": "separator"},
-                {"title": "COMPAS Home", "action": lambda: QDesktopServices.openUrl(QUrl("https://compas.dev/"))},
-                {"title": "COMPAS Docs", "action": lambda: QDesktopServices.openUrl(QUrl("https://compas.dev/compas"))},
-                {"title": "COMPAS Github", "action": lambda: QDesktopServices.openUrl(QUrl("https://github.com/compas-dev/compas"))},
-            ],
-        },
-    ]
-    items: list[dict] = field(default_factory=lambda: MenubarConfig._items)
 
 
 # =============================================================================
@@ -226,8 +193,9 @@ class MenubarConfig(ConfigBase):
 
 @dataclass
 class StatusbarConfig(ConfigBase):
+    """Configure the viewer status bar."""
+
     show: bool = True
-    items: Optional[list[dict[str, str]]] = None
 
 
 # =============================================================================
@@ -241,22 +209,13 @@ class StatusbarConfig(ConfigBase):
 
 @dataclass
 class SidebarConfig(ConfigBase):
+    """Configure the viewer sidebar."""
+
     show: bool = True
+    width: int = 320
+    minimum_width: int = 240
     show_widgets: bool = True
     sceneform: bool = True
-    items: list[dict] = field(
-        default_factory=lambda: [
-            {
-                "type": "Sceneform",
-                "columns": [
-                    {"title": "Name", "type": "label", "text": lambda obj: obj.name},
-                    {"title": "Show", "type": "checkbox", "checked": lambda obj: obj.show, "action": lambda obj, checked: setattr(obj, "show", checked)},
-                ],
-            },
-            {"type": "ObjectSetting"},
-            {"type": "CameraSetting"},
-        ]
-    )
 
 
 # =============================================================================
@@ -270,8 +229,9 @@ class SidebarConfig(ConfigBase):
 
 @dataclass
 class SidedockConfig(ConfigBase):
+    """Configure the viewer side dock."""
+
     show: bool = False
-    items: Optional[list[dict[str, str]]] = None
 
 
 # =============================================================================
@@ -283,9 +243,10 @@ class SidedockConfig(ConfigBase):
 # =============================================================================
 
 
-# this should be part of View3D config
 @dataclass
 class DisplayConfig(ConfigBase):
+    """Configure default scene-object display properties."""
+
     pointcolor: Color = field(default_factory=Color.black)
     linecolor: Color = field(default_factory=Color.black)
     surfacecolor: Color = field(default_factory=Color.grey)
@@ -294,9 +255,10 @@ class DisplayConfig(ConfigBase):
     opacity: float = float(1.0)
 
 
-# this should be part of View3D config
 @dataclass
 class RendererConfig(ConfigBase):
+    """Configure rendering, grids, views, and selection styling."""
+
     show_grid: bool = True
     show_gridz: bool = False
     gridmode: Literal["full", "quadrant"] = "full"
@@ -306,14 +268,15 @@ class RendererConfig(ConfigBase):
     ghostopacity: float = 0.7
     rendermode: Literal["ghosted", "shaded", "lighted", "wireframe"] = "shaded"
     view: Literal["perspective", "front", "right", "top"] = "perspective"
-    backgroundcolor: Color = field(default_factory=Color.white)
+    backgroundcolor: Color = field(default_factory=_default_backgroundcolor)
     selectioncolor: Color = field(default_factory=lambda: Color(1.0, 1.0, 0.0, 1.0))
     debug_instance: bool = False
 
 
-# this should be part of View3D config
 @dataclass
 class CameraConfig(ConfigBase):
+    """Configure the viewer camera."""
+
     fov: float = 45.0
     near: float = 0.1
     far: float = 1000.0
@@ -323,12 +286,6 @@ class CameraConfig(ConfigBase):
     zoomdelta: float = 0.05
     rotationdelta: float = 0.01
     pandelta: float = 0.05
-
-
-@dataclass
-class View3dConfig(ConfigBase):
-    viewport: Literal["top", "perspective"] = "perspective"
-    background: Color = field(default_factory=lambda: Color.from_hex("#eeeeee"))
 
 
 # =============================================================================
@@ -342,13 +299,14 @@ class View3dConfig(ConfigBase):
 
 @dataclass
 class UIConfig(ConfigBase):
+    """Group configuration for the viewer interface components."""
+
+    appearance: Appearance = "system"
     menubar: MenubarConfig = field(default_factory=MenubarConfig)
     toolbar: ToolbarConfig = field(default_factory=ToolbarConfig)
     statusbar: StatusbarConfig = field(default_factory=StatusbarConfig)
     sidebar: SidebarConfig = field(default_factory=SidebarConfig)
     sidedock: SidedockConfig = field(default_factory=SidedockConfig)
-    view3d: View3dConfig = field(default_factory=View3dConfig)
-    display: DisplayConfig = field(default_factory=DisplayConfig)
 
 
 # =============================================================================
@@ -370,31 +328,53 @@ class UIConfig(ConfigBase):
 
 @dataclass
 class Config(ConfigBase):
+    """Collect the complete viewer configuration."""
+
+    schema_version: int = 1
     vectorsize: float = 0.1
-    unit: Literal["m", "cm", "mm"] = "m"
+    unit: Unit = "m"
     ui: UIConfig = field(default_factory=UIConfig)
     window: WindowConfig = field(default_factory=WindowConfig)
+    display: DisplayConfig = field(default_factory=DisplayConfig)
     renderer: RendererConfig = field(default_factory=RendererConfig)
     camera: CameraConfig = field(default_factory=CameraConfig)
-    commands: list[Command] = field(
-        default_factory=lambda: [
-            change_rendermode_cmd,
-            change_view_cmd,
-            clear_scene_cmd,
-            delete_selected_cmd,
-            deselect_all_cmd,
-            load_scene_cmd,
-            pan_view_cmd,
-            rotate_view_cmd,
-            save_scene_cmd,
-            select_all_cmd,
-            select_object_cmd,
-            select_window_cmd,
-            toggle_sidebar_cmd,
-            toggle_sidedock_cmd,
-            toggle_statusbar_cmd,
-            toggle_toolbar_cmd,
-            zoom_selected_cmd,
-            zoom_view_cmd,
-        ]
-    )
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> Self:
+        """Create a configuration and migrate supported legacy fields.
+
+        Parameters
+        ----------
+        data
+            Serialized configuration values.
+
+        Returns
+        -------
+        Config
+            Migrated viewer configuration.
+
+        Raises
+        ------
+        ValueError
+            If the configuration schema is newer than this viewer supports.
+
+        """
+        migrated = dict(data)
+        version = migrated.get("schema_version", 0)
+        if not isinstance(version, int) or version > 1:
+            raise ValueError(f"Unsupported configuration schema version: {version!r}.")
+
+        migrated.pop("commands", None)
+        ui = dict(migrated.get("ui", {}))
+        for section in ("menubar", "toolbar", "statusbar", "sidebar", "sidedock"):
+            values = ui.get(section)
+            if isinstance(values, dict):
+                values = dict(values)
+                values.pop("items", None)
+                ui[section] = values
+        ui.pop("view3d", None)
+        if "display" in ui and "display" not in migrated:
+            migrated["display"] = ui.pop("display")
+        migrated["ui"] = ui
+        migrated["schema_version"] = 1
+        return cls(**migrated)

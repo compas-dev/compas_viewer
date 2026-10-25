@@ -1,18 +1,19 @@
+from collections.abc import Callable
+from collections.abc import Sequence
 from math import atan2
 from math import radians
 from math import tan
 from typing import TYPE_CHECKING
-from typing import Optional
-from typing import Sequence
-from typing import Union
 
 from numpy import array
 from numpy import asfortranarray
 from numpy import dot
 from numpy import float32
+from numpy import floating
 from numpy import pi
 from numpy.linalg import det
 from numpy.linalg import norm
+from numpy.typing import NDArray
 
 from compas.geometry import Rotation
 from compas.geometry import Transformation
@@ -24,13 +25,38 @@ if TYPE_CHECKING:
 
 
 class Position(Vector):
-    def __init__(self, vector, on_update=None):
-        super().__init__(*vector)
+    """Vector that invokes a callback when its coordinates change.
+
+    Parameters
+    ----------
+    vector
+        Initial XYZ coordinates.
+    on_update
+        Optional callback receiving updated XYZ coordinates.
+
+    """
+
+    def __init__(self, vector: Sequence[float], on_update: Callable[[Sequence[float]], None] | None = None) -> None:
+        super().__init__(x=vector[0], y=vector[1], z=vector[2])
         self.pause_update = False
         if on_update:
             self.on_update = on_update
 
-    def set(self, x, y, z, pause_update=False):
+    def set(self, x: float, y: float, z: float, pause_update: bool = False) -> None:
+        """Set all coordinates and optionally suppress the update callback.
+
+        Parameters
+        ----------
+        x
+            X coordinate.
+        y
+            Y coordinate.
+        z
+            Z coordinate.
+        pause_update
+            Suppress the update callback for this assignment.
+
+        """
         pause_update = pause_update or self.pause_update
         if hasattr(self, "on_update") and not pause_update:
             self.on_update([x, y, z])
@@ -39,80 +65,72 @@ class Position(Vector):
         self._z = z
 
     @property
-    def x(self):
+    def x(self) -> float:
+        """float: X coordinate, notifying the callback when changed."""
         return self._x
 
     @x.setter
-    def x(self, x):
+    def x(self, x: float) -> None:
         if hasattr(self, "on_update") and not self.pause_update:
             self.on_update([x, self.y, self.z])
         self._x = float(x)
 
     @property
-    def y(self):
+    def y(self) -> float:
+        """float: Y coordinate, notifying the callback when changed."""
         return self._y
 
     @y.setter
-    def y(self, y):
+    def y(self, y: float) -> None:
         if hasattr(self, "on_update") and not self.pause_update:
             self.on_update([self.x, y, self.z])
         self._y = float(y)
 
     @property
-    def z(self):
+    def z(self) -> float:
+        """float: Z coordinate, notifying the callback when changed."""
         return self._z
 
     @z.setter
-    def z(self, z):
+    def z(self, z: float) -> None:
         if hasattr(self, "on_update") and not self.pause_update:
             self.on_update([self.x, self.y, z])
         self._z = float(z)
 
 
 class RotationEuler(Position):
+    """Euler-angle position vector with update notifications."""
+
     pass
 
 
 class Camera:
-    """Camera object for the default view.
+    """Control view and projection transformations for a renderer.
 
     Parameters
     ----------
-    renderer : :class:`compas_viewer.components.renderer.Renderer`,
+    renderer
         The parent renderer of the camera.
 
-    Attributes
-    ----------
-    config : :class:`compas_viewer.configurations.render_config.CameraConfig`
+    fov
+        Vertical field of view in degrees.
+    near
+        Near clipping-plane distance.
+    far
+        Far clipping-plane distance.
+    position
+        Initial camera position.
+    target
+        Initial viewing target.
+    scale
+        Scale applied to clipping distances and camera movement.
+    zoomdelta
+        Relative size of a zoom increment.
+    rotationdelta
+        Size of a rotation increment.
+    pandelta
+        Size of a pan increment.
 
-    Notes
-    -----
-    The camera is defined by the following parameters which can be found in:
-    :class:`compas_viewer.configurations.render_config.CameraConfig`:
-
-    fov : float
-        The field of view as an angler in degrees.
-    near : float
-        The location of the "near" clipping plane.
-    far : float
-        The location of the "far" clipping plane.
-    position : :class:`compas_viewer.components.renderer.camera.Position`
-        The location the camera.
-    rotation : :class:`compas_viewer.components.renderer.camera.RotationEuler`
-        The euler rotation of camera.
-    target : :class:`compas_viewer.components.renderer.camera.Position`
-        The viewing target.
-        Default is the origin of the world coordinate system.
-    distance : float
-        The distance from the camera standpoint to the target.
-    zoomdelta : float
-        Size of one zoom increment.
-    rotationdelta : float
-        Size of one rotation increment.
-    pan_delta : float
-        Size of one pan increment.
-    scale : float
-        The scale factor for camera's near, far and pan_delta.
     """
 
     def __init__(
@@ -143,8 +161,8 @@ class Camera:
         self._target = Position([0, 0, 0], on_update=self._on_target_update)
 
         self.reset_position(view="perspective")
-        self.target.set(*target)
-        self.position.set(*position)
+        self.target.set(target[0], target[1], target[2])
+        self.position.set(position[0], position[1], position[2])
 
     @property
     def position(self) -> Position:
@@ -152,7 +170,7 @@ class Camera:
         return self._position
 
     @position.setter
-    def position(self, position: Union[Position, list[float]]):
+    def position(self, position: Position | Sequence[float]) -> None:
         self._position.set(*position, pause_update=False)
 
     @property
@@ -161,7 +179,7 @@ class Camera:
         return self._rotation
 
     @rotation.setter
-    def rotation(self, rotation: RotationEuler):
+    def rotation(self, rotation: RotationEuler) -> None:
         self._rotation.set(rotation.x, rotation.y, rotation.z)
 
     @property
@@ -170,7 +188,7 @@ class Camera:
         return self._target
 
     @target.setter
-    def target(self, target: Union[Position, list[float]]):
+    def target(self, target: Position | Sequence[float]) -> None:
         self._target.set(*target, pause_update=False)
 
     @property
@@ -179,7 +197,7 @@ class Camera:
         return (self.position - self.target).length
 
     @distance.setter
-    def distance(self, distance: float):
+    def distance(self, distance: float) -> None:
         """Update the position based on the distance."""
         direction = self.position - self.target
         direction.unitize()
@@ -191,22 +209,23 @@ class Camera:
 
         Parameters
         ----------
-        left : float
+        left
             Location of the left clipping plane.
-        right : float
+        right
             Location of the right clipping plane.
-        bottom : float
+        bottom
             Location of the bottom clipping plane.
-        top : float
+        top
             Location of the top clipping plane.
-        near : float
+        near
             Location of the near clipping plane.
-        far : float
+        far
             Location of the far clipping plane.
 
         Returns
         -------
-        :class:`compas.geometry.Transformation`
+        Transformation
+            Orthographic projection transformation.
 
         """
         dx = right - left
@@ -229,18 +248,19 @@ class Camera:
 
         Parameters
         ----------
-        fov : float
+        fov
             The field of view in degrees.
-        aspect : float
+        aspect
             The aspect ratio of the view.
-        near : float
+        near
             Location of the near clipping plane.
-        far : float
+        far
             Location of the far clipping plane.
 
         Returns
         -------
-        :class:`compas.geometry.Transformation`
+        Transformation
+            Perspective projection transformation.
 
         """
         assert near != far
@@ -254,10 +274,10 @@ class Camera:
         matrix = [[sx, 0, 0, 0], [0, sy, 0, 0], [0, 0, zz, zw], [0, 0, -1, 0]]
         return Transformation.from_matrix(matrix)
 
-    def _on_position_update(self, new_position: Position):
+    def _on_position_update(self, new_position: Sequence[float]) -> None:
         """Update camera rotation to keep pointing the target."""
         old_direction = array(self.position - self.target)
-        new_direction = array(Vector(*new_position) - self.target)
+        new_direction = array(Vector(x=new_position[0], y=new_position[1], z=new_position[2]) - self.target)
         old_distance = norm(old_direction)
         new_distance = norm(new_direction)
         self.distance *= float(new_distance) / float(old_distance)
@@ -286,7 +306,7 @@ class Camera:
         new_rotation = self.rotation + [angle_x or 0, 0, angle_z or 0]
         self.rotation.set(*new_rotation, pause_update=True)
 
-    def _on_rotation_update(self, rotation):
+    def _on_rotation_update(self, rotation: Sequence[float]) -> None:
         """Update camera position when rotation around target."""
         R = Rotation.from_euler_angles(rotation)
         T = Translation.from_vector([0, 0, self.distance])
@@ -295,19 +315,26 @@ class Camera:
         position = self.target + vector
         self.position.set(*position, pause_update=True)
 
-    def _on_target_update(self, target: Position):
+    def _on_target_update(self, target: Sequence[float]) -> None:
         """Update camera position when target changes."""
-        R = Rotation.from_euler_angles(self.rotation)
+        R = Rotation.from_euler_angles(list(self.rotation))
         T = Translation.from_vector([0, 0, self.distance])
         M = (R * T).matrix
         vector = [M[i][3] for i in range(3)]
-        position = Vector(*target) + Vector(*vector)
+        position = Vector(x=target[0], y=target[1], z=target[2]) + Vector(x=vector[0], y=vector[1], z=vector[2])
 
         self.target.set(*target, pause_update=True)
         self.position.set(*position, pause_update=True)
 
-    def reset_position(self, view: Optional[str] = None):
-        """Reset the position of the camera based current view type."""
+    def reset_position(self, view: str | None = None) -> None:
+        """Reset the camera for a predefined view.
+
+        Parameters
+        ----------
+        view
+            View name. The renderer's current view is used when omitted.
+
+        """
         self.target.set(0, 0, 0, False)
         view = view or self.renderer.view
 
@@ -322,71 +349,72 @@ class Camera:
         if view == "ortho":
             self.rotation.set(pi / 4, 0, -pi / 4, False)
 
-    def rotate(self, dx: float, dy: float):
+    def rotate(self, dx: float, dy: float) -> None:
         """Rotate the camera based on current mouse movement.
 
         Parameters
         ----------
-        dx : float
+        dx
             Number of rotation increments around the Z axis, with each increment the size
-            of :attr:`Camera.rotationdelta`.
-        dy : float
+            of `rotationdelta`.
+        dy
             Number of rotation increments around the X axis, with each increment the size
-            of :attr:`Camera.rotationdelta`.
+            of `rotationdelta`.
 
         Notes
         -----
         Camera rotations are only available if the current view mode
-        is a perspective view (``camera.renderer.config.view == "perspective"``).
+        is a perspective or orthographic view.
 
         """
         if self.renderer.view == "perspective" or self.renderer.view == "ortho":
             self.rotation += [-self.rotationdelta * dy, 0, -self.rotationdelta * dx]
 
-    def pan(self, dx: float, dy: float):
+    def pan(self, dx: float, dy: float) -> None:
         """Pan the camera based on current mouse movement.
 
         Parameters
         ----------
-        dx : float
+        dx
             Number of "pan" increments in the "X" direction of the current view,
-            with each increment the size of :attr:`Camera.pan_delta`.
-        dy : float
+            with each increment the size of `pandelta`.
+        dy
             Number of "pan" increments in the "Y" direction of the current view,
-            with each increment the size of :attr:`Camera.pan_delta`.
+            with each increment the size of `pandelta`.
+
         """
-        R = Rotation.from_euler_angles(self.rotation)
+        R = Rotation.from_euler_angles(list(self.rotation))
         scaled_pandelta = self.pandelta * self.distance / 10
         T = Translation.from_vector([-dx * scaled_pandelta, dy * scaled_pandelta, 0])
         M = (R * T).matrix
         vector = [M[i][3] for i in range(3)]
         self.target += vector
 
-    def zoom(self, steps: float = 1):
+    def zoom(self, steps: float = 1) -> None:
         """Zoom in or out.
 
         Parameters
         ----------
-        steps : float
+        steps
             The number of zoom increments, with each increment the size
-            of :attr:`compas_viewer.components.renderer.Camera.config.zoomdelta`.
+            of `zoomdelta`.
 
         """
         self.distance -= steps * self.zoomdelta * self.distance
 
-    def projection(self, width: int, height: int) -> list[list[float]]:
+    def projection(self, width: int, height: int) -> NDArray[floating]:
         """Compute the projection matrix corresponding to the current camera settings.
 
         Parameters
         ----------
-        width : int
+        width
             Width of the viewer.
-        height : int
+        height
             Height of the viewer.
 
         Returns
         -------
-        list[list[float]]
+        numpy.ndarray
             The transformation matrix as a `numpy` array in column-major order.
 
         Notes
@@ -407,12 +435,12 @@ class Camera:
 
         return asfortranarray(P, dtype=float32)
 
-    def viewworld(self) -> list[list[float]]:
+    def viewworld(self) -> NDArray[floating]:
         """Compute the view-world matrix corresponding to the current camera settings.
 
         Returns
         -------
-        list[list[float]]
+        numpy.ndarray
             The transformation matrix in column-major order.
 
         Notes
@@ -421,7 +449,7 @@ class Camera:
 
         """
         T = Translation.from_vector(self.position)
-        R = Rotation.from_euler_angles(self.rotation)
+        R = Rotation.from_euler_angles(list(self.rotation))
         W = T * R
 
         return asfortranarray(W.inverted(), dtype=float32)

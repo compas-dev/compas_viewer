@@ -1,66 +1,70 @@
-import pathlib
-from typing import Callable
-from typing import Optional
-from typing import Union
+from collections.abc import Callable
+from pathlib import Path
 
-from PySide6 import QtCore
-from PySide6 import QtGui
-from PySide6 import QtWidgets
+from PySide6.QtCore import QSize
+from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import QPushButton
 
 from .component import Component
 
 
-def set_icon_path(icon_name: str) -> str:
-    path = QtGui.QIcon(str(pathlib.Path(__file__).parent.parent / "assets" / "icons" / icon_name))
-    return path
-
-
-class Button(Component):
-    """
-    This component creates a button widget that can be customized with text, icon, tooltip, and action.
+def set_icon_path(icon_name: str | Path) -> QIcon:
+    """Create an icon from the viewer's icon directory.
 
     Parameters
     ----------
-    text : str, optional
+    icon_name
+        Icon filename relative to the viewer icon directory.
+
+    Returns
+    -------
+    QIcon
+        The loaded Qt icon.
+
+    """
+    icon_path = Path(__file__).resolve().parent.parent / "assets" / "icons" / icon_name
+    return QIcon(str(icon_path))
+
+
+class Button(Component):
+    """Create a push button with optional text, icon, tooltip, and callback.
+
+    Parameters
+    ----------
+    text
         The text to display on the button.
-    icon_path : Union[str, pathlib.Path], optional
+    icon_path
         The path to the icon file to display on the button.
-    tooltip : str, optional
+    tooltip
         The tooltip text to show when hovering over the button.
-    action : Callable[[], None], optional
+    action
         A function to call when the button is clicked.
 
-    Attributes
-    ----------
-    widget : QPushButton
-        The push button widget.
-    action : Callable[[], None] or None
-        The callback function to call when the button is clicked.
-
-    Example
-    -------
+    Examples
+    --------
     >>> def my_action():
     ...     print("Button clicked!")
     >>> component = Button(text="Click Me", action=my_action)
+
     """
 
     def __init__(
         self,
-        text: Optional[str] = None,
-        icon_path: Optional[Union[str, pathlib.Path]] = None,
-        tooltip: Optional[str] = None,
-        action: Optional[Callable[[], None]] = None,
-    ):
+        text: str | None = None,
+        icon_path: str | Path | None = None,
+        tooltip: str | None = None,
+        action: Callable[[], object] | None = None,
+    ) -> None:
         super().__init__()
 
         self.action = action
-        self.widget = QtWidgets.QPushButton()
+        self.widget = QPushButton()
 
         if text:
             self.widget.setText(text)
         if icon_path:
-            self.widget.setIcon(QtGui.QIcon(set_icon_path(icon_path)))
-            self.widget.setIconSize(QtCore.QSize(17, 17))
+            self.widget.setIcon(set_icon_path(icon_path))
+            self.widget.setIconSize(QSize(17, 17))
         if tooltip:
             self.widget.setToolTip(tooltip)
         if action:

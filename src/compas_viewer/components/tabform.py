@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Literal
 
 from PySide6.QtWidgets import QTabWidget
 
@@ -15,16 +15,9 @@ class Tabform(Component):
 
     Parameters
     ----------
-    tab_position : str, optional
+    tab_position
         Position of the tabs. Options are "top", "bottom", "left", "right".
         Defaults to "top".
-
-    Attributes
-    ----------
-    widget : QTabWidget
-        The tab widget that contains all tabs.
-    tabs : dict
-        Dictionary storing tab names and their corresponding containers.
 
     Examples
     --------
@@ -32,13 +25,14 @@ class Tabform(Component):
     >>> tabform.add_tab("Settings", container_type="scrollable")
     >>> tabform.add_tab("Options", container_type="standard")
     >>> tabform.populate_tab("Settings", some_components)
+
     """
 
-    def __init__(self, tab_position: str = "top"):
+    def __init__(self, tab_position: str = "top") -> None:
         super().__init__()
 
         self.widget = QTabWidget()
-        self.tabs = {}
+        self.tabs: dict[str, Container] = {}
 
         # Set tab position
         position_map = {"top": QTabWidget.North, "bottom": QTabWidget.South, "left": QTabWidget.West, "right": QTabWidget.East}
@@ -47,17 +41,22 @@ class Tabform(Component):
         # Connect tab change signal
         self.widget.currentChanged.connect(self.on_tab_changed)
 
-    def add_tab(self, name: str, container: Container = None, container_type: str = "standard") -> Container:
+    def add_tab(
+        self,
+        name: str,
+        container: Container | None = None,
+        container_type: Literal["standard", "scrollable", "splitter"] = "standard",
+    ) -> Container:
         """
         Add a new tab with the given name and container.
 
         Parameters
         ----------
-        name : str
+        name
             The name/title of the tab.
-        container : Container, optional
+        container
             The container to use for this tab. If None, a new container will be created.
-        container_type : str, optional
+        container_type
             Type of container for the tab if container is None. Options are "standard", "scrollable", "splitter".
             Defaults to "standard".
 
@@ -65,6 +64,7 @@ class Tabform(Component):
         -------
         Container
             The container that was added to this tab.
+
         """
         if name in self.tabs:
             raise ValueError(f"Tab '{name}' already exists")
@@ -86,8 +86,9 @@ class Tabform(Component):
 
         Parameters
         ----------
-        name : str
+        name
             The name of the tab to remove.
+
         """
         if name not in self.tabs:
             raise ValueError(f"Tab '{name}' does not exist")
@@ -101,32 +102,34 @@ class Tabform(Component):
         # Remove from our tracking dictionary
         del self.tabs[name]
 
-    def get_tab(self, name: str) -> Optional[Container]:
+    def get_tab(self, name: str) -> Container | None:
         """
         Get the container for a specific tab.
 
         Parameters
         ----------
-        name : str
+        name
             The name of the tab.
 
         Returns
         -------
-        Container or None
+        Container | None
             The container for the tab, or None if not found.
+
         """
         return self.tabs.get(name)
 
-    def populate_tab(self, tab_name: str, components: list) -> None:
+    def populate_tab(self, tab_name: str, components: list[Component]) -> None:
         """
         Populate a tab with components.
 
         Parameters
         ----------
-        tab_name : str
+        tab_name
             The name of the tab to populate.
-        components : list
+        components
             List of components to add to the tab.
+
         """
         if tab_name not in self.tabs:
             raise ValueError(f"Tab '{tab_name}' does not exist")
@@ -143,8 +146,9 @@ class Tabform(Component):
 
         Parameters
         ----------
-        name : str
+        name
             The name of the tab to make active.
+
         """
         if name not in self.tabs:
             raise ValueError(f"Tab '{name}' does not exist")
@@ -154,14 +158,15 @@ class Tabform(Component):
                 self.widget.setCurrentIndex(i)
                 break
 
-    def get_current_tab_name(self) -> Optional[str]:
+    def get_current_tab_name(self) -> str | None:
         """
         Get the name of the currently active tab.
 
         Returns
         -------
-        str or None
+        str | None
             The name of the current tab, or None if no tabs exist.
+
         """
         current_index = self.widget.currentIndex()
         if current_index >= 0:
@@ -174,8 +179,9 @@ class Tabform(Component):
 
         Parameters
         ----------
-        index : int
+        index
             The index of the newly selected tab.
+
         """
         # This can be overridden by subclasses to handle tab changes
         pass
@@ -201,10 +207,11 @@ class Tabform(Component):
 
         Parameters
         ----------
-        text : str
+        text
             The text to display.
-        tab_name : str, optional
+        tab_name
             The name of the tab to display the text in. Defaults to "Info".
+
         """
         if tab_name not in self.tabs:
             self.add_tab(tab_name, container_type="standard")
