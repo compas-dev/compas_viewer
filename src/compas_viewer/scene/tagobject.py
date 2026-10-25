@@ -118,6 +118,7 @@ class TagObject(ViewerSceneObject, GeometryObject):
 
     def init(self):
         self.make_buffers()
+        self._inited = True
 
     def make_buffers(self):
         positions = [
@@ -223,8 +224,12 @@ class TagObject(ViewerSceneObject, GeometryObject):
 
     def draw(self, shader, camera_position, width, height):
         """Draw the object from its buffers"""
-        if not self.show:
-            return
+        node = self
+        while node is not None and not node.is_root:
+            if not getattr(node, "show", True):
+                return
+            node = node.parent
+
         shader.enable_attribute("position")
         if self.worldtransformation is not None:
             shader.uniform4x4("transform", self.worldtransformation.matrix)
