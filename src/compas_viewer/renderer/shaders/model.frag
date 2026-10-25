@@ -49,11 +49,15 @@ void main() {
         alpha = max(alpha, 0.5);
     }
 
-    // Draw circular points
+    // Draw circular points if gl_PointCoord allows
     if (element_type == 0) {
-        vec2 center = gl_PointCoord - vec2(0.5);
-        if (length(center) > 0.5) {
-            discard;
+
+        // Only apply mask if gl_PointCoord is valid
+        if (gl_PointCoord.x > 1e-5 || gl_PointCoord.y > 1e-5){
+            vec2 center = gl_PointCoord - vec2(0.5);
+            if (length(center) > 0.5) {
+                discard;
+            }
         }
     }
 
