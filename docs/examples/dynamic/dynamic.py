@@ -3,13 +3,14 @@ from compas.geometry import Point
 from compas_viewer import Viewer
 
 viewer = Viewer()
-obj = viewer.scene.add(Point(0, 0, 0), show_points=True, pointcolor=Color.red(), pointsize=10)  # type: ignore
+point = Point(0, 0, 0)
+obj = viewer.scene.add(point, show_points=True, pointcolor=Color.red(), pointsize=10)
 
 
 @viewer.on(interval=1000)
-def movepoint(frame):
+def movepoint(frame: int) -> None:
     print("frame", frame)
-    obj.geometry.x += 0.1
+    point.x += 0.1
     obj.update(update_data=True)
 
 

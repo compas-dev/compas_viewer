@@ -12,16 +12,17 @@ class SurfaceObject(TessellationObject):
 
     @property
     def tessellation(self) -> Tessellation:
-        return cast(Surface, self.geometry).tessellation
+        """A fresh tessellation at the scene object's resolution."""
+        return cast(Surface, self.geometry).to_tessellation(nu=self.u, nv=self.v)
 
     def _read_points_data(self) -> ShaderDataType:
-        positions = cast(Surface, self.geometry).vertices
+        positions = cast(Surface, self.geometry).to_polygonal_surface(nu=self.u, nv=self.v).vertices
         colors = [self.pointcolor] * len(positions)
         elements = [[index] for index in range(len(positions))]
         return positions, colors, elements
 
     def _read_lines_data(self) -> ShaderDataType:
-        geometry = cast(Surface, self.geometry)
-        positions = geometry.vertices
+        polygonal_surface = cast(Surface, self.geometry).to_polygonal_surface(nu=self.u, nv=self.v)
+        positions = polygonal_surface.vertices
         colors = [self.linecolor] * len(positions)
-        return positions, colors, geometry.edges
+        return positions, colors, polygonal_surface.edges

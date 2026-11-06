@@ -2,9 +2,9 @@ from compas.colors import Color
 from compas.geometry import Box
 from compas.geometry import Frame
 from compas_viewer import Viewer
-from compas_viewer.layout import Treeform
+from compas_viewer.components import SceneTree
 
-viewer = Viewer(rendermode="shaded")
+viewer = Viewer()
 
 for i in range(10):
     for j in range(10):
@@ -16,13 +16,7 @@ for i in range(10):
             name=f"Box_{i}_{j}",
         )
 
-form_ids = Treeform(viewer.scene, {"Name": (lambda o: o.name), "Object": (lambda o: o)})
-viewer.layout.viewport.add_element(form_ids)
-# form_colors = Treeform(
-#     viewer.scene,
-#     {"Name": (lambda o: o.name), "Object-Color": (lambda o: o.surfacecolor)},
-#     backgrounds={"Object-Color": (lambda o: o.surfacecolor)},
-# )
-# viewer.layout.viewport.add_element(form_colors, False)
+viewer.ui.sidedock.show = True
+viewer.ui.sidedock.add(SceneTree(columns=[{"title": "Name", "type": "label", "text": lambda node: node.name}]))
 
 viewer.show()

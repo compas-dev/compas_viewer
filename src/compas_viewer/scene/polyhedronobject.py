@@ -21,4 +21,5 @@ class PolyhedronObject(TessellationObject):
 
     @property
     def tessellation(self) -> Tessellation:
-        return cast(Polyhedron, self.geometry).to_tessellation()
+        """A fresh non-mutating triangulation of the polyhedron."""
+        return cast(Polyhedron, self.geometry).triangulated()

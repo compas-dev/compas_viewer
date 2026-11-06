@@ -4,26 +4,22 @@ The documentation is built with MkDocs Material. API pages are generated from Py
 
 ## Install the documentation environment
 
-From the repository root, install the project with both development and documentation dependencies:
+From the repository root, synchronize the locked development and documentation
+groups:
 
 ```bash
-python -m pip install -e ".[dev,docs]"
+uv sync --frozen --group dev --group docs
 ```
 
-This installs MkDocs, MkDocs Material, mkdocstrings, Pyright, Pytest, Ruff, Invoke, and the local `compas_viewer` package.
+This installs MkDocs, MkDocs Material, mkdocstrings, Pyright, Pytest, Ruff,
+Invoke, and the local `compas_viewer` package.
 
 ## Build the site
 
 Use the repository task for the normal documentation build:
 
 ```bash
-invoke docs
-```
-
-To remove the previous generated site before building:
-
-```bash
-invoke docs --clean
+QT_QPA_PLATFORM=offscreen uv run mkdocs build --strict
 ```
 
 The generated HTML is written to `site/`. This directory is build output; edit files in `docs/` or source docstrings instead.
@@ -33,7 +29,7 @@ The generated HTML is written to `site/`. This directory is build output; edit f
 Start MkDocs' development server from the repository root:
 
 ```bash
-python -m mkdocs serve
+QT_QPA_PLATFORM=offscreen uv run mkdocs serve
 ```
 
 Open <http://127.0.0.1:8000/>. MkDocs watches documentation, configuration, and imported source files and refreshes the site after changes.
@@ -41,7 +37,7 @@ Open <http://127.0.0.1:8000/>. MkDocs watches documentation, configuration, and 
 Use a different address or port when necessary:
 
 ```bash
-python -m mkdocs serve --dev-addr 127.0.0.1:9000
+QT_QPA_PLATFORM=offscreen uv run mkdocs serve --dev-addr 127.0.0.1:9000
 ```
 
 Stop the server with `Ctrl+C`.
@@ -51,19 +47,20 @@ Stop the server with `Ctrl+C`.
 Before submitting documentation changes, treat broken links, stale navigation, and other MkDocs warnings as errors:
 
 ```bash
-python -m mkdocs build --strict
+QT_QPA_PLATFORM=offscreen uv run mkdocs build --strict
 ```
 
 Also check Markdown code blocks, docstrings, and repository formatting:
 
 ```bash
-invoke testcodeblocks
-invoke testdocs
-ruff check src tests
+uv run pytest --doctest-glob="*.md" docs
+uv run ruff check .
 git diff --check
 ```
 
-The documentation CI workflow installs Python 3.12 with the `docs` extra and runs `invoke docs` on pull requests and pushes to `main`.
+The documentation workflow installs the locked `docs` group, provisions the
+Linux EGL/OpenGL packages explicitly, selects Qt's headless backend, and runs a
+strict MkDocs build on pull requests.
 
 ## Documentation layout
 
@@ -114,7 +111,9 @@ docs/examples/scene/
 └── groups.py
 ```
 
-Add the Markdown page—not the Python source—to the Examples navigation in `mkdocs.yml`. Run the Python file directly when checking runtime behavior, and use `invoke testcodeblocks` for fenced documentation examples.
+Add the Markdown page—not the Python source—to the Examples navigation in
+`mkdocs.yml`. Run the Python file directly when checking runtime behavior, and
+use the focused documentation doctest command above for fenced examples.
 
 ## Add images and other assets
 
@@ -173,7 +172,7 @@ Keep types in Python annotations rather than repeating them in parameter descrip
 Install the documentation extra in the active environment:
 
 ```bash
-python -m pip install -e ".[docs]"
+uv sync --frozen --group docs
 ```
 
 Using `python -m mkdocs` ensures that MkDocs runs from the same environment as the selected Python interpreter.
@@ -183,13 +182,13 @@ Using `python -m mkdocs` ensures that MkDocs runs from the same environment as t
 Install the project in editable mode with all documentation dependencies:
 
 ```bash
-python -m pip install -e ".[dev,docs]"
+uv sync --frozen --group dev --group docs
 ```
 
 Then verify that the active interpreter can import the package:
 
 ```bash
-python -c "import compas_viewer; print(compas_viewer.__version__)"
+uv run python -c "import compas_viewer; print(compas_viewer.__version__)"
 ```
 
 ### Strict builds report missing pages

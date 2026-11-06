@@ -1,6 +1,6 @@
 # COMPAS VIEWER
 
-A standalone, high-performance 3D viewer for COMPAS 2.0, built with PySide6 and OpenGL.
+A standalone, high-performance 3D viewer for COMPAS 3, built with PySide6 and OpenGL.
 
 [![PyPI version](https://img.shields.io/pypi/v/compas_viewer.svg)](https://pypi.org/project/compas_viewer/)
 [![Documentation](https://img.shields.io/badge/docs-compas.dev-green.svg)](https://compas.dev/compas_viewer/)
@@ -43,18 +43,18 @@ More information is available in the docs: <https://compas.dev/compas_viewer/>
 
 ### Requirements
 - Python >= 3.12
-- COMPAS >= 2.2.0
+- COMPAS >= 3.0
 
 ### Quick Install
 ```bash
-pip install compas_viewer
+python -m pip install compas_viewer
 ```
 
 ### Development Install
 ```bash
 git clone https://github.com/compas-dev/compas_viewer.git
 cd compas_viewer
-python -m pip install -e ".[dev,docs]"
+uv sync --frozen --group dev --group docs
 ```
 
 See the [Getting Started](https://compas.dev/compas_viewer/latest/installation/) instructions in the docs for detailed installation guidelines.
@@ -66,17 +66,14 @@ See the [Getting Started](https://compas.dev/compas_viewer/latest/installation/)
 from compas_viewer import Viewer
 from compas.geometry import Box, Sphere
 
-# Create viewer
 viewer = Viewer()
 
-# Add geometry
 box = Box(1, 2, 3)
 sphere = Sphere(0.5)
 
 viewer.scene.add(box, name="My Box")
 viewer.scene.add(sphere, name="My Sphere")
 
-# Show viewer
 viewer.show()
 ```
 
@@ -98,6 +95,7 @@ common output targets:
 ```python
 def orbit(frame):
     viewer.renderer.camera.rotation.z = frame * 0.05
+
 
 viewer.record_animation(
     "orbit.gif",
@@ -172,10 +170,12 @@ from compas.geometry import Box, Translation
 viewer = Viewer()
 box = viewer.scene.add(Box(1, 1, 1))
 
+
 @viewer.on(interval=50)  # Update every 50ms
 def animate(frame):
     T = Translation.from_vector([0.01 * frame, 0, 0])
     box.transformation = T
+
 
 viewer.show()
 ```
@@ -213,7 +213,7 @@ We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.
 - **[PySide6](https://pypi.org/project/PySide6/)**: Qt6 bindings for Python
 - **[PyOpenGL](https://pypi.org/project/PyOpenGL/)**: OpenGL bindings for Python
 - **[freetype-py](https://pypi.org/project/freetype-py/)**: Font rendering
-- **[COMPAS](https://compas.dev/)**: COMPAS framework (>= 2.2.0)
+- **[COMPAS](https://compas.dev/)**: COMPAS framework (>= 3.0)
 
 ## License
 

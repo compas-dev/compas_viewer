@@ -21,8 +21,9 @@ from PySide6.QtWidgets import QFileDialog
 from PySide6.QtWidgets import QInputDialog
 from PySide6.QtWidgets import QMessageBox
 
-import compas
 from compas.colors import Color
+from compas.data import json_dump
+from compas.data import json_load
 from compas.datastructures import Datastructure
 from compas.geometry import Box
 from compas.geometry import Capsule
@@ -1085,7 +1086,7 @@ def load_from_file(viewer: "Viewer", filepath: str | Path) -> bool:
 
     """
     try:
-        obj = compas.json_load(Path(filepath))
+        obj = json_load(Path(filepath))
         if isinstance(obj, Scene):
             clear_scene(viewer)
             viewer.scene = obj
@@ -1139,7 +1140,7 @@ def save_scene(viewer: "Viewer") -> None:
     if not filepath:
         return
 
-    compas.json_dump(viewer.scene, Path(filepath))
+    json_dump(viewer.scene, Path(filepath))
 
 
 save_scene_cmd = Command(title="Save Scene", callback=save_scene)

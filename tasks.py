@@ -1,35 +1,33 @@
-import sys
-from pathlib import Path
-
-from compas_invocations2 import build
-from compas_invocations2 import docs
-from compas_invocations2 import mkdocs
-from compas_invocations2 import style
-from compas_invocations2 import tests
 from invoke import task
-from invoke.collection import Collection
 
 
 @task
-def typecheck(ctx):
-    """Run static type checking."""
-    ctx.run(f'pyright --pythonpath "{sys.executable}" src/compas_viewer')
+def check(ctx):
+    """Run all non-mutating local quality checks."""
+    ctx.run("uv run ruff check .")
+    ctx.run("uv run ruff format --check .")
+    ctx.run("uv run pyright")
 
 
-ns = Collection(
-    docs.help,
-    style.check,
-    style.lint,
-    style.format,
-    typecheck,
-    mkdocs.docs,
-    tests.test,
-    tests.testdocs,
-    tests.testcodeblocks,
-    build.clean,
-)
-ns.configure(
-    {
-        "base_folder": str(Path(__file__).resolve().parent),
-    }
-)
+@task
+def lint(ctx):
+    """Fix lint violations that Ruff can resolve safely."""
+    ctx.run("uv run ruff check --fix .")
+
+
+@task
+def format(ctx):
+    """Format Python files with Ruff."""
+    ctx.run("uv run ruff format .")
+
+
+@task
+def test(ctx):
+    """Run the test suite with the headless Qt backend."""
+    ctx.run("uv run pytest", env={"QT_QPA_PLATFORM": "offscreen"})
+
+
+@task
+def docs(ctx):
+    """Build the documentation in strict mode."""
+    ctx.run("uv run mkdocs build --strict", env={"QT_QPA_PLATFORM": "offscreen"})

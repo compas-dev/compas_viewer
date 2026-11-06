@@ -9,25 +9,26 @@ COMPAS Viewer supports Python 3.12 and newer:
 ```bash
 git clone https://github.com/compas-dev/compas_viewer.git
 cd compas_viewer
-python -m pip install -e ".[dev,docs]"
+uv sync --frozen --group dev --group docs
 ```
 
-The repository uses `invoke` for its standard workflows:
+The direct uv commands are authoritative:
 
 ```bash
-invoke test
-invoke check
-invoke docs
-invoke format
+uv run ruff check .
+uv run ruff format --check .
+uv run pyright
+QT_QPA_PLATFORM=offscreen uv run pytest
+QT_QPA_PLATFORM=offscreen uv run mkdocs build --strict
 ```
 
-Focused checks are useful while developing:
+Thin Invoke aliases remain available as `uv run invoke check`, `uv run invoke
+test`, and `uv run invoke docs`. Focused checks are useful while developing:
 
 ```bash
-pytest -q tests/test_config.py
-ruff check src tests
-pyright src/compas_viewer
-mkdocs build --strict
+QT_QPA_PLATFORM=offscreen uv run pytest -q tests/test_config.py
+uv run ruff check src tests
+uv run pyright
 ```
 
 ## Architecture
@@ -274,16 +275,17 @@ Test public behavior at the narrowest layer that owns it:
 Always finish a change with:
 
 ```bash
-ruff check src tests
-pyright src/compas_viewer
-pytest -q
+uv run ruff check .
+uv run ruff format --check .
+uv run pyright
+QT_QPA_PLATFORM=offscreen uv run pytest -q
 git diff --check
 ```
 
 Build documentation changes strictly:
 
 ```bash
-mkdocs build --strict
+QT_QPA_PLATFORM=offscreen uv run mkdocs build --strict
 ```
 
 See [Building the Documentation](building-docs.md) for local preview,

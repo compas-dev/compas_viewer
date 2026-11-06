@@ -4,6 +4,7 @@ from math import atan2
 from math import radians
 from math import tan
 from typing import TYPE_CHECKING
+from typing import SupportsFloat
 
 from numpy import array
 from numpy import asfortranarray
@@ -19,6 +20,7 @@ from compas.geometry import Rotation
 from compas.geometry import Transformation
 from compas.geometry import Translation
 from compas.geometry import Vector
+from compas.typing import VectorLike
 
 if TYPE_CHECKING:
     from compas_viewer.renderer import Renderer
@@ -30,19 +32,30 @@ class Position(Vector):
     Parameters
     ----------
     vector
-        Initial XYZ coordinates.
+        Initial XYZ coordinates. Values are stored as Python `float` objects.
     on_update
-        Optional callback receiving updated XYZ coordinates.
+        Optional callback receiving supplied XYZ values before storage
+        normalization.
 
     """
 
-    def __init__(self, vector: Sequence[float], on_update: Callable[[Sequence[float]], None] | None = None) -> None:
+    def __init__(
+        self,
+        vector: VectorLike,
+        on_update: Callable[[Sequence[SupportsFloat]], None] | None = None,
+    ) -> None:
         super().__init__(x=vector[0], y=vector[1], z=vector[2])
         self.pause_update = False
         if on_update:
             self.on_update = on_update
 
-    def set(self, x: float, y: float, z: float, pause_update: bool = False) -> None:
+    def set(
+        self,
+        x: SupportsFloat,
+        y: SupportsFloat,
+        z: SupportsFloat,
+        pause_update: bool = False,
+    ) -> None:
         """Set all coordinates and optionally suppress the update callback.
 
         Parameters
@@ -56,43 +69,64 @@ class Position(Vector):
         pause_update
             Suppress the update callback for this assignment.
 
+        Notes
+        -----
+        Unless updates are paused, the callback receives the three supplied
+        values before they are normalized to Python `float` objects for
+        storage.
+
         """
         pause_update = pause_update or self.pause_update
         if hasattr(self, "on_update") and not pause_update:
             self.on_update([x, y, z])
-        self._x = x
-        self._y = y
-        self._z = z
+        self._x = float(x)
+        self._y = float(y)
+        self._z = float(z)
 
     @property
     def x(self) -> float:
-        """float: X coordinate, notifying the callback when changed."""
+        """X coordinate stored as a Python `float`.
+
+        Assignment notifies the callback with the supplied value before
+        normalization unless updates are paused.
+
+        """
         return self._x
 
     @x.setter
-    def x(self, x: float) -> None:
+    def x(self, x: SupportsFloat) -> None:
         if hasattr(self, "on_update") and not self.pause_update:
             self.on_update([x, self.y, self.z])
         self._x = float(x)
 
     @property
     def y(self) -> float:
-        """float: Y coordinate, notifying the callback when changed."""
+        """Y coordinate stored as a Python `float`.
+
+        Assignment notifies the callback with the supplied value before
+        normalization unless updates are paused.
+
+        """
         return self._y
 
     @y.setter
-    def y(self, y: float) -> None:
+    def y(self, y: SupportsFloat) -> None:
         if hasattr(self, "on_update") and not self.pause_update:
             self.on_update([self.x, y, self.z])
         self._y = float(y)
 
     @property
     def z(self) -> float:
-        """float: Z coordinate, notifying the callback when changed."""
+        """Z coordinate stored as a Python `float`.
+
+        Assignment notifies the callback with the supplied value before
+        normalization unless updates are paused.
+
+        """
         return self._z
 
     @z.setter
-    def z(self, z: float) -> None:
+    def z(self, z: SupportsFloat) -> None:
         if hasattr(self, "on_update") and not self.pause_update:
             self.on_update([self.x, self.y, z])
         self._z = float(z)
@@ -139,8 +173,8 @@ class Camera:
         fov: float = 45.0,
         near: float = 0.1,
         far: float = 1000.0,
-        position: Sequence[float] = [0.0, -10.0, 10.0],
-        target: Sequence[float] = [0.0, 0.0, 0.0],
+        position: VectorLike = [0.0, -10.0, 10.0],
+        target: VectorLike = [0.0, 0.0, 0.0],
         scale: float = 1.0,
         zoomdelta: float = 0.05,
         rotationdelta: float = 0.01,
@@ -170,7 +204,7 @@ class Camera:
         return self._position
 
     @position.setter
-    def position(self, position: Position | Sequence[float]) -> None:
+    def position(self, position: VectorLike) -> None:
         self._position.set(*position, pause_update=False)
 
     @property
@@ -188,7 +222,7 @@ class Camera:
         return self._target
 
     @target.setter
-    def target(self, target: Position | Sequence[float]) -> None:
+    def target(self, target: VectorLike) -> None:
         self._target.set(*target, pause_update=False)
 
     @property
@@ -274,7 +308,7 @@ class Camera:
         matrix = [[sx, 0, 0, 0], [0, sy, 0, 0], [0, 0, zz, zw], [0, 0, -1, 0]]
         return Transformation.from_matrix(matrix)
 
-    def _on_position_update(self, new_position: Sequence[float]) -> None:
+    def _on_position_update(self, new_position: Sequence[SupportsFloat]) -> None:
         """Update camera rotation to keep pointing the target."""
         old_direction = array(self.position - self.target)
         new_direction = array(Vector(x=new_position[0], y=new_position[1], z=new_position[2]) - self.target)
@@ -306,7 +340,7 @@ class Camera:
         new_rotation = self.rotation + [angle_x or 0, 0, angle_z or 0]
         self.rotation.set(*new_rotation, pause_update=True)
 
-    def _on_rotation_update(self, rotation: Sequence[float]) -> None:
+    def _on_rotation_update(self, rotation: Sequence[SupportsFloat]) -> None:
         """Update camera position when rotation around target."""
         R = Rotation.from_euler_angles(rotation)
         T = Translation.from_vector([0, 0, self.distance])
@@ -315,7 +349,7 @@ class Camera:
         position = self.target + vector
         self.position.set(*position, pause_update=True)
 
-    def _on_target_update(self, target: Sequence[float]) -> None:
+    def _on_target_update(self, target: Sequence[SupportsFloat]) -> None:
         """Update camera position when target changes."""
         R = Rotation.from_euler_angles(list(self.rotation))
         T = Translation.from_vector([0, 0, self.distance])

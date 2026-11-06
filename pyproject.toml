@@ -15,7 +15,8 @@ authors = [
     { name = "Li Chen", email = "li.chen@arch.ethz.ch" },
     { name = "Zac Zhuo Zhang", email = "zhuo.zhang@arch.ethz.ch" },
 ]
-license = { file = "LICENSE" }
+license = "MIT"
+license-files = ["LICENSE"]
 readme = "README.md"
 requires-python = ">=3.12"
 dynamic = ["version"]
@@ -29,32 +30,31 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
-    "compas >=2.2.0",
+    "compas>=3,<4",
     "freetype-py",
     "PyOpenGL",
     "Pillow",
     "PySide6",
 ]
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
-    "build",
-    "bump-my-version",
-    "compas_invocations2",
-    "invoke >=0.14",
-    "pyright",
-    "pytest",
-    "pytest-cov",
-    "ruff",
-    "twine",
-    "wheel",
+    "build>=1.2",
+    "bump-my-version>=1.2",
+    "invoke>=2.2",
+    "packaging>=24",
+    "pyright==1.1.414",
+    "pytest>=8",
+    "pytest-cov>=5",
+    "ruff>=0.14",
+    "twine>=6",
 ]
 docs = [
-    "compas_invocations2",
-    "invoke >=0.14",
-    "mkdocs >=1.6",
-    "mkdocs-material >=9.5",
-    "mkdocstrings[python]",
+    { include-group = "dev" },
+    "mike>=2",
+    "mkdocs>=1.6",
+    "mkdocs-material>=9.5",
+    "mkdocstrings[python]>=0.30",
 ]
 
 [project.urls]
@@ -64,6 +64,9 @@ Repository = "https://github.com/compas-dev/compas_viewer.git"
 Changelog = "https://github.com/compas-dev/compas_viewer/blob/main/CHANGELOG.md"
 Issues = "https://github.com/compas-dev/compas_viewer/issues"
 Forum = "https://forum.compas-framework.org/"
+
+[tool.uv.sources]
+compas = { git = "https://github.com/compas-dev/compas.git", rev = "3c1a2e8e0e5c4c14292ecf4bb38c82e5b977273e" }
 
 [project.entry-points."compas.plugins"]
 compas_viewer = "compas_viewer.plugins"
@@ -101,7 +104,7 @@ compas_viewer = [
 minversion = "6.0"
 testpaths = ["tests", "src/compas_viewer"]
 python_files = ["test_*.py", "*_test.py", "test.py"]
-addopts = ["-ra", "--strict-markers", "--doctest-glob=*.md", "--tb=short"]
+addopts = ["-ra", "--strict-markers", "--doctest-glob=*.md", "--tb=short", "--import-mode=importlib"]
 doctest_optionflags = [
     "NORMALIZE_WHITESPACE",
     "IGNORE_EXCEPTION_DETAIL",
@@ -131,11 +134,8 @@ search = "Unreleased"
 replace = "[{new_version}] {now:%Y-%m-%d}"
 
 # ============================================================================
-# replace setup.cfg
+# style and static analysis
 # ============================================================================
-
-[tool.black]
-line-length = 179
 
 [tool.ruff]
 line-length = 179
@@ -163,7 +163,8 @@ max-doc-length = 179
 [tool.ruff.format]
 docstring-code-format = true
 docstring-code-line-length = "dynamic"
+exclude = ["docs/**/*.md"]
 
 [tool.pyright]
-include = ["src/compas_viewer"]
+include = ["src/compas_viewer", "docs/examples"]
 pythonVersion = "3.12"

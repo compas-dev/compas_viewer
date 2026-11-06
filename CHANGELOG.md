@@ -46,9 +46,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* Standardized development on a committed uv lock, direct non-mutating Ruff,
+  Pyright, Pytest, and strict MkDocs commands, with thin Invoke aliases.
+* Made Qt's headless mode and Linux EGL/OpenGL provisioning explicit in local
+  documentation and continuous integration.
+* Reworked package and release verification to build once, inspect the exact
+  wheel and source distribution, and reuse those artifacts for publication.
+* Replaced the mutable COMPAS development-branch install with an exact COMPAS
+  3 candidate revision for the locked development environment.
 * Migrated plugin discovery from `__all_plugins__` package scanning to a
   lightweight `compas_viewer.plugins` module in the `compas.plugins` entry-point
   group, with scene imports deferred until registration.
+* Kept installed plugin discovery independent of Qt and OpenGL by loading the
+  viewer's public graphics objects lazily from the package initializer.
 * Updated scene hooks to the current `clear`, `before_draw`, and `after_draw`
   extension points and registered the stable core `Brep`, `NurbsCurve`, and
   `NurbsSurface` wrappers instead of backend-specific OCC classes.
@@ -67,9 +77,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   singleton state, timers, UI access, and the viewer lifecycle.
 * Avoided instance-level `QEvent.type()` lookup in the renderer event override,
   which fails for nested paint events with PySide6 6.11.
-* Updated shape rendering to use the public cached vertices and edges together
-  with `to_tessellation()` instead of removed private discretization data and
-  triangle properties.
+* Updated shape and surface rendering to keep resolution on scene objects and
+  request fresh polygonal or tessellated representations without mutating or
+  caching discretization data on analytic geometry.
+* Included all executable documentation examples in Ruff and Pyright checks,
+  updated them to current geometry and component APIs, and removed the obsolete
+  optional robot example that depended on the retired layout API.
 * Updated the scene-tree UI for the composition-based `Scene.tree` API.
 * Modernized the scene package and geometry adapters with Python 3.12 type
   annotations, explicit geometry properties, consistent public exports, and

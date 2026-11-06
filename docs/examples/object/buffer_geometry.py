@@ -5,12 +5,13 @@ from compas_viewer import Viewer
 from compas_viewer.scene import BufferGeometry
 
 box = Box(1)
-tessellation = box.tessellation
+surface = box.to_polygonal_surface()
+tessellation = surface.triangulated()
 
-points = np.asarray(box.points, dtype=np.float32)
+points = np.asarray(surface.vertices, dtype=np.float32)
 pointcolor = np.tile([1.0, 0.0, 0.0, 1.0], (len(points), 1))
 
-lines = np.asarray([point for line in box.lines for point in line], dtype=np.float32)
+lines = np.asarray([surface.vertices[index] for edge in surface.edges for index in edge], dtype=np.float32)
 linecolor = np.tile([0.0, 1.0, 0.0, 1.0], (len(lines), 1))
 
 faces = np.asarray(

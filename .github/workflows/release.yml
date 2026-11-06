@@ -5,88 +5,170 @@ on:
     branches: [main]
 
 permissions:
+  actions: read
   contents: read
 
+concurrency:
+  group: release
+  cancel-in-progress: false
+
 jobs:
-  release-change:
-    name: Detect release merge
+  detect:
     runs-on: ubuntu-latest
     outputs:
       is-release: ${{ steps.release.outputs.is-release }}
-      version: ${{ steps.release.outputs.version }}
       tag: ${{ steps.release.outputs.tag }}
+      version: ${{ steps.release.outputs.version }}
     steps:
-      - uses: compas-dev/compas-actions/release-check@v1
-        id: release
+      - id: release
+        uses: compas-dev/compas-actions/release-check@5c64e6e2b576a1232d28fed47d9478ca8eb63b2d # v2 candidate
 
-  build:
-    needs: release-change
-    if: needs.release-change.outputs.is-release == 'true'
+  validate:
+    needs: detect
+    if: needs.detect.outputs.is-release == 'true'
     runs-on: ${{ matrix.os }}
+    env:
+      QT_QPA_PLATFORM: offscreen
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python: ["3.12", "3.13", "3.14"]
-
     steps:
-      - uses: actions/checkout@v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Install OpenGL system libraries
+      - name: Install Linux EGL/OpenGL runtime
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install --yes libegl1 python3-opengl
-      - uses: compas-dev/compas-actions/ci@v1
+      - uses: compas-dev/compas-actions/setup-python@5c64e6e2b576a1232d28fed47d9478ca8eb63b2d # v2 candidate
         with:
           python-version: ${{ matrix.python }}
-          management-tool: uv
-          extras: dev
-          invoke-tasks: lint test
-          check-import: true
+          dependency-groups: dev
+          extras: ""
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run pyright
+      - run: uv run pytest
 
-  prepare:
-    needs: [release-change, build]
-    if: needs.release-change.outputs.is-release == 'true'
+  docs-build:
+    needs: detect
+    if: needs.detect.outputs.is-release == 'true'
     runs-on: ubuntu-latest
+    env:
+      QT_QPA_PLATFORM: offscreen
     steps:
-      - uses: actions/checkout@v7.0.1
-        with:
-          persist-credentials: false
-      - uses: compas-dev/compas-actions/prepare-release@v1
+      - name: Install Linux EGL/OpenGL runtime
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes libegl1 python3-opengl
+      - uses: compas-dev/compas-actions/docs@5c64e6e2b576a1232d28fed47d9478ca8eb63b2d # v2 candidate
         with:
           python-version: "3.12"
-          management-tool: uv
+          dependency-groups: docs
+          extras: ""
+          strict: true
+
+  prepare:
+    needs: [detect, validate]
+    if: needs.detect.outputs.is-release == 'true'
+    runs-on: ubuntu-latest
+    env:
+      QT_QPA_PLATFORM: offscreen
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install Linux EGL/OpenGL runtime
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes libegl1 python3-opengl
+      - uses: compas-dev/compas-actions/setup-python@5c64e6e2b576a1232d28fed47d9478ca8eb63b2d # v2 candidate
+        with:
+          python-version: "3.12"
+          dependency-groups: dev
+          extras: ""
+      - name: Build and verify distributions outside the checkout
+        shell: bash
+        run: |
+          mkdir -p "${RUNNER_TEMP}/source" "${RUNNER_TEMP}/dist"
+          git archive HEAD | tar -xf - -C "${RUNNER_TEMP}/source"
+          uv build --out-dir "${RUNNER_TEMP}/dist" "${RUNNER_TEMP}/source"
+          uv run python .github/verify_distributions.py "${RUNNER_TEMP}/dist"
+          uv venv "${RUNNER_TEMP}/wheel-env"
+          uv pip install \
+            --python "${RUNNER_TEMP}/wheel-env/bin/python" \
+            "compas @ git+https://github.com/compas-dev/compas.git@3c1a2e8e0e5c4c14292ecf4bb38c82e5b977273e"
+          uv pip install --python "${RUNNER_TEMP}/wheel-env/bin/python" --no-deps "${RUNNER_TEMP}"/dist/*.whl
+          "${RUNNER_TEMP}/wheel-env/bin/python" "${GITHUB_WORKSPACE}/.github/verify_plugin_discovery.py"
+          uv pip install \
+            --python "${RUNNER_TEMP}/wheel-env/bin/python" \
+            freetype-py Pillow PyOpenGL PySide6
+          cd "${RUNNER_TEMP}"
+          "${RUNNER_TEMP}/wheel-env/bin/python" -c "from compas_viewer import ANIMATION_PRESETS, AnimationPreset, CommandRegistry, Viewer, ViewerState"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: python-package-distributions
+          path: ${{ runner.temp }}/dist/*
+          if-no-files-found: error
 
   publish:
-    needs: [release-change, prepare]
-    if: needs.release-change.outputs.is-release == 'true'
+    needs: [detect, docs-build, prepare]
+    if: needs.detect.outputs.is-release == 'true'
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/p/compas-viewer
+      url: https://pypi.org/project/compas-viewer
     permissions:
+      actions: read
       contents: read
       id-token: write
     steps:
-      - name: Download package distributions
-        uses: actions/download-artifact@v8.0.1
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: python-package-distributions
-          path: dist
-      - name: Publish package distributions to PyPI
-        uses: pypa/gh-action-pypi-publish@v1.14.2
+          path: ${{ runner.temp }}/dist
+      - uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
+        with:
+          packages-dir: ${{ runner.temp }}/dist
 
-  create-release:
-    needs: [release-change, publish]
-    if: needs.release-change.outputs.is-release == 'true'
+  github-release:
+    needs: [detect, publish]
+    if: needs.detect.outputs.is-release == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: write
+    steps:
+      - uses: compas-dev/compas-actions/github-release@5c64e6e2b576a1232d28fed47d9478ca8eb63b2d # v2 candidate
+        with:
+          github-token: ${{ github.token }}
+          tag-name: ${{ needs.detect.outputs.tag }}
+          target: ${{ github.sha }}
+          release-name-prefix: COMPAS Viewer
+          distribution-artifact-name: python-package-distributions
+
+  docs:
+    needs: [detect, github-release]
+    if: needs.detect.outputs.is-release == 'true'
+    runs-on: ubuntu-latest
+    env:
+      QT_QPA_PLATFORM: offscreen
     permissions:
       contents: write
     steps:
-      - uses: compas-dev/compas-actions/github-release@v1
+      - name: Install Linux EGL/OpenGL runtime
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes libegl1 python3-opengl
+      - uses: compas-dev/compas-actions/docs@5c64e6e2b576a1232d28fed47d9478ca8eb63b2d # v2 candidate
         with:
+          deploy: true
+          version: ${{ needs.detect.outputs.version }}
           github-token: ${{ github.token }}
-          tag-name: ${{ needs.release-change.outputs.tag }}
-          target: ${{ github.sha }}
+          python-version: "3.12"
+          dependency-groups: docs
+          extras: ""
+          strict: true

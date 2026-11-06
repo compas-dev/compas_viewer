@@ -1,48 +1,120 @@
 from unittest.mock import Mock
 
+import pytest
+
+from compas.geometry import Box
+from compas.geometry import Capsule
+from compas.geometry import Cone
+from compas.geometry import Cylinder
+from compas.geometry import PlanarSurface
 from compas.geometry import Sphere
+from compas.geometry import Torus
 from compas_viewer import Viewer
 
 
-def test_shape_object_preserves_geometry_resolution(monkeypatch):
+@pytest.fixture
+def viewer(monkeypatch):
     monkeypatch.setenv("QT_QPA_PLATFORM", "offscreen")
     viewer = Viewer()
+    viewer.running = False
+    viewer.scene.clear(clear_context=False)
+    yield viewer
+    viewer.running = False
+    viewer.scene.clear(clear_context=False)
+
+
+def test_shape_object_owns_default_resolution(viewer):
     shape = Sphere(1.0)
-    shape.resolution_u = 24
-    shape.resolution_v = 12
 
     sceneobject = viewer.scene.add(shape)
 
-    assert sceneobject.u == 24
-    assert sceneobject.v == 12
+    assert sceneobject.u == 16
+    assert sceneobject.v == 16
+    assert not hasattr(shape, "resolution_u")
+    assert not hasattr(shape, "resolution_v")
 
 
-def test_shape_object_resolution_override(monkeypatch):
-    monkeypatch.setenv("QT_QPA_PLATFORM", "offscreen")
-    viewer = Viewer()
+def test_shape_object_resolution_override_does_not_mutate_geometry(viewer):
     shape = Sphere(1.0)
+    data = shape.__data__
 
-    sceneobject = viewer.scene.add(shape, u=24, v=12)
+    sceneobject = viewer.scene.add(shape, u=6, v=4)
+    tessellation = sceneobject.tessellation
 
-    assert sceneobject.u == 24
-    assert sceneobject.v == 12
+    assert sceneobject.u == 6
+    assert sceneobject.v == 4
+    assert tessellation.number_of_vertices == 20
+    assert tessellation.number_of_triangles == 36
+    assert shape.__data__ == data
 
 
-def test_changing_shape_object_resolution_rebuilds_buffers(monkeypatch):
-    monkeypatch.setenv("QT_QPA_PLATFORM", "offscreen")
-    viewer = Viewer()
-    sceneobject = viewer.scene.add(Sphere(1.0))
+@pytest.mark.parametrize(
+    ("shape", "u", "v", "vertices", "triangles"),
+    [
+        (Box(1.0), 6, 4, 8, 12),
+        (Cone(1.0, 2.0), 6, 4, 8, 12),
+        (Cylinder(1.0, 2.0), 6, 4, 14, 24),
+        (Capsule(1.0, 2.0), 6, 4, 26, 48),
+        (Sphere(1.0), 6, 4, 20, 36),
+        (Torus(2.0, 0.5), 6, 4, 24, 48),
+    ],
+)
+def test_shape_object_dispatches_producer_specific_resolution(viewer, shape, u, v, vertices, triangles):
+    sceneobject = viewer.scene.add(shape, u=u, v=v)
+
+    tessellation = sceneobject.tessellation
+
+    assert tessellation.number_of_vertices == vertices
+    assert tessellation.number_of_triangles == triangles
+
+
+def test_shape_object_requests_fresh_representations(viewer):
+    shape = Sphere(1.0)
+    sceneobject = viewer.scene.add(shape, u=6, v=4)
+
+    first = sceneobject.tessellation
+    second = sceneobject.tessellation
+
+    assert first is not second
+    assert first.vertices is not second.vertices
+
+
+def test_changing_shape_object_resolution_changes_tessellation(viewer):
+    sceneobject = viewer.scene.add(Sphere(1.0), u=6, v=4)
+    initial = sceneobject.tessellation
+
+    sceneobject.u = 8
+    sceneobject.v = 6
+    updated = sceneobject.tessellation
+
+    assert updated.number_of_vertices != initial.number_of_vertices
+    assert updated.number_of_triangles != initial.number_of_triangles
+
+
+def test_changing_active_shape_object_resolution_refreshes_and_rebuilds(viewer, monkeypatch):
+    sceneobject = viewer.scene.add(Sphere(1.0), u=6, v=4)
+    refresh_data = Mock()
     rebuild_buffers = Mock()
     update = Mock()
+    monkeypatch.setattr(sceneobject, "refresh_data", refresh_data)
     monkeypatch.setattr(viewer.renderer, "rebuild_buffers", rebuild_buffers)
     monkeypatch.setattr(viewer.renderer, "update", update)
     viewer.running = True
 
-    try:
-        sceneobject.u = 24
-    finally:
-        viewer.running = False
+    sceneobject.u = 8
 
-    assert sceneobject.geometry.resolution_u == 24
+    refresh_data.assert_called_once_with()
     rebuild_buffers.assert_called_once_with()
     update.assert_called_once_with()
+
+
+def test_surface_object_uses_scene_owned_resolution_without_mutation(viewer):
+    surface = PlanarSurface()
+    data = surface.__data__
+
+    sceneobject = viewer.scene.add(surface, u=2, v=3)
+    tessellation = sceneobject.tessellation
+
+    assert tessellation.number_of_vertices == 12
+    assert tessellation.number_of_triangles == 12
+    assert surface.__data__ == data

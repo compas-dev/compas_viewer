@@ -1,5 +1,4 @@
 from compas.colors import Color
-from compas.datastructures import Mesh
 from compas.geometry import Frame
 from compas.geometry import Sphere
 from compas_viewer import Viewer
@@ -16,7 +15,7 @@ viewer.renderer.camera.rotation.y = 10
 viewer.renderer.camera.distance = 5
 
 viewer.scene.add(
-    Mesh.from_shape(sphere, u=32, v=32),
+    sphere.to_polygonal_surface(nu=32, nv=32).to_mesh(),
     facecolor=Color.cyan(),
     linecolor=Color.blue(),
     use_vertexcolors=False,

@@ -106,40 +106,38 @@ class ViewerScene(Scene):
             Geometry, data structure, scene object, or collection to add.
         parent
             The parent of the item.
-        is_selected : bool, optional
+        is_selected
             Whether the object is selected.
             Default to False.
-        show : bool, optional
+        show
             Whether to show object.
             Default to True.
-        show_points : bool, optional
+        show_points
             Whether to show points/vertices of the object.
-        show_lines : bool, optional
+        show_lines
             Whether to show lines/edges of the object.
-        show_faces : bool, optional
+        show_faces
             Whether to show faces of the object.
-        pointcolor : Union[:class:`compas.colors.Color`, dict[Any, :class:`compas.colors.Color`], optional
+        pointcolor
             The color or the dict of colors of the points/vertices of object.
-        linecolor : Union[:class:`compas.colors.Color`, dict[Any, :class:`compas.colors.Color`], optional
+        linecolor
             The color or the dict of colors of the lines/edges of object.
-        facecolor : Union[:class:`compas.colors.Color`, dict[Any, :class:`compas.colors.Color`], optional
+        facecolor
             The color or the dict of colors of the faces of object.
-        linewidth : float, optional
+        linewidth
             The line width to be drawn on screen
-        pointsize : float, optional
+        pointsize
             The point size to be drawn on screen
-        opacity : float, optional
+        opacity
             The opacity of the object.
-        hide_coplanaredges : bool, optional
+        hide_coplanaredges
             Whether to hide the coplanar edges of the mesh.
-        use_vertexcolors : bool, optional
+        use_vertexcolors
             Whether to use vertex color.
-        v : int, optional
-            The resolution in the V direction. By default, use the geometry's
-            existing resolution.
-        u : int, optional
-            The resolution in the U direction. By default, use the geometry's
-            existing resolution.
+        v
+            The scene-owned cell count in the V direction. Default is 16.
+        u
+            The scene-owned cell count in the U direction. Default is 16.
         **kwargs
             Additional options passed to the scene-object constructor.
 
@@ -152,7 +150,7 @@ class ViewerScene(Scene):
         edgecolor = kwargs.pop("edgecolor", linecolor)
 
         sceneobject = super().add(
-            item=cast(Data, item),
+            item=item,
             parent=parent,
             is_selected=is_selected,
             show=show,

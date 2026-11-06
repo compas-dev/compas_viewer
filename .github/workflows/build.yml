@@ -1,51 +1,84 @@
 name: build
 
 on:
-  push:
-    branches: [main]
   pull_request:
+    branches: [main, c3-upgrade]
+  push:
     branches: [main]
 
 permissions:
   contents: read
 
-jobs:
-  release-change:
-    name: Detect release merge
-    runs-on: ubuntu-latest
-    outputs:
-      is-release: ${{ steps.release.outputs.is-release }}
-    steps:
-      - uses: compas-dev/compas-actions/release-check@v1
-        id: release
+concurrency:
+  group: build-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
-  build:
-    needs: release-change
-    if: >-
-      !contains(github.event.pull_request.labels.*.name, 'docs-only') &&
-      (github.event_name == 'pull_request' || needs.release-change.outputs.is-release != 'true')
+jobs:
+  quality:
+    if: "!contains(github.event.pull_request.labels.*.name, 'docs-only')"
     runs-on: ${{ matrix.os }}
+    env:
+      QT_QPA_PLATFORM: offscreen
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python: ["3.12", "3.13", "3.14"]
-
     steps:
-      - uses: actions/checkout@v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Install OpenGL system libraries
+      - name: Install Linux EGL/OpenGL runtime
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install --yes libegl1 python3-opengl
-      - uses: compas-dev/compas-actions/setup-python@v1
+      - uses: compas-dev/compas-actions/setup-python@5c64e6e2b576a1232d28fed47d9478ca8eb63b2d # v2 candidate
         with:
           python-version: ${{ matrix.python }}
-          management-tool: uv
-          extras: dev
-      - name: Install COMPAS remove-future branch
-        run: uv pip install --upgrade --reinstall "compas @ git+https://github.com/compas-dev/compas.git@remove-future"
-      - name: Run checks
-        run: invoke lint test
+          dependency-groups: dev
+          extras: ""
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run pyright
+      - run: uv run pytest
+
+  distributions:
+    needs: quality
+    runs-on: ubuntu-latest
+    env:
+      QT_QPA_PLATFORM: offscreen
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install Linux EGL/OpenGL runtime
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes libegl1 python3-opengl
+      - uses: compas-dev/compas-actions/setup-python@5c64e6e2b576a1232d28fed47d9478ca8eb63b2d # v2 candidate
+        with:
+          python-version: "3.12"
+          dependency-groups: dev
+          extras: ""
+      - name: Build distributions outside the checkout
+        shell: bash
+        run: |
+          mkdir -p "${RUNNER_TEMP}/source" "${RUNNER_TEMP}/dist"
+          git archive HEAD | tar -xf - -C "${RUNNER_TEMP}/source"
+          uv build --out-dir "${RUNNER_TEMP}/dist" "${RUNNER_TEMP}/source"
+      - name: Verify and install the exact wheel
+        shell: bash
+        run: |
+          uv run python .github/verify_distributions.py "${RUNNER_TEMP}/dist"
+          uv venv "${RUNNER_TEMP}/wheel-env"
+          uv pip install \
+            --python "${RUNNER_TEMP}/wheel-env/bin/python" \
+            "compas @ git+https://github.com/compas-dev/compas.git@3c1a2e8e0e5c4c14292ecf4bb38c82e5b977273e"
+          uv pip install --python "${RUNNER_TEMP}/wheel-env/bin/python" --no-deps "${RUNNER_TEMP}"/dist/*.whl
+          "${RUNNER_TEMP}/wheel-env/bin/python" "${GITHUB_WORKSPACE}/.github/verify_plugin_discovery.py"
+          uv pip install \
+            --python "${RUNNER_TEMP}/wheel-env/bin/python" \
+            freetype-py Pillow PyOpenGL PySide6
+          cd "${RUNNER_TEMP}"
+          "${RUNNER_TEMP}/wheel-env/bin/python" -c "from compas_viewer import ANIMATION_PRESETS, AnimationPreset, CommandRegistry, Viewer, ViewerState"

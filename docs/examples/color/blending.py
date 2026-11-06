@@ -20,7 +20,7 @@ facecolor = {k: Color(random(), random(), random()) for k in mesh.faces()}
 edgecolor = {k: Color(random(), random(), random()) for k in mesh.edges()}
 vertexcolor = {k: Color(random(), random(), random()) for k in mesh.vertices()}
 
-viewer.scene.add(mesh, name="mesh1", show_points=True, facecolor=facecolor, edgecolor=edgecolor, vertexcolor=vertexcolor, use_vertexcolors=True)  # type: ignore
+viewer.scene.add(mesh, name="mesh1", show_points=True, facecolor=facecolor, edgecolor=edgecolor, vertexcolor=vertexcolor, use_vertexcolors=True)
 viewer.scene.add(
     mesh2,
     name="mesh2",

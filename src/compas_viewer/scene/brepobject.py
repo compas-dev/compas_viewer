@@ -2,6 +2,10 @@ from collections.abc import Iterable
 from typing import cast
 
 from compas.geometry import Brep
+from compas.geometry import Tessellation
+from compas.itertools import pairwise
+from compas.typing import PointLike
+from compas.typing import RealInput
 
 from .geometryobject import GeometryObject as ViewerGeometryObject
 
@@ -17,24 +21,20 @@ class BRepObject(ViewerGeometryObject):
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
         geometry = cast(Brep, self.geometry)
-        self._viewmesh, self._boundaries = geometry.to_tesselation()
+        self._tessellation: Tessellation = geometry.to_tessellation()
 
     @property
-    def points(self) -> list[Iterable[float]]:
+    def points(self) -> list[Iterable[RealInput]]:
         """Boundary vertices of the Brep."""
         geometry = cast(Brep, self.geometry)
         return [point for point in geometry.points]
 
     @property
-    def lines(self) -> list[Iterable[Iterable[float]]]:
+    def lines(self) -> list[tuple[PointLike, PointLike]]:
         """Discretized boundary curves of the Brep."""
-        lines: list[Iterable[Iterable[float]]] = []
-        for polyline in self._boundaries:
-            lines += polyline.lines
-        return lines
+        return [segment for polyline in self._tessellation.polylines for segment in pairwise(polyline)]
 
     @property
     def viewmesh(self) -> tuple[list[Iterable[float]], list[list[int]]]:
         """Triangulated view mesh of the Brep."""
-        vertices, faces = self._viewmesh.to_vertices_and_faces(triangulated=True)
-        return [vertex for vertex in vertices], [face for face in faces]
+        return [vertex for vertex in self._tessellation.vertices], [list(triangle) for triangle in self._tessellation.triangles]

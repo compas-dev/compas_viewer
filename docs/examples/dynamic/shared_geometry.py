@@ -1,13 +1,12 @@
 from random import random
 
-from compas.datastructures import Mesh
 from compas.geometry import Box
 from compas.geometry import Translation
 from compas_viewer import Viewer
 
 viewer = Viewer()
 
-mesh = Mesh.from_shape(Box.from_width_height_depth(2, 2, 2))
+mesh = Box.from_width_height_depth(2, 2, 2).to_polygonal_surface().to_mesh()
 obj1 = viewer.scene.add(mesh)
 obj2 = viewer.scene.add(mesh, transformation=Translation.from_vector([5, 0, 0]))
 obj3 = viewer.scene.add(mesh, transformation=Translation.from_vector([-5, 0, 0]))
@@ -19,7 +18,7 @@ obj1.opacity = 0.7
 def deform_mesh(frame: int) -> None:
     obj1.opacity = (frame / 20) % 1
     for v in mesh.vertices():
-        vertex = mesh.vertex_coordinates(v)
+        vertex = mesh.vertex_point(v)
         vertex[0] += (random() - 0.5) * 0.1
         vertex[1] += (random() - 0.5) * 0.1
         vertex[2] += (random() - 0.5) * 0.1

@@ -1,49 +1,49 @@
 # Installation
 
+## Stable release
 
-## Stable
-
-
-Stable releases are available on PyPI and can be installed with pip.
+Install the latest stable release from PyPI:
 
 ```bash
-pip install compas_viewer
-
-
+python -m pip install compas_viewer
 ```
 
-## Latest
+COMPAS Viewer requires Python 3.12 or newer, COMPAS 3, PySide6, and OpenGL.
 
+## Development setup
 
-The latest version can be installed from local source.
+Clone the repository and create the locked development and documentation
+environment with uv:
 
 ```bash
 git clone https://github.com/compas-dev/compas_viewer.git
 cd compas_viewer
-pip install -e .
-
-
+uv sync --frozen --group dev --group docs
 ```
 
-## Development
-
-
-To install `compas_viewer` for development, install from local source with the "dev" requirements.
+Run the same checks used by continuous integration:
 
 ```bash
-git clone https://github.com/compas-dev/compas_viewer.git
-cd compas_viewer
-pip install -e ".[dev]"
-
-
+uv run ruff check .
+uv run ruff format --check .
+uv run pyright
+QT_QPA_PLATFORM=offscreen uv run pytest
+QT_QPA_PLATFORM=offscreen uv run mkdocs build --strict
 ```
 
-## Known issues
+The direct commands are authoritative. Thin Invoke aliases remain available,
+for example `uv run invoke test` and `uv run invoke docs`.
 
+## Linux graphics libraries
 
-For ubuntu users, following dependencies might be required depending on the system version:
+Linux development and continuous-integration environments need an explicit
+EGL/OpenGL runtime. On Ubuntu, install:
 
 ```bash
-sudo apt-get install libegl1
-sudo apt-get install python3-opengl
+sudo apt-get update
+sudo apt-get install --yes libegl1 python3-opengl
 ```
+
+The test and documentation commands select Qt's `offscreen` platform so that
+they do not require a visible display. This does not replace platform-specific
+testing of the interactive Qt/OpenGL viewer.

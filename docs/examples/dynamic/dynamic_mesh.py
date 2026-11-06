@@ -12,9 +12,9 @@ obj = viewer.scene.add(mesh, surfacecolor=Color.cyan(), use_vertexcolors=False)
 
 
 @viewer.on(interval=200)
-def deform_mesh(frame):
+def deform_mesh(frame: int) -> None:
     for v in mesh.vertices():
-        vertex: list = mesh.vertex_attributes(v, "xyz")  # type: ignore
+        vertex = mesh.vertex_point(v)
         vertex[0] += random() - 0.5
         vertex[1] += random() - 0.5
         vertex[2] += random() - 0.5

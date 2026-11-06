@@ -8,38 +8,34 @@ We accept code contributions through pull requests.
 In short, this is how that works.
 
 1. Fork [the repository](https://github.com/compas.dev/compas_viewer) and clone the fork.
-2. Create a virtual environment using your tool of choice (e.g. `virtualenv`, `conda`, etc).
-3. Install the project with development and documentation dependencies:
+2. Install the locked development and documentation environment:
 
    ```bash
-   python -m pip install -e ".[dev,docs]"
+   uv sync --frozen --group dev --group docs
    ```
 
-4. Make sure all tests pass:
+3. Run the same checks used by continuous integration:
 
    ```bash
-   invoke test
+   uv run ruff check .
+   uv run ruff format --check .
+   uv run pyright
+   QT_QPA_PLATFORM=offscreen uv run pytest
+   QT_QPA_PLATFORM=offscreen uv run mkdocs build --strict
    ```
 
-5. Start making your changes to the **master** branch (or branch off of it).
-6. Make sure all tests still pass:
+4. Create a branch for your changes.
+5. Make your changes and rerun the checks above.
+6. Commit your changes and push your branch to GitHub.
+7. Create a [pull request](https://help.github.com/articles/about-pull-requests/) through the GitHub website.
 
-   ```bash
-   invoke test
-   ```
+The direct uv commands above are authoritative. Thin Invoke aliases remain
+available for convenience:
 
-7. Add yourself to the *Contributors* section of `AUTHORS.md`.
-8. Commit your changes and push your branch to GitHub.
-9. Create a [pull request](https://help.github.com/articles/about-pull-requests/) through the GitHub website.
-
-During development, use [pyinvoke](http://docs.pyinvoke.org/) tasks on the
-command line to ease recurring operations:
-
-* `invoke clean`: Clean all generated artifacts.
-* `invoke check`: Run various code and documentation style checks.
-* `invoke docs`: Generate documentation.
-* `invoke test`: Run all tests and checks in one swift command.
-* `invoke`: Show available tasks.
+* `uv run invoke check`: Run lint, formatting, and typing checks.
+* `uv run invoke docs`: Build documentation in strict mode.
+* `uv run invoke test`: Run tests with Qt's headless backend.
+* `uv run invoke --list`: Show available tasks.
 
 For documentation setup, local preview, strict builds, examples, assets, and
 API-page conventions, see the

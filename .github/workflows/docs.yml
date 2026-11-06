@@ -1,29 +1,30 @@
 name: docs
 
 on:
-  push:
-    branches: [main]
   pull_request:
-    branches: [main]
+    branches: [main, c3-upgrade]
+  workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: docs-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      QT_QPA_PLATFORM: offscreen
     steps:
-      - uses: actions/checkout@v7.0.1
-        with:
-          persist-credentials: false
-      - name: Install OpenGL system libraries
+      - name: Install Linux EGL/OpenGL runtime
         run: |
           sudo apt-get update
           sudo apt-get install --yes libegl1 python3-opengl
-      - uses: compas-dev/compas-actions/setup-python@v1
+      - uses: compas-dev/compas-actions/docs@5c64e6e2b576a1232d28fed47d9478ca8eb63b2d # v2 candidate
         with:
           python-version: "3.12"
-          management-tool: uv
-          extras: docs
-      - name: Build documentation
-        run: invoke docs
+          dependency-groups: docs
+          extras: ""
+          strict: true

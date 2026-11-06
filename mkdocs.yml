@@ -81,6 +81,7 @@ nav:
   - Getting Started:
       - Installation: installation.md
       - Hello World: hello-world.md
+      - Tutorial: tutorial.md
   - Guides:
       - User Guide: user-guide.md
       - Developer Guide: developer-guide.md
@@ -139,7 +140,6 @@ nav:
           - Tree View: examples/__temp/layout/tree_view.md
           - Object Overview: examples/__temp/object.md
           - Fonts: examples/__temp/object/fonts.md
-          - Robot: examples/__temp/object/robot.md
           - Text: examples/__temp/object/texts.md
   - API Reference:
       - Overview: api.md
@@ -152,4 +152,5 @@ nav:
       - UI: api/compas_viewer.ui.md
   - Project:
       - Acknowledgements: acknowledgements.md
+      - Changelog: changelog.md
       - License: license.md

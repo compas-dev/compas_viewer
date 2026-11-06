@@ -5,8 +5,8 @@
 import argparse
 from pathlib import Path
 
-from compas import json_load
-from compas import json_loadz
+from compas.data import json_load
+from compas.data import json_loadz
 from compas.scene.context import ITEM_SCENEOBJECT
 from compas_viewer import Viewer
 

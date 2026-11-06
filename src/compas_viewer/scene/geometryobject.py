@@ -7,6 +7,7 @@ from compas.colors import Color
 from compas.itertools import flatten
 from compas.scene import GeometryObject as BaseGeometryObject
 from compas.scene.descriptors.color import ColorAttribute
+from compas.typing import RealInput
 
 from .sceneobject import ShaderDataType
 from .sceneobject import ViewerSceneObject
@@ -19,10 +20,10 @@ class GeometryObject(ViewerSceneObject, BaseGeometryObject):
     ----------
     geometry
         A COMPAS geometry.
-    v
-        The number of vertices in the u-direction of non-OCC geometries.
     u
-        The number of vertices in the v-direction of non-OCC geometries.
+        The number of cells in the u-direction of structured geometry.
+    v
+        The number of cells in the v-direction of structured geometry.
     pointcolor
         The color of the points. Default is the value of `pointcolor` in `viewer.config`.
     linecolor
@@ -40,8 +41,28 @@ class GeometryObject(ViewerSceneObject, BaseGeometryObject):
 
     def __init__(self, u: int | None = 16, v: int | None = 16, **kwargs: Any) -> None:
         super().__init__(**kwargs)
-        self.u = 16 if u is None else u
-        self.v = 16 if v is None else v
+        self._u = 16 if u is None else u
+        self._v = 16 if v is None else v
+
+    @property
+    def u(self) -> int:
+        """The scene-owned cell count in the u-direction."""
+        return self._u
+
+    @u.setter
+    def u(self, value: int) -> None:
+        self._u = value
+        self._rebuild_resolution_buffers()
+
+    @property
+    def v(self) -> int:
+        """The scene-owned cell count in the v-direction."""
+        return self._v
+
+    @v.setter
+    def v(self, value: int) -> None:
+        self._v = value
+        self._rebuild_resolution_buffers()
 
     @property
     def facecolor(self) -> Color:
@@ -52,11 +73,11 @@ class GeometryObject(ViewerSceneObject, BaseGeometryObject):
         self.surfacecolor = color
 
     @property
-    def points(self) -> Sequence[Iterable[float]] | None:
+    def points(self) -> Sequence[Iterable[RealInput]] | None:
         return None
 
     @property
-    def lines(self) -> Sequence[Iterable[Iterable[float]]] | None:
+    def lines(self) -> Sequence[Iterable[Iterable[RealInput]]] | None:
         return None
 
     @property
@@ -95,3 +116,10 @@ class GeometryObject(ViewerSceneObject, BaseGeometryObject):
         elements = [list(reversed(element)) for element in source_elements]
         colors = [self.facecolor] * len(positions)
         return positions, colors, elements
+
+    def _rebuild_resolution_buffers(self) -> None:
+        """Refresh and rebuild active renderer buffers after resolution changes."""
+        if self.viewer.running and self in self.viewer.scene.objects:
+            self.refresh_data()
+            self.viewer.renderer.rebuild_buffers()
+            self.viewer.renderer.update()

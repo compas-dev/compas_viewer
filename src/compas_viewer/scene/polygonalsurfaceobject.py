@@ -12,7 +12,8 @@ class PolygonalSurfaceObject(TessellationObject):
 
     @property
     def tessellation(self) -> Tessellation:
-        return cast(PolygonalSurface, self.geometry).tessellation
+        """A fresh non-mutating triangulation of the polygonal surface."""
+        return cast(PolygonalSurface, self.geometry).triangulated()
 
     def _read_points_data(self) -> ShaderDataType:
         positions = cast(PolygonalSurface, self.geometry).vertices
