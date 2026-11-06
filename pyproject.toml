@@ -88,6 +88,7 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 compas_viewer = [
+    "py.typed",
     "assets/fonts/*.ttf",
     "assets/icons/*.png",
     "assets/icons/*.svg",

@@ -15,7 +15,6 @@ concurrency:
 
 jobs:
   quality:
-    if: "!contains(github.event.pull_request.labels.*.name, 'docs-only')"
     runs-on: ${{ matrix.os }}
     env:
       QT_QPA_PLATFORM: offscreen
@@ -79,6 +78,9 @@ jobs:
           "${RUNNER_TEMP}/wheel-env/bin/python" "${GITHUB_WORKSPACE}/.github/verify_plugin_discovery.py"
           uv pip install \
             --python "${RUNNER_TEMP}/wheel-env/bin/python" \
-            freetype-py Pillow PyOpenGL PySide6
+            freetype-py Pillow PyOpenGL PySide6 pyright==1.1.414
           cd "${RUNNER_TEMP}"
           "${RUNNER_TEMP}/wheel-env/bin/python" -c "from compas_viewer import ANIMATION_PRESETS, AnimationPreset, CommandRegistry, Viewer, ViewerState"
+          "${RUNNER_TEMP}/wheel-env/bin/python" -m pyright \
+            --pythonpath "${RUNNER_TEMP}/wheel-env/bin/python" \
+            "${GITHUB_WORKSPACE}/tests/installed_typing_consumer.py"

@@ -72,20 +72,42 @@ class StubBrep(Brep):
         return self.tessellation
 
 
-def test_brep_scene_object_reuses_one_tessellation_result():
-    tessellation = Tessellation(
+def test_brep_scene_object_refreshes_one_current_tessellation():
+    initial = Tessellation(
         vertices=[[0, 0, 0], [1, 0, 0], [0, 1, 0]],
         triangles=[[0, 1, 2]],
         polylines=[[[0, 0, 0], [1, 0, 0], [1, 1, 0]]],
     )
-    brep = StubBrep(tessellation)
+    before_first_draw = Tessellation(
+        vertices=[[0, 0, 0], [2, 0, 0], [0, 2, 0]],
+        triangles=[[0, 2, 1]],
+        polylines=[[[0, 0, 0], [2, 0, 0], [2, 2, 0]]],
+    )
+    after_mutation = Tessellation(
+        vertices=[[0, 0, 0], [3, 0, 0], [0, 3, 0]],
+        triangles=[[0, 1, 2]],
+        polylines=[[[0, 0, 0], [3, 0, 0], [3, 3, 0]]],
+    )
+    brep = StubBrep(initial)
     sceneobject = object.__new__(BRepObject)
 
     BRepObject.__init__(sceneobject, item=brep)
+    brep.tessellation = before_first_draw
+    sceneobject.refresh_data()
 
     assert brep.tessellation_calls == 1
-    assert sceneobject.viewmesh == (tessellation.vertices, tessellation.triangles)
+    assert sceneobject.viewmesh == (before_first_draw.vertices, before_first_draw.triangles)
     assert sceneobject.lines == [
-        ([0, 0, 0], [1, 0, 0]),
-        ([1, 0, 0], [1, 1, 0]),
+        ([0, 0, 0], [2, 0, 0]),
+        ([2, 0, 0], [2, 2, 0]),
+    ]
+
+    brep.tessellation = after_mutation
+    sceneobject.refresh_data()
+
+    assert brep.tessellation_calls == 2
+    assert sceneobject.viewmesh == (after_mutation.vertices, after_mutation.triangles)
+    assert sceneobject.lines == [
+        ([0, 0, 0], [3, 0, 0]),
+        ([3, 0, 0], [3, 3, 0]),
     ]

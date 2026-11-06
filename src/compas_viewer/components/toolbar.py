@@ -93,7 +93,8 @@ class ToolBar(Component):
         """
         args = args or []
         kwargs = kwargs or {}
-        return self.widget.addWidget(Button(text=text, tooltip=tooltip, icon_path=icon, action=partial(action, *args, **kwargs)))
+        button = Button(text=text, tooltip=tooltip, icon_path=icon, action=partial(action, *args, **kwargs))
+        return self.widget.addWidget(button.widget)
 
     # def add_combobox(self, items, action, title=None):
     #     combobox = QComboBox()

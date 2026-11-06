@@ -6,6 +6,7 @@ from compas.geometry import Tessellation
 from compas.itertools import pairwise
 from compas.typing import PointLike
 from compas.typing import RealInput
+from compas.typing import VerticesFaces
 
 from .geometryobject import GeometryObject as ViewerGeometryObject
 
@@ -20,8 +21,27 @@ class BRepObject(ViewerGeometryObject):
 
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
+        self._tessellation: Tessellation | None = None
+
+    def refresh_data(self) -> None:
+        """Regenerate one coherent tessellation and all render buffers.
+
+        A Brep is mutable. Re-tessellating at the refresh boundary keeps its
+        boundary curves and face buffers synchronized with the current Brep
+        while avoiding duplicate tessellation work during one refresh.
+
+        """
         geometry = cast(Brep, self.geometry)
-        self._tessellation: Tessellation = geometry.to_tessellation()
+        self._tessellation = geometry.to_tessellation()
+        super().refresh_data()
+
+    @property
+    def tessellation(self) -> Tessellation:
+        """Tessellation used by the current render-data refresh."""
+        if self._tessellation is None:
+            geometry = cast(Brep, self.geometry)
+            self._tessellation = geometry.to_tessellation()
+        return self._tessellation
 
     @property
     def points(self) -> list[Iterable[RealInput]]:
@@ -32,9 +52,9 @@ class BRepObject(ViewerGeometryObject):
     @property
     def lines(self) -> list[tuple[PointLike, PointLike]]:
         """Discretized boundary curves of the Brep."""
-        return [segment for polyline in self._tessellation.polylines for segment in pairwise(polyline)]
+        return [segment for polyline in self.tessellation.polylines for segment in pairwise(polyline)]
 
     @property
-    def viewmesh(self) -> tuple[list[Iterable[float]], list[list[int]]]:
+    def viewmesh(self) -> VerticesFaces:
         """Triangulated view mesh of the Brep."""
-        return [vertex for vertex in self._tessellation.vertices], [list(triangle) for triangle in self._tessellation.triangles]
+        return self.tessellation.vertices, self.tessellation.triangles

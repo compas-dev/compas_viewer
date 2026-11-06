@@ -105,9 +105,12 @@ jobs:
           "${RUNNER_TEMP}/wheel-env/bin/python" "${GITHUB_WORKSPACE}/.github/verify_plugin_discovery.py"
           uv pip install \
             --python "${RUNNER_TEMP}/wheel-env/bin/python" \
-            freetype-py Pillow PyOpenGL PySide6
+            freetype-py Pillow PyOpenGL PySide6 pyright==1.1.414
           cd "${RUNNER_TEMP}"
           "${RUNNER_TEMP}/wheel-env/bin/python" -c "from compas_viewer import ANIMATION_PRESETS, AnimationPreset, CommandRegistry, Viewer, ViewerState"
+          "${RUNNER_TEMP}/wheel-env/bin/python" -m pyright \
+            --pythonpath "${RUNNER_TEMP}/wheel-env/bin/python" \
+            "${GITHUB_WORKSPACE}/tests/installed_typing_consumer.py"
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: python-package-distributions

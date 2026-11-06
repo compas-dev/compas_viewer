@@ -80,13 +80,13 @@ def key_mapper(
 
     if type == 0:
         for v in Qt.Key:
-            if v.name.replace("Key", "").replace("_", "").lower() == key:
+            if v.name and v.name.replace("Key", "").replace("_", "").lower() == key:
                 return Qt.Key(v.value)
         raise ValueError(f"Key mapping of {key} not found in Qt.Key. Check your typing?")
 
     elif type == 1:
         for v in Qt.KeyboardModifier:
-            if v.name.replace("Modifier", "").lower() == key:
+            if v.name and v.name.replace("Modifier", "").lower() == key:
                 return Qt.KeyboardModifier(v.value)
         if key == "no":
             return Qt.KeyboardModifier.NoModifier  # Some times the no modifier is not recognized.
@@ -94,7 +94,7 @@ def key_mapper(
 
     elif type == 2:
         for v in Qt.MouseButton:
-            if v.name.replace("Button", "").lower() == key:
+            if v.name and v.name.replace("Button", "").lower() == key:
                 return Qt.MouseButton(v.value)
         raise ValueError(f"Key mapping of {key} not found in Qt.MouseButton. Check your typing?")
 

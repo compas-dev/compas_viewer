@@ -34,6 +34,6 @@ class MainWindow(Component):
         """
         self.widget.resize(w, h)
         rect = self.viewer.app.primaryScreen().availableGeometry()
-        x = 0.5 * (rect.width() - w)
-        y = 0.5 * (rect.height() - h)
+        x = round(0.5 * (rect.width() - w))
+        y = round(0.5 * (rect.height() - h))
         self.widget.setGeometry(x, y, w, h)

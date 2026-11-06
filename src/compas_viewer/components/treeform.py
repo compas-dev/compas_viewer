@@ -1,5 +1,6 @@
 from collections.abc import Callable
 from typing import Any
+from typing import cast
 
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QTreeWidget
@@ -9,6 +10,12 @@ from compas.datastructures import Tree
 from compas.datastructures import TreeNode
 
 from .component import Component
+
+
+class TreeFormItem(QTreeWidgetItem):
+    """Qt tree item carrying its owning COMPAS tree node."""
+
+    node: TreeNode
 
 
 class Treeform(Component):
@@ -89,19 +96,23 @@ class Treeform(Component):
 
             strings = [str(c(node)) for _, c in self.columns.items()]
 
-            if node.parent.is_root:  # type: ignore
-                node.attributes["widget_item"] = QTreeWidgetItem(self.widget, strings)  # type: ignore
+            parent = node.parent
+            if parent is None:
+                continue
+            if parent.is_root:
+                item = TreeFormItem(self.widget, strings)
             else:
-                node.attributes["widget_item"] = QTreeWidgetItem(
-                    node.parent.attributes["widget_item"],
-                    strings,  # type: ignore
+                item = TreeFormItem(
+                    cast(TreeFormItem, parent.attributes["widget_item"]),
+                    strings,
                 )
 
-            node.attributes["widget_item"].node = node
+            item.node = node
+            node.attributes["widget_item"] = item
 
             if self._backgrounds:
                 for col, background in self._backgrounds.items():
-                    node.attributes["widget_item"].setBackground(list(self.columns.keys()).index(col), QColor(*background(node).rgb255))
+                    item.setBackground(list(self.columns.keys()).index(col), QColor(*background(node).rgb255))
 
     def tree_from_dict(self, data: dict[object, Any]) -> Tree:
         """Create a tree structure from a dictionary.
@@ -163,4 +174,4 @@ class Treeform(Component):
         """
         for item in self.widget.selectedItems():
             if self.action:
-                self.action(item.node)
+                self.action(cast(TreeFormItem, item).node)

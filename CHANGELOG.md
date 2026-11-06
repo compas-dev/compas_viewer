@@ -66,12 +66,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Consolidated runtime, development, and documentation dependencies in
   `pyproject.toml` and removed the legacy requirements files.
 * Updated package metadata, static asset inclusion, Pyright configuration, and
-  CI version matrices for Python 3.12 through 3.14.
+  CI version matrices for Python 3.12 through 3.14, and marked the installed
+  distribution as typed with `py.typed`.
 * Migrated CI, pull-request checks, coverage, and releases to the composable
-  `compas-actions` v1 workflows with `uv` environments and trusted PyPI
+  `compas-actions` v2 candidate actions with `uv` environments and trusted PyPI
   publishing.
-* Added a focused `invoke typecheck` task and removed obsolete release and
-  Grasshopper component tasks from the viewer task collection.
+* Kept a thin `uv run invoke check` convenience task for Ruff and Pyright and
+  removed obsolete release and Grasshopper component tasks from the viewer
+  task collection.
 * Modernized type annotations across the top-level `compas_viewer` modules,
   including commands, configuration, events, OpenGL helpers, Qt mappings,
   singleton state, timers, UI access, and the viewer lifecycle.
@@ -130,6 +132,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   remains synchronized with persistent configuration.
 * Fixed buffer refresh behavior after editing underlying geometry parameters,
   including changes that affect vertex or element counts.
+* Fixed mutable Brep scene objects to regenerate one coherent tessellation on
+  every data refresh instead of retaining stale boundary and face buffers.
 * Fixed small pointer jitter during a click being interpreted as a camera pan
   or rotation by adding a shared drag threshold to navigation gestures.
 

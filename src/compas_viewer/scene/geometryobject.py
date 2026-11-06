@@ -8,7 +8,9 @@ from compas.itertools import flatten
 from compas.scene import GeometryObject as BaseGeometryObject
 from compas.scene.descriptors.color import ColorAttribute
 from compas.typing import RealInput
+from compas.typing import VerticesFaces
 
+from .sceneobject import BufferValues
 from .sceneobject import ShaderDataType
 from .sceneobject import ViewerSceneObject
 
@@ -81,7 +83,7 @@ class GeometryObject(ViewerSceneObject, BaseGeometryObject):
         return None
 
     @property
-    def viewmesh(self) -> tuple[Sequence[Iterable[float]], Sequence[Sequence[int]]] | None:
+    def viewmesh(self) -> VerticesFaces | None:
         return None
 
     def _read_points_data(self) -> ShaderDataType:
@@ -107,7 +109,7 @@ class GeometryObject(ViewerSceneObject, BaseGeometryObject):
             return [], [], []
         positions, elements = self.viewmesh
         colors = [self.facecolor] * len(positions)
-        return positions, colors, elements
+        return cast(BufferValues, positions), colors, cast(BufferValues, elements)
 
     def _read_backfaces_data(self) -> ShaderDataType:
         if self.viewmesh is None:
@@ -115,7 +117,7 @@ class GeometryObject(ViewerSceneObject, BaseGeometryObject):
         positions, source_elements = self.viewmesh
         elements = [list(reversed(element)) for element in source_elements]
         colors = [self.facecolor] * len(positions)
-        return positions, colors, elements
+        return cast(BufferValues, positions), colors, elements
 
     def _rebuild_resolution_buffers(self) -> None:
         """Refresh and rebuild active renderer buffers after resolution changes."""

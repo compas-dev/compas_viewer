@@ -4,6 +4,7 @@ from typing import TypedDict
 from typing import cast
 
 from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QAbstractItemView
 from PySide6.QtWidgets import QTreeWidget
 from PySide6.QtWidgets import QTreeWidgetItem
 
@@ -25,6 +26,12 @@ class CheckboxColumn(TypedDict):
 
     action: Callable[[Any, bool], None]
     checked: Callable[[Any], bool]
+
+
+class SceneTreeItem(QTreeWidgetItem):
+    """Qt tree item carrying its owning COMPAS scene node."""
+
+    node: Any
 
 
 class Sceneform(Component):
@@ -58,9 +65,9 @@ class Sceneform(Component):
         self.checkbox_columns: dict[int, CheckboxColumn] = {}
         self.column_editable = (column_editable or [False]) + [False] * (len(columns) - len(column_editable or [False]))
         self.widget.setColumnCount(len(columns))
-        self.widget.setHeaderLabels(cast(str, col.get("title")) for col in self.columns)
+        self.widget.setHeaderLabels([cast(str, col.get("title")) for col in self.columns])
         self.widget.setHeaderHidden(not show_headers)
-        self.widget.setSelectionMode(QTreeWidget.ExtendedSelection)
+        self.widget.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         self._sceneobjects: list[Any] = []
         self._refreshing = False
 
@@ -118,16 +125,19 @@ class Sceneform(Component):
                         strings.append(text(node))
 
                 parent_widget = self.widget if node.parent is None or node.parent.is_root else node.parent.attributes["widget"]
-                widget = QTreeWidgetItem(parent_widget, strings)
+                widget = SceneTreeItem(parent_widget, strings)
                 widget.node = node
                 widget.setSelected(node.is_selected)
                 if node.is_selected:
                     self.expand(node.parent)
 
-                widget.setFlags(widget.flags() | Qt.ItemIsUserCheckable | Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+                widget.setFlags(widget.flags() | Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled)
 
                 for col, col_data in self.checkbox_columns.items():
-                    widget.setCheckState(col, Qt.Checked if col_data["checked"](node) else Qt.Unchecked)
+                    widget.setCheckState(
+                        col,
+                        Qt.CheckState.Checked if col_data["checked"](node) else Qt.CheckState.Unchecked,
+                    )
 
                 node.attributes["widget"] = widget
 
@@ -162,7 +172,8 @@ class Sceneform(Component):
         """
         if column in self.checkbox_columns:
             check = self.checkbox_columns[column]["action"]
-            check(item.node, item.checkState(column) == Qt.Checked)
+            node = cast(SceneTreeItem, item).node
+            check(node, item.checkState(column) == Qt.CheckState.Checked)
 
         self._sync_selection_from_widget()
 
@@ -173,7 +184,7 @@ class Sceneform(Component):
 
     def _sync_selection_from_widget(self) -> None:
         """Apply the widget selection to scene objects and refresh the viewer."""
-        selected_nodes = {item.node for item in self.widget.selectedItems()}
+        selected_nodes = {cast(SceneTreeItem, item).node for item in self.widget.selectedItems()}
         for node in cast(list[Any], self.scene.objects):
             node.is_selected = node in selected_nodes
             if self.action and node.is_selected:

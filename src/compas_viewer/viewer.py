@@ -514,6 +514,6 @@ def _qimage_to_pillow(image: Any) -> Any:
     if not image.save(buffer, "PNG"):
         raise RuntimeError("Could not encode an animation frame.")
     buffer.close()
-    converted = Image.open(BytesIO(bytes(data)))
+    converted = Image.open(BytesIO(data.data()))
     converted.load()
     return converted

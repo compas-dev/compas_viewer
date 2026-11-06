@@ -35,7 +35,7 @@ class SideDock(Container):
         self.scroll.setWidget(content)
         self.scroll.setWidgetResizable(True)
         self.layout = QVBoxLayout(content)
-        self.layout.setAlignment(Qt.AlignTop)
+        self.layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.widget.setAllowedAreas(Qt.DockWidgetArea.LeftDockWidgetArea | Qt.DockWidgetArea.RightDockWidgetArea)
         self.widget.setFeatures(QDockWidget.DockWidgetFeature.DockWidgetFloatable | QDockWidget.DockWidgetFeature.DockWidgetMovable)
         window.widget.addDockWidget(self.locations["left"], self.widget)

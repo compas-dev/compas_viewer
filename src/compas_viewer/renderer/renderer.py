@@ -21,6 +21,7 @@ from PySide6.QtGui import QMouseEvent
 from PySide6.QtGui import QSurfaceFormat
 from PySide6.QtGui import QWheelEvent
 from PySide6.QtOpenGLWidgets import QOpenGLWidget
+from PySide6.QtWidgets import QGesture
 from PySide6.QtWidgets import QGestureEvent
 
 from compas.geometry import Frame
@@ -62,7 +63,7 @@ class Renderer(QOpenGLWidget, Base):
     def __init__(self) -> None:
         format = QSurfaceFormat()
         format.setVersion(3, 3)
-        format.setProfile(QSurfaceFormat.CoreProfile)
+        format.setProfile(QSurfaceFormat.OpenGLContextProfile.CoreProfile)
         format.setSamples(4)  # Enable 4x MSAA (optional, can be set to 8, etc.)
         QSurfaceFormat.setDefaultFormat(format)
 
@@ -284,7 +285,7 @@ class Renderer(QOpenGLWidget, Base):
 
         """
         GL.glViewport(0, 0, w, h)
-        self.resize(w, h)
+        self.update_projection(w, h)
 
     def paintGL(self, is_instance: bool = False) -> None:
         """Paint the OpenGL canvas.
@@ -388,7 +389,7 @@ class Renderer(QOpenGLWidget, Base):
 
         """
         pinch = event.gesture(Qt.GestureType.PinchGesture)
-        if pinch:
+        if isinstance(pinch, QGesture):
             self.viewer.eventmanager.delegate_pinch(pinch)
             return True
         return False
@@ -642,20 +643,6 @@ class Renderer(QOpenGLWidget, Base):
         self.shader_tag.bind()
         self.shader_tag.uniform4x4("projection", projection)
         self.shader_tag.release()
-
-    def resize(self, w: int, h: int) -> None:
-        """
-        Resize the renderer.
-
-        Parameters
-        ----------
-        w
-            The width of the renderer.
-        h
-            The height of the renderer.
-
-        """
-        self.update_projection(w, h)
 
     def sort_objects_from_viewworld(self, objects: list["MeshObject"], viewworld: NDArray[np.floating]) -> list["MeshObject"]:
         """Sort objects by the distances from their bounding box centers to camera location

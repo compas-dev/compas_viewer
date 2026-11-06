@@ -1,5 +1,6 @@
 from collections.abc import Callable
 from collections.abc import Sequence
+from typing import cast
 
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QColorDialog
@@ -83,7 +84,7 @@ class ColorPicker(BoundComponent[Color]):
         if isinstance(default_color, Color):
             default_color = default_color.rgb
         elif isinstance(default_color, ColorDict):
-            default_color = default_color.default
+            default_color = default_color.default.rgb
         else:
             raise ValueError("Invalid color type. : {}".format(type(default_color)))
 
@@ -131,7 +132,8 @@ class ColorPicker(BoundComponent[Color]):
             Qt color selected by the user.
 
         """
-        rgb = remap_rgb(color.getRgb())[:-1]  # rgba to rgb(0-1)
+        rgba = cast(tuple[int, int, int, int], color.getRgb())
+        rgb = remap_rgb(rgba)[:-1]  # rgba to rgb(0-1)
         new_color = Color(red=rgb[0], green=rgb[1], blue=rgb[2])
         self.on_value_changed(new_color)
 

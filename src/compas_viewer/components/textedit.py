@@ -52,9 +52,9 @@ class TextEdit(BoundComponent[str]):
         title = title if title is not None else attr
         self.label = QLabel(title)
         self.text_edit = QTextEdit()
-        self.text_edit.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.text_edit.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.text_edit.setMaximumSize(85, 25)
-        self.text_edit.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.text_edit.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
 
         self.text_edit.setText(str(self.get_attr()))
         self.layout.addWidget(self.label)

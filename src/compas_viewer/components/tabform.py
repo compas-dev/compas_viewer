@@ -35,8 +35,13 @@ class Tabform(Component):
         self.tabs: dict[str, Container] = {}
 
         # Set tab position
-        position_map = {"top": QTabWidget.North, "bottom": QTabWidget.South, "left": QTabWidget.West, "right": QTabWidget.East}
-        self.widget.setTabPosition(position_map.get(tab_position, QTabWidget.North))
+        position_map = {
+            "top": QTabWidget.TabPosition.North,
+            "bottom": QTabWidget.TabPosition.South,
+            "left": QTabWidget.TabPosition.West,
+            "right": QTabWidget.TabPosition.East,
+        }
+        self.widget.setTabPosition(position_map.get(tab_position, QTabWidget.TabPosition.North))
 
         # Connect tab change signal
         self.widget.currentChanged.connect(self.on_tab_changed)

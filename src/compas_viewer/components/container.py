@@ -1,4 +1,5 @@
 from typing import Literal
+from typing import cast
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QLabel
@@ -65,7 +66,7 @@ class Container(Component):
             self._scroll_content = QWidget()
             self._scroll_content.setContentsMargins(0, 0, 0, 0)
             self._scroll_layout = QVBoxLayout(self._scroll_content)
-            self._scroll_layout.setAlignment(Qt.AlignTop)
+            self._scroll_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
             self._scroll_layout.setContentsMargins(0, 0, 0, 0)
             self.widget.setWidget(self._scroll_content)
             self.layout = QVBoxLayout()
@@ -102,12 +103,13 @@ class Container(Component):
             return
 
         if self.container_type == "splitter":
-            self.widget.addWidget(component.widget)
-            child_count = self.widget.count()
-            height = self.widget.height()
+            splitter = cast(QSplitter, self.widget)
+            splitter.addWidget(component.widget)
+            child_count = splitter.count()
+            height = splitter.height()
             if child_count > 0:
                 equal_sizes = [height // child_count] * child_count
-                self.widget.setSizes(equal_sizes)
+                splitter.setSizes(equal_sizes)
         else:
             assert self.layout is not None
             if self.compact:
@@ -158,8 +160,9 @@ class Container(Component):
         self.children = []
         if self.container_type == "splitter":
             # For splitter, remove all widgets
-            while self.widget.count():
-                child = self.widget.widget(0)
+            splitter = cast(QSplitter, self.widget)
+            while splitter.count():
+                child = splitter.widget(0)
                 if child:
                     child.setParent(None)
         else:
@@ -167,8 +170,10 @@ class Container(Component):
             assert self.layout is not None
             while self.layout.count():
                 child = self.layout.takeAt(0)
-                if child.widget():
-                    child.widget().setParent(None)
+                if child is not None:
+                    widget = child.widget()
+                    if widget is not None:
+                        widget.setParent(None)
 
     def display_text(self, text: str) -> None:
         """Replace the container contents with a text label.
@@ -181,10 +186,10 @@ class Container(Component):
         """
         self.reset()
         label = QLabel(text)
-        label.setAlignment(Qt.AlignCenter)
+        label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         label.setStyleSheet("color: gray; font-style: italic; padding: 10px;")
         if self.container_type == "splitter":
-            self.widget.addWidget(label)
+            cast(QSplitter, self.widget).addWidget(label)
         else:
             assert self.layout is not None
             self.layout.addWidget(label)

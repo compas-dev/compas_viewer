@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING
 from typing import Literal
+from typing import Protocol
 from typing import cast
 
 from PySide6.QtCore import QObject
@@ -8,7 +9,7 @@ from PySide6.QtCore import Signal
 from PySide6.QtGui import QKeyEvent
 from PySide6.QtGui import QMouseEvent
 from PySide6.QtGui import QWheelEvent
-from PySide6.QtWidgets import QGestureEvent
+from PySide6.QtWidgets import QGesture
 
 from compas_viewer.base import Base
 
@@ -17,6 +18,18 @@ if TYPE_CHECKING:
 
 type ModifierName = Literal["CTRL", "SHIFT", "ALT"]
 type MouseButtonName = Literal["LEFT", "RIGHT", "MIDDLE"]
+
+
+class _KeyEventProtocol(Protocol):
+    def key(self) -> int: ...
+
+    def modifiers(self) -> Qt.KeyboardModifier: ...
+
+
+class _MouseEventProtocol(Protocol):
+    def buttons(self) -> Qt.MouseButton: ...
+
+    def modifiers(self) -> Qt.KeyboardModifier: ...
 
 
 mousebutton_constant: dict[MouseButtonName, Qt.MouseButton] = {
@@ -106,7 +119,10 @@ class KeyEvent(QObject):
             return f"{self.title}: {self.key} + {self.modifier}"
         return f"{self.title}: {self.key}"
 
-    def __eq__(self, event: QKeyEvent) -> bool:
+    def __eq__(self, event: object) -> bool:
+        if not isinstance(event, QKeyEvent):
+            return False
+        event = cast(_KeyEventProtocol, event)
         return event.key() == self.keycode and event.modifiers() == self.modifierconstant
 
 
@@ -182,7 +198,10 @@ class MouseEvent(QObject):
             return f"{self.title}: {self.button} + {self.modifier}"
         return f"{self.title}: {self.button}"
 
-    def __eq__(self, event: QMouseEvent) -> bool:
+    def __eq__(self, event: object) -> bool:
+        if not isinstance(event, QMouseEvent):
+            return False
+        event = cast(_MouseEventProtocol, event)
         return event.buttons() == self._buttonconstant and event.modifiers() == self._modifierconstant
 
 
@@ -349,7 +368,7 @@ class EventManager(Base):
         for wheelevent in self.wheel_events:
             wheelevent.triggered.emit(event)
 
-    def delegate_pinch(self, event: QGestureEvent) -> None:
+    def delegate_pinch(self, event: QGesture) -> None:
         """Handle a pinch gesture event.
 
         Parameters

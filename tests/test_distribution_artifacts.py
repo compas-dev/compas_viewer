@@ -56,6 +56,7 @@ def write_sdist(directory):
         "README.md",
         "pyproject.toml",
         "src/compas_viewer/plugins.py",
+        "src/compas_viewer/py.typed",
         "src/compas_viewer/assets/fonts/FreeSans.ttf",
         "src/compas_viewer/renderer/shaders/model.vert",
     ]

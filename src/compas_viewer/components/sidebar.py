@@ -1,6 +1,8 @@
 from typing import TYPE_CHECKING
 from typing import cast
 
+from PySide6.QtWidgets import QSplitter
+
 from compas_viewer.components import SceneTree
 from compas_viewer.components.camerasetting import CameraSetting
 from compas_viewer.components.container import Container
@@ -23,11 +25,12 @@ class SideBarRight(Container):
         self.tabform = Tabform(tab_position="top")
         self.load_items()
         self.widget.setMinimumWidth(self.viewer.config.ui.sidebar.minimum_width)
-        self.widget.setSizes([360, 240])
-        if self.widget.count() > 0:
-            self.widget.setStretchFactor(0, 3)
-        if self.widget.count() > 1:
-            self.widget.setStretchFactor(1, 2)
+        splitter = cast(QSplitter, self.widget)
+        splitter.setSizes([360, 240])
+        if splitter.count() > 0:
+            splitter.setStretchFactor(0, 3)
+        if splitter.count() > 1:
+            splitter.setStretchFactor(1, 2)
 
     @property
     def items(self) -> list[UIItem]:

@@ -80,7 +80,10 @@ class Slider(BoundComponent[float]):
         self.min_val = min_val
         self.max_val = max_val
         self.step = step
-        self._tick_interval = tick_interval if tick_interval is not None else (self._scaled_max_val - self._scaled_min_val) / 10
+        if tick_interval is None:
+            self._tick_interval = max(1, round((self._scaled_max_val - self._scaled_min_val) / 10))
+        else:
+            self._tick_interval = max(1, round(tick_interval / self.step))
 
         self._updating = False
 
@@ -99,18 +102,18 @@ class Slider(BoundComponent[float]):
 
         self._text_layout = QHBoxLayout()
         self._domain_layout = QHBoxLayout()
-        self.slider = QSlider(Qt.Horizontal)
+        self.slider = QSlider(Qt.Orientation.Horizontal)
         self.slider.setMinimum(self._scaled_min_val)
         self.slider.setMaximum(self._scaled_max_val)
         self.slider.setTickInterval(self._tick_interval)
-        self.slider.setTickPosition(QSlider.TicksBelow)
+        self.slider.setTickPosition(QSlider.TickPosition.TicksBelow)
         self.slider.setValue(self._scale_value(initial_value))
         # Connect the slider movement to the action
         self.slider.valueChanged.connect(self.on_slider_changed)
 
         # Labels for displaying the range and current value
-        self._min_label = QLabel(str(self.min_val), alignment=Qt.AlignLeft)
-        self._max_label = QLabel(str(self.max_val), alignment=Qt.AlignRight)
+        self._min_label = QLabel(str(self.min_val), alignment=Qt.AlignmentFlag.AlignLeft)
+        self._max_label = QLabel(str(self.max_val), alignment=Qt.AlignmentFlag.AlignRight)
         self.value_label = QLabel(f"{self.title}:")
         self.line_edit = QLineEdit(str(initial_value))
         self.line_edit.setMaximumSize(85, 25)

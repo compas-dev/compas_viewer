@@ -37,10 +37,19 @@ def test_quality_workflow_keeps_headless_graphics_provisioning_visible():
     assert "uv run ruff format --check ." in workflow
     assert "uv run pyright" in workflow
     assert "uv run pytest" in workflow
+    assert "docs-only" not in workflow
     assert "ruff check --fix" not in workflow
     assert "remove-future" not in workflow
     assert COMPAS_CANDIDATE in workflow
     assert f"compas-actions/setup-python@{COMPAS_ACTIONS}" in workflow
+
+
+def test_authoritative_examples_have_declared_categories_and_no_temp_archive():
+    examples = (ROOT / "docs" / "examples.md").read_text()
+    assert "static-only interactive" in examples
+    assert "static-and-smoke" in examples
+    assert "static-plus-optional-runtime" in examples
+    assert not (ROOT / "docs" / "examples" / "__temp").exists()
 
 
 def test_documentation_and_release_workflows_are_strict_and_build_once():
@@ -61,6 +70,8 @@ def test_artifact_workflows_verify_graphics_free_plugin_discovery():
         verifier = 'python" "${GITHUB_WORKSPACE}/.github/verify_plugin_discovery.py"'
         assert verifier in workflow
         assert workflow.index(verifier) < workflow.index("freetype-py Pillow PyOpenGL PySide6")
+        assert "tests/installed_typing_consumer.py" in workflow
+        assert 'python" -m pyright' in workflow
 
 
 def test_invoke_tasks_are_thin_uv_aliases():

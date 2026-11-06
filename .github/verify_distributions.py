@@ -17,6 +17,7 @@ EXPECTED_DEPENDENCIES = {
     "pyside6": "",
 }
 REQUIRED_WHEEL_FILES = {
+    "compas_viewer/py.typed",
     "compas_viewer/assets/fonts/FreeSans.ttf",
     "compas_viewer/renderer/shaders/model.frag",
     "compas_viewer/renderer/shaders/model.vert",
@@ -80,6 +81,7 @@ def verify_sdist(sdist: Path) -> None:
         f"{root}/README.md",
         f"{root}/pyproject.toml",
         f"{root}/src/compas_viewer/plugins.py",
+        f"{root}/src/compas_viewer/py.typed",
         f"{root}/src/compas_viewer/assets/fonts/FreeSans.ttf",
         f"{root}/src/compas_viewer/renderer/shaders/model.vert",
     }
