@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Added declarative persistent-state fields for viewer scene objects and
+  explicit rebinding of separately serialized COMPAS data.
 * Added multi-object selection, directional window selection, selection
   inversion, and selection by type, color, or name. Left-to-right windows
   require full containment, while right-to-left windows select intersections.
@@ -46,6 +48,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* Changed scene persistence to store durable node state and data references
+  without embedding represented geometry or transient renderer state.
 * Standardized development on a committed uv lock, direct non-mutating Ruff,
   Pyright, Pytest, and strict MkDocs commands, with thin Invoke aliases.
 * Made Qt's headless mode and Linux EGL/OpenGL provisioning explicit in local

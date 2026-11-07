@@ -37,10 +37,12 @@ jobs:
           python-version: ${{ matrix.python }}
           dependency-groups: dev
           extras: ""
-      - run: uv run ruff check .
-      - run: uv run ruff format --check .
-      - run: uv run pyright
-      - run: uv run pytest
+      - name: Install the reviewed COMPAS scene candidate
+        run: uv pip install --python .venv --reinstall "compas @ git+https://github.com/compas-dev/compas.git@f878cd102e87e7859030af96c7871a5b3345cf7d"
+      - run: uv run --no-sync ruff check .
+      - run: uv run --no-sync ruff format --check .
+      - run: uv run --no-sync pyright
+      - run: uv run --no-sync pytest
 
   distributions:
     needs: quality
@@ -73,7 +75,7 @@ jobs:
           uv venv "${RUNNER_TEMP}/wheel-env"
           uv pip install \
             --python "${RUNNER_TEMP}/wheel-env/bin/python" \
-            "compas @ git+https://github.com/compas-dev/compas.git@3c1a2e8e0e5c4c14292ecf4bb38c82e5b977273e"
+            "compas @ git+https://github.com/compas-dev/compas.git@f878cd102e87e7859030af96c7871a5b3345cf7d"
           uv pip install --python "${RUNNER_TEMP}/wheel-env/bin/python" --no-deps "${RUNNER_TEMP}"/dist/*.whl
           "${RUNNER_TEMP}/wheel-env/bin/python" "${GITHUB_WORKSPACE}/.github/verify_plugin_discovery.py"
           uv pip install \
