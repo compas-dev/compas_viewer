@@ -5,7 +5,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).parents[1]
 WORKFLOWS = ROOT / ".github" / "workflows"
-COMPAS_CANDIDATE = "3c1a2e8e0e5c4c14292ecf4bb38c82e5b977273e"
+LOCKED_COMPAS_CANDIDATE = "3c1a2e8e0e5c4c14292ecf4bb38c82e5b977273e"
+SCENE_COMPAS_CANDIDATE = "f878cd102e87e7859030af96c7871a5b3345cf7d"
 COMPAS_ACTIONS = "5c64e6e2b576a1232d28fed47d9478ca8eb63b2d"
 
 
@@ -18,7 +19,7 @@ def test_project_uses_locked_dependency_groups_and_compas_3():
     assert "optional-dependencies" not in project["project"]
     assert set(project["dependency-groups"]) == {"dev", "docs"}
     assert "compas>=3,<4" in project["project"]["dependencies"]
-    assert project["tool"]["uv"]["sources"]["compas"]["rev"] == COMPAS_CANDIDATE
+    assert project["tool"]["uv"]["sources"]["compas"]["rev"] == LOCKED_COMPAS_CANDIDATE
     assert project["tool"]["pyright"]["include"] == ["src/compas_viewer", "docs/examples"]
     assert "black" not in project["tool"]
 
@@ -33,14 +34,14 @@ def test_quality_workflow_keeps_headless_graphics_provisioning_visible():
     workflow = workflow_text("build.yml")
     assert "QT_QPA_PLATFORM: offscreen" in workflow
     assert "apt-get install --yes libegl1 python3-opengl" in workflow
-    assert "uv run ruff check ." in workflow
-    assert "uv run ruff format --check ." in workflow
-    assert "uv run pyright" in workflow
-    assert "uv run pytest" in workflow
+    assert "uv run --no-sync ruff check ." in workflow
+    assert "uv run --no-sync ruff format --check ." in workflow
+    assert "uv run --no-sync pyright" in workflow
+    assert "uv run --no-sync pytest" in workflow
     assert "docs-only" not in workflow
     assert "ruff check --fix" not in workflow
     assert "remove-future" not in workflow
-    assert COMPAS_CANDIDATE in workflow
+    assert SCENE_COMPAS_CANDIDATE in workflow
     assert f"compas-actions/setup-python@{COMPAS_ACTIONS}" in workflow
 
 
