@@ -11,21 +11,19 @@ tessellation = surface.triangulated()
 points = np.asarray(surface.vertices, dtype=np.float32)
 pointcolor = np.tile([1.0, 0.0, 0.0, 1.0], (len(points), 1))
 
-lines = np.asarray([surface.vertices[index] for edge in surface.edges for index in edge], dtype=np.float32)
-linecolor = np.tile([0.0, 1.0, 0.0, 1.0], (len(lines), 1))
+edges = np.asarray(surface.edges, dtype=np.int32)
+linecolor = np.tile([0.0, 1.0, 0.0, 1.0], (len(points), 1))
 
-faces = np.asarray(
-    [tessellation.vertices[index] for triangle in tessellation.triangles for index in triangle],
-    dtype=np.float32,
-)
-facecolor = np.tile([0.0, 0.0, 1.0, 1.0], (len(faces), 1))
+triangles = np.asarray(tessellation.triangles, dtype=np.int32)
+facecolor = np.tile([0.0, 0.0, 1.0, 1.0], (len(points), 1))
 
 geometry = BufferGeometry(
-    points=points,
+    vertices=points,
+    points=np.arange(len(points), dtype=np.int32),
+    edges=edges,
+    triangles=triangles,
     pointcolor=pointcolor,
-    lines=lines,
     linecolor=linecolor,
-    faces=faces,
     facecolor=facecolor,
 )
 

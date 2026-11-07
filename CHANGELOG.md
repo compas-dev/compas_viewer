@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Added shared-vertex indexed `BufferGeometry` with convenience constructors
+  for point, edge, and triangle buffers and independent JSON serialization.
 * Added declarative persistent-state fields for viewer scene objects and
   explicit rebinding of separately serialized COMPAS data.
 * Added multi-object selection, directional window selection, selection
@@ -48,6 +50,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* Changed Viewer buffer assembly to preserve supplied primitive indices instead
+  of expanding vertices, including per-triangle back-face winding.
 * Changed scene persistence to store durable node state and data references
   without embedding represented geometry or transient renderer state.
 * Standardized development on a committed uv lock, direct non-mutating Ruff,

@@ -91,35 +91,35 @@ class BufferManager:
     def _add_buffer_data(self, obj: Any, buffer_type: str) -> None:
         """Add buffer data for a specific geometry type."""
         positions, colors, elements = getattr(obj, buffer_type)
+        pos_array = np.asarray(positions, dtype=np.float32).reshape(-1)
+        if pos_array.size % 3:
+            raise ValueError(f"Buffer positions should contain complete xyz coordinates, got {pos_array.size} values.")
+        vertex_count = pos_array.size // 3
+        colors = list(colors)
 
-        if len(colors) > len(positions):
-            print(
-                f"WARNING: Buffer type: {buffer_type} colors length: {len(colors)} greater than positions length: {len(positions)} for {obj},the remaining colors will be ignored"
-            )
-            colors = colors[: len(positions)]
-        elif len(colors) < len(positions):
-            print(f"WARNING: Buffer type: {buffer_type} colors length: {len(colors)} less than positions length: {len(positions)} for {obj}, last color will be repeated")
-            colors = colors + [colors[-1]] * (len(positions) - len(colors))
+        if len(colors) > vertex_count:
+            print(f"WARNING: Buffer type: {buffer_type} colors length: {len(colors)} greater than vertex count: {vertex_count} for {obj},the remaining colors will be ignored")
+            colors = colors[:vertex_count]
+        elif len(colors) < vertex_count:
+            print(f"WARNING: Buffer type: {buffer_type} colors length: {len(colors)} less than vertex count: {vertex_count} for {obj}, last color will be repeated")
+            colors = colors + [colors[-1]] * (vertex_count - len(colors))
 
         # Convert to numpy arrays
-        pos_array = np.array(positions, dtype=np.float32).flatten()
         col_array = np.array([c.rgba for c in colors] if len(colors) > 0 and isinstance(colors[0], Color) else colors, dtype=np.float32).flatten()
         elem_array = np.array(elements, dtype=np.int32).flatten()
 
         opaque_element_indices: list[int] = []
         transparent_element_indices: list[int] = []
         if buffer_type == "_frontfaces_data" or buffer_type == "_backfaces_data":
-            for e in elem_array:
-                if e >= len(colors):
+            if elem_array.size % 3:
+                raise ValueError(f"Face elements should contain complete triangle triplets, got {elem_array.size} indices.")
+            for triangle in elem_array.reshape((-1, 3)):
+                if any(e < 0 or e >= len(colors) for e in triangle):
                     # print("WARNING: Element index out of range", obj) # TODO: Fix BREP from IFC
                     continue
-
-                color = colors[e]
-                alpha = color.a if isinstance(color, Color) else color[3]
-                if alpha < 1.0 or obj.opacity < 1.0:
-                    transparent_element_indices.append(int(e))
-                else:
-                    opaque_element_indices.append(int(e))
+                alphas = [color.a if isinstance(color := colors[e], Color) else color[3] for e in triangle]
+                target = transparent_element_indices if obj.opacity < 1.0 or any(alpha < 1.0 for alpha in alphas) else opaque_element_indices
+                target.extend(int(e) for e in triangle)
 
         # Update elements to account for offset
         start_idx = len(self.positions[buffer_type]) // 3
@@ -127,7 +127,7 @@ class BufferManager:
 
         # Create vertex indices
         object_index = len(self.transforms)
-        obj_indices = np.full(len(positions), object_index, dtype=np.float32)
+        obj_indices = np.full(vertex_count, object_index, dtype=np.float32)
 
         # Append to existing buffers
         self.positions[buffer_type] = np.append(self.positions[buffer_type], pos_array)
