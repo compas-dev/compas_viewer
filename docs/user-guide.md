@@ -89,6 +89,25 @@ viewer.show()
 
 The Show column changes an object's visibility without removing it. Selection in the tree and selection in the viewport remain synchronized.
 
+## Save and restore scenes
+
+A serialized scene contains the hierarchy, references to COMPAS data by GUID,
+and durable presentation state. It does not embed the referenced geometry or
+data structures. Save those objects separately when they must be restored with
+the scene.
+
+After loading, the scene nodes are available for inspection without the data.
+Bind the independently loaded objects with `scene.bind(...)` or
+`scene.bind_many(...)`, then create Viewer adapters with
+`scene.bind_context("Viewer")`. Accessing `scene.objects` or drawing before all
+referenced items are bound raises `SceneItemNotBoundError`.
+
+Durable Viewer state includes transformations, visibility, colors, display
+sizes, resolution, and mesh display flags. Selection, instance-picking colors,
+GPU buffers, and renderer caches belong to the live Viewer session and are not
+serialized. See the [scene serialization example](examples/scene/serialization.md)
+for the complete step-by-step script.
+
 ## Inspect and edit objects
 
 Select an object and open the **Object** tab to see:

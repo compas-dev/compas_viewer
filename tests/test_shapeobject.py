@@ -19,6 +19,11 @@ from compas.geometry import Translation
 from compas.geometry import Vector
 from compas.scene import Scene
 from compas_viewer import Viewer
+from compas_viewer.scene import BufferObject
+from compas_viewer.scene import GraphObject
+from compas_viewer.scene import MeshObject
+from compas_viewer.scene import ShapeObject
+from compas_viewer.scene.scene import instance_colors_generator
 
 
 @pytest.fixture
@@ -64,6 +69,7 @@ def test_shape_object_scene_roundtrip_preserves_durable_state(viewer):
     original = viewer.scene.add(
         shape,
         is_selected=True,
+        show_faces=False,
         u=7,
         use_rgba=True,
         v=9,
@@ -71,6 +77,7 @@ def test_shape_object_scene_roundtrip_preserves_durable_state(viewer):
         transformation=transformation,
     )
     original.background = True
+    assert not hasattr(original, "settings")
 
     payload = json_dumps(viewer.scene)
     restored_scene = json_loads(payload)
@@ -84,6 +91,7 @@ def test_shape_object_scene_roundtrip_preserves_durable_state(viewer):
     assert restored.u == 7
     assert restored.v == 9
     assert restored.facecolor == facecolor
+    assert restored.show_faces is False
     assert restored.use_rgba is True
     assert restored.background is True
     assert restored.is_selected is False
@@ -105,6 +113,50 @@ def test_geometry_adapter_scene_roundtrip_preserves_declared_state(viewer):
     assert restored_frame.size == 2.5
     assert restored_plane.planesize == 4.5
     assert restored_vector.anchor == Point(5, 6, 7)
+
+
+@pytest.mark.parametrize("object_type", [ShapeObject, MeshObject, GraphObject, BufferObject])
+def test_viewer_scene_state_mro_has_one_owner_per_adapter_attribute(object_type):
+    declarations = object_type.scene_state_fields()
+    attributes = [field.attribute for fields in declarations.values() for field in fields]
+
+    assert len(attributes) == len(set(attributes))
+
+
+def test_shape_object_uses_core_ownership_for_shared_geometry_state():
+    declarations = ShapeObject.scene_state_fields()
+    core_fields = {field.attribute for field in declarations["compas.scene.GeometryObject"]}
+    viewer_fields = {field.attribute for field in declarations["compas_viewer.scene.ViewerSceneObject"]}
+
+    assert {"show_points", "show_lines", "linewidth", "pointsize"} <= core_fields
+    assert not {"show_points", "show_lines", "linewidth", "pointsize"} & viewer_fields
+
+
+def test_instance_color_cache_resets_when_adapters_are_rebound(viewer):
+    original = viewer.scene.add(Sphere(1.0))
+    viewer.scene.instance_colors[(10, 20, 30)] = original
+
+    viewer.scene.bind_context("Viewer")
+
+    assert viewer.scene.objects[0] is not original
+    assert viewer.scene.instance_colors == {}
+    assert next(viewer.scene._instance_colors_generator) == next(instance_colors_generator())
+
+
+def test_instance_color_cache_resets_when_scene_changes(viewer):
+    sceneobject = viewer.scene.add(Sphere(1.0))
+    viewer.scene.instance_colors[(10, 20, 30)] = sceneobject
+
+    viewer.scene.remove(sceneobject, rebuild_buffers=False)
+
+    assert viewer.scene.instance_colors == {}
+    assert next(viewer.scene._instance_colors_generator) == next(instance_colors_generator())
+
+    viewer.scene.instance_colors[(40, 50, 60)] = sceneobject
+    viewer.scene.clear(clear_scene=False, clear_context=False)
+
+    assert viewer.scene.instance_colors == {}
+    assert next(viewer.scene._instance_colors_generator) == next(instance_colors_generator())
 
 
 @pytest.mark.parametrize(

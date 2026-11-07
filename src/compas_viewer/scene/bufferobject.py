@@ -5,6 +5,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from compas.geometry import Geometry
+from compas.scene import SceneStateField
 from compas_viewer.scene import ViewerSceneObject
 
 from .sceneobject import ShaderDataType
@@ -64,6 +65,15 @@ class BufferObject(ViewerSceneObject):
         Additional keyword arguments.
 
     """
+
+    __scene_state_namespace__ = "compas_viewer.scene.BufferObject"
+    __scene_state_fields__ = (
+        SceneStateField("show_points", bool),
+        SceneStateField("show_lines", bool),
+        SceneStateField("show_faces", bool),
+        SceneStateField("linewidth", (int, float)),
+        SceneStateField("pointsize", (int, float)),
+    )
 
     def __init__(self, *args: Any, show_points: bool = True, show_lines: bool = True, show_faces: bool = True, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)

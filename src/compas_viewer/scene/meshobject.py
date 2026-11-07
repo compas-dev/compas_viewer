@@ -47,6 +47,10 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
     facecolor = ColorDictAttribute(default=Color(0.9, 0.9, 0.9))
     __scene_state_namespace__ = "compas_viewer.scene.MeshObject"
     __scene_state_fields__ = (
+        SceneStateField("show_points", bool),
+        SceneStateField("show_lines", bool),
+        SceneStateField("linewidth", (int, float)),
+        SceneStateField("pointsize", (int, float)),
         SceneStateField("hide_coplanaredges", bool),
         SceneStateField("use_vertexcolors", bool),
     )

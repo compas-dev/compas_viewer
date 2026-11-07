@@ -52,11 +52,6 @@ class ViewerSceneObject(SceneObject):
 
     __scene_state_namespace__ = "compas_viewer.scene.ViewerSceneObject"
     __scene_state_fields__ = (
-        SceneStateField("show_points", bool),
-        SceneStateField("show_lines", bool),
-        SceneStateField("show_faces", bool),
-        SceneStateField("linewidth", (int, float)),
-        SceneStateField("pointsize", (int, float)),
         SceneStateField("use_rgba", bool),
         SceneStateField("background", bool),
     )
@@ -112,6 +107,15 @@ class ViewerSceneObject(SceneObject):
         return Viewer()
 
     @property
+    def show_faces(self) -> bool:
+        """Whether to display surface geometry as faces."""
+        return self.show_surfaces
+
+    @show_faces.setter
+    def show_faces(self, show: bool) -> None:
+        self.show_surfaces = show
+
+    @property
     def bounding_box(self) -> list[list[float]] | None:
         """list[list[float]] | None: World-space minimum and maximum corners."""
         return self._bounding_box
@@ -163,6 +167,9 @@ class ViewerSceneObject(SceneObject):
     def init(self) -> None:
         """Initialize render data, bounds, and instance-selection color."""
         self.refresh_data()
+        previous = getattr(self, "instance_color", None)
+        if previous is not None and self.viewer.scene.instance_colors.get(previous.rgb255) is self:
+            self.viewer.scene.instance_colors.pop(previous.rgb255)
         self.instance_color = Color.from_rgb255(*next(self.viewer.scene._instance_colors_generator))
         self.viewer.scene.instance_colors[self.instance_color.rgb255] = self
 
@@ -207,33 +214,6 @@ class ViewerSceneObject(SceneObject):
         self._bounding_box = list(transform_points_numpy(array([_positions.min(axis=0), _positions.max(axis=0)]), self.worldtransformation.matrix))
         center = average(a=array(self.bounding_box), axis=0)
         self._bounding_box_center = Point(center[0], center[1], center[2])
-
-    @property
-    def settings(self) -> dict[str, Any]:
-        """dict[str, Any]: Current display settings for the scene object."""
-        settings = {
-            "name": self.name,
-            "is_selected": self.is_selected,
-            "show": self.show,
-            "show_points": self.show_points,
-            "show_lines": self.show_lines,
-            "show_faces": self.show_faces,
-            "linewidth": self.linewidth,
-            "pointsize": self.pointsize,
-            "opacity": self.opacity,
-            "background": self.background,
-        }
-
-        if hasattr(self, "pointcolor"):
-            settings["pointcolor"] = getattr(self, "pointcolor")
-
-        if hasattr(self, "linecolor"):
-            settings["linecolor"] = getattr(self, "linecolor")
-
-        if hasattr(self, "facecolor"):
-            settings["facecolor"] = getattr(self, "facecolor")
-
-        return settings
 
     @property
     def buffer_manager(self) -> Any:

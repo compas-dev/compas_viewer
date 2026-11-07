@@ -82,6 +82,16 @@ class ViewerScene(Scene):
 
         return Viewer()
 
+    def _reset_instance_colors(self) -> None:
+        """Reset transient picking colors and release cached adapter references."""
+        self.instance_colors.clear()
+        self._instance_colors_generator = instance_colors_generator()
+
+    def bind_context(self, context: str | None = None) -> None:
+        """Bind runtime adapters and reset transient picking state."""
+        super().bind_context(context)
+        self._reset_instance_colors()
+
     # TODO: These fixed kwargs could be moved to COMPAS core.
     def add(
         self,
@@ -223,8 +233,14 @@ class ViewerScene(Scene):
 
         """
         super().remove(sceneobject)
+        self._reset_instance_colors()
 
         if self.viewer.running and rebuild_buffers:
             self.viewer.renderer.rebuild_buffers()
             self.viewer.renderer.update()
             self.viewer.ui.sidebar.update()
+
+    def clear(self, clear_scene: bool = True, clear_context: bool = True) -> None:
+        """Clear scene state and reset transient picking colors."""
+        super().clear(clear_scene=clear_scene, clear_context=clear_context)
+        self._reset_instance_colors()

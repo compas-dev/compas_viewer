@@ -3,6 +3,7 @@ from typing import cast
 
 from compas.colors import Color
 from compas.scene import GraphObject as BaseGraphObject
+from compas.scene import SceneStateField
 
 from .sceneobject import ShaderDataType
 from .sceneobject import ViewerSceneObject
@@ -14,6 +15,15 @@ class ColorLookup(Protocol):
 
 class GraphObject(ViewerSceneObject, BaseGraphObject):
     """Viewer scene object for displaying COMPAS Graph data."""
+
+    __scene_state_namespace__ = "compas_viewer.scene.GraphObject"
+    __scene_state_fields__ = (
+        SceneStateField("show_points", bool),
+        SceneStateField("show_lines", bool),
+        SceneStateField("show_faces", bool),
+        SceneStateField("linewidth", (int, float)),
+        SceneStateField("pointsize", (int, float)),
+    )
 
     def _read_points_data(self) -> ShaderDataType:
         positions = []
