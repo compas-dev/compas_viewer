@@ -3,7 +3,7 @@ from random import randint
 from random import seed
 from typing import TYPE_CHECKING
 from typing import Any
-from typing import cast
+from uuid import UUID
 
 from compas.colors import Color
 from compas.data import Data
@@ -11,7 +11,6 @@ from compas.scene import Scene
 from compas.scene import SceneNode
 from compas.scene import SceneObject
 
-from .group import Group
 from .sceneobject import ViewerSceneObject
 
 if TYPE_CHECKING:
@@ -70,32 +69,64 @@ class ViewerScene(Scene):
         context: str | None = "Viewer",
         *,
         _detect_context: bool = True,
+        _objects: dict[UUID, SceneObject] | None = None,
         _root: SceneNode | None = None,
     ) -> None:
-        super().__init__(name=name, context=context, _detect_context=_detect_context, _root=_root)
-        self.instance_colors: dict[tuple[int, int, int], ViewerSceneObject] = {}
+        super().__init__(name=name, context=context, _detect_context=_detect_context, _objects=_objects, _root=_root)
+        self.render_objects: dict[UUID, ViewerSceneObject] = {}
+        self.instance_colors: dict[tuple[int, int, int], SceneObject] = {}
+        self._selected: set[UUID] = set()
         self._instance_colors_generator = instance_colors_generator()
+        self._viewer: Viewer | None = None
 
     @property
     def viewer(self) -> "Viewer":
-        from compas_viewer import Viewer
+        if self._viewer is None:
+            raise RuntimeError("This ViewerScene is not attached to a Viewer.")
+        return self._viewer
 
-        return Viewer()
+    def attach(self, viewer: "Viewer") -> None:
+        """Attach the explicit Viewer that owns this runtime scene."""
+        self._viewer = viewer
 
     def _reset_instance_colors(self) -> None:
         """Reset transient picking colors and release cached adapter references."""
         self.instance_colors.clear()
         self._instance_colors_generator = instance_colors_generator()
 
-    def bind_context(self, context: str | None = None) -> None:
-        """Bind runtime adapters and reset transient picking state."""
-        super().bind_context(context)
+    def prepare(self) -> None:
+        """Create transient render state for the current stable objects."""
         self._reset_instance_colors()
+        self.draw(context="Viewer", runtime=self)
+
+    def render_object(self, sceneobject: SceneObject) -> ViewerSceneObject:
+        """Return the transient render state for a stable scene object."""
+        try:
+            return self.render_objects[sceneobject.guid]
+        except KeyError:
+            self.draw_object(sceneobject, context="Viewer", runtime=self)
+            return self.render_objects[sceneobject.guid]
+
+    def is_selected(self, sceneobject: SceneObject) -> bool:
+        """Return whether a stable scene object is selected in this Viewer."""
+        return sceneobject.guid in self._selected
+
+    def set_selected(self, sceneobject: SceneObject, selected: bool) -> None:
+        """Set transient Viewer selection state for a stable scene object."""
+        if selected:
+            self._selected.add(sceneobject.guid)
+        else:
+            self._selected.discard(sceneobject.guid)
+
+    def release_picking(self, sceneobject: SceneObject) -> None:
+        """Remove transient picking entries for a stable scene object."""
+        self.instance_colors = {color: obj for color, obj in self.instance_colors.items() if obj.guid != sceneobject.guid}
+        self._selected.discard(sceneobject.guid)
 
     # TODO: These fixed kwargs could be moved to COMPAS core.
     def add(
         self,
-        item: Data | SceneObject,
+        item: Data,
         parent: SceneObject | SceneNode | None = None,
         is_selected: bool = False,
         show: bool = True,
@@ -115,7 +146,7 @@ class ViewerScene(Scene):
         v: int | None = None,
         u: int | None = None,
         **kwargs: Any,
-    ) -> ViewerSceneObject:
+    ) -> SceneObject:
         """Add an item to the scene.
 
         Parameters
@@ -165,60 +196,124 @@ class ViewerScene(Scene):
             The scene object.
 
         """
+        from compas.datastructures import Graph
+        from compas.datastructures import Mesh
+        from compas.geometry import Point
+        from compas.geometry import Pointcloud
+
+        from .bufferobject import BufferGeometry
+        from .collectionobject import Collection
+
+        if isinstance(item, Collection):
+            collection_options = dict(kwargs)
+            name = collection_options.pop("name", None) or item.name or "Collection"
+            transformation = collection_options.pop("transformation", None)
+            color = collection_options.get("color")
+            group_options = {"show": show, "transformation": transformation}
+            if color is not None:
+                group_options["color"] = color
+            if opacity is not None:
+                group_options["opacity"] = opacity
+            group = self.add_group(name=name, parent=parent, **group_options)
+            self.set_selected(group, is_selected)
+            for child in item.items:
+                self.add(
+                    child,
+                    parent=group,
+                    is_selected=is_selected,
+                    show=show,
+                    show_points=show_points,
+                    show_lines=show_lines,
+                    show_faces=show_faces,
+                    vertexcolor=vertexcolor,
+                    pointcolor=pointcolor,
+                    linecolor=linecolor,
+                    facecolor=facecolor,
+                    surfacecolor=surfacecolor,
+                    linewidth=linewidth,
+                    pointsize=pointsize,
+                    opacity=opacity,
+                    hide_coplanaredges=hide_coplanaredges,
+                    use_vertexcolors=use_vertexcolors,
+                    v=v,
+                    u=u,
+                    **collection_options,
+                )
+            return group
+
         edgecolor = kwargs.pop("edgecolor", linecolor)
+        if isinstance(item, (Point, Pointcloud)) and show_points is None:
+            show_points = True
+        if isinstance(item, BufferGeometry):
+            show_points = item.points is not None if show_points is None else show_points
+            show_lines = item.edges is not None if show_lines is None else show_lines
+            show_faces = item.triangles is not None if show_faces is None else show_faces
+        options = {"show": show, **kwargs}
+        if opacity is not None:
+            options["opacity"] = opacity
+        if isinstance(item, Mesh):
+            options.update(
+                {
+                    key: value
+                    for key, value in {
+                        "show_vertices": show_points,
+                        "show_edges": show_lines,
+                        "show_faces": show_faces,
+                        "vertexcolor": vertexcolor or pointcolor,
+                        "edgecolor": edgecolor,
+                        "facecolor": facecolor,
+                        "vertexsize": pointsize,
+                        "edgewidth": linewidth,
+                        "hide_coplanaredges": hide_coplanaredges,
+                        "use_vertexcolors": use_vertexcolors,
+                    }.items()
+                    if value is not None
+                }
+            )
+        elif isinstance(item, Graph):
+            options.update(
+                {
+                    key: value
+                    for key, value in {
+                        "show_nodes": show_points,
+                        "show_edges": show_lines,
+                        "nodecolor": pointcolor,
+                        "edgecolor": linecolor,
+                        "nodesize": pointsize,
+                        "edgewidth": linewidth,
+                    }.items()
+                    if value is not None
+                }
+            )
+        else:
+            options.update(
+                {
+                    key: value
+                    for key, value in {
+                        "show_points": show_points,
+                        "show_lines": show_lines,
+                        "show_surfaces": show_faces,
+                        "pointcolor": pointcolor,
+                        "linecolor": linecolor,
+                        "surfacecolor": surfacecolor or facecolor,
+                        "linewidth": linewidth,
+                        "pointsize": pointsize,
+                        "u": u,
+                        "v": v,
+                    }.items()
+                    if value is not None
+                }
+            )
 
-        sceneobject = super().add(
-            item=item,
-            parent=parent,
-            is_selected=is_selected,
-            show=show,
-            show_points=show_points,
-            show_lines=show_lines,
-            show_faces=show_faces,
-            pointcolor=pointcolor,
-            vertexcolor=vertexcolor or pointcolor,
-            linecolor=linecolor,
-            edgecolor=edgecolor,
-            facecolor=facecolor,
-            surfacecolor=surfacecolor or facecolor,
-            linewidth=linewidth,
-            pointsize=pointsize,
-            opacity=opacity,
-            hide_coplanaredges=hide_coplanaredges,
-            use_vertexcolors=use_vertexcolors,
-            v=v,
-            u=u,
-            **kwargs,
-        )
+        sceneobject = super().add(item=item, parent=parent, **options)
+        self.set_selected(sceneobject, is_selected)
 
-        if self.viewer.running:
-            self.viewer.renderer.rebuild_buffers()
-            self.viewer.renderer.update()
-            self.viewer.ui.sidebar.update()
+        if self._viewer is not None and self._viewer.running:
+            self._viewer.renderer.rebuild_buffers()
+            self._viewer.renderer.update()
+            self._viewer.ui.sidebar.update()
 
-        return cast(ViewerSceneObject, sceneobject)
-
-    def add_group(self, name: str = "Group", parent: SceneObject | SceneNode | None = None, **kwargs: Any) -> Group:
-        """Add a group to the scene.
-
-        Parameters
-        ----------
-        name
-            The name of the group.
-        parent
-            The parent of the group.
-        **kwargs
-            The other possible parameters to be passed to the group.
-
-        Returns
-        -------
-        Group
-            The group.
-
-        """
-        group = Group(name=name, **kwargs)
-        self.add(group, parent=parent)
-        return group
+        return sceneobject
 
     def remove(self, sceneobject: SceneObject | SceneNode, rebuild_buffers: bool = True) -> None:
         """Remove a scene object from the scene.
@@ -232,15 +327,27 @@ class ViewerScene(Scene):
             Default to True.
 
         """
+        stable_object = self.object(sceneobject) if isinstance(sceneobject, SceneNode) else sceneobject
+        removed_objects = [self.object(node) for node in self.node(stable_object.guid).traverse()]
         super().remove(sceneobject)
-        self._reset_instance_colors()
+        for removed_object in removed_objects:
+            self.render_objects.pop(removed_object.guid, None)
+            self.release_picking(removed_object)
 
-        if self.viewer.running and rebuild_buffers:
-            self.viewer.renderer.rebuild_buffers()
-            self.viewer.renderer.update()
-            self.viewer.ui.sidebar.update()
+        if self._viewer is not None and self._viewer.running and rebuild_buffers:
+            self._viewer.renderer.rebuild_buffers()
+            self._viewer.renderer.update()
+            self._viewer.ui.sidebar.update()
 
-    def clear(self, clear_scene: bool = True, clear_context: bool = True) -> None:
+    def clear(
+        self,
+        clear_scene: bool = True,
+        clear_context: bool = True,
+        context: str | None = None,
+        runtime: object | None = None,
+    ) -> None:
         """Clear scene state and reset transient picking colors."""
-        super().clear(clear_scene=clear_scene, clear_context=clear_context)
+        super().clear(clear_scene=clear_scene, clear_context=clear_context, context=context, runtime=runtime)
+        if clear_context:
+            self.render_objects.clear()
         self._reset_instance_colors()

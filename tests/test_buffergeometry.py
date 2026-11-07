@@ -123,7 +123,8 @@ def test_bufferobject_preserves_shared_vertices_and_indices(viewer):
         edges=[[0, 1], [2, 3]],
         triangles=[[0, 1, 2], [1, 3, 2]],
     )
-    obj = viewer.scene.add(geometry)
+    sceneobject = viewer.scene.add(geometry)
+    obj = viewer.scene.render_object(sceneobject)
 
     point_positions, _, point_indices = obj._read_points_data()
     edge_positions, _, edge_indices = obj._read_lines_data()
@@ -145,7 +146,8 @@ def test_large_indexed_geometry_keeps_one_shared_vertex_table(viewer):
     edges = np.column_stack((np.arange(count - 1), np.arange(1, count)))
     triangles = np.column_stack((np.zeros(count - 2, dtype=int), np.arange(1, count - 1), np.arange(2, count)))
     geometry = BufferGeometry(vertices, edges=edges, triangles=triangles)
-    obj = viewer.scene.add(geometry)
+    sceneobject = viewer.scene.add(geometry)
+    obj = viewer.scene.render_object(sceneobject)
 
     assert len(viewer.scene.objects) == 1
     assert obj._read_lines_data()[0].shape == (count, 3)

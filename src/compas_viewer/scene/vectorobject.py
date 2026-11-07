@@ -4,14 +4,12 @@ from typing import cast
 from compas.colors import Color
 from compas.geometry import Point
 from compas.geometry import Vector
-from compas.scene import GeometryObject
-from compas.scene import SceneStateField
 
 from .sceneobject import ShaderDataType
 from .sceneobject import ViewerSceneObject
 
 
-class VectorObject(ViewerSceneObject, GeometryObject):
+class VectorObject(ViewerSceneObject):
     """Viewer scene object for displaying COMPAS Vector geometry.
 
     Parameters
@@ -34,25 +32,13 @@ class VectorObject(ViewerSceneObject, GeometryObject):
 
     # Fixed indices for the arrow faces:
     ARROW_FACE_INDICES = [[6, 2, 3], [6, 3, 4], [6, 4, 5], [6, 5, 2], [2, 4, 3], [2, 5, 4]]
-    __scene_state_namespace__ = "compas_viewer.scene.VectorObject"
-    __scene_state_fields__ = (SceneStateField("anchor", Point),)
 
-    def __init__(self, anchor: Point | None = None, **kwargs: Any) -> None:
-        self.anchor = anchor or Point(0, 0, 0)
+    def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
         self.arrow_buffer: dict[str, Any]
         self._lines_buffer: dict[str, Any]
         self._arrow_vertices: list[Point] = []
         self._arrow_colors: list[Color] = []
-
-    @property
-    def anchor(self) -> Point:
-        """The world-space anchor of the displayed vector."""
-        return self._anchor
-
-    @anchor.setter
-    def anchor(self, anchor: Point) -> None:
-        self._anchor = anchor
 
     def _calculate_arrow_buffer_data(self) -> None:
         vector = cast(Vector, self.geometry)

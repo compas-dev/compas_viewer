@@ -32,7 +32,6 @@ from compas_viewer.mouse import Mouse
 from compas_viewer.plugins import ensure_scene_objects_registered
 from compas_viewer.renderer import Renderer
 from compas_viewer.scene import ViewerScene
-from compas_viewer.scene import ViewerSceneObject
 from compas_viewer.singleton import Singleton
 from compas_viewer.state import ViewerState
 from compas_viewer.ui import UI
@@ -84,15 +83,22 @@ class Viewer(Singleton):
         """The active viewer scene, created lazily on first access."""
         if self._scene is None:
             self._scene = ViewerScene()
+            self._scene.attach(self)
         return self._scene
 
     @scene.setter
     def scene(self, scene: Scene) -> None:
         """Replace the active scene from serialized COMPAS scene data."""
-        self._scene = ViewerScene.__from_data__(scene.__data__)
+        if isinstance(scene, ViewerScene):
+            self._scene = scene
+        else:
+            self._scene = ViewerScene.__from_data__(scene.__data__)
+            self._scene.bind_many(scene.item_store.values())
+        self._scene.attach(self)
         if self.running:
-            for obj in self._scene.objects:
-                cast(ViewerSceneObject, obj).init()
+            self._scene.prepare()
+            for obj in self._scene.render_objects.values():
+                obj.init()
 
     def create_app(self) -> QApplication:
         """Create and configure the Qt application.

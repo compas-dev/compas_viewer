@@ -7,11 +7,9 @@ from numpy import average
 from numpy.typing import NDArray
 
 from compas.colors import Color
-from compas.data import Data
 from compas.geometry import Point
 from compas.geometry import transform_points_numpy
 from compas.scene import SceneObject
-from compas.scene import SceneStateField
 
 from .parameters import ObjectParameter
 from .parameters import inspect_object_parameters
@@ -22,8 +20,8 @@ type BufferValues = Sequence[Any] | NDArray[Any]
 type ShaderDataType = tuple[BufferValues, BufferValues | None, BufferValues]
 
 
-class ViewerSceneObject(SceneObject):
-    """Base class for viewer scene objects with render-buffer support.
+class ViewerSceneObject:
+    """Transient Viewer render state for a stable COMPAS scene object.
 
     Parameters
     ----------
@@ -50,42 +48,16 @@ class ViewerSceneObject(SceneObject):
 
     """
 
-    __scene_state_namespace__ = "compas_viewer.scene.ViewerSceneObject"
-    __scene_state_fields__ = (
-        SceneStateField("use_rgba", bool),
-        SceneStateField("background", bool),
-    )
-
     def __init__(
         self,
-        is_selected: bool = False,
-        show: bool = True,
-        show_points: bool | None = None,
-        show_lines: bool | None = None,
-        show_faces: bool | None = None,
-        linewidth: float | None = None,
-        pointsize: float | None = None,
-        opacity: float | None = None,
-        use_rgba: bool = False,
+        sceneobject: SceneObject,
+        runtime: Any,
         **kwargs: Any,
     ) -> None:
-        #  Basic
-        super().__init__(**kwargs)
-        self.show = show
-        self.show_points = show_points if show_points is not None else False
-        self.show_lines = show_lines if show_lines is not None else True
-        self.show_faces = show_faces if show_faces is not None else True
-        self.linewidth = linewidth if linewidth is not None else self.viewer.config.display.linewidth
-        self.pointsize = pointsize if pointsize is not None else self.viewer.config.display.pointsize
-        self.opacity = opacity if opacity is not None else self.viewer.config.display.opacity
-
-        #  Selection
-        self.is_selected = is_selected
+        object.__setattr__(self, "sceneobject", sceneobject)
+        object.__setattr__(self, "runtime", runtime)
 
         #  Visual
-        self.background: bool = False
-        self.use_rgba = use_rgba
-
         #  Geometric
         self._bounding_box: list[list[float]] | None = None
         self._bounding_box_center: Point | None = None
@@ -97,14 +69,44 @@ class ViewerSceneObject(SceneObject):
         self._backfaces_data: ShaderDataType | None = None
 
         self._inited = False
-        self.context = "Viewer"
+        self._inited = False
+
+    def __getattr__(self, name: str) -> Any:
+        """Delegate durable presentation and item access to the stable object."""
+        return getattr(self.sceneobject, name)
+
+    def __setattr__(self, name: str, value: Any) -> None:
+        """Store durable fields on the stable object and runtime fields locally."""
+        sceneobject = self.__dict__.get("sceneobject")
+        if sceneobject is not None and hasattr(sceneobject, name):
+            setattr(sceneobject, name, value)
+        else:
+            object.__setattr__(self, name, value)
 
     @property
     def viewer(self) -> Any:
-        """Viewer: The shared viewer instance."""
-        from compas_viewer.viewer import Viewer
+        """The Viewer instance that owns this transient render state."""
+        from .scene import ViewerScene
 
-        return Viewer()
+        if isinstance(self.runtime, ViewerScene):
+            return self.runtime.viewer
+        if getattr(self.runtime, "scene", None) is self.runtime_scene:
+            return self.runtime
+        raise RuntimeError("This render helper is not attached to a Viewer runtime.")
+
+    @property
+    def runtime_scene(self) -> Any:
+        """The ViewerScene that owns this transient render state."""
+        return getattr(self.runtime, "scene", self.runtime)
+
+    @property
+    def is_selected(self) -> bool:
+        """Whether the stable object is selected in the current Viewer."""
+        return self.runtime_scene.is_selected(self.sceneobject)
+
+    @is_selected.setter
+    def is_selected(self, selected: bool) -> None:
+        self.runtime_scene.set_selected(self.sceneobject, selected)
 
     @property
     def show_faces(self) -> bool:
@@ -114,6 +116,12 @@ class ViewerSceneObject(SceneObject):
     @show_faces.setter
     def show_faces(self, show: bool) -> None:
         self.show_surfaces = show
+
+    @property
+    def parent(self) -> "ViewerSceneObject | None":
+        """Transient render state of the stable parent, when rendered."""
+        parent = self.sceneobject.parent
+        return self.runtime_scene.render_objects.get(parent.guid) if parent is not None else None
 
     @property
     def bounding_box(self) -> list[list[float]] | None:
@@ -126,8 +134,8 @@ class ViewerSceneObject(SceneObject):
         return self._bounding_box_center
 
     @property
-    def data(self) -> Data | None:
-        """Data | None: Underlying COMPAS data or geometry object."""
+    def data(self) -> Any:
+        """Underlying COMPAS data or geometry object."""
         return self.item
 
     @property
@@ -168,10 +176,11 @@ class ViewerSceneObject(SceneObject):
         """Initialize render data, bounds, and instance-selection color."""
         self.refresh_data()
         previous = getattr(self, "instance_color", None)
-        if previous is not None and self.viewer.scene.instance_colors.get(previous.rgb255) is self:
-            self.viewer.scene.instance_colors.pop(previous.rgb255)
-        self.instance_color = Color.from_rgb255(*next(self.viewer.scene._instance_colors_generator))
-        self.viewer.scene.instance_colors[self.instance_color.rgb255] = self
+        if previous is not None and self.runtime_scene.instance_colors.get(previous.rgb255) is self.sceneobject:
+            self.runtime_scene.instance_colors.pop(previous.rgb255)
+        self.instance_color = Color.from_rgb255(*next(self.runtime_scene._instance_colors_generator))
+        self.runtime_scene.instance_colors[self.instance_color.rgb255] = self.sceneobject
+        self._inited = True
 
     def refresh_data(self) -> None:
         """Regenerate render data and bounds from the underlying object."""

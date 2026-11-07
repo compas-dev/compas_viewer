@@ -3,10 +3,9 @@ import pytest
 from compas.colors import Color
 from compas.geometry import Point
 from compas.geometry import Translation
-from compas.scene.context import ITEM_SCENEOBJECT
-from compas_viewer import plugins
+from compas.scene import GeometryObject
 from compas_viewer.scene import ArrowOverlay
-from compas_viewer.scene import ArrowOverlayObject
+from compas_viewer.scene.arrowoverlayobject import ArrowOverlayObject
 
 
 def test_arrow_overlay_data_roundtrip():
@@ -61,7 +60,11 @@ def test_arrow_overlay_rejects_zero_length_arrow():
         ArrowOverlay((0, 0, 0), (0, 0, 0))
 
 
-def test_arrow_overlay_scene_object_is_registered():
-    plugins.register_scene_objects()
+def test_arrow_overlay_uses_stable_geometry_object_and_viewer_runtime():
+    from compas_viewer.scene import ViewerScene
 
-    assert ITEM_SCENEOBJECT["Viewer"][ArrowOverlay] is ArrowOverlayObject
+    scene = ViewerScene()
+    sceneobject = scene.add(ArrowOverlay((0, 0, 0), (1, 0, 0)))
+
+    assert type(sceneobject) is GeometryObject
+    assert isinstance(scene.render_object(sceneobject), ArrowOverlayObject)

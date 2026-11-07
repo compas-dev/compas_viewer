@@ -1,3 +1,4 @@
+from typing import TYPE_CHECKING
 from typing import Any
 
 import numpy as np
@@ -10,7 +11,9 @@ from compas_viewer.gl import make_texture_buffer
 from compas_viewer.gl import make_vertex_buffer
 from compas_viewer.gl import update_texture_buffer
 from compas_viewer.gl import update_vertex_buffer
-from compas_viewer.renderer.shaders import Shader
+
+if TYPE_CHECKING:
+    from compas_viewer.renderer.shaders import Shader
 
 type FloatArray = NDArray[np.float32]
 type IntArray = NDArray[np.int32]
@@ -175,7 +178,7 @@ class BufferManager:
                 else:
                     self.buffer_ids[buffer_type]["elements"] = make_index_buffer(self.elements[buffer_type])
 
-    def _draw_faces(self, shader: Shader, is_instance: bool, is_lighted: bool, is_ghosted: bool, is_wireframe: bool) -> None:
+    def _draw_faces(self, shader: "Shader", is_instance: bool, is_lighted: bool, is_ghosted: bool, is_wireframe: bool) -> None:
         GL.glEnable(GL.GL_POLYGON_OFFSET_FILL)
         if not is_wireframe and (not is_ghosted or is_instance):
             shader.uniform1i("is_lighted", is_lighted)
@@ -190,7 +193,7 @@ class BufferManager:
                         shader.draw_triangles(elements=self.buffer_ids[face_type]["elements_transparent"], n=len(self.elements[face_type + "_transparent"]))
         GL.glDisable(GL.GL_POLYGON_OFFSET_FILL)
 
-    def _draw_points(self, shader: Shader) -> None:
+    def _draw_points(self, shader: "Shader") -> None:
         shader.uniform1i("element_type", 0)
         if self.buffer_ids["_points_data"]:
             shader.bind_attribute("position", self.buffer_ids["_points_data"]["positions"])
@@ -198,7 +201,7 @@ class BufferManager:
             shader.bind_attribute("object_index", self.buffer_ids["_points_data"]["object_indices"], step=1)
             shader.draw_points(elements=self.buffer_ids["_points_data"]["elements"], n=len(self.elements["_points_data"]))
 
-    def _draw_lines(self, line_shader: Shader) -> None:
+    def _draw_lines(self, line_shader: "Shader") -> None:
         GL.glDisable(GL.GL_CULL_FACE)
         line_shader.bind()
         line_shader.uniform1i("is_lighted", False)
@@ -214,7 +217,7 @@ class BufferManager:
         line_shader.release()
         GL.glEnable(GL.GL_CULL_FACE)
 
-    def _draw_transparent_faces(self, shader: Shader, is_lighted: bool, is_ghosted: bool) -> None:
+    def _draw_transparent_faces(self, shader: "Shader", is_lighted: bool, is_ghosted: bool) -> None:
         shader.bind()
         shader.uniform1i("is_lighted", is_lighted)
         shader.uniform1i("element_type", 2)
@@ -229,7 +232,7 @@ class BufferManager:
                     shader.draw_triangles(elements=self.buffer_ids[face_type]["elements"], n=len(self.elements[face_type]))
         GL.glDepthMask(GL.GL_TRUE)
 
-    def draw(self, shader: Shader, line_shader: Shader, rendermode: str, is_instance: bool = False) -> None:
+    def draw(self, shader: "Shader", line_shader: "Shader", rendermode: str, is_instance: bool = False) -> None:
         """Draw all objects using the combined buffers.
 
         Parameters

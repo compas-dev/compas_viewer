@@ -1,5 +1,9 @@
 import numpy as np
 
+from compas.colors import Color
+from compas.datastructures import Graph
+from compas.datastructures import Mesh
+from compas_viewer.scene import ViewerScene
 from compas_viewer.scene.buffermanager import BufferManager
 
 
@@ -81,3 +85,51 @@ def test_buffer_manager_makes_complete_triangles_transparent_with_object_opacity
 
     assert manager.elements["_frontfaces_data"].size == 0
     np.testing.assert_array_equal(manager.elements["_frontfaces_data_transparent"], [0, 1, 2, 1, 3, 2])
+
+
+def test_mesh_and_graph_helpers_satisfy_generic_buffer_contract():
+    scene = ViewerScene()
+    mesh = Mesh.from_vertices_and_faces([[0, 0, 0], [1, 0, 0], [0, 1, 0]], [[0, 1, 2]])
+    graph = Graph()
+    graph.add_node(0, x=0, y=0, z=1)
+    graph.add_node(1, x=1, y=0, z=1)
+    graph.add_edge(0, 1)
+    mesh_object = scene.add(
+        mesh,
+        show_points=True,
+        show_lines=False,
+        show_faces=True,
+        pointcolor=Color.red(),
+        linecolor=Color.green(),
+        facecolor=Color.blue(),
+        pointsize=7,
+        linewidth=3,
+    )
+    graph_object = scene.add(
+        graph,
+        show_points=False,
+        show_lines=True,
+        pointcolor=Color.yellow(),
+        linecolor=Color.cyan(),
+        pointsize=9,
+        linewidth=5,
+    )
+    mesh_render = scene.render_object(mesh_object)
+    graph_render = scene.render_object(graph_object)
+    mesh_render.refresh_data()
+    graph_render.refresh_data()
+    manager = BufferManager()
+
+    manager.add_object(mesh_render)
+    manager.add_object(graph_render)
+
+    assert manager.settings[0][0] == [True, True, False, True]
+    assert manager.settings[0][2][2:] == [7, 3]
+    assert manager.settings[1][0] == [True, False, True, False]
+    assert manager.settings[1][2][2:] == [9, 5]
+    np.testing.assert_array_equal(manager.elements["_points_data"], [0, 1, 2, 3, 4])
+    np.testing.assert_array_equal(manager.elements["_lines_data"], [0, 1, 2, 3, 4, 5, 6, 7])
+    np.testing.assert_allclose(manager.colors["_points_data"][:4], Color.red().rgba)
+    np.testing.assert_allclose(manager.colors["_points_data"][-4:], Color.yellow().rgba)
+    np.testing.assert_allclose(manager.colors["_lines_data"][:4], Color.green().rgba)
+    np.testing.assert_allclose(manager.colors["_lines_data"][-4:], Color.cyan().rgba)

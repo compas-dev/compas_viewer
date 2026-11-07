@@ -15,7 +15,7 @@ EXPECTED_EXTENSION_POINTS = {
     ExtensionPoint("https://plugins.compas.dev/", "drawing-utils", "clear"),
     ExtensionPoint("https://plugins.compas.dev/", "drawing-utils", "before_draw"),
     ExtensionPoint("https://plugins.compas.dev/", "drawing-utils", "after_draw"),
-    ExtensionPoint("https://plugins.compas.dev/", "factories", "register_scene_objects"),
+    ExtensionPoint("https://plugins.compas.dev/", "factories", "register_scene_operations"),
 }
 
 

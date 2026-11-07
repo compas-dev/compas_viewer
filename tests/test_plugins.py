@@ -20,7 +20,7 @@ def test_entry_point_exposes_current_extension_points():
         ExtensionPoint("https://plugins.compas.dev/", "drawing-utils", "clear"),
         ExtensionPoint("https://plugins.compas.dev/", "drawing-utils", "before_draw"),
         ExtensionPoint("https://plugins.compas.dev/", "drawing-utils", "after_draw"),
-        ExtensionPoint("https://plugins.compas.dev/", "factories", "register_scene_objects"),
+        ExtensionPoint("https://plugins.compas.dev/", "factories", "register_scene_operations"),
     }
 
 
@@ -39,56 +39,23 @@ def test_source_entry_point_discovery_is_graphics_free(tmp_path):
     assert result.returncode == 0, result.stdout + result.stderr
 
 
-def test_scene_plugin_registers_stable_core_geometry_types():
-    from compas.geometry import Brep
-    from compas.geometry import NurbsCurve
-    from compas.geometry import NurbsSurface
-    from compas.geometry import PolygonalSurface
-    from compas.geometry import Surface
-    from compas.scene.context import ITEM_SCENEOBJECT
-
+def test_scene_plugin_registers_viewer_operations_without_replacing_types():
+    from compas.scene import SceneObject
+    from compas.scene.context import SCENE_OPERATIONS
     import compas_viewer.plugins as viewer_plugins
-    import compas_viewer.scene as viewer_scene
 
-    had_context = "Viewer" in ITEM_SCENEOBJECT
-    registry = ITEM_SCENEOBJECT["Viewer"]
-    previous = dict(registry)
+    SCENE_OPERATIONS.pop("Viewer", None)
+    viewer_plugins.register_scene_operations()
 
-    try:
-        registry.clear()
-        viewer_plugins.register_scene_objects()
-
-        assert registry[Brep] is viewer_scene.BRepObject
-        assert registry[NurbsCurve] is viewer_scene.NurbsCurveObject
-        assert registry[NurbsSurface] is viewer_scene.SurfaceObject
-        assert registry[Surface] is viewer_scene.SurfaceObject
-        assert registry[PolygonalSurface] is viewer_scene.PolygonalSurfaceObject
-    finally:
-        if had_context:
-            registry.clear()
-            registry.update(previous)
-        else:
-            del ITEM_SCENEOBJECT["Viewer"]
+    assert set(SCENE_OPERATIONS["Viewer"][SceneObject]) == {"draw", "clear"}
 
 
 def test_registration_is_triggered_when_other_contexts_already_exist():
-    from compas.geometry import PolygonalSurface
-    from compas.geometry import Surface
-    from compas.scene.context import ITEM_SCENEOBJECT
-
+    from compas.scene.context import SCENE_OPERATIONS
     import compas_viewer.plugins as viewer_plugins
-    import compas_viewer.scene as viewer_scene
 
-    registry = ITEM_SCENEOBJECT["Viewer"]
-    previous = dict(registry)
-    ITEM_SCENEOBJECT[None][Surface] = viewer_scene.GeometryObject
+    SCENE_OPERATIONS.pop("Viewer", None)
+    SCENE_OPERATIONS["Other"] = {}
+    viewer_plugins.ensure_scene_objects_registered()
 
-    try:
-        registry.clear()
-        viewer_plugins.ensure_scene_objects_registered()
-
-        assert registry[Surface] is viewer_scene.SurfaceObject
-        assert registry[PolygonalSurface] is viewer_scene.PolygonalSurfaceObject
-    finally:
-        registry.clear()
-        registry.update(previous)
+    assert "Viewer" in SCENE_OPERATIONS

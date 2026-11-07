@@ -98,9 +98,10 @@ the scene.
 
 After loading, the scene nodes are available for inspection without the data.
 Bind the independently loaded objects with `scene.bind(...)` or
-`scene.bind_many(...)`, then create Viewer adapters with
-`scene.bind_context("Viewer")`. Accessing `scene.objects` or drawing before all
-referenced items are bound raises `SceneItemNotBoundError`.
+`scene.bind_many(...)`, then assign the scene to the Viewer. The stable scene
+objects keep their identity; the Viewer creates transient render state only
+when it prepares or draws the scene. Accessing an unresolved item or drawing
+before all referenced items are bound raises `SceneItemNotBoundError`.
 
 Durable Viewer state includes transformations, visibility, colors, display
 sizes, resolution, and mesh display flags. Selection, instance-picking colors,

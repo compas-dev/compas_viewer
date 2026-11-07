@@ -73,7 +73,20 @@ class Camera:
 
 class Viewer:
     def __init__(self, objects):
-        self.scene = SimpleNamespace(objects=objects)
+        class Scene:
+            def __init__(self, objects):
+                self.objects = objects
+
+            def is_selected(self, sceneobject):
+                return sceneobject.is_selected
+
+            def set_selected(self, sceneobject, selected):
+                sceneobject.is_selected = selected
+
+            def render_object(self, sceneobject):
+                return sceneobject
+
+        self.scene = Scene(objects)
         self.renderer = SimpleNamespace(camera=Camera(), update=lambda: None)
         self.ui = SimpleNamespace(sidebar=SimpleNamespace(update=lambda: None))
         self.config = Config()

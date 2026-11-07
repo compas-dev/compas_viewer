@@ -4,7 +4,7 @@ from typing import cast
 from PySide6.QtWidgets import QPlainTextEdit
 from PySide6.QtWidgets import QSizePolicy
 
-from compas_viewer.scene import ViewerSceneObject
+from compas_viewer.scene.sceneobject import ViewerSceneObject
 
 from .booleantoggle import BooleanToggle
 from .colorpicker import ColorPicker
@@ -12,6 +12,11 @@ from .component import Component
 from .container import Container
 from .numberedit import NumberEdit
 from .textedit import TextEdit
+
+
+def _has_editable_face_channel(obj: object) -> bool:
+    """Return whether the object inspector should expose face controls."""
+    return bool(getattr(obj, "_supports_faces", True)) and hasattr(obj, "show_faces")
 
 
 class ObjectSetting(Container):
@@ -23,8 +28,7 @@ class ObjectSetting(Container):
     @property
     def selected(self) -> list[ViewerSceneObject]:
         """list[ViewerSceneObject]: Currently selected scene objects."""
-        objects = cast(list[ViewerSceneObject], self.scene.objects)
-        return [obj for obj in objects if obj.is_selected]
+        return [self.scene.render_object(obj) for obj in self.scene.objects if self.scene.is_selected(obj)]
 
     def update(self) -> None:
         """Update the layout with the latest object settings."""
@@ -79,7 +83,7 @@ class ObjectSetting(Container):
         if hasattr(obj, "show_lines"):
             self._add_control(BooleanToggle(obj=obj, attr="show_lines", action=_update_obj_settings))
 
-        if hasattr(obj, "show_faces"):
+        if _has_editable_face_channel(obj):
             self._add_control(BooleanToggle(obj=obj, attr="show_faces", action=_update_obj_settings))
 
         if hasattr(dynamic_obj, "pointcolor") and dynamic_obj.pointcolor is not None:

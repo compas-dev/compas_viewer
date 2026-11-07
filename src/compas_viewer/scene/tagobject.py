@@ -17,7 +17,6 @@ from compas.geometry import Geometry
 from compas.geometry import Point
 from compas.geometry import Transformation
 from compas.geometry import Vector
-from compas.scene import GeometryObject
 from compas_viewer import HERE
 from compas_viewer.gl import make_index_buffer
 from compas_viewer.gl import make_vertex_buffer
@@ -144,7 +143,7 @@ class Tag(Geometry):
         self.position.transform(transformation)
 
 
-class TagObject(ViewerSceneObject, GeometryObject):
+class TagObject(ViewerSceneObject):
     """Render a text annotation as a camera-facing billboard."""
 
     VERTICAL_ALIGN = {"top": 1, "center": 0, "bottom": -1}
@@ -193,6 +192,16 @@ class TagObject(ViewerSceneObject, GeometryObject):
             "text_texture": texture,
             "n": 4,
         }
+
+    def clear(self) -> None:
+        """Release transient OpenGL texture and buffer resources."""
+        buffer = getattr(self, "_text_buffer", None)
+        if buffer is None:
+            return
+        GL.glDeleteTextures(1, [buffer["text_texture"]])
+        GL.glDeleteBuffers(2, [buffer["positions"], buffer["elements"]])
+        del self._text_buffer
+        self._inited = False
 
     def make_text_texture(self) -> tuple[int, float, float]:
         """Rasterize multiline text and upload it as an OpenGL texture."""

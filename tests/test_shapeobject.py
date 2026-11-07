@@ -2,28 +2,26 @@ from unittest.mock import Mock
 
 import pytest
 
-from compas.colors import Color
 from compas.data import json_dumps
 from compas.data import json_loads
+from compas.geometry import Frame
 from compas.geometry import Box
 from compas.geometry import Capsule
 from compas.geometry import Cone
 from compas.geometry import Cylinder
-from compas.geometry import Frame
-from compas.geometry import PlanarSurface
 from compas.geometry import Plane
-from compas.geometry import Point
 from compas.geometry import Sphere
 from compas.geometry import Torus
 from compas.geometry import Translation
 from compas.geometry import Vector
+from compas.scene import FrameObject
+from compas.scene import PlaneObject
 from compas.scene import Scene
+from compas.scene import ShapeObject
+from compas.scene import VectorObject
 from compas_viewer import Viewer
-from compas_viewer.scene import BufferObject
-from compas_viewer.scene import GraphObject
-from compas_viewer.scene import MeshObject
-from compas_viewer.scene import ShapeObject
-from compas_viewer.scene.scene import instance_colors_generator
+from compas_viewer.commands import zoom_extents
+from compas_viewer.scene.shapeobject import ShapeObject as ViewerShapeObject
 
 
 @pytest.fixture
@@ -37,195 +35,177 @@ def viewer(monkeypatch):
     viewer.scene.clear(clear_context=False)
 
 
-def test_shape_object_owns_default_resolution(viewer):
-    shape = Sphere(1.0)
+def test_viewer_scene_keeps_stable_core_type_and_runtime_state_separate(viewer):
+    sceneobject = viewer.scene.add(Sphere(1.0), u=6, v=4)
+    render_object = viewer.scene.render_object(sceneobject)
 
-    sceneobject = viewer.scene.add(shape)
+    assert type(sceneobject) is ShapeObject
+    assert isinstance(render_object, ViewerShapeObject)
+    assert render_object.sceneobject is sceneobject
+    assert viewer.scene.objects[0] is sceneobject
+
+
+def test_render_helper_construction_does_not_mutate_hidden_stable_object(viewer):
+    sceneobject = viewer.scene.add(Sphere(1.0), show=False, u=6, v=4)
+    durable_state = sceneobject.__data__
+
+    render_object = viewer.scene.render_object(sceneobject)
+    zoom_extents(viewer)
+
+    assert render_object.sceneobject is sceneobject
+    assert sceneobject.__data__ == durable_state
+    assert sceneobject.show is False
+
+
+def test_scene_draw_accepts_explicit_viewer_runtime(viewer):
+    sceneobject = viewer.scene.add(Sphere(1.0))
+
+    viewer.scene.draw(context="Viewer", runtime=viewer)
+    render_object = viewer.scene.render_objects[sceneobject.guid]
+
+    assert render_object.runtime is viewer
+    assert render_object.runtime_scene is viewer.scene
+    assert render_object.viewer is viewer
+
+
+def test_shape_object_owns_default_resolution(viewer):
+    sceneobject = viewer.scene.add(Sphere(1.0))
 
     assert sceneobject.u == 16
     assert sceneobject.v == 16
-    assert not hasattr(shape, "resolution_u")
-    assert not hasattr(shape, "resolution_v")
 
 
-def test_shape_object_resolution_override_does_not_mutate_geometry(viewer):
+def test_shape_resolution_is_durable_without_serializing_runtime(viewer):
     shape = Sphere(1.0)
-    data = shape.__data__
-
-    sceneobject = viewer.scene.add(shape, u=6, v=4)
-    tessellation = sceneobject.tessellation
-
-    assert sceneobject.u == 6
-    assert sceneobject.v == 4
-    assert tessellation.number_of_vertices == 20
-    assert tessellation.number_of_triangles == 36
-    assert shape.__data__ == data
-
-
-def test_shape_object_scene_roundtrip_preserves_durable_state(viewer):
-    shape = Sphere(1.0)
-    transformation = Translation.from_vector([2, 0, 0])
-    facecolor = Color.red()
-    original = viewer.scene.add(
-        shape,
-        is_selected=True,
-        show_faces=False,
-        u=7,
-        use_rgba=True,
-        v=9,
-        facecolor=facecolor,
-        transformation=transformation,
-    )
-    original.background = True
-    assert not hasattr(original, "settings")
+    sceneobject = viewer.scene.add(shape, u=7, v=9, transformation=Translation.from_vector([2, 0, 0]))
+    viewer.scene.set_selected(sceneobject, True)
+    viewer.scene.render_object(sceneobject).init()
 
     payload = json_dumps(viewer.scene)
-    restored_scene = json_loads(payload)
+    restored = json_loads(payload)
 
-    assert isinstance(restored_scene, Scene)
+    assert isinstance(restored, Scene)
+    restored.bind(shape)
+    assert type(restored.objects[0]) is ShapeObject
+    assert restored.objects[0].u == 7
+    assert restored.objects[0].v == 9
+    assert "render_objects" not in payload
+    assert "instance_color" not in payload
     assert "is_selected" not in payload
-    restored_scene.bind(shape)
-    restored_scene.bind_context("Viewer")
-    restored = restored_scene.objects[0]
-    assert restored.transformation == transformation
-    assert restored.u == 7
-    assert restored.v == 9
-    assert restored.facecolor == facecolor
-    assert restored.show_faces is False
-    assert restored.use_rgba is True
-    assert restored.background is True
-    assert restored.is_selected is False
 
 
-def test_geometry_adapter_scene_roundtrip_preserves_declared_state(viewer):
-    frame = Frame.worldXY()
-    plane = Plane.worldXY()
-    vector = Vector(1, 2, 3)
-    viewer.scene.add(frame, size=2.5)
-    viewer.scene.add(plane, planesize=4.5)
-    viewer.scene.add(vector, anchor=Point(5, 6, 7))
+def test_stable_specialized_geometry_fields_use_core_names(viewer):
+    frame = viewer.scene.add(Frame.worldXY(), size=2.5)
+    plane = viewer.scene.add(Plane.worldXY(), size=4.5)
+    vector = viewer.scene.add(Vector(1, 2, 3), anchor=[5, 6, 7])
 
-    restored_scene = json_loads(json_dumps(viewer.scene))
-    restored_scene.bind_many([frame, plane, vector])
-    restored_scene.bind_context("Viewer")
-    restored_frame, restored_plane, restored_vector = restored_scene.objects
-
-    assert restored_frame.size == 2.5
-    assert restored_plane.planesize == 4.5
-    assert restored_vector.anchor == Point(5, 6, 7)
+    assert type(frame) is FrameObject and frame.size == 2.5
+    assert type(plane) is PlaneObject and plane.size == 4.5
+    assert type(vector) is VectorObject and list(vector.anchor) == [5, 6, 7]
+    with pytest.raises(TypeError, match="planesize"):
+        viewer.scene.add(Plane.worldXY(), planesize=2.0)
 
 
-@pytest.mark.parametrize("object_type", [ShapeObject, MeshObject, GraphObject, BufferObject])
-def test_viewer_scene_state_mro_has_one_owner_per_adapter_attribute(object_type):
-    declarations = object_type.scene_state_fields()
-    attributes = [field.attribute for fields in declarations.values() for field in fields]
-
-    assert len(attributes) == len(set(attributes))
-
-
-def test_shape_object_uses_core_ownership_for_shared_geometry_state():
-    declarations = ShapeObject.scene_state_fields()
-    core_fields = {field.attribute for field in declarations["compas.scene.GeometryObject"]}
-    viewer_fields = {field.attribute for field in declarations["compas_viewer.scene.ViewerSceneObject"]}
-
-    assert {"show_points", "show_lines", "linewidth", "pointsize"} <= core_fields
-    assert not {"show_points", "show_lines", "linewidth", "pointsize"} & viewer_fields
-
-
-def test_instance_color_cache_resets_when_adapters_are_rebound(viewer):
-    original = viewer.scene.add(Sphere(1.0))
-    viewer.scene.instance_colors[(10, 20, 30)] = original
-
-    viewer.scene.bind_context("Viewer")
-
-    assert viewer.scene.objects[0] is not original
-    assert viewer.scene.instance_colors == {}
-    assert next(viewer.scene._instance_colors_generator) == next(instance_colors_generator())
-
-
-def test_instance_color_cache_resets_when_scene_changes(viewer):
+def test_context_preparation_preserves_stable_identity(viewer):
     sceneobject = viewer.scene.add(Sphere(1.0))
-    viewer.scene.instance_colors[(10, 20, 30)] = sceneobject
+    viewer.scene.prepare()
+    first = viewer.scene.render_object(sceneobject)
+    viewer.scene.prepare()
+    second = viewer.scene.render_object(sceneobject)
 
-    viewer.scene.remove(sceneobject, rebuild_buffers=False)
+    assert viewer.scene.objects[0] is sceneobject
+    assert first is not second
+    assert second.sceneobject is sceneobject
 
-    assert viewer.scene.instance_colors == {}
-    assert next(viewer.scene._instance_colors_generator) == next(instance_colors_generator())
 
-    viewer.scene.instance_colors[(40, 50, 60)] = sceneobject
-    viewer.scene.clear(clear_scene=False, clear_context=False)
+def test_viewer_scene_setter_preserves_bound_item_identity(viewer):
+    shape = Sphere(1.0)
+    source = Scene(context=None, _detect_context=False)
+    source_object = source.add(shape)
 
-    assert viewer.scene.instance_colors == {}
-    assert next(viewer.scene._instance_colors_generator) == next(instance_colors_generator())
+    viewer.scene = source
+
+    adopted = viewer.scene.objects[0]
+    assert adopted.guid == source_object.guid
+    assert adopted.item is shape
+
+
+def test_viewer_adopts_existing_viewer_scene_without_rebuilding(viewer):
+    source = viewer.scene.__class__()
+    shape = Sphere(1.0)
+    source_object = source.add(shape)
+
+    viewer.scene = source
+
+    assert viewer.scene is source
+    assert viewer.scene.objects[0] is source_object
+    assert viewer.scene.objects[0].item is shape
+
+
+def test_shape_render_helper_uses_stable_resolution(viewer):
+    sceneobject = viewer.scene.add(Sphere(1.0), u=6, v=4)
+    render_object = viewer.scene.render_object(sceneobject)
+
+    assert render_object.tessellation.number_of_vertices == 20
+    assert render_object.tessellation.number_of_triangles == 36
+    sceneobject.u = 8
+    sceneobject.v = 6
+    assert render_object.tessellation.number_of_vertices == 42
 
 
 @pytest.mark.parametrize(
-    ("shape", "u", "v", "vertices", "triangles"),
+    ("shape", "vertices", "triangles"),
     [
-        (Box(1.0), 6, 4, 8, 12),
-        (Cone(1.0, 2.0), 6, 4, 8, 12),
-        (Cylinder(1.0, 2.0), 6, 4, 14, 24),
-        (Capsule(1.0, 2.0), 6, 4, 26, 48),
-        (Sphere(1.0), 6, 4, 20, 36),
-        (Torus(2.0, 0.5), 6, 4, 24, 48),
+        (Box(1.0), 8, 12),
+        (Cone(1.0, 2.0), 8, 12),
+        (Cylinder(1.0, 2.0), 14, 24),
+        (Capsule(1.0, 2.0), 26, 48),
+        (Sphere(1.0), 20, 36),
+        (Torus(2.0, 0.5), 24, 48),
     ],
 )
-def test_shape_object_dispatches_producer_specific_resolution(viewer, shape, u, v, vertices, triangles):
-    sceneobject = viewer.scene.add(shape, u=u, v=v)
-
-    tessellation = sceneobject.tessellation
-
-    assert tessellation.number_of_vertices == vertices
-    assert tessellation.number_of_triangles == triangles
-
-
-def test_shape_object_requests_fresh_representations(viewer):
-    shape = Sphere(1.0)
+def test_shape_render_helper_dispatches_nonmutating_representations(viewer, shape, vertices, triangles):
+    data = shape.__data__
     sceneobject = viewer.scene.add(shape, u=6, v=4)
+    render_object = viewer.scene.render_object(sceneobject)
 
-    first = sceneobject.tessellation
-    second = sceneobject.tessellation
+    first = render_object.tessellation
+    second = render_object.tessellation
 
+    assert first.number_of_vertices == vertices
+    assert first.number_of_triangles == triangles
     assert first is not second
     assert first.vertices is not second.vertices
+    assert shape.__data__ == data
 
 
-def test_changing_shape_object_resolution_changes_tessellation(viewer):
+def test_runtime_resolution_refresh_does_not_add_fields_to_stable_object(viewer, monkeypatch):
     sceneobject = viewer.scene.add(Sphere(1.0), u=6, v=4)
-    initial = sceneobject.tessellation
+    render_object = viewer.scene.render_object(sceneobject)
+    refresh_data = Mock()
+    monkeypatch.setattr(render_object, "refresh_data", refresh_data)
 
     sceneobject.u = 8
-    sceneobject.v = 6
-    updated = sceneobject.tessellation
+    render_object._rebuild_resolution_buffers()
 
-    assert updated.number_of_vertices != initial.number_of_vertices
-    assert updated.number_of_triangles != initial.number_of_triangles
+    assert sceneobject.u == 8
+    assert not hasattr(sceneobject, "_points_data")
 
 
-def test_changing_active_shape_object_resolution_refreshes_and_rebuilds(viewer, monkeypatch):
+def test_active_resolution_refresh_rebuilds_runtime_buffers(viewer, monkeypatch):
     sceneobject = viewer.scene.add(Sphere(1.0), u=6, v=4)
+    render_object = viewer.scene.render_object(sceneobject)
     refresh_data = Mock()
     rebuild_buffers = Mock()
     update = Mock()
-    monkeypatch.setattr(sceneobject, "refresh_data", refresh_data)
+    monkeypatch.setattr(render_object, "refresh_data", refresh_data)
     monkeypatch.setattr(viewer.renderer, "rebuild_buffers", rebuild_buffers)
     monkeypatch.setattr(viewer.renderer, "update", update)
     viewer.running = True
 
     sceneobject.u = 8
+    render_object._rebuild_resolution_buffers()
 
     refresh_data.assert_called_once_with()
     rebuild_buffers.assert_called_once_with()
     update.assert_called_once_with()
-
-
-def test_surface_object_uses_scene_owned_resolution_without_mutation(viewer):
-    surface = PlanarSurface()
-    data = surface.__data__
-
-    sceneobject = viewer.scene.add(surface, u=2, v=3)
-    tessellation = sceneobject.tessellation
-
-    assert tessellation.number_of_vertices == 12
-    assert tessellation.number_of_triangles == 12
-    assert surface.__data__ == data

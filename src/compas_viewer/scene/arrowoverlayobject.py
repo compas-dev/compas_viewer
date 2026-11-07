@@ -8,7 +8,6 @@ from compas.colors import Color
 from compas.geometry import Geometry
 from compas.geometry import Point
 from compas.geometry import Transformation
-from compas.scene import GeometryObject
 from compas_viewer.gl import make_index_buffer
 from compas_viewer.gl import make_vertex_buffer
 
@@ -104,7 +103,7 @@ class ArrowOverlay(Geometry):
         self.end.transform(transformation)
 
 
-class ArrowOverlayObject(ViewerSceneObject, GeometryObject):
+class ArrowOverlayObject(ViewerSceneObject):
     """Render an arrow as a constant-pixel-size overlay."""
 
     @property
@@ -169,6 +168,15 @@ class ArrowOverlayObject(ViewerSceneObject, GeometryObject):
             self._update_bounding_box([self.arrow.start, self.arrow.end])
         if update_transform or update_data:
             self.viewer.renderer.update()
+
+    def clear(self) -> None:
+        """Release transient OpenGL buffer resources."""
+        buffer = getattr(self, "_arrow_buffer", None)
+        if buffer is None:
+            return
+        GL.glDeleteBuffers(2, [buffer["positions"], buffer["elements"]])
+        del self._arrow_buffer
+        self._inited = False
 
     def draw_overlay(self, shader: Any, width: int, height: int) -> None:
         """Draw the arrow overlay.

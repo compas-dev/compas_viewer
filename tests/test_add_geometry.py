@@ -59,6 +59,9 @@ def test_add_geometry_selects_only_the_new_object():
     class Scene:
         objects = [existing]
 
+        def set_selected(self, sceneobject, selected):
+            sceneobject.is_selected = selected
+
         def add(self, geometry, **kwargs):
             self.geometry = geometry
             self.kwargs = kwargs

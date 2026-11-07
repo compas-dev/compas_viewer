@@ -37,6 +37,5 @@ node_names = [node.name for node in loaded_scene.nodes]
 print(node_names)
 
 loaded_scene.bind_many(loaded_items)
-loaded_scene.bind_context("Viewer")
 viewer.scene = loaded_scene
 viewer.show()

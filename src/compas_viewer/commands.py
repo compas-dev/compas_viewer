@@ -42,10 +42,11 @@ from compas.geometry import Polyline
 from compas.geometry import Sphere
 from compas.geometry import Torus
 from compas.scene import Scene
+from compas.scene import SceneObject
 
 if TYPE_CHECKING:
     from compas_viewer import Viewer
-    from compas_viewer.scene import ViewerSceneObject
+    from compas_viewer.scene.sceneobject import ViewerSceneObject
 
 
 class Command:
@@ -156,7 +157,7 @@ def create_geometry(kind: str) -> Geometry:
         raise ValueError(f"Unknown geometry preset: {kind!r}.") from error
 
 
-def add_geometry(viewer: "Viewer", kind: str, name: str | None = None) -> "ViewerSceneObject":
+def add_geometry(viewer: "Viewer", kind: str, name: str | None = None) -> SceneObject:
     """Add default geometry to the scene from a named preset.
 
     Parameters
@@ -170,16 +171,16 @@ def add_geometry(viewer: "Viewer", kind: str, name: str | None = None) -> "Viewe
 
     Returns
     -------
-    ViewerSceneObject
+    SceneObject
         Scene object created for the geometry.
 
     """
     geometry = create_geometry(kind)
-    for obj in cast(list["ViewerSceneObject"], viewer.scene.objects):
-        obj.is_selected = False
-    sceneobject = cast("ViewerSceneObject", viewer.scene.add(geometry, name=name or kind.replace("_", " ").title(), is_selected=True))
+    for obj in viewer.scene.objects:
+        viewer.scene.set_selected(obj, False)
+    sceneobject = viewer.scene.add(geometry, name=name or kind.replace("_", " ").title(), is_selected=True)
     if viewer.running:
-        _zoom_objects(viewer, [sceneobject])
+        _zoom_objects(viewer, [viewer.scene.render_object(sceneobject)])
     return sceneobject
 
 
@@ -453,8 +454,8 @@ def zoom_selected(viewer: "Viewer") -> None:
         Viewer whose camera should be updated.
 
     """
-    objects = cast(list["ViewerSceneObject"], viewer.scene.objects)
-    _zoom_objects(viewer, [obj for obj in objects if obj.is_selected])
+    objects = [viewer.scene.render_object(obj) for obj in viewer.scene.objects if viewer.scene.is_selected(obj)]
+    _zoom_objects(viewer, objects)
 
 
 def _zoom_objects(viewer: "Viewer", objects: list["ViewerSceneObject"]) -> bool:
@@ -504,7 +505,7 @@ def zoom_extents(viewer: "Viewer") -> None:
         Viewer whose visible scene extents should be framed.
 
     """
-    objects = cast(list["ViewerSceneObject"], viewer.scene.objects)
+    objects = [viewer.scene.render_object(obj) for obj in viewer.scene.objects]
     _zoom_objects(viewer, objects)
 
 
@@ -520,8 +521,8 @@ def isolate_selected(viewer: "Viewer") -> None:
         Viewer containing the selection to isolate.
 
     """
-    objects = cast(list["ViewerSceneObject"], viewer.scene.objects)
-    selected = [obj for obj in objects if obj.is_selected]
+    objects = viewer.scene.objects
+    selected = [obj for obj in objects if viewer.scene.is_selected(obj)]
     if not selected:
         return
 
@@ -529,7 +530,7 @@ def isolate_selected(viewer: "Viewer") -> None:
     for obj in selected:
         parent = obj.parent
         while parent is not None and not getattr(parent, "is_root", False):
-            visible.add(cast("ViewerSceneObject", parent))
+            visible.add(parent)
             parent = parent.parent
 
     for obj in objects:
@@ -537,7 +538,7 @@ def isolate_selected(viewer: "Viewer") -> None:
 
     viewer.ui.sidebar.update()
     viewer.renderer.update()
-    _zoom_objects(viewer, selected)
+    _zoom_objects(viewer, [viewer.scene.render_object(obj) for obj in selected])
 
 
 isolate_selected_cmd = Command(title="Isolate Selected", callback=isolate_selected)
@@ -552,7 +553,7 @@ def show_all(viewer: "Viewer") -> None:
         Viewer whose scene objects should be made visible.
 
     """
-    for obj in cast(list["ViewerSceneObject"], viewer.scene.objects):
+    for obj in viewer.scene.objects:
         obj.show = True
 
     viewer.ui.sidebar.update()
@@ -615,9 +616,9 @@ def select_all(viewer: "Viewer") -> None:
         Viewer containing the objects to select.
 
     """
-    for obj in cast(list["ViewerSceneObject"], viewer.scene.objects):
+    for obj in viewer.scene.objects:
         if obj.show:
-            obj.is_selected = True
+            viewer.scene.set_selected(obj, True)
 
     viewer.ui.sidebar.update()
     viewer.renderer.update()
@@ -635,9 +636,9 @@ def invert_selection(viewer: "Viewer") -> None:
         Viewer containing the objects whose selection should be inverted.
 
     """
-    for obj in cast(list["ViewerSceneObject"], viewer.scene.objects):
+    for obj in viewer.scene.objects:
         if obj.show:
-            obj.is_selected = not obj.is_selected
+            viewer.scene.set_selected(obj, not viewer.scene.is_selected(obj))
 
     viewer.ui.sidebar.update()
     viewer.renderer.update()
@@ -655,8 +656,8 @@ def deselect_all(viewer: "Viewer") -> None:
         Viewer whose selection should be cleared.
 
     """
-    for obj in cast(list["ViewerSceneObject"], viewer.scene.objects):
-        obj.is_selected = False
+    for obj in viewer.scene.objects:
+        viewer.scene.set_selected(obj, False)
 
     viewer.ui.sidebar.update()
     viewer.renderer.update()
@@ -665,10 +666,10 @@ def deselect_all(viewer: "Viewer") -> None:
 deselect_all_cmd = Command(title="Deselect All", callback=deselect_all, keybinding="Escape")
 
 
-def _select_matching(viewer: "Viewer", predicate: Callable[["ViewerSceneObject"], bool]) -> None:
+def _select_matching(viewer: "Viewer", predicate: Callable[[SceneObject], bool]) -> None:
     """Replace the selection with objects matching a predicate."""
-    for obj in cast(list["ViewerSceneObject"], viewer.scene.objects):
-        obj.is_selected = predicate(obj)
+    for obj in viewer.scene.objects:
+        viewer.scene.set_selected(obj, predicate(obj))
     viewer.ui.sidebar.update()
     viewer.renderer.update()
 
@@ -684,7 +685,7 @@ def select_by_type(viewer: "Viewer", type_name: str | type | None = None) -> Non
         Type or case-insensitive class name. A chooser is shown when omitted.
 
     """
-    objects = cast(list["ViewerSceneObject"], viewer.scene.objects)
+    objects = viewer.scene.objects
     if type_name is None:
         names = sorted({type(obj).__name__ for obj in objects} | {type(obj.item).__name__ for obj in objects if getattr(obj, "item", None) is not None})
         if not names:
@@ -695,13 +696,13 @@ def select_by_type(viewer: "Viewer", type_name: str | type | None = None) -> Non
 
     if isinstance(type_name, type):
 
-        def predicate(obj: "ViewerSceneObject") -> bool:
+        def predicate(obj: SceneObject) -> bool:
             return isinstance(obj, type_name) or isinstance(getattr(obj, "item", None), type_name)
 
     else:
         normalized = type_name.casefold()
 
-        def predicate(obj: "ViewerSceneObject") -> bool:
+        def predicate(obj: SceneObject) -> bool:
             return type(obj).__name__.casefold() == normalized or type(getattr(obj, "item", None)).__name__.casefold() == normalized
 
     _select_matching(viewer, predicate)
@@ -752,7 +753,7 @@ def select_by_color(viewer: "Viewer", color: Color | str | None = None) -> None:
     if target is None:
         return
 
-    def matches(obj: "ViewerSceneObject") -> bool:
+    def matches(obj: SceneObject) -> bool:
         for name in ("color", "pointcolor", "linecolor", "facecolor", "surfacecolor"):
             value = getattr(obj, name, None)
             if isinstance(value, Color) and value.rgba == target.rgba:
@@ -785,14 +786,14 @@ def select_object(viewer: "Viewer", event: QMouseEvent) -> None:
 
     if etype == QEvent.Type.MouseButtonPress:
         for _, obj in viewer.scene.instance_colors.items():
-            obj.is_selected = False
+            viewer.scene.set_selected(obj, False)
 
         x = viewer.mouse.last_pos.x()
         y = viewer.mouse.last_pos.y()
         instance_color = viewer.renderer.read_instance_color((x, y, x, y))
         selected_obj = _object_from_instance_colors(viewer, instance_color)
         if selected_obj:
-            selected_obj.is_selected = True
+            viewer.scene.set_selected(selected_obj, True)
 
         viewer.ui.sidebar.update()
 
@@ -802,7 +803,7 @@ def select_object(viewer: "Viewer", event: QMouseEvent) -> None:
 select_object_cmd = Command(title="Select Object", callback=select_object, mousebinding="LEFT")
 
 
-def _object_from_instance_colors(viewer: "Viewer", pixels: NDArray[np.uint8]) -> "ViewerSceneObject | None":
+def _object_from_instance_colors(viewer: "Viewer", pixels: NDArray[np.uint8]) -> SceneObject | None:
     """Resolve the most frequently sampled registered instance color."""
     colors, counts = unique(pixels, axis=0, return_counts=True)
     candidates = [(int(count), viewer.scene.instance_colors.get((int(color[0]), int(color[1]), int(color[2])))) for color, count in zip(colors, counts, strict=True)]
@@ -848,7 +849,7 @@ def select_multiple(viewer: "Viewer", event: QMouseEvent) -> None:
         instance_color = viewer.renderer.read_instance_color((x, y, x, y))
         selected_obj = _object_from_instance_colors(viewer, instance_color)
         if selected_obj:
-            selected_obj.is_selected = True
+            viewer.scene.set_selected(selected_obj, True)
             viewer.ui.sidebar.update()
 
     viewer.renderer.update()
@@ -895,7 +896,7 @@ def select_window(viewer: "Viewer", event: QMouseEvent) -> None:
 
         # Deselect all objects first
         for _, obj in viewer.scene.instance_colors.items():
-            obj.is_selected = False
+            viewer.scene.set_selected(obj, False)
 
         box = (start.x(), start.y(), end.x(), end.y())
         fully_contained = end.x() >= start.x()
@@ -909,7 +910,7 @@ def select_window(viewer: "Viewer", event: QMouseEvent) -> None:
         # Select based on instance colors
         for color, obj in viewer.scene.instance_colors.items():
             if color in selected_colors:
-                obj.is_selected = True
+                viewer.scene.set_selected(obj, True)
 
         viewer.ui.sidebar.update()
 
@@ -938,7 +939,7 @@ def deselect_object(viewer: "Viewer", event: QMouseEvent) -> None:
         instance_color = viewer.renderer.read_instance_color((x, y, x, y))
         selected_obj = _object_from_instance_colors(viewer, instance_color)
         if selected_obj:
-            selected_obj.is_selected = False
+            viewer.scene.set_selected(selected_obj, False)
 
         viewer.ui.sidebar.update()
 
@@ -979,14 +980,14 @@ def modify_selected(viewer: "Viewer") -> bool:
     from compas_viewer.components import ParameterForm
     from compas_viewer.scene import modify_object_parameters
 
-    selected = [obj for obj in cast(list["ViewerSceneObject"], viewer.scene.objects) if obj.is_selected]
+    selected = [obj for obj in viewer.scene.objects if viewer.scene.is_selected(obj)]
     parent = viewer.ui.window.widget
     if len(selected) != 1:
         QMessageBox.information(parent, "Modify Parameters", "Select exactly one object to modify.")
         return False
 
     sceneobject = selected[0]
-    data = sceneobject.data
+    data = sceneobject.item
     if data is None:
         QMessageBox.information(parent, "Modify Parameters", "The selected scene object has no underlying data object.")
         return False
@@ -1006,7 +1007,7 @@ def modify_selected(viewer: "Viewer") -> bool:
         QMessageBox.critical(parent, "Could Not Modify Object", str(error))
         return False
 
-    sceneobject.refresh_data()
+    viewer.scene.render_object(sceneobject).refresh_data()
     if viewer.running:
         viewer.renderer.rebuild_buffers()
         viewer.renderer.update()
@@ -1029,8 +1030,8 @@ def delete_selected(viewer: "Viewer") -> None:
         Viewer containing the objects to remove.
 
     """
-    for obj in cast(list["ViewerSceneObject"], viewer.scene.objects):
-        if obj.is_selected:
+    for obj in viewer.scene.objects:
+        if viewer.scene.is_selected(obj):
             viewer.scene.remove(obj)
             del obj
     viewer.renderer.update()
@@ -1057,7 +1058,7 @@ def clear_scene(viewer: "Viewer") -> None:
         Viewer whose scene should be cleared.
 
     """
-    for obj in cast(list["ViewerSceneObject"], viewer.scene.objects):
+    for obj in viewer.scene.objects:
         viewer.scene.remove(obj, rebuild_buffers=False)
         del obj
 

@@ -7,10 +7,9 @@ import numpy as np
 from numpy.typing import NDArray
 
 from compas.geometry import Geometry
-from compas.scene import SceneStateField
-from compas_viewer.scene import ViewerSceneObject
 
 from .sceneobject import ShaderDataType
+from .sceneobject import ViewerSceneObject
 
 
 class BufferGeometry(Geometry):
@@ -225,21 +224,6 @@ class BufferObject(ViewerSceneObject):
         Additional keyword arguments.
 
     """
-
-    __scene_state_namespace__ = "compas_viewer.scene.BufferObject"
-    __scene_state_fields__ = (
-        SceneStateField("show_points", bool),
-        SceneStateField("show_lines", bool),
-        SceneStateField("show_faces", bool),
-        SceneStateField("linewidth", (int, float)),
-        SceneStateField("pointsize", (int, float)),
-    )
-
-    def __init__(self, *args: Any, show_points: bool | None = None, show_lines: bool | None = None, show_faces: bool | None = None, **kwargs: Any) -> None:
-        super().__init__(*args, **kwargs)
-        self.show_points = show_points if show_points is not None else self.buffergeometry.points is not None
-        self.show_lines = show_lines if show_lines is not None else self.buffergeometry.edges is not None
-        self.show_faces = show_faces if show_faces is not None else self.buffergeometry.triangles is not None
 
     @property
     def buffergeometry(self) -> BufferGeometry:

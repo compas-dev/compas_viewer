@@ -4,7 +4,6 @@ from compas.colors import Color
 from compas.geometry import Frame
 from compas.geometry import Point
 from compas.geometry import Transformation
-from compas.scene import SceneStateField
 
 from .sceneobject import ShaderDataType
 from .sceneobject import ViewerSceneObject
@@ -26,13 +25,6 @@ class FrameObject(ViewerSceneObject):
     `compas.geometry.Frame`
 
     """
-
-    __scene_state_namespace__ = "compas_viewer.scene.FrameObject"
-    __scene_state_fields__ = (SceneStateField("size", (int, float, type(None))),)
-
-    def __init__(self, size: float | None = 1, **kwargs) -> None:
-        super().__init__(**kwargs)
-        self.size = size
 
     def _read_lines_data(self) -> ShaderDataType:
         trans = Transformation.from_frame_to_frame(Frame.worldXY(), cast(Frame, self.item))

@@ -26,19 +26,17 @@ from PySide6.QtWidgets import QGestureEvent
 
 from compas.geometry import Frame
 from compas.geometry import transform_points_numpy
-from compas.scene import Group
 from compas_viewer.base import Base
 from compas_viewer.gl import OffscreenBufferContext
-from compas_viewer.scene import ArrowOverlayObject
-from compas_viewer.scene import TagObject
+from compas_viewer.scene.arrowoverlayobject import ArrowOverlayObject
 from compas_viewer.scene.buffermanager import BufferManager
 from compas_viewer.scene.gridobject import GridObject
+from compas_viewer.scene.tagobject import TagObject
 
 from .camera import Camera
 from .shaders import Shader
 
 if TYPE_CHECKING:
-    from compas_viewer.scene import ViewerSceneObject
     from compas_viewer.scene.gridobject import GridObject
     from compas_viewer.scene.meshobject import MeshObject
 
@@ -526,11 +524,11 @@ class Renderer(QOpenGLWidget, Base):
         )
         self.grid.init()
 
-        for obj in cast(list["ViewerSceneObject"], self.viewer.scene.objects):
-            if not isinstance(obj, Group):
-                obj.init()
+        self.viewer.scene.prepare()
+        for obj in self.viewer.scene.render_objects.values():
+            obj.init()
 
-        for obj in cast(list["ViewerSceneObject"], self.viewer.scene.objects):
+        for obj in self.viewer.scene.render_objects.values():
             if not isinstance(obj, (TagObject, ArrowOverlayObject)):
                 self.buffer_manager.add_object(obj)
 
@@ -569,12 +567,13 @@ class Renderer(QOpenGLWidget, Base):
         self.buffer_manager.clear()
 
         # Ensure all objects are initialized before adding to buffer
-        for obj in cast(list["ViewerSceneObject"], self.viewer.scene.objects):
-            if not isinstance(obj, Group) and not obj._inited:
+        self.viewer.scene.prepare()
+        for obj in self.viewer.scene.render_objects.values():
+            if not obj._inited:
                 obj.init()
 
-        for obj in cast(list["ViewerSceneObject"], self.viewer.scene.objects):
-            if not isinstance(obj, (Group, TagObject, ArrowOverlayObject)):
+        for obj in self.viewer.scene.render_objects.values():
+            if not isinstance(obj, (TagObject, ArrowOverlayObject)):
                 self.buffer_manager.add_object(obj)
         self.buffer_manager.create_buffers()
         GL.glBindVertexArray(0)
@@ -726,7 +725,7 @@ class Renderer(QOpenGLWidget, Base):
         )
 
         # Draw text tag sprites if there are any
-        tag_objs = [obj for obj in self.viewer.scene.objects if isinstance(obj, TagObject)]
+        tag_objs = [obj for obj in self.viewer.scene.render_objects.values() if isinstance(obj, TagObject)]
         if tag_objs and not is_instance:
             # release the model shader and bind the tag shader
             self.shader_tag.bind()
@@ -735,7 +734,7 @@ class Renderer(QOpenGLWidget, Base):
                 obj.draw_annotation(self.shader_tag, self.camera.position, self.width(), self.height())
             self.shader_tag.release()
 
-        arrow_overlays = [obj for obj in self.viewer.scene.objects if isinstance(obj, ArrowOverlayObject)]
+        arrow_overlays = [obj for obj in self.viewer.scene.render_objects.values() if isinstance(obj, ArrowOverlayObject)]
         if arrow_overlays and not is_instance:
             self.shader_arrow_overlay.bind()
             self.shader_arrow_overlay.uniform4x4("projection", self.camera.projection(self.width(), self.height()))

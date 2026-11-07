@@ -50,6 +50,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* Replaced Viewer-specific scene-object substitution with stable COMPAS scene
+  objects and context-keyed Viewer draw and clear operations. Render buffers,
+  picking maps, selection, bounds, and renderer handles now live in transient
+  Viewer state keyed by the stable scene-object GUID and are never serialized.
+* Renamed the plane display-size argument from `planesize` to the framework-wide
+  `size`, and changed `Collection` insertion to create a stable group containing
+  ordinary scene entries for its items.
 * Changed Viewer buffer assembly to preserve supplied primitive indices instead
   of expanding vertices, including per-triangle back-face winding.
 * Changed scene persistence to store durable node state and data references

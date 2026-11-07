@@ -5,9 +5,6 @@ from compas.colors import Color
 from compas.geometry import centroid_points
 from compas.geometry import is_coplanar
 from compas.itertools import pairwise
-from compas.scene import MeshObject as BaseMeshObject
-from compas.scene import SceneStateField
-from compas.scene.descriptors.colordict import ColorDictAttribute
 
 from .sceneobject import ShaderDataType
 from .sceneobject import ViewerSceneObject
@@ -15,7 +12,7 @@ from .sceneobject import ViewerSceneObject
 ColorDictValueType = dict[Any, Color] | Color | None
 
 
-class MeshObject(ViewerSceneObject, BaseMeshObject):
+class MeshObject(ViewerSceneObject):
     """Viewer scene object for displaying COMPAS Mesh geometry.
 
     Parameters
@@ -41,40 +38,6 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
     `compas.datastructures.Mesh`
 
     """
-
-    vertexcolor = ColorDictAttribute(default=Color(0.2, 0.2, 0.2))
-    edgecolor = ColorDictAttribute(default=Color(0.2, 0.2, 0.2))
-    facecolor = ColorDictAttribute(default=Color(0.9, 0.9, 0.9))
-    __scene_state_namespace__ = "compas_viewer.scene.MeshObject"
-    __scene_state_fields__ = (
-        SceneStateField("show_points", bool),
-        SceneStateField("show_lines", bool),
-        SceneStateField("linewidth", (int, float)),
-        SceneStateField("pointsize", (int, float)),
-        SceneStateField("hide_coplanaredges", bool),
-        SceneStateField("use_vertexcolors", bool),
-    )
-
-    def __init__(
-        self,
-        show_points: bool | None = None,
-        show_lines: bool | None = None,
-        pointsize: float | None = None,
-        linewidth: int | None = None,
-        hide_coplanaredges: bool | None = None,
-        use_vertexcolors: bool | None = None,
-        **kwargs,
-    ):
-        super().__init__(**kwargs)
-
-        self.show_points = show_points if show_points is not None else False
-        self.show_lines = show_lines if show_lines is not None else True
-
-        self.pointsize = pointsize if pointsize is not None else 6.0
-        self.linewidth = linewidth if linewidth is not None else 1.0
-
-        self.hide_coplanaredges = hide_coplanaredges if hide_coplanaredges is not None else False
-        self.use_vertexcolors = use_vertexcolors if use_vertexcolors is not None else False
 
     @property
     def pointcolor(self) -> Color:
@@ -118,11 +81,11 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
 
     @property
     def linewidth(self) -> float:
-        return self.edgesize
+        return self.edgewidth
 
     @linewidth.setter
     def linewidth(self, size: float) -> None:
-        self.edgesize = size
+        self.edgewidth = size
 
     def _read_points_data(self) -> ShaderDataType:
         positions = []

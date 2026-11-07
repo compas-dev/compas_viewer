@@ -143,52 +143,44 @@ The package exposes its COMPAS plugin module through a project entry point:
 compas_viewer = "compas_viewer.plugins"
 ```
 
-`compas_viewer.plugins` registers Viewer scene-object adapters in the `factories` plugin category. `Viewer` also calls `ensure_scene_objects_registered()` during startup. This covers source checkouts and processes in which another package populated the global COMPAS scene registry before the viewer plugin was requested.
+`compas_viewer.plugins` registers Viewer `draw` and `clear` operations in the
+`factories` plugin category. Plugin discovery imports neither Qt nor OpenGL.
+`Viewer` also ensures these operations are registered during startup for source
+checkouts without installed entry-point metadata.
 
 An external distribution should expose its own plugin module through the same entry-point group rather than relying on import side effects.
 
 ## Add support for a data or geometry type
 
-A scene-object adapter translates an underlying object into shader data. For a geometry that is naturally represented by points and lines, derive from `GeometryObject` and implement the relevant typed properties or `_read_*_data` methods.
-
-```python
-from compas.geometry import Point
-from compas_viewer.scene import GeometryObject
-
-
-class LandmarkObject(GeometryObject):
-    @property
-    def points(self):
-        landmark = self.geometry
-        return [Point(landmark.x, landmark.y, landmark.z)]
-```
-
-Register it for the Viewer context from a COMPAS plugin:
+Register `draw` and `clear` operations for the stable semantic scene-object type
+from a lightweight COMPAS plugin. Keep imports of the render implementation
+inside the operation functions. Operation functions receive the owning scene,
+the stable scene object, and the explicit application runtime. `draw` returns
+opaque runtime handles; `clear` receives those handles for deterministic
+cleanup.
 
 ```python
 from compas.plugins import plugin
 
 
 @plugin(category="factories")
-def register_scene_objects():
-    from compas.scene import register
+def register_scene_operations():
+    from compas.scene import GeometryObject
+    from compas.scene import register_scene_operation
+    from landmark_viewer.operations import clear_landmark
+    from landmark_viewer.operations import draw_landmark
 
-    register(Landmark, LandmarkObject, context="Viewer")
+    register_scene_operation("Viewer", GeometryObject, "draw", draw_landmark)
+    register_scene_operation("Viewer", GeometryObject, "clear", clear_landmark)
 ```
 
-Use the narrowest useful base class:
-
-- `ViewerSceneObject` for non-geometric scene behavior.
-- `GeometryObject` for COMPAS geometry rendered as points, lines, or faces.
-- `ShapeObject` for tessellated COMPAS shapes with `u` and `v` resolution.
-- `MeshObject` or `GraphObject` when adapting corresponding data structures.
-- `BufferObject` for already prepared rendering buffers.
-
-Every scene object exposes its underlying object through `data`, constructor-derived values through `parameters`, and detailed inspection through `parameter_info`.
+Every stable scene object exposes its referenced object through `item`. Viewer
+runtime implementation classes are private and are not extension points.
 
 ## Render-data lifecycle
 
-`ViewerSceneObject.init()` creates render data, bounds, and the instance color used for picking. The four render-data channels are:
+The Viewer internally creates render data, bounds, and the instance color used
+for picking. Its four internal render-data channels are:
 
 - `_points_data`
 - `_lines_data`
@@ -197,13 +189,9 @@ Every scene object exposes its underlying object through `data`, constructor-der
 
 Each populated channel contains positions, colors, and element indices.
 
-Use the appropriate update path:
-
-- `sceneobject.update(update_transform=True)` for transformation-only changes.
-- `sceneobject.update(update_data=True)` for position changes that preserve topology.
-- `sceneobject.refresh_data()` followed by `renderer.rebuild_buffers()` when parameter changes may alter vertex or element counts.
-
-The buffer manager combines scene-object data into shared OpenGL buffers. Do not make scene objects own global OpenGL lifecycle decisions unless a specialized overlay requires it.
+The buffer manager combines these values into shared OpenGL buffers. Backend
+operations and runtime state own GPU lifecycle decisions; stable scene objects
+remain graphics-free.
 
 ## Selection and picking
 
