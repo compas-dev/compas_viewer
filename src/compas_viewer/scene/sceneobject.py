@@ -11,6 +11,7 @@ from compas.data import Data
 from compas.geometry import Point
 from compas.geometry import transform_points_numpy
 from compas.scene import SceneObject
+from compas.scene import SceneStateField
 
 from .parameters import ObjectParameter
 from .parameters import inspect_object_parameters
@@ -48,6 +49,17 @@ class ViewerSceneObject(SceneObject):
         Additional COMPAS scene-object options.
 
     """
+
+    __scene_state_namespace__ = "compas_viewer.scene.ViewerSceneObject"
+    __scene_state_fields__ = (
+        SceneStateField("show_points", bool),
+        SceneStateField("show_lines", bool),
+        SceneStateField("show_faces", bool),
+        SceneStateField("linewidth", (int, float)),
+        SceneStateField("pointsize", (int, float)),
+        SceneStateField("use_rgba", bool),
+        SceneStateField("background", bool),
+    )
 
     def __init__(
         self,

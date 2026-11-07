@@ -3,25 +3,28 @@ from typing import cast
 from compas.geometry import Frame
 from compas.geometry import Plane
 from compas.geometry import Point
+from compas.scene import SceneStateField
 
 from .geometryobject import GeometryObject
 
 
 class PlaneObject(GeometryObject):
-    """
-    Viewer scene object for displaying COMPAS Plane geometry.
+    """Viewer scene object for displaying COMPAS plane geometry.
 
     Parameters
     ----------
-    planesize : float
+    planesize
         The size of the plane.
         Default is 1.
 
     See Also
     --------
-    :class:`compas.geometry.Plane`
+    `compas.geometry.Plane`
 
     """
+
+    __scene_state_namespace__ = "compas_viewer.scene.PlaneObject"
+    __scene_state_fields__ = (SceneStateField("planesize", (int, float)),)
 
     def __init__(self, planesize: float = 1, **kwargs) -> None:
         super().__init__(**kwargs)

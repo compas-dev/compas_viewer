@@ -6,6 +6,7 @@ from typing import cast
 from compas.colors import Color
 from compas.itertools import flatten
 from compas.scene import GeometryObject as BaseGeometryObject
+from compas.scene import SceneStateField
 from compas.scene.descriptors.color import ColorAttribute
 from compas.typing import RealInput
 from compas.typing import VerticesFaces
@@ -40,6 +41,11 @@ class GeometryObject(ViewerSceneObject, BaseGeometryObject):
     pointcolor = ColorAttribute(default=Color(0.2, 0.2, 0.2))
     linecolor = ColorAttribute(default=Color(0.2, 0.2, 0.2))
     surfacecolor = ColorAttribute(default=Color(0.9, 0.9, 0.9))
+    __scene_state_namespace__ = "compas_viewer.scene.GeometryObject"
+    __scene_state_fields__ = (
+        SceneStateField("u", int),
+        SceneStateField("v", int),
+    )
 
     def __init__(self, u: int | None = 16, v: int | None = 16, **kwargs: Any) -> None:
         super().__init__(**kwargs)

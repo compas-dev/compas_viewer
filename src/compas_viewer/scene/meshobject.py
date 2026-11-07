@@ -6,6 +6,7 @@ from compas.geometry import centroid_points
 from compas.geometry import is_coplanar
 from compas.itertools import pairwise
 from compas.scene import MeshObject as BaseMeshObject
+from compas.scene import SceneStateField
 from compas.scene.descriptors.colordict import ColorDictAttribute
 
 from .sceneobject import ShaderDataType
@@ -19,39 +20,36 @@ class MeshObject(ViewerSceneObject, BaseMeshObject):
 
     Parameters
     ----------
-    mesh : :class:`compas.datastructures.Mesh`
+    mesh
         A COMPAS mesh.
-    vertexcolor : Union[Dict[Any, :class:`compas.colors.Color`], :class:`compas.colors.Color`]], optional
+    vertexcolor
         The vertex color. Defaults to the value of `pointcolor` in `viewer.config`.
-    edgecolor : Union[Dict[Any, :class:`compas.colors.Color`], :class:`compas.colors.Color`]], optional
+    edgecolor
         The edge color. Defaults to the value of `linecolor` in `viewer.config`.
-    facecolor : Union[Dict[Any, :class:`compas.colors.Color`], :class:`compas.colors.Color`]], optional
+    facecolor
         The face color. Defaults to the value of `surfacecolor` in `viewer.config`.
-    hide_coplanaredges : bool, optional
+    hide_coplanaredges
         True to hide the coplanar edges. Defaults to the value of `hide_coplanaredges` in `viewer.config`.
-    use_vertexcolors : bool, optional
+    use_vertexcolors
         True to use vertex color. Defaults to the value of `use_vertexcolors` in `viewer.config`.
-    **kwargs : dict, optional
-        Additional options for the :class:`compas_viewer.scene.ViewerSceneObject` and :class:`compas.scene.MeshObject`.
-
-    Attributes
-    ----------
-    mesh : :class:`compas.datastructures.Mesh`
-        The mesh data structure.
-    use_vertexcolors : bool
-        True to use vertex color. Defaults to False.
-    hide_coplanaredges : bool
-        True to hide the coplanar edges.
+    **kwargs
+        Additional options for [ViewerSceneObject][compas_viewer.scene.ViewerSceneObject]
+        and `compas.scene.MeshObject`.
 
     See Also
     --------
-    :class:`compas.datastructures.Mesh`
+    `compas.datastructures.Mesh`
 
     """
 
     vertexcolor = ColorDictAttribute(default=Color(0.2, 0.2, 0.2))
     edgecolor = ColorDictAttribute(default=Color(0.2, 0.2, 0.2))
     facecolor = ColorDictAttribute(default=Color(0.9, 0.9, 0.9))
+    __scene_state_namespace__ = "compas_viewer.scene.MeshObject"
+    __scene_state_fields__ = (
+        SceneStateField("hide_coplanaredges", bool),
+        SceneStateField("use_vertexcolors", bool),
+    )
 
     def __init__(
         self,

@@ -8,6 +8,7 @@ from typing import cast
 from compas.colors import Color
 from compas.data import Data
 from compas.scene import Scene
+from compas.scene import SceneNode
 from compas.scene import SceneObject
 
 from .group import Group
@@ -63,8 +64,15 @@ class ViewerScene(Scene):
 
     """
 
-    def __init__(self, name: str = "ViewerScene", context: str = "Viewer") -> None:
-        super().__init__(name=name, context=context)
+    def __init__(
+        self,
+        name: str = "ViewerScene",
+        context: str | None = "Viewer",
+        *,
+        _detect_context: bool = True,
+        _root: SceneNode | None = None,
+    ) -> None:
+        super().__init__(name=name, context=context, _detect_context=_detect_context, _root=_root)
         self.instance_colors: dict[tuple[int, int, int], ViewerSceneObject] = {}
         self._instance_colors_generator = instance_colors_generator()
 
@@ -78,7 +86,7 @@ class ViewerScene(Scene):
     def add(
         self,
         item: Data | SceneObject,
-        parent: SceneObject | None = None,
+        parent: SceneObject | SceneNode | None = None,
         is_selected: bool = False,
         show: bool = True,
         show_points: bool | None = None,
@@ -180,7 +188,7 @@ class ViewerScene(Scene):
 
         return cast(ViewerSceneObject, sceneobject)
 
-    def add_group(self, name: str = "Group", parent: SceneObject | None = None, **kwargs: Any) -> Group:
+    def add_group(self, name: str = "Group", parent: SceneObject | SceneNode | None = None, **kwargs: Any) -> Group:
         """Add a group to the scene.
 
         Parameters
@@ -202,7 +210,7 @@ class ViewerScene(Scene):
         self.add(group, parent=parent)
         return group
 
-    def remove(self, sceneobject: SceneObject, rebuild_buffers: bool = True) -> None:
+    def remove(self, sceneobject: SceneObject | SceneNode, rebuild_buffers: bool = True) -> None:
         """Remove a scene object from the scene.
 
         Parameters

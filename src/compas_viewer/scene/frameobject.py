@@ -4,48 +4,31 @@ from compas.colors import Color
 from compas.geometry import Frame
 from compas.geometry import Point
 from compas.geometry import Transformation
+from compas.scene import SceneStateField
 
 from .sceneobject import ShaderDataType
 from .sceneobject import ViewerSceneObject
 
 
 class FrameObject(ViewerSceneObject):
-    """
-    The scene object of the COMPAS Frame.
-    With its modifiable cell size and dimension.
+    """Viewer scene object for displaying a COMPAS frame.
 
     Parameters
     ----------
-    frame : :class:`compas.geometry.Frame`
-        The frame geometry.
-    framesize : tuple[float, int, float, int]
-        The size of the grid in [dx, nx, dy, ny] format.
-        Notice that the `nx` and `ny` must be even numbers.
-    linecolor : :class:`compas.colors.Color`
-        The color of the grid lines.
-    show_framez : bool
-        If True, the Z axis of the grid will be shown.
-
-    Attributes
-    ----------
-    geometry : :class:`compas.geometry.Frame`
-        The frame geometry.
-    dx : float
-        The size of the grid in the X direction.
-    nx : int
-        The number of grid cells in the X direction.
-    dy : float
-        The size of the grid in the Y direction.
-    ny : int
-        The number of grid cells in the Y direction.
-    show_framez : bool
-        If the Z axis of the grid is shown.
+    size
+        Length of each displayed frame axis. Use `None` to derive the size
+        from the viewer configuration.
+    **kwargs
+        Additional scene-object options.
 
     See Also
     --------
-    :class:`compas.geometry.Frame`
+    `compas.geometry.Frame`
 
     """
+
+    __scene_state_namespace__ = "compas_viewer.scene.FrameObject"
+    __scene_state_fields__ = (SceneStateField("size", (int, float, type(None))),)
 
     def __init__(self, size: float | None = 1, **kwargs) -> None:
         super().__init__(**kwargs)

@@ -2,13 +2,22 @@ from unittest.mock import Mock
 
 import pytest
 
+from compas.colors import Color
+from compas.data import json_dumps
+from compas.data import json_loads
 from compas.geometry import Box
 from compas.geometry import Capsule
 from compas.geometry import Cone
 from compas.geometry import Cylinder
+from compas.geometry import Frame
 from compas.geometry import PlanarSurface
+from compas.geometry import Plane
+from compas.geometry import Point
 from compas.geometry import Sphere
 from compas.geometry import Torus
+from compas.geometry import Translation
+from compas.geometry import Vector
+from compas.scene import Scene
 from compas_viewer import Viewer
 
 
@@ -46,6 +55,56 @@ def test_shape_object_resolution_override_does_not_mutate_geometry(viewer):
     assert tessellation.number_of_vertices == 20
     assert tessellation.number_of_triangles == 36
     assert shape.__data__ == data
+
+
+def test_shape_object_scene_roundtrip_preserves_durable_state(viewer):
+    shape = Sphere(1.0)
+    transformation = Translation.from_vector([2, 0, 0])
+    facecolor = Color.red()
+    original = viewer.scene.add(
+        shape,
+        is_selected=True,
+        u=7,
+        use_rgba=True,
+        v=9,
+        facecolor=facecolor,
+        transformation=transformation,
+    )
+    original.background = True
+
+    payload = json_dumps(viewer.scene)
+    restored_scene = json_loads(payload)
+
+    assert isinstance(restored_scene, Scene)
+    assert "is_selected" not in payload
+    restored_scene.bind(shape)
+    restored_scene.bind_context("Viewer")
+    restored = restored_scene.objects[0]
+    assert restored.transformation == transformation
+    assert restored.u == 7
+    assert restored.v == 9
+    assert restored.facecolor == facecolor
+    assert restored.use_rgba is True
+    assert restored.background is True
+    assert restored.is_selected is False
+
+
+def test_geometry_adapter_scene_roundtrip_preserves_declared_state(viewer):
+    frame = Frame.worldXY()
+    plane = Plane.worldXY()
+    vector = Vector(1, 2, 3)
+    viewer.scene.add(frame, size=2.5)
+    viewer.scene.add(plane, planesize=4.5)
+    viewer.scene.add(vector, anchor=Point(5, 6, 7))
+
+    restored_scene = json_loads(json_dumps(viewer.scene))
+    restored_scene.bind_many([frame, plane, vector])
+    restored_scene.bind_context("Viewer")
+    restored_frame, restored_plane, restored_vector = restored_scene.objects
+
+    assert restored_frame.size == 2.5
+    assert restored_plane.planesize == 4.5
+    assert restored_vector.anchor == Point(5, 6, 7)
 
 
 @pytest.mark.parametrize(
