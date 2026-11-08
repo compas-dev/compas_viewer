@@ -8,15 +8,15 @@ from compas.geometry import Sphere
 from compas.geometry import Translation
 from compas.scene import GeometryObject
 from compas.scene import SceneObject
+from compas.scene import ArrowAnnotation
+from compas.scene import TextAnnotation
 from compas_viewer import Viewer
 from compas_viewer.commands import clear_scene
 from compas_viewer.commands import delete_selected
-from compas_viewer.scene import ArrowOverlay
 from compas_viewer.scene import Collection
-from compas_viewer.scene import Tag
 from compas_viewer.scene import ViewerScene
-from compas_viewer.scene.arrowoverlayobject import ArrowOverlayObject
-from compas_viewer.scene.tagobject import TagObject
+from compas_viewer.scene.annotationobject import ArrowAnnotationRenderObject
+from compas_viewer.scene.annotationobject import TextAnnotationRenderObject
 from compas_viewer.config import Config
 from compas_viewer.state import ViewerState
 
@@ -107,10 +107,10 @@ def test_collection_expands_with_explicit_presentation_and_group_transform():
 
 def test_prepare_clears_old_runtime_before_replacement(monkeypatch):
     scene = ViewerScene()
-    sceneobject = scene.add(Tag("A", [0, 0, 0]))
+    sceneobject = scene.add(TextAnnotation("A", [0, 0, 0]))
     render_object = scene.render_object(sceneobject)
     clear = Mock()
-    monkeypatch.setattr(TagObject, "clear", clear)
+    monkeypatch.setattr(TextAnnotationRenderObject, "clear", clear)
 
     scene.prepare()
 
@@ -118,27 +118,27 @@ def test_prepare_clears_old_runtime_before_replacement(monkeypatch):
     assert scene.render_object(sceneobject) is not render_object
 
 
-def test_overlay_helpers_release_gl_resources(monkeypatch):
-    import compas_viewer.scene.tagobject as tag_module
+def test_annotation_helpers_release_gl_resources(monkeypatch):
+    import compas_viewer.scene.annotationobject as annotation_module
 
     scene = ViewerScene()
-    tag = scene.render_object(scene.add(Tag("A", [0, 0, 0])))
-    arrow = scene.render_object(scene.add(ArrowOverlay([0, 0, 0], [1, 0, 0])))
-    assert isinstance(tag, TagObject)
-    assert isinstance(arrow, ArrowOverlayObject)
-    tag._text_buffer = {"text_texture": 1, "positions": 2, "elements": 3}
+    text = scene.render_object(scene.add(TextAnnotation("A", [0, 0, 0])))
+    arrow = scene.render_object(scene.add(ArrowAnnotation([0, 0, 0], [1, 0, 0])))
+    assert isinstance(text, TextAnnotationRenderObject)
+    assert isinstance(arrow, ArrowAnnotationRenderObject)
+    text._text_buffer = {"text_texture": 1, "positions": 2, "elements": 3}
     arrow._arrow_buffer = {"positions": 4, "elements": 5}
     delete_textures = Mock()
     delete_buffers = Mock()
-    monkeypatch.setattr(tag_module.GL, "glDeleteTextures", delete_textures)
-    monkeypatch.setattr(tag_module.GL, "glDeleteBuffers", delete_buffers)
+    monkeypatch.setattr(annotation_module.GL, "glDeleteTextures", delete_textures)
+    monkeypatch.setattr(annotation_module.GL, "glDeleteBuffers", delete_buffers)
 
-    tag.clear()
+    text.clear()
     arrow.clear()
 
     delete_textures.assert_called_once_with(1, [1])
     assert delete_buffers.call_args_list == [call(2, [2, 3]), call(2, [4, 5])]
-    assert not hasattr(tag, "_text_buffer")
+    assert not hasattr(text, "_text_buffer")
     assert not hasattr(arrow, "_arrow_buffer")
 
 

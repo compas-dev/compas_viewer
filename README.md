@@ -117,32 +117,29 @@ The presets provide the following defaults:
 Pass `width`, `height`, or `fps` to override individual preset values. GIF and
 animated WebP output are supported.
 
-Text and arrow annotations use screen-scaled styling, making them suitable for
-captures and animation overlays:
+Backend-neutral COMPAS annotations remain legible as the camera changes and can
+be shared with other scene consumers:
 
 ```python
-from compas.colors import Color
-from compas_viewer.scene import ArrowOverlay
-from compas_viewer.scene import TextAnnotation
+from compas.scene import ArrowAnnotation
+from compas.scene import DistanceDimension
+from compas.scene import PointAnchor
+from compas.scene import TextAnnotation
 
-viewer.scene.add(
-    ArrowOverlay(
-        start=(0, 0, 0),
-        end=(1, 1, 0),
-        color=Color.red(),
-        linewidth=4,
-        head_length=18,
-        head_width=14,
-        on_top=True,
-    )
-)
+viewer.scene.add(ArrowAnnotation((0, 0, 0), (1, 1, 0)))
 viewer.scene.add(
     TextAnnotation(
         "Resultant force",
-        position=(1, 1, 0),
-        offset=(8, 8),
-        backgroundcolor=Color(1, 1, 1, 0.8),
-        padding=4,
+        anchor=(1, 1, 0),
+        horizontal_alignment="center",
+    )
+)
+viewer.scene.add(
+    DistanceDimension(
+        PointAnchor((0, 0, 0)),
+        PointAnchor((1, 1, 0)),
+        unit="m",
+        precision=2,
     )
 )
 ```

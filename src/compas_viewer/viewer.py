@@ -502,13 +502,11 @@ class Viewer(Singleton):
     @staticmethod
     def _update_world_bounds(render_object: Any) -> None:
         """Recompute one render helper's world-space bounds."""
-        update_bounds = getattr(render_object, "_update_bounding_box")
-        if hasattr(render_object, "tag"):
-            update_bounds([render_object.tag.position])
-        elif hasattr(render_object, "arrow"):
-            update_bounds([render_object.arrow.start, render_object.arrow.end])
-        else:
-            update_bounds()
+        refresh_annotation_bounds = getattr(render_object, "refresh_annotation_bounds", None)
+        if refresh_annotation_bounds is not None:
+            refresh_annotation_bounds()
+            return
+        render_object._update_bounding_box()
 
     def _sync_view(self) -> None:
         """Synchronize the sidebar and viewport once when the Viewer runs."""

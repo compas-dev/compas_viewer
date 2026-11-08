@@ -28,10 +28,9 @@ from compas.geometry import Frame
 from compas.geometry import transform_points_numpy
 from compas_viewer.base import Base
 from compas_viewer.gl import OffscreenBufferContext
-from compas_viewer.scene.arrowoverlayobject import ArrowOverlayObject
+from compas_viewer.scene.annotationobject import WorldAnnotationRenderObject
 from compas_viewer.scene.buffermanager import BufferManager
 from compas_viewer.scene.gridobject import GridObject
-from compas_viewer.scene.tagobject import TagObject
 
 from .camera import Camera
 from .shaders import Shader
@@ -78,8 +77,8 @@ class Renderer(QOpenGLWidget, Base):
 
         self.shader_model: Shader = None  # type: ignore[assignment]
         self.shader_lines: Shader = None  # type: ignore[assignment]
-        self._shader_tag: Shader | None = None
-        self._shader_arrow_overlay: Shader | None = None
+        self._shader_world_text: Shader | None = None
+        self._shader_world_arrow: Shader | None = None
         self.shader_arrow: Shader = None  # type: ignore[assignment]
         self.shader_instance: Shader = None  # type: ignore[assignment]
         self.shader_grid: Shader = None  # type: ignore[assignment]
@@ -170,49 +169,49 @@ class Renderer(QOpenGLWidget, Base):
         return self._opacity
 
     @property
-    def shader_tag(self) -> Shader:
-        """Lazy initialization of tag shader.
+    def shader_world_text(self) -> Shader:
+        """Return the lazily initialized world-text shader.
 
         Returns
         -------
         Shader
-            The tag shader, initialized on first access.
+            The world-text shader, initialized on first access.
 
         """
-        if self._shader_tag is None:
+        if self._shader_world_text is None:
             projection = self.camera.projection(self.width(), self.height())
             viewworld = self.camera.viewworld()
             transform = identity(4, dtype=float32)
 
-            self._shader_tag = Shader(name="tag")
-            self._shader_tag.bind()
-            self._shader_tag.uniform4x4("projection", projection)
-            self._shader_tag.uniform4x4("viewworld", viewworld)
-            self._shader_tag.uniform4x4("transform", transform)
-            self._shader_tag.uniform1f("opacity", self.opacity)
-            self._shader_tag.uniform3f("selection_color", self.viewer.config.renderer.selectioncolor.rgb)
-            self._shader_tag.release()
-        return self._shader_tag
+            self._shader_world_text = Shader(name="tag")
+            self._shader_world_text.bind()
+            self._shader_world_text.uniform4x4("projection", projection)
+            self._shader_world_text.uniform4x4("viewworld", viewworld)
+            self._shader_world_text.uniform4x4("transform", transform)
+            self._shader_world_text.uniform1f("opacity", self.opacity)
+            self._shader_world_text.uniform3f("selection_color", self.viewer.config.renderer.selectioncolor.rgb)
+            self._shader_world_text.release()
+        return self._shader_world_text
 
     @property
-    def shader_arrow_overlay(self) -> Shader:
-        """Lazy initialization of the screen-scaled arrow shader.
+    def shader_world_arrow(self) -> Shader:
+        """Return the lazily initialized world-arrow shader.
 
         Returns
         -------
         Shader
-            Arrow-overlay shader initialized on first access.
+            World-arrow shader initialized on first access.
 
         """
-        if self._shader_arrow_overlay is None:
-            self._shader_arrow_overlay = Shader(name="arrowoverlay")
-            self._shader_arrow_overlay.bind()
-            self._shader_arrow_overlay.uniform4x4("projection", self.camera.projection(self.width(), self.height()))
-            self._shader_arrow_overlay.uniform4x4("viewworld", self.camera.viewworld())
-            self._shader_arrow_overlay.uniform4x4("transform", identity(4, dtype=float32))
-            self._shader_arrow_overlay.uniform3f("selection_color", self.viewer.config.renderer.selectioncolor.rgb)
-            self._shader_arrow_overlay.release()
-        return self._shader_arrow_overlay
+        if self._shader_world_arrow is None:
+            self._shader_world_arrow = Shader(name="arrowoverlay")
+            self._shader_world_arrow.bind()
+            self._shader_world_arrow.uniform4x4("projection", self.camera.projection(self.width(), self.height()))
+            self._shader_world_arrow.uniform4x4("viewworld", self.camera.viewworld())
+            self._shader_world_arrow.uniform4x4("transform", identity(4, dtype=float32))
+            self._shader_world_arrow.uniform3f("selection_color", self.viewer.config.renderer.selectioncolor.rgb)
+            self._shader_world_arrow.release()
+        return self._shader_world_arrow
 
     # ==========================================================================
     # GL
@@ -530,7 +529,7 @@ class Renderer(QOpenGLWidget, Base):
             obj.init()
 
         for obj in self.viewer.scene.render_objects.values():
-            if not isinstance(obj, (TagObject, ArrowOverlayObject)):
+            if not isinstance(obj, WorldAnnotationRenderObject):
                 self.buffer_manager.add_object(obj)
 
         self.buffer_manager.create_buffers()
@@ -574,7 +573,7 @@ class Renderer(QOpenGLWidget, Base):
                 obj.init()
 
         for obj in self.viewer.scene.render_objects.values():
-            if not isinstance(obj, (TagObject, ArrowOverlayObject)):
+            if not isinstance(obj, WorldAnnotationRenderObject):
                 self.buffer_manager.add_object(obj)
         self.buffer_manager.create_buffers()
         GL.glBindVertexArray(0)
@@ -606,7 +605,7 @@ class Renderer(QOpenGLWidget, Base):
             return
         self.makeCurrent()
         try:
-            shaders = [self.shader_model, self.shader_lines, self._shader_tag, self._shader_arrow_overlay]
+            shaders = [self.shader_model, self.shader_lines, self._shader_world_text, self._shader_world_arrow]
             for shader in shaders:
                 if shader is not None:
                     shader.bind()
@@ -640,9 +639,11 @@ class Renderer(QOpenGLWidget, Base):
         self.shader_lines.uniform4x4("projection", projection)
         self.shader_lines.release()
 
-        self.shader_tag.bind()
-        self.shader_tag.uniform4x4("projection", projection)
-        self.shader_tag.release()
+        for shader in (self._shader_world_text, self._shader_world_arrow):
+            if shader is not None:
+                shader.bind()
+                shader.uniform4x4("projection", projection)
+                shader.release()
 
     def sort_objects_from_viewworld(self, objects: list["MeshObject"], viewworld: NDArray[np.floating]) -> list["MeshObject"]:
         """Sort objects by the distances from their bounding box centers to camera location
@@ -725,24 +726,8 @@ class Renderer(QOpenGLWidget, Base):
             is_instance=is_instance,
         )
 
-        # Draw text tag sprites if there are any
-        tag_objs = [obj for obj in self.viewer.scene.render_objects.values() if isinstance(obj, TagObject)]
-        if tag_objs and not is_instance:
-            # release the model shader and bind the tag shader
-            self.shader_tag.bind()
-            self.shader_tag.uniform4x4("viewworld", viewworld)
-            for obj in tag_objs:
-                obj.draw_annotation(self.shader_tag, self.camera.position, self.width(), self.height())
-            self.shader_tag.release()
-
-        arrow_overlays = [obj for obj in self.viewer.scene.render_objects.values() if isinstance(obj, ArrowOverlayObject)]
-        if arrow_overlays and not is_instance:
-            self.shader_arrow_overlay.bind()
-            self.shader_arrow_overlay.uniform4x4("projection", self.camera.projection(self.width(), self.height()))
-            self.shader_arrow_overlay.uniform4x4("viewworld", viewworld)
-            for obj in arrow_overlays:
-                obj.draw_overlay(self.shader_arrow_overlay, self.width(), self.height())
-            self.shader_arrow_overlay.release()
+        if not is_instance:
+            self._draw_world_annotations(viewworld)
 
         # draw 2D box for multi-selection
         if self.viewer.mouse.is_tracing_a_window:
@@ -766,6 +751,12 @@ class Renderer(QOpenGLWidget, Base):
 
         # Unbind once we're done
         GL.glBindVertexArray(0)
+
+    def _draw_world_annotations(self, viewworld: NDArray[np.floating]) -> None:
+        """Draw world annotations once, in scene insertion order."""
+        for render_object in self.viewer.scene.render_objects.values():
+            if isinstance(render_object, WorldAnnotationRenderObject):
+                render_object.draw_world_annotation(self, viewworld)
 
     def read_instance_color(self, box: tuple[int, int, int, int]) -> NDArray[uint8]:
         """Read instance colors from the specified screen region.

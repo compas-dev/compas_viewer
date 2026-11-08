@@ -32,10 +32,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   operating-system color-scheme changes while the viewer is running.
 * Added configurable grid extents and divisions, grid styling, selection
   color, and viewport background controls.
-* Added camera-facing multiline text annotations with alignment, padding,
-  backgrounds, offsets, and screen- or world-space sizing.
-* Added screen-scaled arrow overlays with configurable shaft and arrowhead
-  styling and optional on-top rendering.
+* Added ordered rendering for backend-neutral COMPAS text annotations, arrow
+  annotations, and fixed or associative distance dimensions.
 * Added ordered transient scale-bar and categorical-legend overlays that stay
   outside scene serialization and picking.
 * Added `Viewer.save_image` for rendering still images without launching the
@@ -57,6 +55,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   build instructions, modernized examples, and a generated API reference.
 
 ### Changed
+
+* Replaced the Viewer-owned `Tag` and `ArrowOverlay` data types with the
+  canonical annotation types from `compas.scene`. Distance labels display the
+  configured precision and informational unit, and unresolved associative
+  dimensions remain visibly marked.
 
 * Audited Viewer configuration as a closed, validated schema-version-2 setup
   contract. Removed retired unit, display-default, sidebar, window-about, and

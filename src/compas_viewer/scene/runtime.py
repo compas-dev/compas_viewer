@@ -31,9 +31,13 @@ def create_render_object(sceneobject: SceneObject, runtime: object) -> "ViewerSc
     from compas.geometry import Shape
     from compas.geometry import Surface
     from compas.geometry import Vector
+    from compas.scene import ArrowAnnotation
+    from compas.scene import DistanceDimension
+    from compas.scene import TextAnnotation
 
-    from .arrowoverlayobject import ArrowOverlay
-    from .arrowoverlayobject import ArrowOverlayObject
+    from .annotationobject import ArrowAnnotationRenderObject
+    from .annotationobject import DistanceDimensionRenderObject
+    from .annotationobject import TextAnnotationRenderObject
     from .brepobject import BRepObject
     from .bufferobject import BufferGeometry
     from .bufferobject import BufferObject
@@ -54,14 +58,13 @@ def create_render_object(sceneobject: SceneObject, runtime: object) -> "ViewerSc
     from .sceneobject import ViewerSceneObject
     from .shapeobject import ShapeObject
     from .surfaceobject import SurfaceObject
-    from .tagobject import Tag
-    from .tagobject import TagObject
     from .vectorobject import VectorObject
 
     item = sceneobject.item
     pairs = (
-        (Tag, TagObject),
-        (ArrowOverlay, ArrowOverlayObject),
+        (TextAnnotation, TextAnnotationRenderObject),
+        (ArrowAnnotation, ArrowAnnotationRenderObject),
+        (DistanceDimension, DistanceDimensionRenderObject),
         (BufferGeometry, BufferObject),
         (Mesh, MeshObject),
         (Graph, GraphObject),

@@ -30,8 +30,6 @@ from compas.geometry import (
 )
 
 from .parameters import ObjectParameter, inspect_object_parameters, modify_object_parameters, object_parameter_values
-from .arrowoverlayobject import ArrowOverlay
-from .tagobject import Tag, TextAnnotation
 from .group import Group
 from .collectionobject import Collection
 from .bufferobject import BufferGeometry
@@ -39,15 +37,12 @@ from .scene import ViewerScene
 
 
 __all__ = [
-    "ArrowOverlay",
     "ObjectParameter",
     "Mesh",
     "Graph",
     "Point",
     "Pointcloud",
     "Line",
-    "Tag",
-    "TextAnnotation",
     "Frame",
     "Vector",
     "Circle",

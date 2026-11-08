@@ -360,28 +360,27 @@ GIF and animated WebP output are supported. Pass `width`, `height`, or `fps` to 
 Text and arrow annotations remain legible as the camera changes:
 
 ```python
-from compas.colors import Color
+from compas.scene import ArrowAnnotation
+from compas.scene import DistanceDimension
+from compas.scene import PointAnchor
+from compas.scene import TextAnnotation
 from compas_viewer import Viewer
-from compas_viewer.scene import ArrowOverlay
-from compas_viewer.scene import TextAnnotation
 
 viewer = Viewer()
-viewer.scene.add(
-    ArrowOverlay(
-        start=(0, 0, 0),
-        end=(1, 1, 0),
-        color=Color.red(),
-        linewidth=4,
-        on_top=True,
-    )
-)
+viewer.scene.add(ArrowAnnotation((0, 0, 0), (1, 1, 0)))
 viewer.scene.add(
     TextAnnotation(
         "Resultant force",
-        position=(1, 1, 0),
-        offset=(8, 8),
-        backgroundcolor=Color(1, 1, 1, 0.8),
-        padding=4,
+        anchor=(1, 1, 0),
+        horizontal_alignment="center",
+    )
+)
+viewer.scene.add(
+    DistanceDimension(
+        PointAnchor((0, 0, 0)),
+        PointAnchor((1, 1, 0)),
+        unit="m",
+        precision=2,
     )
 )
 viewer.show()
