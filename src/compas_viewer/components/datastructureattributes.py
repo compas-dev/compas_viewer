@@ -5,6 +5,7 @@ from typing import cast
 
 from PySide6.QtCore import QAbstractTableModel
 from PySide6.QtCore import QModelIndex
+from PySide6.QtCore import QPersistentModelIndex
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QAbstractItemView
 from PySide6.QtWidgets import QLabel
@@ -124,15 +125,15 @@ class _ElementAttributesModel(QAbstractTableModel):
         self._changed = changed
         self._failed = failed
 
-    def rowCount(self, parent: QModelIndex = QModelIndex()) -> int:
+    def rowCount(self, parent: QModelIndex | QPersistentModelIndex = QModelIndex()) -> int:
         """Return the number of snapshotted element keys."""
         return 0 if parent.isValid() else len(self.keys)
 
-    def columnCount(self, parent: QModelIndex = QModelIndex()) -> int:
+    def columnCount(self, parent: QModelIndex | QPersistentModelIndex = QModelIndex()) -> int:
         """Return the element-key column plus declared attribute columns."""
         return 0 if parent.isValid() else len(self.attributes) + 1
 
-    def data(self, index: QModelIndex, role: int = Qt.ItemDataRole.DisplayRole) -> object | None:
+    def data(self, index: QModelIndex | QPersistentModelIndex, role: int = Qt.ItemDataRole.DisplayRole) -> object | None:
         """Return a display, edit, or check-state value for one cell."""
         if not index.isValid():
             return None
@@ -160,7 +161,7 @@ class _ElementAttributesModel(QAbstractTableModel):
             return "Key" if section == 0 else self.attributes[section - 1]
         return str(section + 1)
 
-    def flags(self, index: QModelIndex) -> Qt.ItemFlag:
+    def flags(self, index: QModelIndex | QPersistentModelIndex) -> Qt.ItemFlag:
         """Return edit flags derived from the declared default value type."""
         if not index.isValid():
             return Qt.ItemFlag.NoItemFlags
@@ -176,7 +177,7 @@ class _ElementAttributesModel(QAbstractTableModel):
             flags |= Qt.ItemFlag.ItemIsUserCheckable
         return flags
 
-    def setData(self, index: QModelIndex, value: object, role: int = Qt.ItemDataRole.EditRole) -> bool:
+    def setData(self, index: QModelIndex | QPersistentModelIndex, value: object, role: int = Qt.ItemDataRole.EditRole) -> bool:
         """Commit one scalar cell through the singular datastructure setter."""
         if not index.isValid() or index.column() == 0:
             return False
@@ -243,7 +244,7 @@ class _ElementAttributesModel(QAbstractTableModel):
             return value
         raise TypeError(f"{self.domain.name} attribute requires a {value_type.__name__} value.")
 
-    def _notify_cell(self, index: QModelIndex) -> None:
+    def _notify_cell(self, index: QModelIndex | QPersistentModelIndex) -> None:
         self.dataChanged.emit(
             index,
             index,

@@ -174,6 +174,20 @@ def test_create_app_applies_configured_identity_and_packaged_icon(monkeypatch):
         app.setWindowIcon(previous_icon)
 
 
+def test_create_app_rejects_existing_non_gui_qt_application(monkeypatch):
+    class FakeApplication:
+        @staticmethod
+        def instance():
+            return object()
+
+    instance = object.__new__(Viewer)
+    instance._config = Config()
+    monkeypatch.setattr(viewer_module, "QApplication", FakeApplication)
+
+    with pytest.raises(RuntimeError, match="non-GUI Qt core application"):
+        Viewer.create_app(instance)
+
+
 def test_window_icon_path_accepts_existing_absolute_file():
     path = viewer_module.HERE / "assets" / "icons" / "compas_icon_white.png"
     instance = object.__new__(Viewer)

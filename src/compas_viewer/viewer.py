@@ -117,8 +117,19 @@ class Viewer(Singleton):
         QApplication
             Configured application instance.
 
+        Raises
+        ------
+        RuntimeError
+            If a non-GUI Qt core application already exists in the process.
+
         """
-        app = QApplication.instance() or QApplication(sys.argv)
+        instance = QApplication.instance()
+        if instance is None:
+            app = QApplication(sys.argv)
+        elif isinstance(instance, QApplication):
+            app = instance
+        else:
+            raise RuntimeError("COMPAS Viewer cannot start after a non-GUI Qt core application has been created.")
         app.setApplicationName(self.config.window.title)
         app.setApplicationDisplayName(self.config.window.title)
         app.setWindowIcon(QIcon(str(self._window_icon_path())))
