@@ -246,6 +246,18 @@ The Display tab controls:
 - Viewport background and selection colors.
 - Grid visibility, axes, mode, color, extents, and divisions.
 
+The **Units and Measurement** tab controls how measurements are presented:
+
+- **Coordinate Unit** declares the unit suffix shown with measurement labels.
+  Leaving it blank keeps the unit unspecified.
+- **Display Precision** sets the number of decimal places shown.
+- The active `compas.tolerance.TOL` values are shown read-only as process-wide
+  numerical context.
+
+The unit declaration does not convert coordinates, and display precision is
+not a geometry tolerance. These presentation settings do not control snapping
+or component association.
+
 ## Configure the viewer in Python
 
 Create a configuration before constructing the viewer:
@@ -261,6 +273,8 @@ config.window.width = 1600
 config.window.height = 900
 config.renderer.show_grid = True
 config.renderer.gridsize = (20.0, 20, 20.0, 20)
+config.measurement.unit = "mm"
+config.measurement.precision = 3
 
 viewer = Viewer(config=config)
 ```
@@ -282,10 +296,12 @@ config.to_json("viewer-config.json")
 restored = Config.from_json("viewer-config.json")
 ```
 
-Configuration files contain persistent values only. Schema version 2 accepts
-only declared fields. Loading a schema-version-1 file retains supported values
-and discards its known retired fields; unknown fields are rejected. Commands
-and menu callbacks are runtime extensions and are deliberately not serialized.
+Configuration files contain persistent values only. Schema version 3 accepts
+only declared fields. Loading schema-version-0, schema-version-1, and
+schema-version-2 files retains supported values, discards the known retired
+fields of the older schemas, and adds default measurement presentation.
+Unknown fields are rejected. Commands and menu callbacks are runtime
+extensions and are deliberately not serialized.
 
 ## Load, save, and capture
 

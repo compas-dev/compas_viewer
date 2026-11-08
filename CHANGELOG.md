@@ -36,6 +36,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   backgrounds, offsets, and screen- or world-space sizing.
 * Added screen-scaled arrow overlays with configurable shaft and arrowhead
   styling and optional on-top rendering.
+* Added ordered transient scale-bar and categorical-legend overlays that stay
+  outside scene serialization and picking.
 * Added `Viewer.save_image` for rendering still images without launching the
   visible viewer or entering its event loop.
 * Added deterministic GIF and WebP animation recording with `preview`,

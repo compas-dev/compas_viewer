@@ -12,6 +12,7 @@ from .datastructureattributes import DatastructureAttributes
 from .displaysetting import DisplaySetting
 from .mainwindow import MainWindow
 from .menubar import MenuBar
+from .measurementsetting import MeasurementSetting
 from .numberedit import NumberEdit
 from .objectsetting import ObjectSetting
 from .parameterform import ParameterForm
@@ -40,6 +41,7 @@ __all__ = [
     "DisplaySetting",
     "MainWindow",
     "MenuBar",
+    "MeasurementSetting",
     "NumberEdit",
     "ObjectSetting",
     "ParameterForm",

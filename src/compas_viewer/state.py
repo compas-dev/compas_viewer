@@ -7,6 +7,7 @@ from PySide6.QtCore import Signal
 
 from compas.scene import SceneObject
 from compas_viewer.config import Config
+from compas_viewer.config import MeasurementConfig
 from compas_viewer.selection import Selection
 
 
@@ -120,6 +121,43 @@ class ViewerState(QObject):
 
         """
         self.changed.emit(path, self.get(path))
+
+    def set_measurement_unit(self, unit: str | None) -> bool:
+        """Set and publish the measurement-label unit declaration.
+
+        Parameters
+        ----------
+        unit
+            Coordinate-unit declaration, or `None` to leave it unspecified.
+            The declaration does not convert coordinates.
+
+        Returns
+        -------
+        bool
+            Whether the stored declaration changed.
+
+        """
+        candidate = MeasurementConfig(unit=unit, precision=self.config.measurement.precision)
+        candidate.validate()
+        return self.set("measurement.unit", unit)
+
+    def set_measurement_precision(self, precision: int) -> bool:
+        """Set and publish the measurement-label display precision.
+
+        Parameters
+        ----------
+        precision
+            Non-negative number of decimal places.
+
+        Returns
+        -------
+        bool
+            Whether the stored precision changed.
+
+        """
+        candidate = MeasurementConfig(unit=self.config.measurement.unit, precision=precision)
+        candidate.validate()
+        return self.set("measurement.precision", precision)
 
     def _selection_changed(self, guids: tuple[UUID, ...]) -> None:
         """Bridge one Qt-neutral selection mutation to Viewer observers."""

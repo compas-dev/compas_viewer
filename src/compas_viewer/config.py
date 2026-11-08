@@ -460,6 +460,49 @@ class CameraConfig(ConfigBase):
 # =============================================================================
 # =============================================================================
 # =============================================================================
+# Measurement
+# =============================================================================
+# =============================================================================
+# =============================================================================
+
+
+@dataclass
+class MeasurementConfig(ConfigBase):
+    """Configure measurement-label presentation.
+
+    Parameters
+    ----------
+    unit
+        Coordinate-unit declaration shown with measurement labels. `None`
+        leaves the unit unspecified. This declaration does not convert
+        coordinates.
+    precision
+        Number of decimal places used to display measurements.
+
+    Notes
+    -----
+    These values control presentation only. They do not configure snapping or
+    COMPAS geometry tolerances.
+
+    """
+
+    unit: str | None = None
+    precision: int = 3
+
+    def validate(self, path: str = "measurement") -> None:
+        if self.unit is not None:
+            if not isinstance(self.unit, str):
+                raise TypeError(f"{path}.unit should be a string or None.")
+            if not self.unit.strip():
+                raise ValueError(f"{path}.unit should be a non-empty string or None.")
+        _require_int(f"{path}.precision", self.precision)
+        if self.precision < 0:
+            raise ValueError(f"{path}.precision should be non-negative.")
+
+
+# =============================================================================
+# =============================================================================
+# =============================================================================
 # UI
 # =============================================================================
 # =============================================================================
@@ -514,18 +557,19 @@ class Config(ConfigBase):
     """Collect validated, serializable Viewer startup preferences.
 
     Nested values may be assigned directly while preparing a Viewer. They do
-    not provide a general reactive runtime interface. Schema version 2 accepts
-    only declared fields. `Config.from_dict` also migrates supported version-0
-    and version-1 data by discarding known retired fields.
+    not provide a general reactive runtime interface. Schema version 3 accepts
+    only declared fields. `Config.from_dict` also migrates supported version-0,
+    version-1, and version-2 data.
 
     """
 
-    schema_version: int = 2
+    schema_version: int = 3
     vectorsize: float = 0.1
     ui: UIConfig = field(default_factory=UIConfig)
     window: WindowConfig = field(default_factory=WindowConfig)
     renderer: RendererConfig = field(default_factory=RendererConfig)
     camera: CameraConfig = field(default_factory=CameraConfig)
+    measurement: MeasurementConfig = field(default_factory=MeasurementConfig)
 
     def validate(self, path: str = "") -> None:
         """Validate the complete configuration.
@@ -537,8 +581,8 @@ class Config(ConfigBase):
 
         """
         _require_int(_path(path, "schema_version"), self.schema_version)
-        if self.schema_version != 2:
-            raise ValueError(f"{_path(path, 'schema_version')} should be 2.")
+        if self.schema_version != 3:
+            raise ValueError(f"{_path(path, 'schema_version')} should be 3.")
         _require_number(_path(path, "vectorsize"), self.vectorsize, positive=True)
 
         sections = {
@@ -546,6 +590,7 @@ class Config(ConfigBase):
             "window": (self.window, WindowConfig),
             "renderer": (self.renderer, RendererConfig),
             "camera": (self.camera, CameraConfig),
+            "measurement": (self.measurement, MeasurementConfig),
         }
         for name, (value, expected) in sections.items():
             section_path = _path(path, name)
@@ -553,7 +598,7 @@ class Config(ConfigBase):
                 raise TypeError(f"{section_path} should be a {expected.__name__}.")
             value.validate(section_path)
 
-        core_fields = {"schema_version", "vectorsize", "ui", "window", "renderer", "camera"}
+        core_fields = {"schema_version", "vectorsize", "ui", "window", "renderer", "camera", "measurement"}
         annotations = get_type_hints(type(self))
         for config_field in fields(self):
             if config_field.name in core_fields:
@@ -594,8 +639,11 @@ class Config(ConfigBase):
 
         migrated = dict(data)
         version = migrated.get("schema_version", 0)
-        if isinstance(version, bool) or not isinstance(version, int) or version not in {0, 1, 2}:
+        if isinstance(version, bool) or not isinstance(version, int) or version not in {0, 1, 2, 3}:
             raise ValueError(f"Unsupported configuration schema version: {version!r}.")
+
+        if version < 3 and "measurement" in migrated:
+            raise ValueError("Unknown configuration fields: measurement.")
 
         if version < 2:
             for name in ("commands", "display", "unit"):
@@ -630,5 +678,9 @@ class Config(ConfigBase):
                 migrated["ui"] = ui
 
             migrated["schema_version"] = 2
+
+        if version < 3:
+            migrated["measurement"] = MeasurementConfig().to_dict()
+            migrated["schema_version"] = 3
 
         return cls._from_dict(migrated, "")

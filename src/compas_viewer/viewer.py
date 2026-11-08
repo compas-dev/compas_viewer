@@ -15,6 +15,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtCore import QTimer
 from PySide6.QtGui import QColor
 from PySide6.QtGui import QIcon
+from PySide6.QtGui import QPainter
 from PySide6.QtGui import QPalette
 from PySide6.QtWidgets import QApplication
 
@@ -34,6 +35,9 @@ from compas_viewer.config import Appearance
 from compas_viewer.config import Config
 from compas_viewer.events import EventManager
 from compas_viewer.mouse import Mouse
+from compas_viewer.overlays import Overlay
+from compas_viewer.overlays import _OverlayContext
+from compas_viewer.overlays import _OverlayLayer
 from compas_viewer.plugins import ensure_scene_objects_registered
 from compas_viewer.renderer import Renderer
 from compas_viewer.scene import ViewerScene
@@ -64,6 +68,7 @@ class Viewer(Singleton):
         self.app = self.create_app()
         self.running = False
         self._scene: ViewerScene | None = None
+        self._overlay_layer = _OverlayLayer()
         self._undo_transforms: list[TransformTransaction] = []
         self._redo_transforms: list[TransformTransaction] = []
 
@@ -118,6 +123,74 @@ class Viewer(Singleton):
             self._scene.prepare()
             for obj in self._scene.render_objects.values():
                 obj.init()
+
+    @property
+    def overlays(self) -> tuple[Overlay, ...]:
+        """Transient screen overlays in their drawing order."""
+        return tuple(self._overlay_layer)
+
+    def add_overlay(self, overlay: Overlay) -> None:
+        """Add a transient screen overlay.
+
+        Overlays belong to the Viewer rather than the scene. They are not
+        serialized, picked, or included in scene selection.
+
+        Parameters
+        ----------
+        overlay
+            Scale bar or categorical legend to append to the drawing order.
+
+        Raises
+        ------
+        TypeError
+            If `overlay` is not an approved concrete overlay type.
+        ValueError
+            If the same overlay instance is already present.
+
+        """
+        self._overlay_layer.add(overlay)
+        if self.running:
+            self.renderer.update()
+
+    def remove_overlay(self, overlay: Overlay) -> bool:
+        """Remove a transient screen overlay by identity.
+
+        Parameters
+        ----------
+        overlay
+            Overlay instance to remove.
+
+        Returns
+        -------
+        bool
+            Whether the overlay was present.
+
+        """
+        removed = self._overlay_layer.remove(overlay)
+        if removed and self.running:
+            self.renderer.update()
+        return removed
+
+    def _draw_overlays(self, renderer: Renderer) -> None:
+        """Draw Viewer-owned overlays after normal scene rendering."""
+        width = renderer.width()
+        height = renderer.height()
+        if not self._overlay_layer or width <= 0 or height <= 0:
+            return
+        context = _OverlayContext(
+            width=width,
+            height=height,
+            camera_distance=renderer.camera.distance,
+            field_of_view=renderer.camera.fov,
+            perspective=renderer.view == "perspective",
+            unit=self.config.measurement.unit,
+            precision=self.config.measurement.precision,
+        )
+        painter = QPainter(renderer)
+        try:
+            self._overlay_layer.draw(painter, context)
+        finally:
+            painter.end()
 
     def create_app(self) -> QApplication:
         """Return the configured Qt application, creating it if necessary.
@@ -479,6 +552,8 @@ class Viewer(Singleton):
             self._apply_appearance(cast(Appearance, value))
         elif path == "selection" and hasattr(self, "ui"):
             self.ui.sidebar.update()
+            self.renderer.update()
+        elif path.startswith("measurement.") and hasattr(self, "ui"):
             self.renderer.update()
 
     def _on_system_color_scheme_changed(self, _scheme: Qt.ColorScheme) -> None:

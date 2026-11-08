@@ -8,6 +8,7 @@ from compas_viewer.components.camerasetting import CameraSetting
 from compas_viewer.components.container import Container
 from compas_viewer.components.datastructureattributes import DatastructureAttributes
 from compas_viewer.components.displaysetting import DisplaySetting
+from compas_viewer.components.measurementsetting import MeasurementSetting
 from compas_viewer.components.objectsetting import ObjectSetting
 from compas_viewer.components.sceneform import SceneColumn
 from compas_viewer.components.tabform import Tabform
@@ -76,6 +77,13 @@ class SideBarRight(Container):
             if itemtype == "DisplaySetting":
                 self.display_setting = DisplaySetting(self.viewport)
                 self.tabform.add_tab("Display", container=self.display_setting)
+                if not tabform_added:
+                    self.add(self.tabform)
+                    tabform_added = True
+
+            if itemtype == "MeasurementSetting":
+                self.measurement_setting = MeasurementSetting()
+                self.tabform.add_tab("Units and Measurement", container=self.measurement_setting)
                 if not tabform_added:
                     self.add(self.tabform)
                     tabform_added = True

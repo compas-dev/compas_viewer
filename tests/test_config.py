@@ -16,6 +16,8 @@ def test_config_dict_roundtrip_preserves_nested_types_and_colors(tmp_path):
     original.window.width = 1440
     original.renderer.backgroundcolor = Color(0.1, 0.2, 0.3, 0.4)
     original.renderer.gridsize = (25.0, 5, 50.0, 10)
+    original.measurement.unit = "mm"
+    original.measurement.precision = 4
 
     restored = config.Config.from_dict(original.to_dict())
 
@@ -25,7 +27,10 @@ def test_config_dict_roundtrip_preserves_nested_types_and_colors(tmp_path):
     assert restored.window.width == 1440
     assert restored.renderer.backgroundcolor == original.renderer.backgroundcolor
     assert restored.renderer.gridsize == (25.0, 5, 50.0, 10)
-    assert restored.schema_version == 2
+    assert isinstance(restored.measurement, config.MeasurementConfig)
+    assert restored.measurement.unit == "mm"
+    assert restored.measurement.precision == 4
+    assert restored.schema_version == 3
 
 
 def test_config_json_roundtrip_uses_declared_fields_only(tmp_path):
@@ -60,14 +65,23 @@ def test_schema_one_config_drops_retired_fields_and_preserves_retained_values():
         }
     )
 
-    assert restored.schema_version == 2
+    assert restored.schema_version == 3
     assert restored.window.title == "Legacy Viewer"
     assert restored.window.fullscreen is True
     assert restored.renderer.view == "top"
     assert restored.ui.toolbar.show is True
     assert restored.ui.sidebar.width == 400
+    assert restored.measurement == config.MeasurementConfig()
     assert "unit" not in restored.to_dict()
     assert "display" not in restored.to_dict()
+
+
+def test_schema_two_config_adds_default_measurement_group():
+    restored = config.Config.from_dict({"schema_version": 2, "renderer": {"view": "top"}})
+
+    assert restored.schema_version == 3
+    assert restored.renderer.view == "top"
+    assert restored.measurement == config.MeasurementConfig()
 
 
 @pytest.mark.parametrize(
@@ -81,6 +95,8 @@ def test_schema_one_config_drops_retired_fields_and_preserves_retained_values():
         ({"schema_version": 2, "renderer": {"opacity": 1.0}}, "renderer.opacity"),
         ({"schema_version": 2, "ui": {"sidebar": {"sceneform": True}}}, "ui.sidebar.sceneform"),
         ({"schema_version": 2, "ui": {"sidebar": {"show_widgets": True}}}, "ui.sidebar.show_widgets"),
+        ({"schema_version": 2, "measurement": {"unit": "mm"}}, "measurement"),
+        ({"schema_version": 3, "unit": "m"}, "unit"),
     ],
 )
 def test_config_rejects_unknown_or_retired_fields(data, path):
@@ -88,7 +104,7 @@ def test_config_rejects_unknown_or_retired_fields(data, path):
         config.Config.from_dict(data)
 
 
-@pytest.mark.parametrize("version", [-1, 3, "2", True])
+@pytest.mark.parametrize("version", [-1, 4, "3", True])
 def test_unsupported_config_schema_is_rejected(version):
     with pytest.raises(ValueError, match="schema version"):
         config.Config.from_dict({"schema_version": version})
@@ -97,15 +113,19 @@ def test_unsupported_config_schema_is_rejected(version):
 @pytest.mark.parametrize(
     "data, error, path",
     [
-        ({"schema_version": 2, "window": {"width": 0}}, ValueError, "window.width"),
-        ({"schema_version": 2, "window": {"height": 1.5}}, TypeError, "window.height"),
-        ({"schema_version": 2, "ui": {"appearance": "sepia"}}, ValueError, "ui.appearance"),
-        ({"schema_version": 2, "renderer": {"gridmode": "half"}}, ValueError, "renderer.gridmode"),
-        ({"schema_version": 2, "renderer": {"gridsize": [10.0, 10]}}, ValueError, "renderer.gridsize"),
-        ({"schema_version": 2, "renderer": {"ghostopacity": 1.1}}, ValueError, "renderer.ghostopacity"),
-        ({"schema_version": 2, "camera": {"position": [0.0, 0.0]}}, ValueError, "camera.position"),
-        ({"schema_version": 2, "camera": {"near": 10.0, "far": 1.0}}, ValueError, "camera.far"),
-        ({"schema_version": 2, "vectorsize": 0.0}, ValueError, "vectorsize"),
+        ({"schema_version": 3, "window": {"width": 0}}, ValueError, "window.width"),
+        ({"schema_version": 3, "window": {"height": 1.5}}, TypeError, "window.height"),
+        ({"schema_version": 3, "ui": {"appearance": "sepia"}}, ValueError, "ui.appearance"),
+        ({"schema_version": 3, "renderer": {"gridmode": "half"}}, ValueError, "renderer.gridmode"),
+        ({"schema_version": 3, "renderer": {"gridsize": [10.0, 10]}}, ValueError, "renderer.gridsize"),
+        ({"schema_version": 3, "renderer": {"ghostopacity": 1.1}}, ValueError, "renderer.ghostopacity"),
+        ({"schema_version": 3, "camera": {"position": [0.0, 0.0]}}, ValueError, "camera.position"),
+        ({"schema_version": 3, "camera": {"near": 10.0, "far": 1.0}}, ValueError, "camera.far"),
+        ({"schema_version": 3, "vectorsize": 0.0}, ValueError, "vectorsize"),
+        ({"schema_version": 3, "measurement": {"unit": "  "}}, ValueError, "measurement.unit"),
+        ({"schema_version": 3, "measurement": {"unit": 1}}, TypeError, "measurement.unit"),
+        ({"schema_version": 3, "measurement": {"precision": -1}}, ValueError, "measurement.precision"),
+        ({"schema_version": 3, "measurement": {"precision": 2.5}}, TypeError, "measurement.precision"),
     ],
 )
 def test_config_validation_reports_full_paths(data, error, path):
@@ -116,15 +136,15 @@ def test_config_validation_reports_full_paths(data, error, path):
 @pytest.mark.parametrize(
     "data, path",
     [
-        ({"schema_version": 2, "vectorsize": float("nan")}, "vectorsize"),
-        ({"schema_version": 2, "vectorsize": float("inf")}, "vectorsize"),
-        ({"schema_version": 2, "camera": {"near": float("nan")}}, "camera.near"),
-        ({"schema_version": 2, "camera": {"far": float("-inf")}}, "camera.far"),
-        ({"schema_version": 2, "renderer": {"gridsize": [float("inf"), 10, 10.0, 10]}}, "renderer.gridsize[0]"),
-        ({"schema_version": 2, "renderer": {"gridsize": [10.0, 10, float("nan"), 10]}}, "renderer.gridsize[2]"),
+        ({"schema_version": 3, "vectorsize": float("nan")}, "vectorsize"),
+        ({"schema_version": 3, "vectorsize": float("inf")}, "vectorsize"),
+        ({"schema_version": 3, "camera": {"near": float("nan")}}, "camera.near"),
+        ({"schema_version": 3, "camera": {"far": float("-inf")}}, "camera.far"),
+        ({"schema_version": 3, "renderer": {"gridsize": [float("inf"), 10, 10.0, 10]}}, "renderer.gridsize[0]"),
+        ({"schema_version": 3, "renderer": {"gridsize": [10.0, 10, float("nan"), 10]}}, "renderer.gridsize[2]"),
         (
             {
-                "schema_version": 2,
+                "schema_version": 3,
                 "renderer": {"backgroundcolor": {"__color__": [0.0, float("nan"), 0.0, 1.0]}},
             },
             "renderer.backgroundcolor[1]",
@@ -137,7 +157,7 @@ def test_config_rejects_nonfinite_numbers_with_full_paths(data, path):
 
 
 def test_renderer_accepts_orthographic_view():
-    restored = config.Config.from_dict({"schema_version": 2, "renderer": {"view": "ortho"}})
+    restored = config.Config.from_dict({"schema_version": 3, "renderer": {"view": "ortho"}})
 
     assert restored.renderer.view == "ortho"
 
@@ -166,7 +186,7 @@ def test_typed_config_subclass_roundtrips_and_validates_nested_section():
     assert restored.extension.enabled is True
 
     with pytest.raises(TypeError, match=r"extension\.enabled"):
-        ExtendedConfig.from_dict({"schema_version": 2, "extension": {"enabled": "yes"}})
+        ExtendedConfig.from_dict({"schema_version": 3, "extension": {"enabled": "yes"}})
 
     invalid = ExtendedConfig()
     setattr(invalid, "extension", "invalid")

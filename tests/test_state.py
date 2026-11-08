@@ -69,6 +69,41 @@ def test_state_rejects_invalid_paths_and_non_boolean_toggles():
         state.toggle("renderer.rendermode")
 
 
+def test_state_updates_measurement_presentation_through_explicit_methods():
+    config = Config()
+    state = ViewerState(config)
+    changes = []
+    state.changed.connect(lambda path, value: changes.append((path, value)))
+
+    assert state.set_measurement_unit("mm")
+    assert state.set_measurement_precision(4)
+    assert not state.set_measurement_precision(4)
+
+    assert config.measurement.unit == "mm"
+    assert config.measurement.precision == 4
+    assert changes == [("measurement.unit", "mm"), ("measurement.precision", 4)]
+
+
+@pytest.mark.parametrize(
+    "method, value, error",
+    [
+        ("set_measurement_unit", " ", ValueError),
+        ("set_measurement_unit", 1, TypeError),
+        ("set_measurement_precision", -1, ValueError),
+        ("set_measurement_precision", 1.5, TypeError),
+    ],
+)
+def test_state_rejects_invalid_measurement_presentation(method, value, error):
+    config = Config()
+    state = ViewerState(config)
+
+    with pytest.raises(error, match="measurement"):
+        getattr(state, method)(value)
+
+    assert config.measurement.unit is None
+    assert config.measurement.precision == 3
+
+
 def test_menu_actions_reflect_published_state():
     action = Action()
     menubar = type("Menu", (), {"_state_actions": {"renderer.show_grid": [(action, True)]}})()

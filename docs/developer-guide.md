@@ -62,6 +62,8 @@ config = Config()
 config.window.title = "Analysis Viewer"
 config.window.width = 1440
 config.renderer.rendermode = "wireframe"
+config.measurement.unit = "mm"
+config.measurement.precision = 3
 config.to_json("viewer.json")
 ```
 
@@ -78,11 +80,13 @@ The root configuration currently contains:
 - `ui`: appearance and component visibility.
 - `renderer`: grid, render mode, background, and selection styling.
 - `camera`: initial camera parameters and interaction increments.
+- `measurement`: coordinate-unit declaration and decimal display precision.
 - `vectorsize`: the viewer-wide vector-arrow preference.
 
-`schema_version` protects persisted data. Schema version 2 is closed: unknown
-and retired fields are rejected. `Config.from_dict` migrates version-1 data by
-retaining declared values and dropping only these known retired fields:
+`schema_version` protects persisted data. Schema version 3 is closed: unknown
+and retired fields are rejected. `Config.from_dict` migrates versions 0, 1,
+and 2 by retaining declared values and adding the default `measurement` group.
+Versions 0 and 1 also drop only these known retired fields:
 
 - Root `commands`, `display`, and `unit` fields.
 - `window.about` and `renderer.opacity`.
@@ -91,6 +95,15 @@ retaining declared values and dropping only these known retired fields:
 
 Each nested configuration group validates its own values and reports complete
 paths such as `renderer.gridmode`.
+
+At runtime, the **Units and Measurement** sidebar tab updates these settings
+through `ViewerState.set_measurement_unit` and
+`ViewerState.set_measurement_precision`. The tab reads the active
+process-wide `compas.tolerance.TOL` values for context but never mutates them.
+Unit and precision affect labels only: they do not convert coordinates,
+configure snapping, or define geometry tolerance. The sidebar is the sole
+settings surface; a future Settings-menu action may focus this same tab but
+must not create a second form or state path.
 
 Applications may subclass `Config` and add typed nested `ConfigBase`
 dataclasses. Declared fields round-trip through dictionaries and JSON; dynamic

@@ -303,6 +303,7 @@ class Renderer(QOpenGLWidget, Base):
             r = self.devicePixelRatio()
             GL.glViewport(0, 0, int(self.width() * r), int(self.height() * r))  # Normal scaled viewport
             self.paint()
+            self.viewer._draw_overlays(self)
 
         self._frames += 1
         if time.time() - self._now > 1:
