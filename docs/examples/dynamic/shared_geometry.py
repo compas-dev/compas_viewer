@@ -28,13 +28,10 @@ def deform_mesh(frame: int) -> None:
     moving_object.transformation = Translation.from_vector([rng.random() - 0.5, rng.random() - 0.5, rng.random() - 0.5])
     rotating_object.transformation *= Translation.from_euler_angles([0.05, 0, 0])
 
-    # Three scene objects share the same geometry data, but their transient
-    # Viewer representations can refresh transforms and geometry independently.
-    viewer.scene.render_object(moving_object).update(update_transform=True, update_data=True)
-
-    viewer.scene.render_object(static_object).update(update_transform=False, update_data=True)
-
-    viewer.scene.render_object(rotating_object).update(update_transform=True, update_data=False)
+    # All three scene objects share the modified mesh, so regenerate their
+    # geometry. Then synchronize the two externally assigned transformations.
+    viewer.refresh_geometry()
+    viewer.refresh_transform((moving_object, rotating_object))
 
 
 viewer.show()

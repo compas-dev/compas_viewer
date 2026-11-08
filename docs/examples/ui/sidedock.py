@@ -15,17 +15,16 @@ box_object = viewer.scene.add(Box(1))
 
 def toggle_box() -> None:
     box_object.show = not box_object.show
-    viewer.renderer.update()
+    viewer.refresh_appearance((box_object,))
 
 
 def move_box(_component: Component, value: float) -> None:
     box_object.transformation = Translation.from_vector([5 * value, 0, 0])
-    viewer.scene.render_object(box_object).update()
-    viewer.renderer.update()
+    viewer.refresh_transform((box_object,))
 
 
 def refresh_viewer(_component: Component, _value: float) -> None:
-    viewer.renderer.update()
+    viewer.refresh_appearance((box_object,))
 
 
 viewer.ui.sidedock.add(Button(text="Toggle Box", action=toggle_box))

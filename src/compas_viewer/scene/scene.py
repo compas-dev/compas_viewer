@@ -94,9 +94,16 @@ class ViewerScene(Scene):
         self._instance_colors_generator = instance_colors_generator()
 
     def prepare(self) -> None:
-        """Create transient render state for the current stable objects."""
+        """Create transient render state for every non-root stable object.
+
+        Hidden objects and item-less groups remain part of the runtime
+        hierarchy because buffered descendants resolve their parent transforms
+        through these entries.
+
+        """
         self._reset_instance_colors()
-        self.draw(context="Viewer", runtime=self)
+        for sceneobject in self.objects:
+            self.draw_object(sceneobject, context="Viewer", runtime=self)
 
     def render_object(self, sceneobject: SceneObject) -> ViewerSceneObject:
         """Return the transient render state for a stable scene object."""
@@ -326,6 +333,9 @@ class ViewerScene(Scene):
 
         selection_changed = False
         if self._viewer is not None:
+            clear_history = getattr(self._viewer, "_clear_transform_history", None)
+            if clear_history is not None:
+                clear_history()
             if self._viewer.running and rebuild_buffers:
                 self._viewer.renderer.rebuild_buffers()
             if cleanup_selection:
@@ -353,6 +363,9 @@ class ViewerScene(Scene):
         self._reset_instance_colors()
 
         if clear_scene and self._viewer is not None:
+            clear_history = getattr(self._viewer, "_clear_transform_history", None)
+            if clear_history is not None:
+                clear_history()
             if self._viewer.running:
                 self._viewer.renderer.rebuild_buffers()
             if not self._viewer.state.selection.clear():

@@ -1,8 +1,8 @@
 # Dynamic Point
 
-The scene object stores durable display state, while the Viewer render object
-owns transient buffers. After changing the represented point, refresh only the
-render data derived from it.
+The scene object stores durable display state, while the Viewer owns transient
+render buffers. After changing the represented point, call
+`viewer.refresh_geometry(...)` to regenerate its render data.
 
 ![](../../assets/images/dynamic.gif)
 

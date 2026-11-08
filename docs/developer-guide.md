@@ -47,6 +47,7 @@ The main responsibilities are deliberately separated:
 | UI definitions | Runtime menu and sidebar composition |
 | Configuration | Serializable startup preferences and defaults |
 | Viewer state | Observable transient selection and runtime state |
+| Transform history | Reversible Viewer transform transactions |
 
 `Viewer`, scene objects, and UI components use the shared viewer instance exposed by the project's singleton infrastructure. Avoid constructing hidden secondary viewers inside extensions.
 
@@ -283,6 +284,44 @@ The buffer manager combines these values into shared OpenGL buffers. Backend
 operations and runtime state own GPU lifecycle decisions; stable scene objects
 remain graphics-free.
 
+Public integrations synchronize changes through four categorized Viewer
+operations:
+
+- `refresh_geometry(objects=None)` regenerates render data and rebuilds
+  combined geometry buffers. Use it after represented coordinates or topology
+  change.
+- `refresh_appearance(objects=None)` updates appearance data and display
+  settings without a full geometry rebuild.
+- `refresh_transform(objects=None)` updates local transform buffers and cached
+  world bounds for the requested objects and their descendants without
+  rebuilding geometry.
+- `refresh_hierarchy()` reconstructs transient render helpers, parent indices,
+  picking state, selection membership, and buffers after hierarchy changes.
+
+`None` means all current scene objects for the object-scoped operations. Direct
+external transformation mutation followed by `refresh_transform` invalidates
+transform history because the Viewer cannot construct a reversible transaction
+for the earlier value. Hierarchy refresh also invalidates transform history;
+geometry and appearance refresh do not.
+
+Use `Viewer.transform_objects` when a transformation should be atomic,
+immediately synchronized, and reversible. It materializes and validates every
+target before mutation, removes duplicate targets without changing their input
+order, and accepts only objects from the current scene. For each object, one
+world-space delta $\Delta$ is applied to its captured world transformation
+$W_i$:
+
+$$
+W_i' = \Delta W_i
+$$
+
+The new local transformation is derived through the inverse captured parent
+world transformation. A request containing both an ancestor and its descendant
+is rejected because their simultaneous group semantics are intentionally
+undefined. `Viewer.undo` and `Viewer.redo` operate only on these explicit
+transform transactions; arbitrary command callbacks and domain mutations do
+not enter Viewer history.
+
 ## Selection and picking
 
 The renderer assigns a unique instance color to each selectable scene object. Picking renders or reads those colors rather than relying on geometric ray intersections. Consequently:
@@ -291,7 +330,11 @@ The renderer assigns a unique instance color to each selectable scene object. Pi
 - Point and line widths affect their visible picking footprint.
 - Directional window selection compares colors within the rectangle with colors in the complete instance map to distinguish fully contained objects from intersections.
 
-After changing scene hierarchy or topology, rebuild buffers so object indices, transforms, settings, and picking colors remain synchronized.
+After changing scene hierarchy through an external integration, call
+`viewer.refresh_hierarchy()` so object indices, transforms, settings, picking
+colors, selection, and transform history remain synchronized. After changing
+represented topology without changing the hierarchy, call
+`viewer.refresh_geometry(...)` instead.
 
 ## UI components
 

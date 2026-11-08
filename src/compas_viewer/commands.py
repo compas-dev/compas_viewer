@@ -41,6 +41,7 @@ from compas.geometry import PolygonalSurface
 from compas.geometry import Polyline
 from compas.geometry import Sphere
 from compas.geometry import Torus
+from compas.geometry import Transformation
 from compas.scene import Scene
 from compas.scene import SceneObject
 
@@ -984,6 +985,68 @@ modify_selected_cmd = Command(title="Modify Parameters...", callback=modify_sele
 # =============================================================================
 
 
+def transform_selected(viewer: "Viewer", transformation: Transformation, space: Literal["world"] = "world") -> None:
+    """Transform the current object selection through the Viewer transaction.
+
+    Parameters
+    ----------
+    viewer
+        Viewer containing the selected objects.
+    transformation
+        World-space transformation delta.
+    space
+        Transformation space. Only `"world"` is supported.
+
+    """
+    viewer.transform_objects(viewer.state.selection.objects, transformation, space=space)
+
+
+transform_selected_cmd = Command(title="Transform Selected", callback=transform_selected)
+
+
+def undo(viewer: "Viewer") -> bool:
+    """Undo the most recent reversible Viewer transaction.
+
+    Parameters
+    ----------
+    viewer
+        Viewer whose transaction history should move backward.
+
+    Returns
+    -------
+    bool
+        Whether a transaction was undone.
+
+    """
+    return viewer.undo()
+
+
+undo_cmd = Command(title="Undo", callback=undo)
+
+
+def redo(viewer: "Viewer") -> bool:
+    """Redo the most recently undone Viewer transaction.
+
+    Parameters
+    ----------
+    viewer
+        Viewer whose transaction history should move forward.
+
+    Returns
+    -------
+    bool
+        Whether a transaction was redone.
+
+    """
+    return viewer.redo()
+
+
+redo_cmd = Command(title="Redo", callback=redo)
+
+
+# =============================================================================
+
+
 def delete_selected(viewer: "Viewer") -> None:
     """Remove all selected objects from the scene.
 
@@ -1149,6 +1212,7 @@ def builtin_commands() -> dict[str, Command]:
         "viewer.modify_selected": modify_selected_cmd,
         "viewer.open_url": open_url_cmd,
         "viewer.pan_view": pan_view_cmd,
+        "viewer.redo": redo_cmd,
         "viewer.rotate_view": rotate_view_cmd,
         "viewer.save_scene": save_scene_cmd,
         "viewer.select_all": select_all_cmd,
@@ -1164,6 +1228,8 @@ def builtin_commands() -> dict[str, Command]:
         "viewer.toggle_sidedock": toggle_sidedock_cmd,
         "viewer.toggle_statusbar": toggle_statusbar_cmd,
         "viewer.toggle_toolbar": toggle_toolbar_cmd,
+        "viewer.transform_selected": transform_selected_cmd,
+        "viewer.undo": undo_cmd,
         "viewer.zoom_extents": zoom_extents_cmd,
         "viewer.zoom_selected": zoom_selected_cmd,
         "viewer.zoom_view": zoom_view_cmd,

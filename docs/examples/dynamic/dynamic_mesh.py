@@ -20,7 +20,7 @@ def deform_mesh(frame: int) -> None:
         point[1] += rng.random() - 0.5
         point[2] += rng.random() - 0.5
         mesh.set_vertex_point(vertex, point)
-    viewer.scene.render_object(sceneobject).update(update_data=True)
+    viewer.refresh_geometry((sceneobject,))
     print(frame)
 
 

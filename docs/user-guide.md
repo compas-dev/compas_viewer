@@ -107,6 +107,60 @@ viewer.show()
 
 The Show column changes an object's visibility without removing it. Selection in the tree and selection in the viewport remain synchronized.
 
+## Transform objects and undo
+
+Use `transform_objects` when a script, command, or interactive tool should move
+one or more scene objects and make that change reversible:
+
+```python
+from compas.geometry import Box
+from compas.geometry import Translation
+from compas_viewer import Viewer
+
+viewer = Viewer()
+first = viewer.scene.add(Box(1.0))
+second = viewer.scene.add(
+    Box(1.0),
+    transformation=Translation.from_vector([3.0, 0.0, 0.0]),
+)
+
+viewer.transform_objects(
+    (first, second),
+    Translation.from_vector([0.0, 0.0, 2.0]),
+)
+viewer.undo()
+viewer.redo()
+```
+
+The transformation is a world-space delta applied to every object's original
+world transformation. The Viewer converts each result back to a local
+transformation through its parent. Every target must belong to the current
+scene. An operation containing both an ancestor and its descendant is rejected,
+and any invalid target leaves all objects unchanged. Only `space="world"` is
+currently supported.
+
+Undo and redo cover explicit Viewer transform transactions only. They do not
+capture arbitrary scene edits, geometry mutations, object-inspector changes, or
+datastructure attribute edits. A new transform after undo clears the redo
+history. **Edit → Undo** and **Edit → Redo** use the same transaction history as
+the programmatic methods.
+
+Direct scene-object or represented-data mutation remains valid, but the Viewer
+cannot detect it automatically. Call the matching explicit refresh operation:
+
+| Change | Operation |
+| --- | --- |
+| Coordinates, topology, or represented geometry | `viewer.refresh_geometry(objects)` |
+| Colors, visibility, opacity, or display sizes | `viewer.refresh_appearance(objects)` |
+| Direct local or world transformation assignment | `viewer.refresh_transform(objects)` |
+| Added, removed, or reparented scene objects | `viewer.refresh_hierarchy()` |
+
+Omit `objects` to refresh every object in the current scene. Transform refresh
+updates transformation data and world bounds without rebuilding geometry.
+Because it reports an external, untracked transformation change, it clears the
+Viewer's transform history. Hierarchy refresh also clears transform history;
+geometry and appearance refresh do not.
+
 ## Save and restore scenes
 
 A serialized scene contains the hierarchy, references to COMPAS data by GUID,
@@ -139,7 +193,7 @@ Select an object and open the **Object** tab to see:
 
 Scene-object settings affect presentation. To edit the underlying geometry or data, select exactly one object and choose **Edit → Modify Parameters…**. The parameter form currently supports writable scalar values: booleans, integers, floating-point values, and strings. Applying a change regenerates the render data and bounding box.
 
-Complex parameters such as frames and collections are displayed as information but are not yet editable through the generic parameter form. Modify those objects in Python and refresh or recreate their scene objects when needed.
+Complex parameters such as frames and collections are displayed as information but are not yet editable through the generic parameter form. Modify those objects in Python and call `refresh_geometry` for the affected scene objects when needed.
 
 ## Edit datastructure element attributes
 
@@ -161,9 +215,10 @@ explicit overrides and expose the effective default values again.
 
 Only attributes declared in the default dictionaries appear. Sparse attributes
 that exist on individual elements, the default dictionaries themselves, batch
-paste, undo, and synchronized viewport element selection are outside the
-initial table contract. Successful edits rebuild the selected object's render
-data and refresh the Viewer.
+paste, and synchronized viewport element selection are outside the initial
+table contract. Attribute-table edits do not enter the Viewer's transform-only
+undo history. Successful edits rebuild the selected object's render data and
+refresh the Viewer.
 
 ## Add geometry from the UI
 
@@ -263,6 +318,7 @@ box = viewer.scene.add(Box(1.0))
 
 def update(frame):
     box.transformation = Translation.from_vector([0.02 * frame, 0, 0])
+    viewer.refresh_transform((box,))
 
 viewer.record_animation(
     "moving-box.gif",

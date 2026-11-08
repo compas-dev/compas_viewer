@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from .sceneobject import ViewerSceneObject
 
 
-def create_render_object(sceneobject: SceneObject, runtime: object) -> "ViewerSceneObject | None":
+def create_render_object(sceneobject: SceneObject, runtime: object) -> "ViewerSceneObject":
     """Create the transient render helper for a stable scene object."""
     from compas.datastructures import Graph
     from compas.datastructures import Mesh
@@ -86,7 +86,13 @@ def create_render_object(sceneobject: SceneObject, runtime: object) -> "ViewerSc
     for item_type, render_type in pairs:
         if isinstance(item, item_type):
             return render_type(sceneobject=sceneobject, runtime=runtime)
-    return ViewerSceneObject(sceneobject=sceneobject, runtime=runtime) if item is not None else None
+    render_object = ViewerSceneObject(sceneobject=sceneobject, runtime=runtime)
+    object.__setattr__(render_object, "show_points", False)
+    object.__setattr__(render_object, "show_lines", False)
+    object.__setattr__(render_object, "show_surfaces", False)
+    object.__setattr__(render_object, "pointsize", 1.0)
+    object.__setattr__(render_object, "linewidth", 1.0)
+    return render_object
 
 
 def draw(scene: "Scene", sceneobject: SceneObject, runtime: object | None) -> list[object]:
@@ -97,8 +103,7 @@ def draw(scene: "Scene", sceneobject: SceneObject, runtime: object | None) -> li
     if not isinstance(viewer_scene, ViewerScene):
         raise TypeError("Viewer draw operations require a Viewer or ViewerScene runtime.")
     render_object = create_render_object(sceneobject, runtime or viewer_scene)
-    if render_object is not None:
-        viewer_scene.render_objects[sceneobject.guid] = render_object
+    viewer_scene.render_objects[sceneobject.guid] = render_object
     return []
 
 

@@ -31,21 +31,23 @@ import sys
 
 from compas_viewer import Viewer
 
-updates = []
+refreshes = []
 
 
-class RenderObject:
-    def update(self, *args, **kwargs):
-        assert not args
-        updates.append(kwargs)
+def record_refresh(name):
+    def refresh(self, objects=None):
+        count = None if objects is None else len(tuple(objects))
+        refreshes.append([name, count])
 
+    return refresh
 
+Viewer.refresh_geometry = record_refresh("geometry")
+Viewer.refresh_appearance = record_refresh("appearance")
+Viewer.refresh_transform = record_refresh("transform")
 Viewer.show = lambda self: None
 namespace = runpy.run_path(sys.argv[1], run_name="__main__")
-viewer = namespace["viewer"]
-viewer.scene.render_object = lambda sceneobject: RenderObject()
 namespace[sys.argv[2]](*json.loads(sys.argv[3]))
-assert updates == json.loads(sys.argv[4])
+assert refreshes == json.loads(sys.argv[4])
 """
 
 
@@ -56,6 +58,7 @@ assert updates == json.loads(sys.argv[4])
         ("docs/examples/scene/groups.py", 4),
         ("docs/examples/configuration/window.py", 1),
         ("docs/examples/dynamic/orbiting.py", 1),
+        ("docs/examples/dynamic/transform.py", 2),
         ("docs/examples/ui/camera.py", 25),
         ("docs/examples/ui/object_inspection.py", 2),
         ("docs/examples/ui/sidedock.py", 1),
@@ -73,25 +76,22 @@ def test_documentation_example_smoke(relative_path, expected_objects):
 
 
 @pytest.mark.parametrize(
-    ("relative_path", "callback", "callback_args", "expected_updates"),
+    ("relative_path", "callback", "callback_args", "expected_refreshes"),
     [
-        ("docs/examples/dynamic/dynamic.py", "move_point", [1], [{"update_data": True}]),
-        ("docs/examples/dynamic/dynamic_mesh.py", "deform_mesh", [1], [{"update_data": True}]),
+        ("docs/examples/dynamic/dynamic.py", "move_point", [1], [["geometry", 1]]),
+        ("docs/examples/dynamic/dynamic_mesh.py", "deform_mesh", [1], [["geometry", 1]]),
         (
             "docs/examples/dynamic/shared_geometry.py",
             "deform_mesh",
             [1],
-            [
-                {"update_transform": True, "update_data": True},
-                {"update_transform": False, "update_data": True},
-                {"update_transform": True, "update_data": False},
-            ],
+            [["geometry", None], ["transform", 2]],
         ),
-        ("docs/examples/dynamic/transform.py", "transform_objects", [1], [{}, {}, {}]),
-        ("docs/examples/ui/sidedock.py", "move_box", [None, 1.0], [{}]),
+        ("docs/examples/ui/sidedock.py", "toggle_box", [], [["appearance", 1]]),
+        ("docs/examples/ui/sidedock.py", "move_box", [None, 1.0], [["transform", 1]]),
+        ("docs/examples/ui/sidedock.py", "refresh_viewer", [None, 1.0], [["appearance", 1]]),
     ],
 )
-def test_documentation_callback_refreshes_render_object(relative_path, callback, callback_args, expected_updates):
+def test_documentation_callback_uses_public_refresh(relative_path, callback, callback_args, expected_refreshes):
     environment = os.environ.copy()
     environment["QT_QPA_PLATFORM"] = "offscreen"
     subprocess.run(
@@ -102,7 +102,7 @@ def test_documentation_callback_refreshes_render_object(relative_path, callback,
             str(ROOT / relative_path),
             callback,
             json.dumps(callback_args),
-            json.dumps(expected_updates),
+            json.dumps(expected_refreshes),
         ],
         check=True,
         cwd=ROOT,

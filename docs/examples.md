@@ -8,11 +8,12 @@ result is verified manually with a supported desktop OpenGL environment.
 The following exceptions have additional runtime evidence:
 
 - `object/points.py`, `scene/groups.py`, `configuration/window.py`,
-  `dynamic/orbiting.py`, and the three `ui/` scripts form the representative
-  **static-and-smoke** subset. The smoke test suppresses only the visible event
-  loop and asserts the number of scene objects constructed by each complete
-  script. Separate callback checks exercise render-data and transformation
-  refreshes in the dynamic and side-dock examples.
+  `dynamic/orbiting.py`, `dynamic/transform.py`, and the three `ui/` scripts
+  form the representative **static-and-smoke** subset. The smoke test
+  suppresses only the visible event loop and asserts the number of scene
+  objects constructed by each complete script. Separate callback checks
+  exercise categorized geometry, appearance, and transformation refreshes in
+  the dynamic and side-dock examples.
 - `object/brep.py` and `object/nurbs.py` are
   **static-plus-optional-runtime**. They use stable core COMPAS geometry
   facades and require compatible optional geometry backends, such as

@@ -114,7 +114,15 @@ def default_menu_items() -> list[UIItem]:
                 {"title": "Capture View", "command": "viewer.capture_view"},
             ],
         },
-        {"title": "Edit", "items": [{"title": "Modify Parameters...", "command": "viewer.modify_selected"}]},
+        {
+            "title": "Edit",
+            "items": [
+                {"title": "Undo", "command": "viewer.undo"},
+                {"title": "Redo", "command": "viewer.redo"},
+                {"type": "separator"},
+                {"title": "Modify Parameters...", "command": "viewer.modify_selected"},
+            ],
+        },
         {
             "title": "Select",
             "items": [
