@@ -6,6 +6,7 @@ from PySide6.QtWidgets import QSplitter
 from compas_viewer.components import SceneTree
 from compas_viewer.components.camerasetting import CameraSetting
 from compas_viewer.components.container import Container
+from compas_viewer.components.datastructureattributes import DatastructureAttributes
 from compas_viewer.components.displaysetting import DisplaySetting
 from compas_viewer.components.objectsetting import ObjectSetting
 from compas_viewer.components.sceneform import SceneColumn
@@ -54,6 +55,13 @@ class SideBarRight(Container):
             if itemtype == "ObjectSetting":
                 self.object_setting = ObjectSetting()
                 self.tabform.add_tab("Object", container=self.object_setting)
+                if not tabform_added:
+                    self.add(self.tabform)
+                    tabform_added = True
+
+            if itemtype == "DatastructureAttributes":
+                self.datastructure_attributes = DatastructureAttributes()
+                self.tabform.add_tab("Attributes", container=self.datastructure_attributes)
                 if not tabform_added:
                     self.add(self.tabform)
                     tabform_added = True

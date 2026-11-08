@@ -11,6 +11,7 @@ def test_sidebar_is_visible_with_scene_tree_by_default():
     assert config.show
     assert config.width >= config.minimum_width
     assert items[0]["type"] == "SceneTree"
+    assert items[2]["type"] == "DatastructureAttributes"
     assert [column["title"] for column in items[0]["columns"]] == ["Name", "Type", "Show"]
 
 

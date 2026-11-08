@@ -35,6 +35,7 @@ The main window consists of:
 - A 3D viewport for navigation and selection.
 - A scene tree showing object hierarchy, groups, names, types, and visibility.
 - An Object tab for information and display settings of the current selection.
+- An Attributes tab for declared mesh and graph element attributes.
 - Camera and Display tabs for view, grid, color, and rendering settings.
 - Menus for creating geometry, selecting objects, changing the view, and loading or saving scenes.
 
@@ -122,6 +123,30 @@ Select an object and open the **Object** tab to see:
 Scene-object settings affect presentation. To edit the underlying geometry or data, select exactly one object and choose **Edit → Modify Parameters…**. The parameter form currently supports writable scalar values: booleans, integers, floating-point values, and strings. Applying a change regenerates the render data and bounding box.
 
 Complex parameters such as frames and collections are displayed as information but are not yet editable through the generic parameter form. Modify those objects in Python and refresh or recreate their scene objects when needed.
+
+## Edit datastructure element attributes
+
+Select one mesh or graph and open the **Attributes** tab. The Viewer creates a
+separate table for each element domain that declares default attributes:
+
+- Mesh vertices, edges, and faces.
+- Graph nodes and edges.
+
+The first column contains the element key. The remaining columns follow the
+insertion order of the corresponding `default_*_attributes` dictionary. Values
+are fetched as the table displays them, so the Viewer does not create a widget
+for every cell or copy the complete attribute data.
+
+Boolean, integer, floating-point, and text defaults define editable columns.
+Columns with `None` or structured defaults remain visible and read-only. Select
+one or more editable cells and choose **Reset to default** to remove their
+explicit overrides and expose the effective default values again.
+
+Only attributes declared in the default dictionaries appear. Sparse attributes
+that exist on individual elements, the default dictionaries themselves, batch
+paste, undo, and synchronized viewport element selection are outside the
+initial table contract. Successful edits rebuild the selected object's render
+data and refresh the Viewer.
 
 ## Add geometry from the UI
 

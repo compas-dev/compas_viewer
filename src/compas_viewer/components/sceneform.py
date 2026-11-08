@@ -195,6 +195,8 @@ class Sceneform(Component):
             if self.action and selected:
                 self.action(self, sceneobject)
         self.viewer.ui.sidebar.object_setting.update()
+        if hasattr(self.viewer.ui.sidebar, "datastructure_attributes"):
+            self.viewer.ui.sidebar.datastructure_attributes.update()
         self.viewer.renderer.update()
 
     def adjust_column_widths(self) -> None:

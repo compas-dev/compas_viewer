@@ -45,6 +45,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   plugins.
 * Added contextual editable-attribute contributions for filtering or adapting
   the stable scene-object attributes shown by Viewer's object inspector.
+* Added lazy tabbed element-attribute tables for selected meshes and graphs,
+  including scalar cell editing and reset-to-default operations.
 * Added startup Viewer identity configuration for the application and window
   title, packaged or absolute custom icons, and fullscreen display.
 * Added versioned configuration serialization and migration of supported legacy

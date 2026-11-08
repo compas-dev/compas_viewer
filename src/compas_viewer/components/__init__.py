@@ -8,6 +8,7 @@ from .colorpicker import ColorPicker
 from .choiceedit import ChoiceEdit
 from .component import Component
 from .container import Container
+from .datastructureattributes import DatastructureAttributes
 from .displaysetting import DisplaySetting
 from .mainwindow import MainWindow
 from .menubar import MenuBar
@@ -35,6 +36,7 @@ __all__ = [
     "ChoiceEdit",
     "Component",
     "Container",
+    "DatastructureAttributes",
     "DisplaySetting",
     "MainWindow",
     "MenuBar",
