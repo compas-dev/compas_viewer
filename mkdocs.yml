@@ -136,6 +136,7 @@ nav:
       - Commands: api/compas_viewer.commands.md
       - Components: api/compas_viewer.components.md
       - Events: api/compas_viewer.events.md
+      - Forms: api/compas_viewer.forms.md
       - Renderer: api/compas_viewer.renderer.md
       - Scene: api/compas_viewer.scene.md
       - UI: api/compas_viewer.ui.md

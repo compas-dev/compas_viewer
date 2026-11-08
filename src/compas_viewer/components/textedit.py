@@ -68,3 +68,9 @@ class TextEdit(BoundComponent[str]):
         """Handle text change events by updating the bound attribute and calling the action."""
         new_text = self.text_edit.toPlainText()
         self.on_value_changed(new_text)
+
+    def sync_from_bound_object(self, value: str) -> None:
+        """Synchronize the editor without publishing another change."""
+        self.text_edit.blockSignals(True)
+        self.text_edit.setText(value)
+        self.text_edit.blockSignals(False)

@@ -14,8 +14,6 @@ class ColorLookup(Protocol):
 class GraphObject(ViewerSceneObject):
     """Viewer scene object for displaying COMPAS Graph data."""
 
-    _supports_faces = False
-
     @property
     def show_points(self) -> bool:
         """Whether graph nodes are visible in the point channel."""

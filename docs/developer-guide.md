@@ -177,6 +177,43 @@ def register_scene_operations():
 Every stable scene object exposes its referenced object through `item`. Viewer
 runtime implementation classes are private and are not extension points.
 
+## Contribute contextual object settings
+
+Viewer builds its object inspector from the stable scene object's
+`editable_attributes()` inventory. A package can filter that inventory or
+replace an attribute's data-side update callback for one visualization
+context. Contributions contain no widgets, labels, form metadata, represented
+item parameters, or rendering callbacks.
+
+Register contributions from a lightweight COMPAS plugin:
+
+```python
+from compas.plugins import plugin
+
+
+@plugin(category="factories")
+def register_scene_attribute_contributions():
+    from compas.scene import ShapeObject
+    from compas_viewer.forms import REMOVE_EDITABLE_ATTRIBUTE
+    from compas_viewer.forms import register_scene_attribute_contribution
+
+    register_scene_attribute_contribution(
+        context="Viewer",
+        sceneobject_type=ShapeObject,
+        contribution="example.shape",
+        attributes={
+            "u": None,
+            "opacity": REMOVE_EDITABLE_ATTRIBUTE,
+        },
+    )
+```
+
+`None` selects ordinary scene-object assignment. The explicit removal marker
+hides an inherited editable attribute. Viewer infers Boolean, number, text,
+and color controls from current values, omits unsupported values, and owns the
+render-data rebuild, redraw, and inspector refresh after successful mutation.
+Represented-item parameters remain on the separate parameter form path.
+
 ## Render-data lifecycle
 
 The Viewer internally creates render data, bounds, and the instance color used

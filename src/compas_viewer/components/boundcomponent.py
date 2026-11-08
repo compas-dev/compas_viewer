@@ -98,7 +98,13 @@ class BoundComponent(Component, Generic[T]):
             The new value to set.
 
         """
-        self.set_attr(value)
+        previous = self.get_attr()
+        try:
+            self.set_attr(value)
+        except Exception:
+            if previous is not None:
+                self.sync_from_bound_object(previous)
+            raise
         if self.action is not None:
             self.action(self, value)
 

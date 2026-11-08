@@ -47,6 +47,11 @@ def register_scene_operations() -> None:
     register_scene_operation("Viewer", SceneObject, "clear", clear)
 
 
+@plugin(category="factories")
+def register_scene_attribute_contributions() -> None:
+    """Register lightweight Viewer editable-attribute contributions."""
+
+
 def ensure_scene_objects_registered() -> None:
     """Ensure Viewer scene operations are available from source checkouts."""
     from compas.plugins import plugin_manager
@@ -62,4 +67,11 @@ def ensure_scene_objects_registered() -> None:
     register_all_scene_operations()
 
 
-__all__ = ["after_draw", "before_draw", "clear", "ensure_scene_objects_registered", "register_scene_operations"]
+__all__ = [
+    "after_draw",
+    "before_draw",
+    "clear",
+    "ensure_scene_objects_registered",
+    "register_scene_attribute_contributions",
+    "register_scene_operations",
+]

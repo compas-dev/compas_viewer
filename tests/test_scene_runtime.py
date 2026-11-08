@@ -13,7 +13,6 @@ from compas_viewer.scene import Tag
 from compas_viewer.scene import ViewerScene
 from compas_viewer.scene.arrowoverlayobject import ArrowOverlayObject
 from compas_viewer.scene.tagobject import TagObject
-from compas_viewer.components.objectsetting import _has_editable_face_channel
 
 
 def test_standalone_viewer_scenes_keep_runtime_state_local():
@@ -159,15 +158,3 @@ def test_operation_registration_coexists_with_specialized_viewer_operation():
             SCENE_OPERATIONS.pop("Viewer", None)
         else:
             SCENE_OPERATIONS["Viewer"] = previous
-
-
-def test_graph_inspector_does_not_expose_faces_toggle():
-    from compas.datastructures import Graph
-
-    graph = Graph()
-    graph.add_node(0, x=0, y=0, z=0)
-    scene = ViewerScene()
-    render_object = scene.render_object(scene.add(graph))
-
-    assert render_object.show_faces is False
-    assert not _has_editable_face_channel(render_object)

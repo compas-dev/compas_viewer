@@ -43,6 +43,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added a stable runtime command registry, namespaced command identifiers, live
   input-binding registration, and menu contributions for applications and
   plugins.
+* Added contextual editable-attribute contributions for filtering or adapting
+  the stable scene-object attributes shown by Viewer's object inspector.
 * Added versioned configuration serialization and migration of supported legacy
   configuration layouts.
 * Added MkDocs user and developer guides, a Hello World tutorial, documentation
