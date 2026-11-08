@@ -34,7 +34,10 @@ class UI(Base):
     def init(self) -> None:
         """Size and show the main window, then refresh the sidebar."""
         self.window.resize(self.viewer.config.window.width, self.viewer.config.window.height)
-        self.window.widget.show()
+        if self.viewer.config.window.fullscreen:
+            self.window.widget.showFullScreen()
+        else:
+            self.window.widget.show()
 
         self.sidebar.update()
 

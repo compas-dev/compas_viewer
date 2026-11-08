@@ -57,10 +57,18 @@ Configuration contains persistent values only. `Config`, its nested dataclasses,
 from compas_viewer.config import Config
 
 config = Config()
+config.window.title = "Analysis Viewer"
 config.window.width = 1440
 config.renderer.rendermode = "wireframe"
 config.to_json("viewer.json")
 ```
+
+`window.title`, `window.icon`, and `window.fullscreen` are startup settings.
+The title is shared by the Qt application and main window. An icon value of
+`None` selects the packaged COMPAS icon; a custom icon must be an existing
+absolute filesystem path. Viewer validates and applies this identity before it
+constructs the Qt application. Changing these values afterward has no promised
+live effect.
 
 The root configuration currently contains:
 

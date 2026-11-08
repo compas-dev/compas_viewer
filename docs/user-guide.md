@@ -162,14 +162,20 @@ from compas_viewer.config import Config
 
 config = Config()
 config.ui.appearance = "dark"
+config.window.title = "My COMPAS Viewer"
 config.window.width = 1600
 config.window.height = 900
 config.renderer.show_grid = True
 config.renderer.gridsize = (20.0, 20, 20.0, 20)
-config.display.pointsize = 8.0
 
 viewer = Viewer(config=config)
 ```
+
+The configured window title also supplies the Qt application name and display
+name. Set `config.window.fullscreen = True` to start fullscreen. The packaged
+COMPAS icon is used by default; `config.window.icon` may point to an existing
+absolute icon path. These identity settings are applied during Viewer startup
+and are not a live-update interface.
 
 Save and restore settings as JSON:
 

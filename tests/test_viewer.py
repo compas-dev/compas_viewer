@@ -4,6 +4,10 @@ import pytest
 
 from compas_viewer import Viewer
 from compas_viewer.animation import ANIMATION_PRESETS
+from compas_viewer.config import Config
+from compas_viewer.config import WindowConfig
+from compas_viewer.components.mainwindow import MainWindow
+from compas_viewer.ui import UI
 from compas_viewer import viewer as viewer_module
 
 
@@ -73,6 +77,7 @@ class FakeWindow:
     def __init__(self):
         self.attributes = []
         self.visible = False
+        self.fullscreen = False
         self.size = None
 
     def setAttribute(self, attribute, enabled):
@@ -84,8 +89,149 @@ class FakeWindow:
     def show(self):
         self.visible = True
 
+    def showFullScreen(self):
+        self.fullscreen = True
+        self.visible = True
+
     def hide(self):
         self.visible = False
+
+
+def test_viewer_assigns_configuration_before_creating_application(monkeypatch):
+    configured = Config(window=WindowConfig(title="Configured Viewer"))
+    instance = object.__new__(Viewer)
+
+    class ApplicationCreated(Exception):
+        pass
+
+    def create_app(viewer):
+        assert viewer.config is configured
+        raise ApplicationCreated
+
+    monkeypatch.setattr(Viewer, "create_app", create_app)
+
+    with pytest.raises(ApplicationCreated):
+        Viewer.__init__(instance, configured)
+
+
+@pytest.mark.parametrize("icon", ["relative.png", "icons/viewer.png"])
+def test_viewer_rejects_relative_window_icon_before_creating_application(monkeypatch, icon):
+    configured = Config(window=WindowConfig(icon=icon))
+    instance = object.__new__(Viewer)
+    created = False
+
+    def create_app(_viewer):
+        nonlocal created
+        created = True
+        raise AssertionError("application should not be created")
+
+    monkeypatch.setattr(Viewer, "create_app", create_app)
+
+    with pytest.raises(ValueError, match="window.icon.*absolute"):
+        Viewer.__init__(instance, configured)
+
+    assert not created
+
+
+def test_viewer_rejects_missing_absolute_window_icon_before_creating_application(monkeypatch, tmp_path):
+    configured = Config(window=WindowConfig(icon=str(tmp_path / "missing.png")))
+    instance = object.__new__(Viewer)
+    created = False
+
+    def create_app(_viewer):
+        nonlocal created
+        created = True
+        raise AssertionError("application should not be created")
+
+    monkeypatch.setattr(Viewer, "create_app", create_app)
+
+    with pytest.raises(ValueError, match="window.icon.*existing file"):
+        Viewer.__init__(instance, configured)
+
+    assert not created
+
+
+def test_create_app_applies_configured_identity_and_packaged_icon(monkeypatch):
+    monkeypatch.setenv("QT_QPA_PLATFORM", "offscreen")
+    from PySide6.QtWidgets import QApplication
+
+    app = QApplication.instance() or QApplication([])
+    previous_name = app.applicationName()
+    previous_display_name = app.applicationDisplayName()
+    previous_icon = app.windowIcon()
+    instance = object.__new__(Viewer)
+    instance.config = Config(window=WindowConfig(title="Configured Viewer"))
+
+    try:
+        app = Viewer.create_app(instance)
+
+        assert app.applicationName() == "Configured Viewer"
+        assert app.applicationDisplayName() == "Configured Viewer"
+        assert not app.windowIcon().isNull()
+    finally:
+        app.setApplicationName(previous_name)
+        app.setApplicationDisplayName(previous_display_name)
+        app.setWindowIcon(previous_icon)
+
+
+def test_window_icon_path_accepts_existing_absolute_file():
+    path = viewer_module.HERE / "assets" / "icons" / "compas_icon_white.png"
+    instance = object.__new__(Viewer)
+    instance.config = Config(window=WindowConfig(icon=str(path)))
+
+    assert instance._window_icon_path() == path
+
+
+def test_main_window_uses_configured_title(monkeypatch):
+    monkeypatch.setenv("QT_QPA_PLATFORM", "offscreen")
+    from PySide6.QtWidgets import QApplication
+
+    app = QApplication.instance() or QApplication([])
+    configured = SimpleNamespace(config=Config(window=WindowConfig(title="Configured Window")), app=app)
+    monkeypatch.setattr(MainWindow, "viewer", property(lambda _self: configured), raising=False)
+
+    window = MainWindow()
+    try:
+        assert window.title == "Configured Window"
+    finally:
+        window.widget.close()
+
+
+def test_viewer_rejects_empty_window_title_before_creating_application(monkeypatch):
+    configured = Config(window=WindowConfig(title=""))
+    instance = object.__new__(Viewer)
+    created = False
+
+    def create_app(_viewer):
+        nonlocal created
+        created = True
+        raise AssertionError("application should not be created")
+
+    monkeypatch.setattr(Viewer, "create_app", create_app)
+
+    with pytest.raises(ValueError, match="window.title.*non-empty"):
+        Viewer.__init__(instance, configured)
+
+    assert not created
+
+
+@pytest.mark.parametrize("fullscreen", [False, True])
+def test_ui_init_applies_configured_startup_window_mode(fullscreen):
+    window = FakeWindow()
+    size = []
+    sidebar_updates = []
+    ui = SimpleNamespace(
+        viewer=SimpleNamespace(config=SimpleNamespace(window=SimpleNamespace(width=900, height=600, fullscreen=fullscreen))),
+        window=SimpleNamespace(widget=window, resize=lambda width, height: size.append((width, height))),
+        sidebar=SimpleNamespace(update=lambda: sidebar_updates.append(True)),
+    )
+
+    UI.init(ui)
+
+    assert size == [(900, 600)]
+    assert window.visible
+    assert window.fullscreen is fullscreen
+    assert sidebar_updates == [True]
 
 
 def test_save_image_renders_without_starting_event_loop(tmp_path):

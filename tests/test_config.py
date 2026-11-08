@@ -4,8 +4,11 @@ from compas.colors import Color
 from compas_viewer import config
 
 
-def test_config_dict_roundtrip_preserves_nested_types_and_colors():
+def test_config_dict_roundtrip_preserves_nested_types_and_colors(tmp_path):
     original = config.Config()
+    icon = tmp_path / "viewer-icon.png"
+    icon.write_bytes(b"icon")
+    original.window.icon = str(icon)
     original.window.width = 1440
     original.renderer.backgroundcolor = Color(0.1, 0.2, 0.3, 0.4)
     original.renderer.gridsize = (25.0, 5, 50.0, 10)
@@ -14,6 +17,7 @@ def test_config_dict_roundtrip_preserves_nested_types_and_colors():
 
     assert isinstance(restored.window, config.WindowConfig)
     assert isinstance(restored.renderer, config.RendererConfig)
+    assert restored.window.icon == str(icon)
     assert restored.window.width == 1440
     assert restored.renderer.backgroundcolor == original.renderer.backgroundcolor
     assert restored.renderer.gridsize == (25.0, 5, 50.0, 10)

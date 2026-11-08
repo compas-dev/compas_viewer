@@ -144,6 +144,7 @@ class WindowConfig(ConfigBase):
     """Configure the main viewer window."""
 
     title: str = "COMPAS Viewer"
+    icon: str | None = None
     width: int = 1280
     height: int = 720
     fullscreen: bool = False

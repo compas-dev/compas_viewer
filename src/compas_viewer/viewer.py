@@ -54,11 +54,12 @@ class Viewer(Singleton):
 
     def __init__(self, config: Config | None = None, **kwargs: Any) -> None:
         ensure_scene_objects_registered()
+        self.config = config or Config()
+        self._validate_window_identity()
         self.app = self.create_app()
         self.running = False
         self._scene: ViewerScene | None = None
 
-        self.config = config or Config()
         self.state = ViewerState(self.config)
         self.state.changed.connect(self._on_state_changed)
         self.commands = CommandRegistry(builtin_commands())
@@ -101,7 +102,7 @@ class Viewer(Singleton):
                 obj.init()
 
     def create_app(self) -> QApplication:
-        """Create and configure the Qt application.
+        """Return the configured Qt application, creating it if necessary.
 
         Returns
         -------
@@ -109,11 +110,32 @@ class Viewer(Singleton):
             Configured application instance.
 
         """
-        app = QApplication(sys.argv)
-        app.setApplicationName("COMPAS Viewer")
-        app.setApplicationDisplayName("COMPAS Viewer")
-        app.setWindowIcon(QIcon(str(HERE / "assets" / "icons" / "compas_icon_white.png")))
+        app = QApplication.instance() or QApplication(sys.argv)
+        app.setApplicationName(self.config.window.title)
+        app.setApplicationDisplayName(self.config.window.title)
+        app.setWindowIcon(QIcon(str(self._window_icon_path())))
         return app
+
+    def _validate_window_identity(self) -> None:
+        """Validate startup identity before constructing the Qt application."""
+        title = self.config.window.title
+        if not isinstance(title, str) or not title:
+            raise ValueError("window.title should be a non-empty string.")
+        self._window_icon_path()
+
+    def _window_icon_path(self) -> Path:
+        """Return the configured absolute icon path or the packaged default."""
+        icon = self.config.window.icon
+        if icon is None:
+            return HERE / "assets" / "icons" / "compas_icon_white.png"
+        if not isinstance(icon, str):
+            raise TypeError("window.icon should be an absolute path string or None.")
+        path = Path(icon)
+        if not path.is_absolute():
+            raise ValueError("window.icon should be an absolute filesystem path.")
+        if not path.is_file():
+            raise ValueError(f"window.icon does not identify an existing file: {path}.")
+        return path
 
     def register_command(self, identifier: str, command: Command, *, replace: bool = False) -> None:
         """Register a runtime command and activate its input bindings.
