@@ -160,7 +160,7 @@ def test_create_app_applies_configured_identity_and_packaged_icon(monkeypatch):
     previous_display_name = app.applicationDisplayName()
     previous_icon = app.windowIcon()
     instance = object.__new__(Viewer)
-    instance.config = Config(window=WindowConfig(title="Configured Viewer"))
+    instance._config = Config(window=WindowConfig(title="Configured Viewer"))
 
     try:
         app = Viewer.create_app(instance)
@@ -177,7 +177,7 @@ def test_create_app_applies_configured_identity_and_packaged_icon(monkeypatch):
 def test_window_icon_path_accepts_existing_absolute_file():
     path = viewer_module.HERE / "assets" / "icons" / "compas_icon_white.png"
     instance = object.__new__(Viewer)
-    instance.config = Config(window=WindowConfig(icon=str(path)))
+    instance._config = Config(window=WindowConfig(icon=str(path)))
 
     assert instance._window_icon_path() == path
 
@@ -213,6 +213,58 @@ def test_viewer_rejects_empty_window_title_before_creating_application(monkeypat
         Viewer.__init__(instance, configured)
 
     assert not created
+
+
+def test_viewer_validates_complete_configuration_before_creating_application(monkeypatch):
+    configured = Config(vectorsize=0.0)
+    instance = object.__new__(Viewer)
+    created = False
+
+    def create_app(_viewer):
+        nonlocal created
+        created = True
+        raise AssertionError("application should not be created")
+
+    monkeypatch.setattr(Viewer, "create_app", create_app)
+
+    with pytest.raises(ValueError, match="vectorsize"):
+        Viewer.__init__(instance, configured)
+
+    assert not created
+
+
+def test_viewer_configuration_cannot_be_replaced():
+    instance = object.__new__(Viewer)
+    instance._config = Config()
+
+    with pytest.raises(AttributeError):
+        instance.config = Config()
+
+
+def test_ui_applies_configured_statusbar_visibility_at_initialization(monkeypatch):
+    class FakeComponent:
+        def __init__(self, *args):
+            self.show = None
+
+    viewport = FakeComponent()
+    viewport.sidebar = FakeComponent()
+    configured = SimpleNamespace(
+        config=Config(),
+        state=SimpleNamespace(changed=SimpleNamespace(connect=lambda callback: None)),
+    )
+    configured.config.ui.statusbar.show = False
+
+    monkeypatch.setattr(UI, "viewer", property(lambda _self: configured), raising=False)
+    monkeypatch.setattr("compas_viewer.ui.MainWindow", FakeComponent)
+    monkeypatch.setattr("compas_viewer.ui.MenuBar", FakeComponent)
+    monkeypatch.setattr("compas_viewer.ui.ToolBar", FakeComponent)
+    monkeypatch.setattr("compas_viewer.ui.StatusBar", FakeComponent)
+    monkeypatch.setattr("compas_viewer.ui.SideDock", FakeComponent)
+    monkeypatch.setattr("compas_viewer.ui.ViewPort", lambda *args: viewport)
+
+    ui = UI()
+
+    assert ui.statusbar.show is False
 
 
 @pytest.mark.parametrize("fullscreen", [False, True])

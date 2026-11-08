@@ -30,17 +30,17 @@ class ViewerSceneObject:
     show
         Whether to show object. Default is True.
     show_points
-        Whether to show points/vertices of the object. Default is the value of `show_points` in `viewer.config`.
+        Whether to show points or vertices of the object.
     show_lines
-        Whether to show lines/edges of the object. Default is the value of `show_lines` in `viewer.config`.
+        Whether to show lines or edges of the object.
     show_faces
-        Whether to show faces of the object. Default is the value of `show_faces` in `viewer.config`.
+        Whether to show faces of the object.
     linewidth
-        The line width to be drawn on screen. Default is the value of `linewidth` in `viewer.config`.
+        The line width to draw on screen.
     pointsize
-        The point size to be drawn on screen. Default is the value of `pointsize` in `viewer.config`.
+        The point size to draw on screen.
     opacity
-        The opacity of the object. Default is the value of `opacity` in `viewer.config`.
+        The opacity of the object.
     use_rgba
         Whether buffer colors contain alpha values.
     **kwargs

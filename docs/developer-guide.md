@@ -72,14 +72,22 @@ live effect.
 
 The root configuration currently contains:
 
-- `window`: window size, title, and related preferences.
+- `window`: window size, title, icon, and fullscreen startup mode.
 - `ui`: appearance and component visibility.
-- `display`: default scene-object colors and sizes.
 - `renderer`: grid, render mode, background, and selection styling.
 - `camera`: initial camera parameters and interaction increments.
-- `unit` and `vectorsize`: viewer-wide geometric preferences.
+- `vectorsize`: the viewer-wide vector-arrow preference.
 
-`schema_version` protects persisted data. `Config.from_dict` migrates supported legacy fields and rejects files written by a newer unsupported schema.
+`schema_version` protects persisted data. Schema version 2 is closed: unknown
+and retired fields are rejected. `Config.from_dict` migrates version-1 data by
+retaining declared values and dropping only known retired fields. Each nested
+configuration group validates its own values and reports complete paths such
+as `renderer.gridmode`.
+
+Applications may subclass `Config` and add typed nested `ConfigBase`
+dataclasses. Declared fields round-trip through dictionaries and JSON; dynamic
+attributes do not. Validate custom groups explicitly, following the built-in
+group pattern.
 
 Do not place callbacks, Qt widgets, commands, or plugin objects in configuration. Runtime composition belongs in the command registry and UI definitions.
 
@@ -275,14 +283,15 @@ viewer.state.toggle("ui.sidebar.show")
 
 State changes update the configuration and publish a Qt signal. Menus, display
 controls, component visibility, the viewport, and the renderer subscribe to
-the paths they own and update immediately. Use `viewer.state` for runtime
-changes instead of assigning directly to `viewer.config`; direct configuration
-assignment is intended for setup before constructing the viewer.
+the declared paths they own and update immediately. `ViewerState` is not a
+general extension namespace. Use `viewer.state` for supported runtime changes;
+direct nested configuration assignment is intended for setup before
+constructing the viewer, and replacing `viewer.config` is unsupported.
 
 Bound controls that assign a configuration attribute before their callback can
 call `viewer.state.notify(path)` to publish the resulting value.
 
-For coupled settings, prefer a method on the owning runtime object. `Viewer.set_appearance`, viewport unit changes, renderer view changes, and grid rebuilding are examples of boundaries where a plain dataclass assignment is insufficient.
+For coupled settings, prefer a method on the owning runtime object. `Viewer.set_appearance`, renderer view changes, and grid rebuilding are examples of boundaries where a plain dataclass assignment is insufficient.
 
 ## Images and animation
 

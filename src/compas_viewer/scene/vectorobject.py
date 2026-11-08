@@ -54,7 +54,7 @@ class VectorObject(ViewerSceneObject):
             self.anchor + vector,  # Arrow end
         ]
 
-        self._arrow_colors = [self.linecolor or self.viewer.config.display.linecolor] * len(self._arrow_vertices)
+        self._arrow_colors = [self.linecolor] * len(self._arrow_vertices)
 
     def _read_lines_data(self) -> ShaderDataType:
         positions = self._arrow_vertices

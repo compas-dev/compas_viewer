@@ -26,7 +26,6 @@ from compas_viewer.commands import Command
 from compas_viewer.commands import builtin_commands
 from compas_viewer.config import Appearance
 from compas_viewer.config import Config
-from compas_viewer.config import Unit
 from compas_viewer.events import EventManager
 from compas_viewer.mouse import Mouse
 from compas_viewer.plugins import ensure_scene_objects_registered
@@ -54,8 +53,8 @@ class Viewer(Singleton):
 
     def __init__(self, config: Config | None = None, **kwargs: Any) -> None:
         ensure_scene_objects_registered()
-        self.config = config or Config()
-        self._validate_window_identity()
+        self._config = config if config is not None else Config()
+        self._config.validate()
         self.app = self.create_app()
         self.running = False
         self._scene: ViewerScene | None = None
@@ -73,6 +72,15 @@ class Viewer(Singleton):
 
         self.eventmanager = EventManager()
         self.ui = UI()
+
+    @property
+    def config(self) -> Config:
+        """Config: Startup configuration owned by this viewer.
+
+        The nested configuration values may be adjusted during setup. Replacing
+        the complete configuration of an existing viewer is unsupported.
+        """
+        return self._config
 
     @property
     def renderer(self) -> Renderer:
@@ -116,26 +124,12 @@ class Viewer(Singleton):
         app.setWindowIcon(QIcon(str(self._window_icon_path())))
         return app
 
-    def _validate_window_identity(self) -> None:
-        """Validate startup identity before constructing the Qt application."""
-        title = self.config.window.title
-        if not isinstance(title, str) or not title:
-            raise ValueError("window.title should be a non-empty string.")
-        self._window_icon_path()
-
     def _window_icon_path(self) -> Path:
         """Return the configured absolute icon path or the packaged default."""
         icon = self.config.window.icon
         if icon is None:
             return HERE / "assets" / "icons" / "compas_icon_white.png"
-        if not isinstance(icon, str):
-            raise TypeError("window.icon should be an absolute path string or None.")
-        path = Path(icon)
-        if not path.is_absolute():
-            raise ValueError("window.icon should be an absolute filesystem path.")
-        if not path.is_file():
-            raise ValueError(f"window.icon does not identify an existing file: {path}.")
-        return path
+        return Path(icon)
 
     def register_command(self, identifier: str, command: Command, *, replace: bool = False) -> None:
         """Register a runtime command and activate its input bindings.
@@ -273,16 +267,6 @@ class Viewer(Singleton):
         for role, color in colors.items():
             palette.setColor(role, QColor(color))
         return palette
-
-    @property
-    def unit(self) -> Unit:
-        """The display unit used by the viewport."""
-        return self.ui.viewport.unit
-
-    @unit.setter
-    def unit(self, unit: Unit) -> None:
-        """Set the display unit before the viewer starts running."""
-        self.ui.viewport.unit = unit
 
     def show(self) -> None:
         """Initialize the interface and enter the Qt event loop."""

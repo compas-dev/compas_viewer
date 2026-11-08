@@ -40,18 +40,10 @@ class DisplaySetting(Container):
         def update_grid(*args: object) -> None:
             self.viewer.state.set("renderer.gridsize", (self.grid.dx, int(self.grid.nx), self.grid.dy, int(self.grid.ny)))
 
-        def update_unit(*args: object) -> None:
-            dx, nx, dy, ny = renderer_config.gridsize
-            self.grid.dx = dx
-            self.grid.nx = float(nx)
-            self.grid.dy = dy
-            self.grid.ny = float(ny)
-
         def add_state_control(path: str, control: BoundComponent[Any]) -> None:
             self._state_controls[path] = control
             self.add(control)
 
-        add_state_control("unit", ChoiceEdit(self.viewport, "unit", ["m", "cm", "mm"], title="Units", action=update_unit))
         add_state_control("renderer.rendermode", ChoiceEdit(self.renderer, "rendermode", ["shaded", "lighted", "ghosted", "wireframe"], title="Render Mode"))
         add_state_control("renderer.view", ChoiceEdit(self.renderer, "view", ["perspective", "top", "front", "right", "ortho"], title="View"))
         add_state_control("renderer.backgroundcolor", ColorPicker(renderer_config, "backgroundcolor", title="Background", action=notify("renderer.backgroundcolor")))

@@ -2,6 +2,7 @@ from unittest.mock import Mock
 
 import pytest
 
+from compas.colors import Color
 from compas.data import json_dumps
 from compas.data import json_loads
 from compas.geometry import Frame
@@ -22,6 +23,7 @@ from compas.scene import VectorObject
 from compas_viewer import Viewer
 from compas_viewer.commands import zoom_extents
 from compas_viewer.scene.shapeobject import ShapeObject as ViewerShapeObject
+from compas_viewer.scene.vectorobject import VectorObject as ViewerVectorObject
 
 
 @pytest.fixture
@@ -104,6 +106,16 @@ def test_stable_specialized_geometry_fields_use_core_names(viewer):
     assert type(vector) is VectorObject and list(vector.anchor) == [5, 6, 7]
     with pytest.raises(TypeError, match="planesize"):
         viewer.scene.add(Plane.worldXY(), planesize=2.0)
+
+
+def test_vector_rendering_uses_stable_scene_object_color(viewer):
+    sceneobject = viewer.scene.add(Vector(1, 0, 0), linecolor=Color.red())
+    render_object = viewer.scene.render_object(sceneobject)
+
+    assert isinstance(render_object, ViewerVectorObject)
+    render_object._calculate_arrow_buffer_data()
+
+    assert render_object._arrow_colors == [sceneobject.linecolor] * 7
 
 
 def test_context_preparation_preserves_stable_identity(viewer):

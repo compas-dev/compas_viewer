@@ -35,7 +35,7 @@ The main window consists of:
 - A 3D viewport for navigation and selection.
 - A scene tree showing object hierarchy, groups, names, types, and visibility.
 - An Object tab for information and display settings of the current selection.
-- Camera and Display tabs for view, grid, unit, color, and rendering settings.
+- Camera and Display tabs for view, grid, color, and rendering settings.
 - Menus for creating geometry, selecting objects, changing the view, and loading or saving scenes.
 
 The sidebar is visible by default. Use **View → Sidebar** to hide or restore it.
@@ -144,13 +144,10 @@ Use **View → Appearance** to select:
 
 The Display tab controls:
 
-- Units: metres, centimetres, or millimetres.
 - Shaded, lighted, ghosted, and wireframe rendering.
 - Perspective, orthographic, and standard views.
 - Viewport background and selection colors.
 - Grid visibility, axes, mode, color, extents, and divisions.
-
-Changing units rescales the grid and camera so that the scene remains usable at the selected scale.
 
 ## Configure the viewer in Python
 
@@ -177,6 +174,10 @@ COMPAS icon is used by default; `config.window.icon` may point to an existing
 absolute icon path. These identity settings are applied during Viewer startup
 and are not a live-update interface.
 
+Configuration is a setup-time interface. Adjust its nested fields before
+constructing the Viewer; replacing `viewer.config` is unsupported. Runtime UI
+changes use the Viewer's commands and state interfaces instead.
+
 Save and restore settings as JSON:
 
 ```python
@@ -184,7 +185,10 @@ config.to_json("viewer-config.json")
 restored = Config.from_json("viewer-config.json")
 ```
 
-Configuration files contain persistent values only. Commands and menu callbacks are runtime extensions and are deliberately not serialized.
+Configuration files contain persistent values only. Schema version 2 accepts
+only declared fields. Loading a schema-version-1 file retains supported values
+and discards its known retired fields; unknown fields are rejected. Commands
+and menu callbacks are runtime extensions and are deliberately not serialized.
 
 ## Load, save, and capture
 

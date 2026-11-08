@@ -25,11 +25,11 @@ class GeometryObject(ViewerSceneObject):
     v
         The number of cells in the v-direction of structured geometry.
     pointcolor
-        The color of the points. Default is the value of `pointcolor` in `viewer.config`.
+        The color of the points.
     linecolor
-        The color of the lines. Default is the value of `linecolor` in `viewer.config`.
+        The color of the lines.
     surfacecolor
-        The color of the surfaces. Default is the value of `surfacecolor` in `viewer.config`.
+        The color of the surfaces.
     **kwargs
         Additional scene-object options.
 

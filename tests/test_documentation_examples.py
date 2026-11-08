@@ -30,7 +30,7 @@ runpy.run_path(sys.argv[1], run_name="__main__")
     [
         ("docs/examples/object/points.py", 10),
         ("docs/examples/scene/groups.py", 4),
-        ("docs/examples/configuration/units.py", 25),
+        ("docs/examples/configuration/window.py", 1),
     ],
 )
 def test_documentation_example_smoke(relative_path, expected_objects):

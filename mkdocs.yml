@@ -129,7 +129,7 @@ nav:
           - Camera Controls: examples/ui/camera.md
       - Configuration:
           - Overview: examples/configuration.md
-          - Units and Grid Scale: examples/configuration/units.md
+          - Viewer Window: examples/configuration/window.md
   - API Reference:
       - Overview: api.md
       - compas_viewer: api/compas_viewer.md

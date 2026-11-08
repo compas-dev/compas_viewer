@@ -7,7 +7,7 @@ result is verified manually with a supported desktop OpenGL environment.
 
 The following exceptions have additional runtime evidence:
 
-- `object/points.py`, `scene/groups.py`, and `configuration/units.py` form the
+- `object/points.py`, `scene/groups.py`, and `configuration/window.py` form the
   representative **static-and-smoke** subset. The smoke test suppresses only
   the visible event loop and asserts the number of scene objects constructed
   by each complete script.

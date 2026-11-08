@@ -22,6 +22,7 @@ class UI(Base):
 
         self.menubar.show = self.viewer.config.ui.menubar.show
         self.toolbar.show = self.viewer.config.ui.toolbar.show
+        self.statusbar.show = self.viewer.config.ui.statusbar.show
         self.sidebar.show = self.viewer.config.ui.sidebar.show
         self.sidedock.show = self.viewer.config.ui.sidedock.show
         self.viewer.state.changed.connect(self._on_state_changed)

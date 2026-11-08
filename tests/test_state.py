@@ -51,7 +51,7 @@ def test_state_rejects_invalid_paths_and_non_boolean_toggles():
     with pytest.raises(ValueError, match="Invalid state path"):
         state.get("")
     with pytest.raises(TypeError, match="not boolean"):
-        state.toggle("unit")
+        state.toggle("renderer.rendermode")
 
 
 def test_menu_actions_reflect_published_state():

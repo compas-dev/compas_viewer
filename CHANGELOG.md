@@ -30,8 +30,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   transactional and refreshes render data and bounds.
 * Added System, Light, and Dark application appearances. System mode follows
   operating-system color-scheme changes while the viewer is running.
-* Added configurable units, grid extents and divisions, grid styling,
-  selection color, and viewport background controls.
+* Added configurable grid extents and divisions, grid styling, selection
+  color, and viewport background controls.
 * Added camera-facing multiline text annotations with alignment, padding,
   backgrounds, offsets, and screen- or world-space sizing.
 * Added screen-scaled arrow overlays with configurable shaft and arrowhead
@@ -54,6 +54,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* Audited Viewer configuration as a closed, validated schema-version-2 setup
+  contract. Removed retired unit, display-default, sidebar, window-about, and
+  renderer-opacity fields; added orthographic view serialization; and retained
+  supported values when migrating schema-version-1 data.
 * Replaced Viewer-specific scene-object substitution with stable COMPAS scene
   objects and context-keyed Viewer draw and clear operations. Render buffers,
   picking maps, selection, bounds, and renderer handles now live in transient
@@ -115,8 +119,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Separated persistent configuration from runtime commands and UI composition.
   Configuration now contains serializable values only; menus and sidebar
   definitions resolve commands through stable runtime IDs.
-* Moved default scene-object presentation settings from `config.ui.display` to
-  `config.display` and added migration for existing JSON configuration files.
+* Moved default presentation settings out of Viewer configuration so stable
+  scene objects own their own colors, sizes, and opacity.
 * Made callback serialization an explicit error instead of silently omitting
   runtime data from configuration files.
 * Reworked scene hierarchy display so parenting, groups, visibility, and
