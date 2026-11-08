@@ -290,7 +290,7 @@ class DatastructureAttributes(Container):
     @property
     def selected(self) -> list[SceneObject]:
         """list[SceneObject]: Currently selected stable scene objects."""
-        return [sceneobject for sceneobject in self.scene.objects if self.scene.is_selected(sceneobject)]
+        return list(self.viewer.state.selection.objects)
 
     def update(self) -> None:
         """Rebuild attribute tabs for the current single selection."""

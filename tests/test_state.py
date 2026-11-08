@@ -1,5 +1,6 @@
 import pytest
 
+from compas.scene import SceneObject
 from compas_viewer.config import Config
 from compas_viewer.components.menubar import MenuBar
 from compas_viewer.state import ViewerState
@@ -36,6 +37,20 @@ def test_state_does_not_publish_unchanged_values():
 
     assert not changed
     assert changes == []
+
+
+def test_state_bridges_each_selection_batch_to_one_change():
+    first = SceneObject(name="First")
+    second = SceneObject(name="Second")
+    objects = {sceneobject.guid: sceneobject for sceneobject in (first, second)}
+    state = ViewerState(Config(), objects.__getitem__)
+    changes = []
+    state.changed.connect(lambda path, value: changes.append((path, value)))
+
+    state.selection.add(first, second)
+    state.selection.add(first)
+
+    assert changes == [("selection", (first.guid, second.guid))]
 
 
 def test_state_toggles_boolean_values():

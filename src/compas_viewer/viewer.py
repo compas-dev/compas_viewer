@@ -59,7 +59,7 @@ class Viewer(Singleton):
         self.running = False
         self._scene: ViewerScene | None = None
 
-        self.state = ViewerState(self.config)
+        self.state = ViewerState(self.config, lambda guid: self.scene.object(guid))
         self.state.changed.connect(self._on_state_changed)
         self.commands = CommandRegistry(builtin_commands())
         self.menu_items: list[UIItem] = default_menu_items()
@@ -104,6 +104,7 @@ class Viewer(Singleton):
             self._scene = ViewerScene.__from_data__(scene.__data__)
             self._scene.bind_many(scene.item_store.values())
         self._scene.attach(self)
+        self.state.selection.clear()
         if self.running:
             self._scene.prepare()
             for obj in self._scene.render_objects.values():
@@ -210,6 +211,9 @@ class Viewer(Singleton):
         """Apply viewer-owned effects for a changed state value."""
         if path == "ui.appearance":
             self._apply_appearance(cast(Appearance, value))
+        elif path == "selection" and hasattr(self, "ui"):
+            self.ui.sidebar.update()
+            self.renderer.update()
 
     def _on_system_color_scheme_changed(self, _scheme: Qt.ColorScheme) -> None:
         """Reapply system appearance after a platform theme change."""

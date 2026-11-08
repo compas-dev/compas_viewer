@@ -94,7 +94,7 @@ class Sceneform(Component):
                 sceneobject = self.scene.object(node)
                 widget = self._widgets.get(sceneobject.guid)
                 if widget:
-                    selected = self.scene.is_selected(sceneobject)
+                    selected = sceneobject in self.viewer.state.selection
                     widget.setSelected(selected)
                     if selected:
                         self.expand(widget.parent())
@@ -133,7 +133,7 @@ class Sceneform(Component):
                 widget = SceneTreeItem(parent_widget, strings)
                 widget.node = sceneobject
                 self._widgets[sceneobject.guid] = widget
-                selected = self.scene.is_selected(sceneobject)
+                selected = sceneobject in self.viewer.state.selection
                 widget.setSelected(selected)
                 if selected and isinstance(parent_widget, SceneTreeItem):
                     self.expand(parent_widget)
@@ -188,16 +188,11 @@ class Sceneform(Component):
 
     def _sync_selection_from_widget(self) -> None:
         """Apply the widget selection to scene objects and refresh the viewer."""
-        selected_objects = {cast(SceneTreeItem, item).node for item in self.widget.selectedItems()}
-        for sceneobject in self.scene.objects:
-            selected = sceneobject in selected_objects
-            self.scene.set_selected(sceneobject, selected)
-            if self.action and selected:
+        selected_objects = [sceneobject for sceneobject in self._sceneobjects if self._widgets[sceneobject.guid].isSelected()]
+        self.viewer.state.selection.replace(selected_objects)
+        if self.action:
+            for sceneobject in selected_objects:
                 self.action(self, sceneobject)
-        self.viewer.ui.sidebar.object_setting.update()
-        if hasattr(self.viewer.ui.sidebar, "datastructure_attributes"):
-            self.viewer.ui.sidebar.datastructure_attributes.update()
-        self.viewer.renderer.update()
 
     def adjust_column_widths(self) -> None:
         """Use a compact width for checkbox columns."""

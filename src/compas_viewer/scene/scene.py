@@ -75,7 +75,6 @@ class ViewerScene(Scene):
         super().__init__(name=name, context=context, _detect_context=_detect_context, _objects=_objects, _root=_root)
         self.render_objects: dict[UUID, ViewerSceneObject] = {}
         self.instance_colors: dict[tuple[int, int, int], SceneObject] = {}
-        self._selected: set[UUID] = set()
         self._instance_colors_generator = instance_colors_generator()
         self._viewer: Viewer | None = None
 
@@ -107,28 +106,15 @@ class ViewerScene(Scene):
             self.draw_object(sceneobject, context="Viewer", runtime=self)
             return self.render_objects[sceneobject.guid]
 
-    def is_selected(self, sceneobject: SceneObject) -> bool:
-        """Return whether a stable scene object is selected in this Viewer."""
-        return sceneobject.guid in self._selected
-
-    def set_selected(self, sceneobject: SceneObject, selected: bool) -> None:
-        """Set transient Viewer selection state for a stable scene object."""
-        if selected:
-            self._selected.add(sceneobject.guid)
-        else:
-            self._selected.discard(sceneobject.guid)
-
     def release_picking(self, sceneobject: SceneObject) -> None:
         """Remove transient picking entries for a stable scene object."""
         self.instance_colors = {color: obj for color, obj in self.instance_colors.items() if obj.guid != sceneobject.guid}
-        self._selected.discard(sceneobject.guid)
 
     # TODO: These fixed kwargs could be moved to COMPAS core.
     def add(
         self,
         item: Data,
         parent: SceneObject | SceneNode | None = None,
-        is_selected: bool = False,
         show: bool = True,
         show_points: bool | None = None,
         show_lines: bool | None = None,
@@ -155,9 +141,6 @@ class ViewerScene(Scene):
             Geometry, data structure, scene object, or collection to add.
         parent
             The parent of the item.
-        is_selected
-            Whether the object is selected.
-            Default to False.
         show
             Whether to show object.
             Default to True.
@@ -192,7 +175,7 @@ class ViewerScene(Scene):
 
         Returns
         -------
-        ViewerSceneObject
+        SceneObject
             The scene object.
 
         """
@@ -215,12 +198,10 @@ class ViewerScene(Scene):
             if opacity is not None:
                 group_options["opacity"] = opacity
             group = self.add_group(name=name, parent=parent, **group_options)
-            self.set_selected(group, is_selected)
             for child in item.items:
                 self.add(
                     child,
                     parent=group,
-                    is_selected=is_selected,
                     show=show,
                     show_points=show_points,
                     show_lines=show_lines,
@@ -306,7 +287,6 @@ class ViewerScene(Scene):
             )
 
         sceneobject = super().add(item=item, parent=parent, **options)
-        self.set_selected(sceneobject, is_selected)
 
         if self._viewer is not None and self._viewer.running:
             self._viewer.renderer.rebuild_buffers()
@@ -327,6 +307,16 @@ class ViewerScene(Scene):
             Default to True.
 
         """
+        self._remove(sceneobject, rebuild_buffers=rebuild_buffers, cleanup_selection=True)
+
+    def _remove(
+        self,
+        sceneobject: SceneObject | SceneNode,
+        *,
+        rebuild_buffers: bool,
+        cleanup_selection: bool,
+    ) -> None:
+        """Remove one hierarchy with optional deferred selection cleanup."""
         stable_object = self.object(sceneobject) if isinstance(sceneobject, SceneNode) else sceneobject
         removed_objects = [self.object(node) for node in self.node(stable_object.guid).traverse()]
         super().remove(sceneobject)
@@ -334,8 +324,14 @@ class ViewerScene(Scene):
             self.render_objects.pop(removed_object.guid, None)
             self.release_picking(removed_object)
 
-        if self._viewer is not None and self._viewer.running and rebuild_buffers:
-            self._viewer.renderer.rebuild_buffers()
+        selection_changed = False
+        if self._viewer is not None:
+            if self._viewer.running and rebuild_buffers:
+                self._viewer.renderer.rebuild_buffers()
+            if cleanup_selection:
+                selection_changed = self._viewer.state.selection.remove(*removed_objects)
+
+        if self._viewer is not None and self._viewer.running and rebuild_buffers and not selection_changed:
             self._viewer.renderer.update()
             self._viewer.ui.sidebar.update()
 
@@ -346,8 +342,19 @@ class ViewerScene(Scene):
         context: str | None = None,
         runtime: object | None = None,
     ) -> None:
-        """Clear scene state and reset transient picking colors."""
-        super().clear(clear_scene=clear_scene, clear_context=clear_context, context=context, runtime=runtime)
+        """Clear scene state, runtime buffers, and transient picking colors."""
+        if clear_context:
+            super().clear(clear_scene=False, clear_context=True, context=context, runtime=runtime)
+        if clear_scene:
+            for child in tuple(self.root_node.children):
+                self._remove(child, rebuild_buffers=False, cleanup_selection=False)
         if clear_context:
             self.render_objects.clear()
         self._reset_instance_colors()
+
+        if clear_scene and self._viewer is not None:
+            if self._viewer.running:
+                self._viewer.renderer.rebuild_buffers()
+            if not self._viewer.state.selection.clear():
+                self._viewer.ui.sidebar.update()
+                self._viewer.renderer.update()

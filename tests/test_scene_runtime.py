@@ -1,5 +1,6 @@
 from unittest.mock import Mock
 from unittest.mock import call
+from types import SimpleNamespace
 
 from compas.colors import Color
 from compas.datastructures import Mesh
@@ -7,15 +8,41 @@ from compas.geometry import Sphere
 from compas.geometry import Translation
 from compas.scene import GeometryObject
 from compas.scene import SceneObject
+from compas_viewer import Viewer
+from compas_viewer.commands import clear_scene
+from compas_viewer.commands import delete_selected
 from compas_viewer.scene import ArrowOverlay
 from compas_viewer.scene import Collection
 from compas_viewer.scene import Tag
 from compas_viewer.scene import ViewerScene
 from compas_viewer.scene.arrowoverlayobject import ArrowOverlayObject
 from compas_viewer.scene.tagobject import TagObject
+from compas_viewer.config import Config
+from compas_viewer.state import ViewerState
 
 
-def test_standalone_viewer_scenes_keep_runtime_state_local():
+def connected_viewer(scene):
+    events = Mock()
+    renderer = SimpleNamespace(
+        rebuild_buffers=events.rebuild_buffers,
+        update=events.renderer_update,
+    )
+    sidebar = SimpleNamespace(update=events.sidebar_update)
+    viewer = object.__new__(Viewer)
+    viewer._config = Config()
+    viewer._scene = scene
+    viewer.running = False
+    viewer.ui = SimpleNamespace(
+        viewport=SimpleNamespace(renderer=renderer),
+        sidebar=sidebar,
+    )
+    viewer.state = ViewerState(viewer.config, scene.object)
+    viewer.state.changed.connect(viewer._on_state_changed)
+    scene.attach(viewer)
+    return viewer, events
+
+
+def test_standalone_viewer_scenes_keep_picking_state_local():
     first = ViewerScene()
     second = ViewerScene()
     first_object = first.add(Sphere(1.0))
@@ -23,12 +50,11 @@ def test_standalone_viewer_scenes_keep_runtime_state_local():
     first_render = first.render_object(first_object)
     second_render = second.render_object(second_object)
 
-    first.set_selected(first_object, True)
     first_render.init()
     second_render.init()
 
-    assert first.is_selected(first_object)
-    assert not second.is_selected(second_object)
+    assert not first_render.is_selected
+    assert not second_render.is_selected
     assert first_render.runtime_scene is first
     assert second_render.runtime_scene is second
     assert set(first.instance_colors.values()) == {first_object}
@@ -44,7 +70,6 @@ def test_collection_expands_with_explicit_presentation_and_group_transform():
     group = scene.add(
         collection,
         name="Parts",
-        is_selected=True,
         show=False,
         pointcolor=Color.red(),
         linecolor=Color.green(),
@@ -64,7 +89,6 @@ def test_collection_expands_with_explicit_presentation_and_group_transform():
     assert group.transformation == transformation
     assert group.opacity == 0.5
     assert not group.show
-    assert scene.is_selected(group)
     assert shape_object.transformation is None
     assert shape_object.worldtransformation == transformation
     assert shape_object.u == 6 and shape_object.v == 4
@@ -72,13 +96,13 @@ def test_collection_expands_with_explicit_presentation_and_group_transform():
     assert shape_object.linecolor == Color.green()
     assert shape_object.surfacecolor == Color.blue()
     assert shape_object.pointsize == 7 and shape_object.linewidth == 3
-    assert not shape_object.show and scene.is_selected(shape_object)
+    assert not shape_object.show
     assert mesh_object.vertexcolor[0] == Color.red()
     assert mesh_object.edgecolor[(0, 1)] == Color.green()
     assert mesh_object.facecolor[0] == Color.blue()
     assert mesh_object.vertexsize == 7 and mesh_object.edgewidth == 3
     assert mesh_object.hide_coplanaredges and mesh_object.use_vertexcolors
-    assert not mesh_object.show and scene.is_selected(mesh_object)
+    assert not mesh_object.show
 
 
 def test_prepare_clears_old_runtime_before_replacement(monkeypatch):
@@ -120,12 +144,14 @@ def test_overlay_helpers_release_gl_resources(monkeypatch):
 
 def test_remove_group_cleans_all_descendant_runtime_state():
     scene = ViewerScene()
+    state = ViewerState(Config(), scene.object)
+    scene.attach(SimpleNamespace(state=state, running=False))
     group = scene.add_group("Group")
     visible = scene.add(Sphere(1.0), parent=group)
     hidden = scene.add(Sphere(2.0), parent=group, show=False)
-    scene.set_selected(group, True)
-    scene.set_selected(visible, True)
-    scene.set_selected(hidden, True)
+    state.selection.add(group, visible, hidden)
+    changes = []
+    state.changed.connect(lambda path, value: changes.append((path, value)))
     scene.render_object(visible).init()
     scene.render_objects[hidden.guid] = scene.render_object(hidden)
 
@@ -135,8 +161,94 @@ def test_remove_group_cleans_all_descendant_runtime_state():
     assert visible not in scene.objects
     assert hidden not in scene.objects
     assert not {group.guid, visible.guid, hidden.guid} & scene.render_objects.keys()
-    assert not scene._selected
+    assert not state.selection
     assert not scene.instance_colors
+    assert changes == [("selection", ())]
+
+
+def test_direct_clear_with_selection_syncs_once_after_scene_and_buffers():
+    scene = ViewerScene()
+    viewer, events = connected_viewer(scene)
+    first = scene.add(Sphere(1.0))
+    second = scene.add(Sphere(2.0))
+    scene.render_objects[first.guid] = scene.render_object(first)
+    scene.instance_colors[(1, 2, 3)] = first
+    viewer.state.selection.add(first, second)
+    events.reset_mock()
+    viewer.running = True
+
+    scene.clear()
+
+    assert not scene.objects
+    assert not scene.render_objects
+    assert not scene.instance_colors
+    assert not viewer.state.selection
+    assert events.mock_calls == [
+        call.rebuild_buffers(),
+        call.sidebar_update(),
+        call.renderer_update(),
+    ]
+
+
+def test_direct_clear_without_selection_syncs_once_after_scene_and_buffers():
+    scene = ViewerScene()
+    viewer, events = connected_viewer(scene)
+    sceneobject = scene.add(Sphere(1.0))
+    scene.render_objects[sceneobject.guid] = scene.render_object(sceneobject)
+    scene.instance_colors[(1, 2, 3)] = sceneobject
+    events.reset_mock()
+    viewer.running = True
+
+    scene.clear()
+
+    assert not scene.objects
+    assert not scene.render_objects
+    assert not scene.instance_colors
+    assert not viewer.state.selection
+    assert events.mock_calls == [
+        call.rebuild_buffers(),
+        call.sidebar_update(),
+        call.renderer_update(),
+    ]
+
+
+def test_delete_selected_batches_parent_and_descendant_selection():
+    scene = ViewerScene()
+    viewer, events = connected_viewer(scene)
+    group = scene.add_group("Group")
+    child = scene.add(Sphere(1.0), parent=group)
+    viewer.state.selection.add(group, child)
+    events.reset_mock()
+    viewer.running = True
+
+    delete_selected(viewer)
+
+    assert not scene.objects
+    assert not viewer.state.selection
+    assert events.mock_calls == [
+        call.rebuild_buffers(),
+        call.sidebar_update(),
+        call.renderer_update(),
+    ]
+
+
+def test_clear_scene_command_uses_one_post_mutation_sync():
+    scene = ViewerScene()
+    viewer, events = connected_viewer(scene)
+    sceneobject = scene.add(Sphere(1.0))
+    viewer.state.selection.add(sceneobject)
+    events.reset_mock()
+    viewer.running = True
+
+    clear_scene(viewer)
+
+    assert not scene.objects
+    assert not viewer.state.selection
+    assert events.mock_calls == [
+        call.rebuild_buffers(),
+        call.sidebar_update(),
+        call.renderer_update(),
+    ]
 
 
 def test_operation_registration_coexists_with_specialized_viewer_operation():

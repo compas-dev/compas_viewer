@@ -130,6 +130,7 @@ def test_successful_mutation_conservatively_refreshes_viewer(monkeypatch):
     setting = ObjectSetting()
     viewer = Mock()
     viewer.scene.objects = []
+    viewer.state.selection.objects = ()
     monkeypatch.setattr(ObjectSetting, "viewer", viewer)
 
     setting._refresh_object(sceneobject)
@@ -243,6 +244,7 @@ def test_builtin_mesh_color_control_preserves_colordict_semantics(isolated_regis
     setting = ObjectSetting()
     viewer = Mock()
     viewer.scene.objects = []
+    viewer.state.selection.objects = ()
     monkeypatch.setattr(ObjectSetting, "viewer", viewer)
     binding = _EditableAttributeBinding(sceneobject, "vertexcolor", None)
     control = setting._create_control(binding)

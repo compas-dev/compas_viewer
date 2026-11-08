@@ -25,8 +25,6 @@ class ViewerSceneObject:
 
     Parameters
     ----------
-    is_selected
-        Whether the object is selected. Default is False.
     show
         Whether to show object. Default is True.
     show_points
@@ -101,12 +99,11 @@ class ViewerSceneObject:
 
     @property
     def is_selected(self) -> bool:
-        """Whether the stable object is selected in the current Viewer."""
-        return self.runtime_scene.is_selected(self.sceneobject)
-
-    @is_selected.setter
-    def is_selected(self, selected: bool) -> None:
-        self.runtime_scene.set_selected(self.sceneobject, selected)
+        """bool: Whether the stable object is selected in the current Viewer."""
+        try:
+            return self.sceneobject in self.viewer.state.selection
+        except RuntimeError:
+            return False
 
     @property
     def show_faces(self) -> bool:

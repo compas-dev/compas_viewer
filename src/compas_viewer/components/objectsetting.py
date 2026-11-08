@@ -71,7 +71,7 @@ class ObjectSetting(Container):
     @property
     def selected(self) -> list[SceneObject]:
         """list[SceneObject]: Currently selected stable scene objects."""
-        return [obj for obj in self.scene.objects if self.scene.is_selected(obj)]
+        return list(self.viewer.state.selection.objects)
 
     def update(self) -> None:
         """Update the layout with the latest object settings."""

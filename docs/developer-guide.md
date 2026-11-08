@@ -46,6 +46,7 @@ The main responsibilities are deliberately separated:
 | Command registry | Stable runtime lookup for commands |
 | UI definitions | Runtime menu and sidebar composition |
 | Configuration | Serializable startup preferences and defaults |
+| Viewer state | Observable transient selection and runtime state |
 
 `Viewer`, scene objects, and UI components use the shared viewer instance exposed by the project's singleton infrastructure. Avoid constructing hidden secondary viewers inside extensions.
 
@@ -106,7 +107,7 @@ from compas_viewer.commands import Command
 
 
 def report_selection(viewer, verbose=False):
-    selected = [obj for obj in viewer.scene.objects if obj.is_selected]
+    selected = viewer.state.selection.objects
     print(f"{len(selected)} selected")
     if verbose:
         print([obj.name for obj in selected])
@@ -153,6 +154,36 @@ viewer.add_menu_item(
 ```
 
 Built-in identifiers use the `viewer.*` namespace. Third-party packages should use a package-specific prefix to avoid collisions.
+
+## Work with selection from code
+
+`viewer.state.selection` is the single object-selection model shared by the
+viewport, scene tree, commands, renderer, and programmatic integrations. It
+stores stable scene-object GUIDs and resolves them against the current Viewer
+scene in selection order:
+
+```python
+first = viewer.scene.add(first_geometry, name="First")
+second = viewer.scene.add(second_geometry, name="Second")
+third = viewer.scene.add(third_geometry, name="Third")
+
+viewer.state.selection.replace((first, second))
+viewer.state.selection.add(third)
+viewer.state.selection.remove(first)
+viewer.state.selection.toggle(second)
+
+for sceneobject in viewer.state.selection:
+    print(sceneobject.name)
+
+viewer.state.selection.clear()
+```
+
+Each effective mutation publishes one complete selection change. Duplicate
+objects and operations that leave the selection unchanged publish nothing.
+Use `selection.objects` for ordered scene objects and `selection.guids` for
+their ordered stable identifiers. Selection is transient Viewer state: it is
+not stored on scene objects and does not participate in scene or configuration
+serialization.
 
 Default menu and sidebar structures live in `compas_viewer.uidefinitions`. They refer to command IDs rather than importing callbacks, keeping UI composition separate from serialization.
 

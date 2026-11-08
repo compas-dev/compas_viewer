@@ -1,9 +1,17 @@
+from collections.abc import Callable
 from typing import Any
+from uuid import UUID
 
 from PySide6.QtCore import QObject
 from PySide6.QtCore import Signal
 
+from compas.scene import SceneObject
 from compas_viewer.config import Config
+from compas_viewer.selection import Selection
+
+
+def _unbound_sceneobject(_guid: UUID) -> SceneObject:
+    raise RuntimeError("This ViewerState is not bound to a Viewer scene.")
 
 
 class ViewerState(QObject):
@@ -13,14 +21,22 @@ class ViewerState(QObject):
     ----------
     config
         Persistent configuration used as the backing store.
+    resolve_sceneobject
+        Resolve stable object GUIDs in the current Viewer scene. Direct state
+        construction may omit the resolver when selection is unused.
 
     """
 
     changed = Signal(str, object)
 
-    def __init__(self, config: Config) -> None:
+    def __init__(
+        self,
+        config: Config,
+        resolve_sceneobject: Callable[[UUID], SceneObject] | None = None,
+    ) -> None:
         super().__init__()
         self.config = config
+        self.selection = Selection(resolve_sceneobject or _unbound_sceneobject, self._selection_changed)
 
     def get(self, path: str) -> Any:
         """Return a state value by dotted configuration path.
@@ -104,6 +120,10 @@ class ViewerState(QObject):
 
         """
         self.changed.emit(path, self.get(path))
+
+    def _selection_changed(self, guids: tuple[UUID, ...]) -> None:
+        """Bridge one Qt-neutral selection mutation to Viewer observers."""
+        self.changed.emit("selection", guids)
 
     @staticmethod
     def _parts(path: str) -> list[str]:

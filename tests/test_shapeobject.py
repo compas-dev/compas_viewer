@@ -80,7 +80,7 @@ def test_shape_object_owns_default_resolution(viewer):
 def test_shape_resolution_is_durable_without_serializing_runtime(viewer):
     shape = Sphere(1.0)
     sceneobject = viewer.scene.add(shape, u=7, v=9, transformation=Translation.from_vector([2, 0, 0]))
-    viewer.scene.set_selected(sceneobject, True)
+    viewer.state.selection.add(sceneobject)
     viewer.scene.render_object(sceneobject).init()
 
     payload = json_dumps(viewer.scene)
@@ -94,6 +94,7 @@ def test_shape_resolution_is_durable_without_serializing_runtime(viewer):
     assert "render_objects" not in payload
     assert "instance_color" not in payload
     assert "is_selected" not in payload
+    assert '"selection"' not in payload
 
 
 def test_stable_specialized_geometry_fields_use_core_names(viewer):

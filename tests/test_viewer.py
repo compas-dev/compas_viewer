@@ -3,10 +3,13 @@ from types import SimpleNamespace
 import pytest
 
 from compas_viewer import Viewer
+from compas.geometry import Sphere
 from compas_viewer.animation import ANIMATION_PRESETS
 from compas_viewer.config import Config
 from compas_viewer.config import WindowConfig
 from compas_viewer.components.mainwindow import MainWindow
+from compas_viewer.scene import ViewerScene
+from compas_viewer.state import ViewerState
 from compas_viewer.ui import UI
 from compas_viewer import viewer as viewer_module
 
@@ -253,6 +256,24 @@ def test_viewer_configuration_cannot_be_replaced():
 
     with pytest.raises(AttributeError):
         instance.config = Config()
+
+
+def test_replacing_scene_clears_transient_selection_once():
+    viewer = object.__new__(Viewer)
+    viewer.running = False
+    viewer._config = Config()
+    viewer._scene = ViewerScene()
+    viewer._scene.attach(viewer)
+    viewer.state = ViewerState(viewer.config, lambda guid: viewer.scene.object(guid))
+    sceneobject = viewer.scene.add(Sphere(1.0))
+    viewer.state.selection.add(sceneobject)
+    changes = []
+    viewer.state.changed.connect(lambda path, value: changes.append((path, value)))
+
+    viewer.scene = ViewerScene()
+
+    assert not viewer.state.selection
+    assert changes == [("selection", ())]
 
 
 def test_ui_applies_configured_statusbar_visibility_at_initialization(monkeypatch):

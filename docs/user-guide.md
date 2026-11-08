@@ -71,6 +71,23 @@ Rectangular selection is directional:
 
 The **Select** menu also provides Select All, Select Inverted, and selection by object type, display color, or name. **Isolate Selected** hides everything else and frames the selected objects. **Show All** restores all scene objects.
 
+Scripts can use the same ordered selection as the viewport and scene tree:
+
+```python
+box = viewer.scene.add(Box(2.0), name="Box")
+sphere = viewer.scene.add(Sphere(1.0), name="Sphere")
+
+viewer.state.selection.replace((box, sphere))
+viewer.state.selection.remove(box)
+
+print(viewer.state.selection.objects)
+```
+
+The selection also provides `add`, `toggle`, and `clear`. Every selected object
+must belong to the Viewer's current scene. Replacing the scene or removing an
+object removes the corresponding transient selection; saved scenes do not
+contain selection state.
+
 ## Work with the scene tree
 
 The scene tree mirrors parent-child relationships in the scene. Create explicit groups when related objects should appear under a shared node:

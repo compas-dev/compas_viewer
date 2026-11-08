@@ -13,7 +13,9 @@ from compas_viewer.commands import zoom_extents
 from compas_viewer.components.datastructureattributes import DatastructureAttributes
 from compas_viewer.components.datastructureattributes import _element_domains
 from compas_viewer.components.datastructureattributes import _ElementAttributesModel
+from compas_viewer.config import Config
 from compas_viewer.scene import ViewerScene
+from compas_viewer.state import ViewerState
 from compas_viewer.uidefinitions import default_sidebar_items
 
 
@@ -244,8 +246,9 @@ def test_edge_key_passes_unchanged_to_singular_setter_and_unsetter(monkeypatch):
 def test_component_builds_tabs_without_mutating_datastructure(monkeypatch):
     mesh = make_mesh()
     sceneobject = SimpleNamespace(item=mesh)
-    scene = SimpleNamespace(objects=[sceneobject], is_selected=lambda obj: obj is sceneobject)
-    viewer = SimpleNamespace(scene=scene)
+    scene = SimpleNamespace(objects=[sceneobject])
+    selection = SimpleNamespace(objects=(sceneobject,))
+    viewer = SimpleNamespace(scene=scene, state=SimpleNamespace(selection=selection))
     monkeypatch.setattr(DatastructureAttributes, "viewer", property(lambda self: viewer), raising=False)
     before = json_dumps(mesh)
 
@@ -266,7 +269,6 @@ def test_component_refreshes_render_data_and_relevant_ui_after_edit(monkeypatch)
     )
     scene = SimpleNamespace(
         objects=[sceneobject],
-        is_selected=lambda obj: obj is sceneobject,
         render_object=lambda obj: render_object,
     )
     sidebar = SimpleNamespace(
@@ -275,6 +277,7 @@ def test_component_refreshes_render_data_and_relevant_ui_after_edit(monkeypatch)
     )
     viewer = SimpleNamespace(
         scene=scene,
+        state=SimpleNamespace(selection=SimpleNamespace(objects=(sceneobject,))),
         renderer=SimpleNamespace(update=lambda: calls.append(("renderer", {}))),
         ui=SimpleNamespace(sidebar=sidebar),
     )
@@ -320,12 +323,14 @@ def test_coordinate_edit_refreshes_bounds_consumed_by_zoom(monkeypatch, kind):
     )
     viewer = SimpleNamespace(
         scene=scene,
+        state=ViewerState(Config(), scene.object),
         renderer=runtime.renderer,
         ui=SimpleNamespace(sidebar=sidebar),
         running=False,
     )
     scene.attach(viewer)
-    sceneobject = scene.add(item, is_selected=True)
+    sceneobject = scene.add(item)
+    viewer.state.selection.add(sceneobject)
     render_object = scene.render_object(sceneobject)
     render_object.refresh_data()
     buffer_updates = []
@@ -359,10 +364,10 @@ def test_empty_reset_selection_performs_no_mutation_or_refresh(monkeypatch):
 
     scene = SimpleNamespace(
         objects=[sceneobject],
-        is_selected=lambda obj: obj is sceneobject,
         render_object=fail_render,
     )
-    viewer = SimpleNamespace(scene=scene)
+    selection = SimpleNamespace(objects=(sceneobject,))
+    viewer = SimpleNamespace(scene=scene, state=SimpleNamespace(selection=selection))
     unset_calls = []
     monkeypatch.setattr(mesh, "unset_vertex_attribute", lambda key, name: unset_calls.append((key, name)))
     monkeypatch.setattr(DatastructureAttributes, "viewer", property(lambda self: viewer), raising=False)
@@ -381,11 +386,14 @@ def test_switching_selected_object_rebuilds_domain_tabs(monkeypatch):
     mesh_object = SimpleNamespace(item=mesh)
     graph_object = SimpleNamespace(item=graph)
     selected = [mesh_object]
-    scene = SimpleNamespace(
-        objects=[mesh_object, graph_object],
-        is_selected=lambda obj: obj in selected,
-    )
-    viewer = SimpleNamespace(scene=scene)
+    scene = SimpleNamespace(objects=[mesh_object, graph_object])
+
+    class Selection:
+        @property
+        def objects(self):
+            return tuple(selected)
+
+    viewer = SimpleNamespace(scene=scene, state=SimpleNamespace(selection=Selection()))
     monkeypatch.setattr(DatastructureAttributes, "viewer", property(lambda self: viewer), raising=False)
     component = DatastructureAttributes()
 
@@ -418,10 +426,10 @@ def test_unresolved_selected_item_shows_message_without_loading_or_rendering(mon
 
     scene = SimpleNamespace(
         objects=[sceneobject],
-        is_selected=lambda obj: obj is sceneobject,
         render_object=fail_render,
     )
-    viewer = SimpleNamespace(scene=scene)
+    selection = SimpleNamespace(objects=(sceneobject,))
+    viewer = SimpleNamespace(scene=scene, state=SimpleNamespace(selection=selection))
     monkeypatch.setattr(DatastructureAttributes, "viewer", property(lambda self: viewer), raising=False)
     component = DatastructureAttributes()
 
