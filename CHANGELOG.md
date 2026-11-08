@@ -34,6 +34,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   color, and viewport background controls.
 * Added ordered rendering for backend-neutral COMPAS text annotations, arrow
   annotations, and fixed or associative distance dimensions.
+* Added one-shot distance inspection and fixed or associative dimension tools
+  with semantic snapping, live previews, and a dedicated Measure menu.
 * Added ordered transient scale-bar and categorical-legend overlays that stay
   outside scene serialization and picking.
 * Added `Viewer.save_image` for rendering still images without launching the

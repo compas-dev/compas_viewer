@@ -1174,6 +1174,80 @@ save_scene_cmd = Command(title="Save Scene", callback=save_scene)
 # =============================================================================
 # =============================================================================
 # =============================================================================
+# Measure
+# =============================================================================
+# =============================================================================
+# =============================================================================
+
+
+def inspect_distance(viewer: "Viewer") -> None:
+    """Start a one-shot transient distance inspection.
+
+    Parameters
+    ----------
+    viewer
+        Viewer receiving the interaction.
+
+    """
+    viewer.start_distance_inspection()
+
+
+inspect_distance_cmd = Command(title="Inspect Distance", callback=inspect_distance)
+
+
+def add_fixed_distance_dimension(viewer: "Viewer") -> None:
+    """Start a one-shot fixed distance-dimension interaction.
+
+    Parameters
+    ----------
+    viewer
+        Viewer receiving the interaction.
+
+    """
+    viewer.start_distance_dimension("fixed")
+
+
+add_fixed_distance_dimension_cmd = Command(title="Add Fixed Distance Dimension", callback=add_fixed_distance_dimension)
+
+
+def add_associative_distance_dimension(viewer: "Viewer") -> None:
+    """Start a one-shot associative distance-dimension interaction.
+
+    Parameters
+    ----------
+    viewer
+        Viewer receiving the interaction.
+
+    """
+    viewer.start_distance_dimension("associative")
+
+
+add_associative_distance_dimension_cmd = Command(title="Add Associative Distance Dimension", callback=add_associative_distance_dimension)
+
+
+def cancel_measurement(viewer: "Viewer") -> bool:
+    """Cancel active or retained transient measurement state.
+
+    Parameters
+    ----------
+    viewer
+        Viewer whose measurement state should be cleared.
+
+    Returns
+    -------
+    bool
+        Whether measurement state was cleared.
+
+    """
+    return viewer.cancel_measurement()
+
+
+cancel_measurement_cmd = Command(title="Cancel Measurement", callback=cancel_measurement)
+
+
+# =============================================================================
+# =============================================================================
+# =============================================================================
 # Data
 # =============================================================================
 # =============================================================================
@@ -1198,7 +1272,10 @@ def builtin_commands() -> dict[str, Command]:
 
     """
     return {
+        "viewer.add_associative_distance_dimension": add_associative_distance_dimension_cmd,
+        "viewer.add_fixed_distance_dimension": add_fixed_distance_dimension_cmd,
         "viewer.add_geometry": add_geometry_cmd,
+        "viewer.cancel_measurement": cancel_measurement_cmd,
         "viewer.capture_view": capture_view_cmd,
         "viewer.change_appearance": change_appearance_cmd,
         "viewer.change_rendermode": change_rendermode_cmd,
@@ -1207,6 +1284,7 @@ def builtin_commands() -> dict[str, Command]:
         "viewer.delete_selected": delete_selected_cmd,
         "viewer.deselect_all": deselect_all_cmd,
         "viewer.invert_selection": invert_selection_cmd,
+        "viewer.inspect_distance": inspect_distance_cmd,
         "viewer.isolate_selected": isolate_selected_cmd,
         "viewer.load_scene": load_scene_cmd,
         "viewer.modify_selected": modify_selected_cmd,

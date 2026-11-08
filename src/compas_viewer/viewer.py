@@ -38,6 +38,7 @@ from compas_viewer.events import EventManager
 from compas_viewer.measurement import SNAP_RADIUS
 from compas_viewer.measurement import DistanceInspection
 from compas_viewer.measurement import PersistentMeasurementMode
+from compas_viewer.measurement import _draw_measurement_preview
 from compas_viewer.mouse import Mouse
 from compas_viewer.overlays import Overlay
 from compas_viewer.overlays import _OverlayContext
@@ -232,20 +233,30 @@ class Viewer(Singleton):
         """Draw Viewer-owned overlays after normal scene rendering."""
         width = renderer.width()
         height = renderer.height()
-        if not self._overlay_layer or width <= 0 or height <= 0:
+        measurement = self.state.measurement
+        if (not self._overlay_layer and not measurement.has_transient_state) or width <= 0 or height <= 0:
             return
-        context = _OverlayContext(
-            width=width,
-            height=height,
-            camera_distance=renderer.camera.distance,
-            field_of_view=renderer.camera.fov,
-            perspective=renderer.view == "perspective",
-            unit=self.config.measurement.unit,
-            precision=self.config.measurement.precision,
-        )
         painter = QPainter(renderer)
         try:
-            self._overlay_layer.draw(painter, context)
+            if self._overlay_layer:
+                context = _OverlayContext(
+                    width=width,
+                    height=height,
+                    camera_distance=renderer.camera.distance,
+                    field_of_view=renderer.camera.fov,
+                    perspective=renderer.view == "perspective",
+                    unit=self.config.measurement.unit,
+                    precision=self.config.measurement.precision,
+                )
+                self._overlay_layer.draw(painter, context)
+            if measurement.has_transient_state:
+                _draw_measurement_preview(
+                    painter,
+                    measurement,
+                    renderer.project_point,
+                    unit=self.config.measurement.unit,
+                    precision=self.config.measurement.precision,
+                )
         finally:
             painter.end()
 

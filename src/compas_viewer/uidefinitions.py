@@ -140,6 +140,17 @@ def default_menu_items() -> list[UIItem]:
             ],
         },
         {
+            "title": "Measure",
+            "items": [
+                {"title": "Inspect Distance", "command": "viewer.inspect_distance"},
+                {"type": "separator"},
+                {"title": "Add Fixed Distance Dimension", "command": "viewer.add_fixed_distance_dimension"},
+                {"title": "Add Associative Distance Dimension", "command": "viewer.add_associative_distance_dimension"},
+                {"type": "separator"},
+                {"title": "Cancel Measurement", "command": "viewer.cancel_measurement"},
+            ],
+        },
+        {
             "title": "Scene",
             "items": [
                 {"title": "Clear Scene", "command": "viewer.clear_scene"},
