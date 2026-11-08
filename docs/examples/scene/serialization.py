@@ -14,11 +14,11 @@ original = Box(1)
 translated = Box(1)
 items = [original, translated]
 
-viewer.scene.add(original, name="Original", facecolor=Color.blue())
+viewer.scene.add(original, name="Original", surfacecolor=Color.blue())
 viewer.scene.add(
     translated,
     name="Translated",
-    facecolor=Color.red(),
+    surfacecolor=Color.red(),
     transformation=Translation.from_vector([2, 0, 0]),
 )
 
@@ -33,8 +33,8 @@ with TemporaryDirectory() as tempdir:
 if not isinstance(loaded_scene, Scene):
     raise TypeError("The serialized file does not contain a COMPAS scene.")
 
-node_names = [node.name for node in loaded_scene.nodes]
-print(node_names)
+object_names = [loaded_scene.object(node.object_guid).name for node in loaded_scene.nodes]
+print(object_names)
 
 loaded_scene.bind_many(loaded_items)
 viewer.scene = loaded_scene

@@ -1,10 +1,12 @@
-from random import random
+from random import Random
 
 from compas.geometry import Box
 from compas.geometry import Frame
 from compas.geometry import Line
+from compas_viewer import Viewer
 from compas_viewer.scene import Collection
-from compas_viewer.viewer import Viewer
+
+rng = Random(42)
 
 viewer = Viewer()
 
@@ -18,7 +20,7 @@ viewer.scene.add(Collection(boxes), name="Boxes")
 
 lines = []
 for _ in range(50):
-    lines.append(Line([random() * 5, random() * 5, random() * 5], [random() * 5, random() * 5, random() * 5]))
+    lines.append(Line([rng.random() * 5, rng.random() * 5, rng.random() * 5], [rng.random() * 5, rng.random() * 5, rng.random() * 5]))
 
 viewer.scene.add(Collection(lines), name="Lines")
 

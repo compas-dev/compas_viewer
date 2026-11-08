@@ -1,32 +1,32 @@
 import numpy as np
 
-from compas.geometry import Box
+from compas.geometry import Translation
 from compas_viewer import Viewer
 from compas_viewer.scene import BufferGeometry
 
-box = Box(1)
-surface = box.to_polygonal_surface()
-tessellation = surface.triangulated()
-
-points = np.asarray(surface.vertices, dtype=np.float32)
-pointcolor = np.tile([1.0, 0.0, 0.0, 1.0], (len(points), 1))
-
-edges = np.asarray(surface.edges, dtype=np.int32)
-linecolor = np.tile([0.0, 1.0, 0.0, 1.0], (len(points), 1))
-
-triangles = np.asarray(tessellation.triangles, dtype=np.int32)
-facecolor = np.tile([0.0, 0.0, 1.0, 1.0], (len(points), 1))
-
-geometry = BufferGeometry(
-    vertices=points,
-    points=np.arange(len(points), dtype=np.int32),
-    edges=edges,
-    triangles=triangles,
-    pointcolor=pointcolor,
-    linecolor=linecolor,
-    facecolor=facecolor,
+vertices = np.array(
+    [
+        [0.0, 0.0, 0.0],
+        [2.0, 0.0, 0.0],
+        [2.0, 2.0, 0.0],
+        [0.0, 2.0, 0.0],
+    ],
+    dtype=np.float32,
 )
+edges = np.array([[0, 1], [1, 2], [2, 3], [3, 0]], dtype=np.int32)
+triangles = np.array([[0, 1, 2], [0, 2, 3]], dtype=np.int32)
+
+linecolor = np.tile([0.1, 0.4, 0.9, 1.0], (len(vertices), 1))
+facecolor = np.tile([0.9, 0.4, 0.1, 1.0], (len(vertices), 1))
+
+edge_geometry = BufferGeometry.from_vertices_and_edges(vertices, edges, linecolor=linecolor)
+triangle_geometry = BufferGeometry.from_vertices_and_triangles(vertices, triangles, facecolor=facecolor)
 
 viewer = Viewer()
-viewer.scene.add(geometry)
+viewer.scene.add(edge_geometry, name="Indexed edges")
+viewer.scene.add(
+    triangle_geometry,
+    name="Indexed triangles",
+    transformation=Translation.from_vector([3.0, 0.0, 0.0]),
+)
 viewer.show()

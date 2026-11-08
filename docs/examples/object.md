@@ -8,7 +8,7 @@
 - [Geometries](object/geometries.md)
 - [Lines](object/lines.md)
 - [Mesh display](object/mesh_display.md)
-- [NURBS](object/nurbs.md)
+- [NURBS surface](object/nurbs.md)
 - [Point clouds](object/pointcloud.md)
 - [Points](object/points.md)
 - [Polylines](object/polyline.md)

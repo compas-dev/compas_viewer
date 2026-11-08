@@ -1,8 +1,9 @@
 # Scene Serialization
 
 Viewer scenes store a reference-only description of their hierarchy and durable
-display state. Save the referenced COMPAS data separately, inspect the restored
-scene through its nodes, and bind the data before assigning the scene to a
+display state. Hierarchy-only nodes contain object GUIDs; resolve each node
+through `Scene.object` to inspect its stable semantic scene object. Save the
+referenced COMPAS data separately and bind it before assigning the scene to a
 Viewer or drawing it.
 
 The durable Viewer fields include resolution, display colors and sizes, mesh

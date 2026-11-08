@@ -98,7 +98,7 @@ nav:
           - Geometries: examples/object/geometries.md
           - Lines: examples/object/lines.md
           - Mesh Display: examples/object/mesh_display.md
-          - NURBS: examples/object/nurbs.md
+          - NURBS Surface: examples/object/nurbs.md
           - Point Clouds: examples/object/pointcloud.md
           - Points: examples/object/points.md
           - Polylines: examples/object/polyline.md
@@ -115,7 +115,7 @@ nav:
           - Overview: examples/color.md
           - Blending: examples/color/blending.md
           - Colors: examples/color/colors.md
-          - Face and Vertex Colors: examples/color/face_vertext_color.md
+          - Vertex Colors: examples/color/vertex_colors.md
       - Dynamic:
           - Overview: examples/dynamic.md
           - Dynamic Objects: examples/dynamic/dynamic.md
@@ -127,6 +127,7 @@ nav:
           - Overview: examples/ui.md
           - Side-dock Controls: examples/ui/sidedock.md
           - Camera Controls: examples/ui/camera.md
+          - Object and Attribute Inspection: examples/ui/object_inspection.md
       - Configuration:
           - Overview: examples/configuration.md
           - Viewer Window: examples/configuration/window.md

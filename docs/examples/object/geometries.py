@@ -1,15 +1,12 @@
 from compas.colors import Color
 from compas.geometry import Box
-from compas.geometry import Brep
 from compas.geometry import Capsule
 from compas.geometry import Circle
 from compas.geometry import Cone
 from compas.geometry import Cylinder
 from compas.geometry import Ellipse
 from compas.geometry import Frame
-from compas.geometry import NurbsSurface
 from compas.geometry import Plane
-from compas.geometry import Point
 from compas.geometry import Polyline
 from compas.geometry import Sphere
 from compas.geometry import Torus
@@ -18,22 +15,6 @@ from compas.geometry import Vector
 from compas_viewer import Viewer
 
 viewer = Viewer()
-
-points = [
-    [Point(0, 0, 0), Point(1, 0, 0), Point(2, 0, 0), Point(3, 0, 0)],
-    [Point(0, 1, 0), Point(1, 1, 2), Point(2, 1, 2), Point(3, 1, 0)],
-    [Point(0, 2, 0), Point(1, 2, 2), Point(2, 2, 2), Point(3, 2, 0)],
-    [Point(0, 3, 0), Point(1, 3, 0), Point(2, 3, 0), Point(3, 3, 0)],
-]
-surface = NurbsSurface.from_points(points=points)
-obj = viewer.scene.add(
-    surface,
-    show_points=True,
-    show_lines=True,
-    pointcolor=Color(0.5, 0.0, 0.0),
-    linecolor=Color(0.0, 0.0, 0.5),
-)
-obj.transformation = Translation.from_vector(Vector(-1.5, -1.5, 0.0))
 
 plane = Plane([0, 0, 0], [0, 0, 1])
 obj = viewer.scene.add(plane, size=0.5, linecolor=Color(0.5, 0.0, 0.0), surfacecolor=Color(0.0, 0.0, 0.5))
@@ -45,7 +26,7 @@ obj.transformation = Translation.from_vector(Vector(10, 0.0, 0.0))
 
 ellipse = Ellipse(1.5, 0.5, Frame.worldXY())
 obj = viewer.scene.add(
-    item=ellipse,
+    ellipse,
     show_points=True,
     linecolor=Color(1.0, 0.0, 0.0),
     pointcolor=Color(0.0, 0.0, 1.0),
@@ -55,14 +36,6 @@ obj.transformation = Translation.from_vector(Vector(0, 5, 0))
 cone = Cone.from_circle_and_height(circle, 1.5)
 obj = viewer.scene.add(cone, surfacecolor=Color(0.5, 0.5, 0.0))
 obj.transformation = Translation.from_vector(Vector(5, 5, 0))
-
-box = Brep.from_box(Box(1.5))
-cx = Brep.from_cylinder(Cylinder(0.5, 8, frame=Frame.worldYZ()))
-cy = Brep.from_cylinder(Cylinder(0.5, 8, frame=Frame.worldZX()))
-cz = Brep.from_cylinder(Cylinder(0.5, 8, frame=Frame.worldXY()))
-result = box - (cx + cy + cz)
-obj = viewer.scene.add(result, surfacecolor=Color(0.0, 0.5, 0.5), use_vertexcolors=False)
-obj.transformation = Translation.from_vector(Vector(10, 5, 0))
 
 capsule = Capsule(0.8, 1)
 obj = viewer.scene.add(capsule, surfacecolor=Color(0.0, 0.0, 0.5), show_lines=False)

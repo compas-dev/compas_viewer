@@ -7,27 +7,23 @@ from compas_viewer import Viewer
 
 viewer = Viewer()
 
-box1 = Box(1, 1, 1, Frame([0, 0, 0], [1, 0, 0], [0, 1, 0]))
-box2 = Box(1, 1, 1, Frame([0, 0, 0], [1, 0, 0], [0, 1, 0]))
-box3 = Box(1, 1, 1, Frame([0, 0, 0], [1, 0, 0], [0, 1, 0]))
-obj1 = viewer.scene.add(box1, surfacecolor=Color.red())
-obj2 = viewer.scene.add(box2, surfacecolor=Color.blue())
-obj3 = viewer.scene.add(box3, surfacecolor=Color.green())
-
-s = 1
+box = Box(1, 1, 1, Frame.worldXY())
+vertical_object = viewer.scene.add(box, surfacecolor=Color.red())
+horizontal_object = viewer.scene.add(box.copy(), surfacecolor=Color.blue())
+scaled_object = viewer.scene.add(box.copy(), surfacecolor=Color.green())
 
 
 @viewer.on(interval=100)
-def transform(frame):
-    obj1.transformation = Translation.from_vector([0, 0, 0.01 * frame])
-    obj1.update()
+def transform_objects(frame: int) -> None:
+    vertical_object.transformation = Translation.from_vector([0, 0, 0.01 * frame])
+    viewer.scene.render_object(vertical_object).update()
 
-    obj2.transformation = Translation.from_vector([0, 0.01 * frame, 0])
-    obj2.update()
+    horizontal_object.transformation = Translation.from_vector([0, 0.01 * frame, 0])
+    viewer.scene.render_object(horizontal_object).update()
 
-    S = Scale.from_factors([0.01 * frame, 0.01 * frame, 0.01 * frame])
-    obj3.transformation = S
-    obj3.update()
+    scale = Scale.from_factors([0.01 * frame, 0.01 * frame, 0.01 * frame])
+    scaled_object.transformation = scale
+    viewer.scene.render_object(scaled_object).update()
 
 
 viewer.show()
