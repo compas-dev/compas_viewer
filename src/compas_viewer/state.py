@@ -8,6 +8,7 @@ from PySide6.QtCore import Signal
 from compas.scene import SceneObject
 from compas_viewer.config import Config
 from compas_viewer.config import MeasurementConfig
+from compas_viewer.measurement import MeasurementState
 from compas_viewer.selection import Selection
 
 
@@ -38,6 +39,7 @@ class ViewerState(QObject):
         super().__init__()
         self.config = config
         self.selection = Selection(resolve_sceneobject or _unbound_sceneobject, self._selection_changed)
+        self.measurement = MeasurementState(self._measurement_changed)
 
     def get(self, path: str) -> Any:
         """Return a state value by dotted configuration path.
@@ -162,6 +164,10 @@ class ViewerState(QObject):
     def _selection_changed(self, guids: tuple[UUID, ...]) -> None:
         """Bridge one Qt-neutral selection mutation to Viewer observers."""
         self.changed.emit("selection", guids)
+
+    def _measurement_changed(self) -> None:
+        """Bridge transient measurement mutation to Viewer observers."""
+        self.changed.emit("measurement.runtime", self.measurement)
 
     @staticmethod
     def _parts(path: str) -> list[str]:

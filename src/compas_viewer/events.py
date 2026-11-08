@@ -294,6 +294,8 @@ class EventManager(Base):
             Qt key event to dispatch.
 
         """
+        if event.key() == Qt.Key.Key_Escape and event.modifiers() == Qt.KeyboardModifier.NoModifier and self.viewer.cancel_measurement():
+            return
         for keyevent in self.key_events:
             if keyevent == event:
                 keyevent.triggered.emit()
@@ -319,6 +321,9 @@ class EventManager(Base):
 
         """
         self.viewer.mouse.begin(event.pos())
+        if self.viewer.state.measurement.active and event.buttons() == Qt.MouseButton.LeftButton:
+            self.viewer._accept_measurement_at(_mouse_position(event))
+            return
         for mouseevent in self.mouse_events:
             if mouseevent == event:
                 mouseevent.triggered.emit(event)
@@ -334,7 +339,13 @@ class EventManager(Base):
 
         """
         self.viewer.mouse.pos = event.pos()
+        measurement_active = self.viewer.state.measurement.active
+        buttons = event.buttons()
+        if measurement_active and buttons in {Qt.MouseButton.NoButton, Qt.MouseButton.LeftButton}:
+            self.viewer._update_measurement_hover(_mouse_position(event))
         for mouseevent in self.mouse_events:
+            if measurement_active and mouseevent.button == "LEFT":
+                continue
             if mouseevent == event:
                 mouseevent.triggered.emit(event)
 
@@ -378,3 +389,8 @@ class EventManager(Base):
 
         """
         pass
+
+
+def _mouse_position(event: QMouseEvent) -> tuple[float, float]:
+    position = event.position()
+    return position.x(), position.y()

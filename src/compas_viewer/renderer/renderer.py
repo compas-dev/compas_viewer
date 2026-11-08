@@ -1,8 +1,12 @@
 import time
 from collections.abc import Sequence
+from dataclasses import dataclass
+from math import ceil
+from math import floor
 from typing import TYPE_CHECKING
 from typing import Literal
 from typing import cast
+from uuid import UUID
 
 import numpy as np
 from numpy import float32
@@ -24,13 +28,20 @@ from PySide6.QtOpenGLWidgets import QOpenGLWidget
 from PySide6.QtWidgets import QGesture
 from PySide6.QtWidgets import QGestureEvent
 
+from compas.datastructures import Mesh
 from compas.geometry import Frame
+from compas.geometry import Point
 from compas.geometry import transform_points_numpy
 from compas_viewer.base import Base
 from compas_viewer.gl import OffscreenBufferContext
 from compas_viewer.scene.annotationobject import WorldAnnotationRenderObject
 from compas_viewer.scene.buffermanager import BufferManager
 from compas_viewer.scene.gridobject import GridObject
+from compas_viewer.snapping import ProjectedPoint
+from compas_viewer.snapping import SnapKind
+from compas_viewer.snapping import SnapResult
+from compas_viewer.snapping import SurfaceHit
+from compas_viewer.snapping import query_snap
 
 from .camera import Camera
 from .shaders import Shader
@@ -41,6 +52,34 @@ if TYPE_CHECKING:
 
 type RenderMode = Literal["ghosted", "shaded", "lighted", "wireframe", "instance"]
 type ViewMode = Literal["perspective", "front", "right", "top", "ortho"]
+
+
+@dataclass(frozen=True, slots=True)
+class _InstanceGLState:
+    """OpenGL state touched by offscreen instance acquisition."""
+
+    scissor_enabled: bool
+    scissor_box: tuple[int, int, int, int]
+    depth_test_enabled: bool
+    depth_func: int
+    depth_write_mask: bool
+    clear_color: tuple[float, float, float, float]
+    blend_enabled: bool
+    polygon_offset_enabled: bool
+    polygon_offset_factor: float
+    polygon_offset_units: float
+    cull_face_enabled: bool
+    line_width: float
+    point_size: float
+    program: int
+    vertex_array: int
+    array_buffer: int
+    element_array_buffer: int
+    texture_buffer: int
+    active_texture: int
+    texture_buffer_bindings: tuple[int, int]
+    texture_2d: int
+    renderbuffer: int
 
 
 class Renderer(QOpenGLWidget, Base):
@@ -56,6 +95,12 @@ class Renderer(QOpenGLWidget, Base):
 
     # Enhance pixel  width for selection.
     PIXEL_SELECTION_INCREMENTAL = 2
+
+    # Two units of the 24-bit instance-buffer depth resolution.
+    SNAP_DEPTH_EPSILON = 2.0 / ((1 << 24) - 1)
+
+    # Outside the generated instance-color range, including its rare 255 red.
+    INSTANCE_BACKGROUND = (1.0, 1.0, 1.0, 1.0)
 
     def __init__(self) -> None:
         format = QSurfaceFormat()
@@ -97,6 +142,7 @@ class Renderer(QOpenGLWidget, Base):
         )
 
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        self.setMouseTracking(True)
         self.grabGesture(Qt.GestureType.PinchGesture)
         self.setAcceptDrops(True)
 
@@ -730,7 +776,7 @@ class Renderer(QOpenGLWidget, Base):
             self._draw_world_annotations(viewworld)
 
         # draw 2D box for multi-selection
-        if self.viewer.mouse.is_tracing_a_window:
+        if not is_instance and self.viewer.mouse.is_tracing_a_window:
             assert self.viewer.mouse.window_start_point is not None
             assert self.viewer.mouse.last_pos is not None
             # Ensure the model shader is bound before drawing
@@ -757,6 +803,330 @@ class Renderer(QOpenGLWidget, Base):
         for render_object in self.viewer.scene.render_objects.values():
             if isinstance(render_object, WorldAnnotationRenderObject):
                 render_object.draw_world_annotation(self, viewworld)
+
+    def project_point(self, point: Point) -> ProjectedPoint | None:
+        """Project a world point to logical Viewer pixels.
+
+        Parameters
+        ----------
+        point
+            World-coordinate point to project.
+
+        Returns
+        -------
+        ProjectedPoint | None
+            Screen position, normalized depth, and clip-space $w$, or `None`
+            when the point lies behind the camera or outside the near or far
+            clipping planes.
+
+        Notes
+        -----
+        Qt pointer positions and the instance framebuffer both use logical
+        pixels. The device pixel ratio therefore does not scale these values.
+
+        """
+        width = self.width()
+        height = self.height()
+        if width <= 0 or height <= 0:
+            return None
+        return self._project_point(point, self._view_projection(), width, height)
+
+    @staticmethod
+    def _project_point(
+        point: Point,
+        view_projection: NDArray[np.float64],
+        width: int,
+        height: int,
+    ) -> ProjectedPoint | None:
+        """Project a point with a prepared view-projection matrix."""
+        clip = view_projection @ np.array([point.x, point.y, point.z, 1.0], dtype=np.float64)
+        clip_w = float(clip[3])
+        if clip_w <= 0.0:
+            return None
+
+        ndc = clip[:3] / clip_w
+        if ndc[2] < -1.0 or ndc[2] > 1.0:
+            return None
+        return ProjectedPoint(
+            x=float((ndc[0] + 1.0) * 0.5 * width),
+            y=float((1.0 - ndc[1]) * 0.5 * height),
+            depth=float((ndc[2] + 1.0) * 0.5),
+            clip_w=clip_w,
+        )
+
+    def query_snap_at(self, screen_point: tuple[float, float], radius: float) -> SnapResult | None:
+        """Return the best visible semantic snap near a screen point.
+
+        Parameters
+        ----------
+        screen_point
+            Pointer position in logical Viewer pixels, with a top-left origin.
+        radius
+            Inclusive acquisition radius in logical pixels.
+
+        Returns
+        -------
+        SnapResult | None
+            Highest-priority visible snap, or `None` when the acquisition
+            region contains no eligible scene component.
+
+        Notes
+        -----
+        One clipped instance-color and depth pass supplies object prefiltering,
+        occlusion testing, and fixed-only face or surface hits. The depth
+        epsilon reflects the instance framebuffer precision and is independent
+        of COMPAS model tolerance and Viewer display settings.
+
+        """
+        region = self._snap_region(screen_point, radius)
+        if region is None:
+            return None
+
+        self.makeCurrent()
+        try:
+            colors, depths = self._acquire_snap_buffers(region)
+        finally:
+            self.doneCurrent()
+
+        scene = self.viewer.scene
+        encountered = {
+            sceneobject.guid
+            for color in np.unique(colors.reshape(-1, 3), axis=0)
+            if (sceneobject := scene.instance_colors.get((int(color[0]), int(color[1]), int(color[2])))) is not None
+        }
+        sceneobjects = tuple(sceneobject for sceneobject in scene.objects if sceneobject.guid in encountered)
+        if not sceneobjects:
+            return None
+
+        surface_hits = tuple(self._surface_hits(region, colors, depths))
+        width = self.width()
+        height = self.height()
+        view_projection = self._view_projection()
+        return query_snap(
+            sceneobjects,
+            screen_point,
+            radius=radius,
+            project=lambda point: self._project_point(point, view_projection, width, height),
+            is_visible=lambda projection: self._is_snap_visible(projection, region, depths),
+            surface_hits=lambda _screen_point, _radius: surface_hits,
+        )
+
+    def _snap_region(self, screen_point: tuple[float, float], radius: float) -> tuple[int, int, int, int, int] | None:
+        """Return a clipped logical and OpenGL acquisition region.
+
+        The returned values are logical `x`, logical top `y`, OpenGL bottom
+        `y`, width, and height.
+
+        """
+        width = self.width()
+        height = self.height()
+        x1 = max(0, floor(screen_point[0] - radius))
+        y1 = max(0, floor(screen_point[1] - radius))
+        x2 = min(width - 1, ceil(screen_point[0] + radius))
+        y2 = min(height - 1, ceil(screen_point[1] + radius))
+        if width <= 0 or height <= 0 or x1 > x2 or y1 > y2:
+            return None
+        region_width = x2 - x1 + 1
+        region_height = y2 - y1 + 1
+        gl_y = height - y1 - region_height
+        return x1, y1, gl_y, region_width, region_height
+
+    def _acquire_snap_buffers(
+        self,
+        region: tuple[int, int, int, int, int],
+    ) -> tuple[NDArray[np.uint8], NDArray[np.float32]]:
+        """Render and read one clipped instance-color and depth region."""
+        x, _y, gl_y, width, height = region
+        state = self._capture_instance_gl_state()
+        try:
+            with OffscreenBufferContext(self.width(), self.height()):
+                GL.glEnable(GL.GL_SCISSOR_TEST)
+                GL.glScissor(x, gl_y, width, height)
+                GL.glPolygonOffset(0.0, 0.0)
+                self._render_instance_map()
+                colors = self._read_pixels(x, gl_y, width, height)
+                depths = self._read_depths(x, gl_y, width, height)
+        finally:
+            self._restore_instance_gl_state(state)
+        return np.flipud(colors), np.flipud(depths)
+
+    def _read_depths(self, x: int, y: int, width: int, height: int) -> NDArray[np.float32]:
+        """Read normalized depth values from the current framebuffer."""
+        alignment = int(GL.glGetIntegerv(GL.GL_PACK_ALIGNMENT))
+        pixel_pack_buffer = int(GL.glGetIntegerv(GL.GL_PIXEL_PACK_BUFFER_BINDING))
+        try:
+            GL.glPixelStorei(GL.GL_PACK_ALIGNMENT, 1)
+            GL.glBindBuffer(GL.GL_PIXEL_PACK_BUFFER, 0)
+            buffer = GL.glReadPixels(x, y, width, height, GL.GL_DEPTH_COMPONENT, GL.GL_FLOAT)
+            return np.frombuffer(cast(bytes, buffer), dtype=np.float32).reshape(height, width)
+        finally:
+            GL.glBindBuffer(GL.GL_PIXEL_PACK_BUFFER, pixel_pack_buffer)
+            GL.glPixelStorei(GL.GL_PACK_ALIGNMENT, alignment)
+
+    @staticmethod
+    def _capture_instance_gl_state() -> _InstanceGLState:
+        """Capture OpenGL state changed by offscreen instance rendering."""
+        active_texture = int(GL.glGetIntegerv(GL.GL_ACTIVE_TEXTURE))
+        texture_buffer_bindings = []
+        for unit in (GL.GL_TEXTURE0, cast(int, GL.GL_TEXTURE0) + 1):
+            GL.glActiveTexture(unit)
+            texture_buffer_bindings.append(int(GL.glGetIntegerv(GL.GL_TEXTURE_BINDING_BUFFER)))
+        GL.glActiveTexture(active_texture)
+        return _InstanceGLState(
+            scissor_enabled=bool(GL.glIsEnabled(GL.GL_SCISSOR_TEST)),
+            scissor_box=tuple(int(value) for value in GL.glGetIntegerv(GL.GL_SCISSOR_BOX)),  # type: ignore[arg-type]
+            depth_test_enabled=bool(GL.glIsEnabled(GL.GL_DEPTH_TEST)),
+            depth_func=int(GL.glGetIntegerv(GL.GL_DEPTH_FUNC)),
+            depth_write_mask=bool(GL.glGetBooleanv(GL.GL_DEPTH_WRITEMASK)),
+            clear_color=tuple(float(value) for value in GL.glGetFloatv(GL.GL_COLOR_CLEAR_VALUE)),  # type: ignore[arg-type]
+            blend_enabled=bool(GL.glIsEnabled(GL.GL_BLEND)),
+            polygon_offset_enabled=bool(GL.glIsEnabled(GL.GL_POLYGON_OFFSET_FILL)),
+            polygon_offset_factor=float(GL.glGetFloatv(GL.GL_POLYGON_OFFSET_FACTOR)),
+            polygon_offset_units=float(GL.glGetFloatv(GL.GL_POLYGON_OFFSET_UNITS)),
+            cull_face_enabled=bool(GL.glIsEnabled(GL.GL_CULL_FACE)),
+            line_width=float(GL.glGetFloatv(GL.GL_LINE_WIDTH)),
+            point_size=float(GL.glGetFloatv(GL.GL_POINT_SIZE)),
+            program=int(GL.glGetIntegerv(GL.GL_CURRENT_PROGRAM)),
+            vertex_array=int(GL.glGetIntegerv(GL.GL_VERTEX_ARRAY_BINDING)),
+            array_buffer=int(GL.glGetIntegerv(GL.GL_ARRAY_BUFFER_BINDING)),
+            element_array_buffer=int(GL.glGetIntegerv(GL.GL_ELEMENT_ARRAY_BUFFER_BINDING)),
+            texture_buffer=int(GL.glGetIntegerv(GL.GL_TEXTURE_BUFFER_BINDING)),
+            active_texture=active_texture,
+            texture_buffer_bindings=(texture_buffer_bindings[0], texture_buffer_bindings[1]),
+            texture_2d=int(GL.glGetIntegerv(GL.GL_TEXTURE_BINDING_2D)),
+            renderbuffer=int(GL.glGetIntegerv(GL.GL_RENDERBUFFER_BINDING)),
+        )
+
+    @staticmethod
+    def _restore_instance_gl_state(state: _InstanceGLState) -> None:
+        """Restore OpenGL state captured before instance rendering."""
+        GL.glBindRenderbuffer(GL.GL_RENDERBUFFER, state.renderbuffer)
+        GL.glScissor(*state.scissor_box)
+        GL.glDepthFunc(state.depth_func)
+        GL.glDepthMask(state.depth_write_mask)
+        GL.glClearColor(*state.clear_color)
+        GL.glPolygonOffset(state.polygon_offset_factor, state.polygon_offset_units)
+        GL.glLineWidth(state.line_width)
+        GL.glPointSize(state.point_size)
+        for unit, binding in zip((GL.GL_TEXTURE0, cast(int, GL.GL_TEXTURE0) + 1), state.texture_buffer_bindings, strict=True):
+            GL.glActiveTexture(unit)
+            GL.glBindTexture(GL.GL_TEXTURE_BUFFER, binding)
+        GL.glActiveTexture(state.active_texture)
+        GL.glBindTexture(GL.GL_TEXTURE_2D, state.texture_2d)
+        GL.glBindBuffer(GL.GL_TEXTURE_BUFFER, state.texture_buffer)
+        GL.glBindVertexArray(state.vertex_array)
+        GL.glBindBuffer(GL.GL_ARRAY_BUFFER, state.array_buffer)
+        GL.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, state.element_array_buffer)
+        GL.glUseProgram(state.program)
+        Renderer._set_gl_capability(GL.GL_SCISSOR_TEST, state.scissor_enabled)
+        Renderer._set_gl_capability(GL.GL_DEPTH_TEST, state.depth_test_enabled)
+        Renderer._set_gl_capability(GL.GL_BLEND, state.blend_enabled)
+        Renderer._set_gl_capability(GL.GL_POLYGON_OFFSET_FILL, state.polygon_offset_enabled)
+        Renderer._set_gl_capability(GL.GL_CULL_FACE, state.cull_face_enabled)
+
+    @staticmethod
+    def _set_gl_capability(capability: int, enabled: bool) -> None:
+        """Restore one boolean OpenGL capability."""
+        if enabled:
+            GL.glEnable(capability)
+        else:
+            GL.glDisable(capability)
+
+    def _is_snap_visible(
+        self,
+        projection: ProjectedPoint,
+        region: tuple[int, int, int, int, int],
+        depths: NDArray[np.float32],
+    ) -> bool:
+        """Return whether a projection is no farther than the sampled depth."""
+        x, y, _gl_y, width, height = region
+        column = floor(projection.x) - x
+        row = floor(projection.y) - y
+        if column < 0 or row < 0 or column >= width or row >= height:
+            return False
+        return projection.depth <= float(depths[row, column]) + self.SNAP_DEPTH_EPSILON
+
+    def _surface_hits(
+        self,
+        region: tuple[int, int, int, int, int],
+        colors: NDArray[np.uint8],
+        depths: NDArray[np.float32],
+    ) -> Sequence[SurfaceHit]:
+        """Return unprojected fixed-only hits for face-buffered objects."""
+        x, y, _gl_y, _width, _height = region
+        hits = []
+        inverse_view_projection = np.linalg.inv(self._view_projection())
+        for row, column in np.ndindex(depths.shape):
+            depth = float(depths[row, column])
+            if depth >= 1.0:
+                continue
+            color = colors[row, column]
+            sceneobject = self.viewer.scene.instance_colors.get((int(color[0]), int(color[1]), int(color[2])))
+            if sceneobject is None or not self._has_face_buffers(sceneobject.guid):
+                continue
+            screen_x = x + column + 0.5
+            screen_y = y + row + 0.5
+            point = self._unproject_point_with_matrix(screen_x, screen_y, depth, inverse_view_projection)
+            if point is None:
+                continue
+            kind = SnapKind.FACE if isinstance(sceneobject.item, Mesh) else SnapKind.SURFACE
+            hits.append(
+                SurfaceHit(
+                    point=point,
+                    object_guid=sceneobject.guid,
+                    projection=ProjectedPoint(screen_x, screen_y, depth),
+                    kind=kind,
+                )
+            )
+        return hits
+
+    def _has_face_buffers(self, object_guid: UUID) -> bool:
+        """Return whether a render helper contributes face geometry."""
+        render_object = self.viewer.scene.render_objects.get(object_guid)
+        if render_object is None:
+            return False
+        for name in ("_frontfaces_data", "_backfaces_data"):
+            data = getattr(render_object, name, None)
+            if data is not None and len(data[0]) > 0:
+                return True
+        return False
+
+    def _unproject_point(self, screen_x: float, screen_y: float, depth: float) -> Point | None:
+        """Unproject a logical screen position and normalized depth."""
+        return self._unproject_point_with_matrix(screen_x, screen_y, depth, np.linalg.inv(self._view_projection()))
+
+    def _unproject_point_with_matrix(
+        self,
+        screen_x: float,
+        screen_y: float,
+        depth: float,
+        inverse_view_projection: NDArray[np.float64],
+    ) -> Point | None:
+        """Unproject a screen position with a prepared inverse matrix."""
+        width = self.width()
+        height = self.height()
+        if width <= 0 or height <= 0:
+            return None
+        ndc = np.array(
+            [
+                2.0 * screen_x / width - 1.0,
+                1.0 - 2.0 * screen_y / height,
+                2.0 * depth - 1.0,
+                1.0,
+            ],
+            dtype=np.float64,
+        )
+        world = inverse_view_projection @ ndc
+        if world[3] == 0.0:
+            return None
+        world /= world[3]
+        return Point(float(world[0]), float(world[1]), float(world[2]))
+
+    def _view_projection(self) -> NDArray[np.float64]:
+        """Return the current logical-pixel view-projection matrix."""
+        projection = np.asarray(self.camera.projection(self.width(), self.height()), dtype=np.float64)
+        viewworld = np.asarray(self.camera.viewworld(), dtype=np.float64)
+        return projection @ viewworld
 
     def read_instance_color(self, box: tuple[int, int, int, int]) -> NDArray[uint8]:
         """Read instance colors from the specified screen region.
@@ -791,13 +1161,17 @@ class Renderer(QOpenGLWidget, Base):
         regions = [self._instance_region(box) for box in boxes]
         results = []
 
-        with OffscreenBufferContext(self.width(), self.height()) as fbo_context:
-            self._render_instance_map()
-            for box, (x, y, width, height) in zip(boxes, regions, strict=True):
-                results.append(self._read_pixels(x, y, width, height).reshape(-1, 3))
-                if self.viewer.config.renderer.debug_instance:
-                    assert fbo_context.viewport is not None
-                    self._save_debug_images(box, x, y, width, height, fbo_context.viewport)
+        state = self._capture_instance_gl_state()
+        try:
+            with OffscreenBufferContext(self.width(), self.height()) as fbo_context:
+                self._render_instance_map()
+                for box, (x, y, width, height) in zip(boxes, regions, strict=True):
+                    results.append(self._read_pixels(x, y, width, height).reshape(-1, 3))
+                    if self.viewer.config.renderer.debug_instance:
+                        assert fbo_context.viewport is not None
+                        self._save_debug_images(box, x, y, width, height, fbo_context.viewport)
+        finally:
+            self._restore_instance_gl_state(state)
 
         return results
 
@@ -812,31 +1186,33 @@ class Renderer(QOpenGLWidget, Base):
 
     def _render_instance_map(self) -> None:
         """Render the scene in instance color mode."""
-        # Set up rendering state for instance mode
-        GL.glEnable(GL.GL_DEPTH_TEST)
-        GL.glDepthFunc(GL.GL_LESS)
-        GL.glDepthMask(GL.GL_TRUE)
-        GL.glClearColor(0.0, 0.0, 0.0, 1.0)
-        GL.glClear(cast(int, GL.GL_COLOR_BUFFER_BIT) | cast(int, GL.GL_DEPTH_BUFFER_BIT))
-
-        # Temporarily disable blending for clean instance colors
-        was_blend_enabled = GL.glIsEnabled(GL.GL_BLEND)
-        GL.glDisable(GL.GL_BLEND)
-
+        state = self._capture_instance_gl_state()
         try:
-            self.paintGL(is_instance=True)
+            GL.glEnable(GL.GL_DEPTH_TEST)
+            GL.glDepthFunc(GL.GL_LEQUAL)
+            GL.glDepthMask(GL.GL_TRUE)
+            GL.glClearColor(*self.INSTANCE_BACKGROUND)
+            GL.glDisable(GL.GL_BLEND)
+            GL.glClear(cast(int, GL.GL_COLOR_BUFFER_BIT) | cast(int, GL.GL_DEPTH_BUFFER_BIT))
+            GL.glViewport(0, 0, self.width(), self.height())
+            self.paint(is_instance=True)
             GL.glFlush()
             GL.glFinish()
         finally:
-            # Restore blending state
-            if was_blend_enabled:
-                GL.glEnable(GL.GL_BLEND)
+            self._restore_instance_gl_state(state)
 
     def _read_pixels(self, x: int, y: int, width: int, height: int) -> NDArray[uint8]:
         """Read pixel data from the current framebuffer."""
-        GL.glPixelStorei(GL.GL_PACK_ALIGNMENT, 1)
-        buffer = GL.glReadPixels(x, y, width, height, GL.GL_RGB, GL.GL_UNSIGNED_BYTE)
-        return np.frombuffer(cast(bytes, buffer), dtype=np.uint8).reshape(height, width, 3)
+        alignment = int(GL.glGetIntegerv(GL.GL_PACK_ALIGNMENT))
+        pixel_pack_buffer = int(GL.glGetIntegerv(GL.GL_PIXEL_PACK_BUFFER_BINDING))
+        try:
+            GL.glPixelStorei(GL.GL_PACK_ALIGNMENT, 1)
+            GL.glBindBuffer(GL.GL_PIXEL_PACK_BUFFER, 0)
+            buffer = GL.glReadPixels(x, y, width, height, GL.GL_RGB, GL.GL_UNSIGNED_BYTE)
+            return np.frombuffer(cast(bytes, buffer), dtype=np.uint8).reshape(height, width, 3)
+        finally:
+            GL.glBindBuffer(GL.GL_PIXEL_PACK_BUFFER, pixel_pack_buffer)
+            GL.glPixelStorei(GL.GL_PACK_ALIGNMENT, alignment)
 
     def _save_debug_images(
         self,

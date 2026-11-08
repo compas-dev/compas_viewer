@@ -21,6 +21,7 @@ from PySide6.QtWidgets import QApplication
 
 from compas.colors import Color
 from compas.geometry import Transformation
+from compas.scene import DistanceDimension
 from compas.scene import Scene
 from compas.scene import SceneObject
 from compas_viewer import HERE
@@ -34,6 +35,9 @@ from compas_viewer.commands import builtin_commands
 from compas_viewer.config import Appearance
 from compas_viewer.config import Config
 from compas_viewer.events import EventManager
+from compas_viewer.measurement import SNAP_RADIUS
+from compas_viewer.measurement import DistanceInspection
+from compas_viewer.measurement import PersistentMeasurementMode
 from compas_viewer.mouse import Mouse
 from compas_viewer.overlays import Overlay
 from compas_viewer.overlays import _OverlayContext
@@ -111,6 +115,7 @@ class Viewer(Singleton):
     @scene.setter
     def scene(self, scene: Scene) -> None:
         """Replace the active scene from serialized COMPAS scene data."""
+        self.cancel_measurement()
         if isinstance(scene, ViewerScene):
             self._scene = scene
         else:
@@ -170,6 +175,58 @@ class Viewer(Singleton):
         if removed and self.running:
             self.renderer.update()
         return removed
+
+    def start_distance_inspection(self) -> None:
+        """Start a one-shot transient distance inspection.
+
+        The completed inspection remains Viewer-owned transient state until it
+        is canceled, another measurement starts, or the scene is replaced.
+
+        """
+        self.state.measurement.start("inspection")
+
+    def start_distance_dimension(self, mode: PersistentMeasurementMode = "fixed") -> None:
+        """Start a one-shot persistent distance-dimension interaction.
+
+        Parameters
+        ----------
+        mode
+            Fixed or associative anchor acquisition. Associative acquisition
+            never falls back to fixed point anchors.
+
+        """
+        self.state.measurement.start(mode)
+
+    def cancel_measurement(self) -> bool:
+        """Cancel active or retained transient measurement state.
+
+        Returns
+        -------
+        bool
+            Whether measurement state was cleared.
+
+        """
+        return self.state.measurement.cancel()
+
+    def _update_measurement_hover(self, screen_point: tuple[float, float]) -> None:
+        """Update the active measurement's hover snap."""
+        snap = self.renderer.query_snap_at(screen_point, SNAP_RADIUS)
+        self.state.measurement.update_hover(snap)
+
+    def _accept_measurement_at(self, screen_point: tuple[float, float]) -> None:
+        """Accept the semantic snap at one screen position."""
+        snap = self.renderer.query_snap_at(screen_point, SNAP_RADIUS)
+        result = self.state.measurement.accept(
+            snap,
+            unit=self.config.measurement.unit,
+            precision=self.config.measurement.precision,
+        )
+        if result is None or isinstance(result, DistanceInspection):
+            return
+        if not isinstance(result, DistanceDimension):
+            raise RuntimeError("Unexpected distance measurement result.")
+        sceneobject = self.scene.add(result)
+        self.state.selection.replace((sceneobject,))
 
     def _draw_overlays(self, renderer: Renderer) -> None:
         """Draw Viewer-owned overlays after normal scene rendering."""

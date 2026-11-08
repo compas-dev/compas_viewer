@@ -363,6 +363,7 @@ class ViewerScene(Scene):
         self._reset_instance_colors()
 
         if clear_scene and self._viewer is not None:
+            self._viewer.cancel_measurement()
             clear_history = getattr(self._viewer, "_clear_transform_history", None)
             if clear_history is not None:
                 clear_history()
