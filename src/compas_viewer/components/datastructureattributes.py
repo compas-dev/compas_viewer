@@ -258,10 +258,17 @@ class _ElementAttributesModel(QAbstractTableModel):
 class DatastructureAttributes(Container):
     """Display editable element attributes for one selected Mesh or Graph.
 
-    The table columns come from the datastructure's ordered default-attribute
-    dictionaries. Values are read lazily through singular element accessors,
-    and successful mutations conservatively rebuild the selected object's
-    Viewer render data.
+    Mesh vertex, edge, and face attributes and Graph node and edge attributes
+    appear in separate tabs. Columns come from the datastructure's ordered
+    default-attribute dictionaries. Values are read lazily through singular
+    element accessors rather than copied into per-cell widgets.
+
+    Boolean, integer, floating-point, and string defaults define editable
+    columns. Resetting a selected cell removes its explicit override through
+    the singular unsetter. Sparse attributes, editing the default dictionaries,
+    undo, and synchronized viewport element selection are not supported.
+    Successful mutations conservatively rebuild the selected object's Viewer
+    render data.
 
     """
 
@@ -307,7 +314,7 @@ class DatastructureAttributes(Container):
         self._populate(sceneobject, domains)
 
     def reset_selected(self) -> None:
-        """Reset selected editable cells to their declared defaults."""
+        """Remove selected editable overrides to expose declared defaults."""
         table = self._current_table()
         if table is None:
             return

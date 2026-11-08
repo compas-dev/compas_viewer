@@ -119,7 +119,10 @@ class ConfigBase:
     """Provide closed JSON and dictionary serialization for a config group.
 
     Only declared dataclass fields are serialized. Subclasses should implement
-    `validate` when they add values with constraints.
+    `validate` when they add values with constraints. Unknown fields are
+    rejected when loading serialized data, and runtime callbacks cannot be
+    serialized.
+
     """
 
     @classmethod
@@ -233,7 +236,28 @@ class ConfigBase:
 
 @dataclass
 class WindowConfig(ConfigBase):
-    """Configure the main viewer window."""
+    """Configure the main viewer window at startup.
+
+    Parameters
+    ----------
+    title
+        Non-empty Qt application and main-window title.
+    icon
+        Absolute path to an existing icon file. If `None`, Viewer uses the
+        packaged COMPAS icon.
+    width
+        Initial window width in pixels.
+    height
+        Initial window height in pixels.
+    fullscreen
+        Whether to start the Viewer in fullscreen mode.
+
+    Notes
+    -----
+    Viewer validates and applies these values during construction. Changing
+    them afterward has no promised live effect.
+
+    """
 
     title: str = "COMPAS Viewer"
     icon: str | None = None
@@ -490,7 +514,10 @@ class Config(ConfigBase):
     """Collect validated, serializable Viewer startup preferences.
 
     Nested values may be assigned directly while preparing a Viewer. They do
-    not provide a general reactive runtime interface.
+    not provide a general reactive runtime interface. Schema version 2 accepts
+    only declared fields. `Config.from_dict` also migrates supported version-0
+    and version-1 data by discarding known retired fields.
+
     """
 
     schema_version: int = 2

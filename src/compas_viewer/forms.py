@@ -33,7 +33,13 @@ _CONTRIBUTIONS_DISCOVERED = False
 
 @pluggable(category="factories", selector="collect_all")
 def register_scene_attribute_contributions() -> None:
-    """Register contextual editable-attribute contributions from plugins."""
+    """Register contextual editable-attribute contributions from plugins.
+
+    Plugin implementations should call
+    `register_scene_attribute_contribution` and defer optional visualization
+    imports until the plugin function body runs.
+
+    """
     raise NotImplementedError
 
 
@@ -56,7 +62,8 @@ def register_scene_attribute_contribution[SceneObjectT: SceneObject](
     attributes
         Ordered mapping from flat attribute names to update callbacks. `None`
         selects ordinary assignment. `REMOVE_EDITABLE_ATTRIBUTE` removes an
-        inherited attribute.
+        inherited attribute. A callback updates only the stable scene object;
+        the visualization context owns render and user-interface effects.
 
     Raises
     ------
@@ -115,6 +122,12 @@ def scene_editable_attributes[SceneObjectT: SceneObject](
     ------
     ValueError
         If contributions at the same specificity modify the same attribute.
+
+    Notes
+    -----
+    Contributions compose from general scene-object classes to more specific
+    classes. Stable contribution identifiers determine order within one class;
+    modifying the same attribute twice at that specificity is an error.
 
     """
     _ensure_contributions_discovered()

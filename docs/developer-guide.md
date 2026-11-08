@@ -80,9 +80,15 @@ The root configuration currently contains:
 
 `schema_version` protects persisted data. Schema version 2 is closed: unknown
 and retired fields are rejected. `Config.from_dict` migrates version-1 data by
-retaining declared values and dropping only known retired fields. Each nested
-configuration group validates its own values and reports complete paths such
-as `renderer.gridmode`.
+retaining declared values and dropping only these known retired fields:
+
+- Root `commands`, `display`, and `unit` fields.
+- `window.about` and `renderer.opacity`.
+- `ui.display`, `ui.view3d`, and per-component `items` fields.
+- `ui.sidebar.show_widgets` and `ui.sidebar.sceneform`.
+
+Each nested configuration group validates its own values and reports complete
+paths such as `renderer.gridmode`.
 
 Applications may subclass `Config` and add typed nested `ConfigBase`
 dataclasses. Declared fields round-trip through dictionaries and JSON; dynamic

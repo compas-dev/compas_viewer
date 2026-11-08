@@ -100,7 +100,7 @@ jobs:
           uv venv "${RUNNER_TEMP}/wheel-env"
           uv pip install \
             --python "${RUNNER_TEMP}/wheel-env/bin/python" \
-            "compas @ git+https://github.com/compas-dev/compas.git@314443976a056174ac755e4393059cb37795dda1"
+            "compas @ git+https://github.com/compas-dev/compas.git@0b4555c23d570589bf9eab412cfa5a71312e1aa2"
           uv pip install --python "${RUNNER_TEMP}/wheel-env/bin/python" --no-deps "${RUNNER_TEMP}"/dist/*.whl
           "${RUNNER_TEMP}/wheel-env/bin/python" "${GITHUB_WORKSPACE}/.github/verify_plugin_discovery.py"
           uv pip install \
