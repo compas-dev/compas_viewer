@@ -4,6 +4,7 @@ from unittest.mock import Mock
 from unittest.mock import call
 
 import pytest
+from OpenGL import GL
 
 from compas.data import json_dumps
 from compas.data import json_loads
@@ -88,17 +89,40 @@ def test_distance_dimension_formats_unit_precision_override_and_unresolved_state
     assert unresolved.display_label == "Unresolved"
 
 
-def test_renderer_draws_world_annotations_once_in_scene_order():
+def test_renderer_draws_world_annotations_once_in_scene_order_with_equal_depth(monkeypatch):
     calls = []
+    depth_function = {"value": GL.GL_LESS}
     first = Mock(spec=WorldAnnotationRenderObject)
     second = Mock(spec=WorldAnnotationRenderObject)
-    first.draw_world_annotation.side_effect = lambda renderer, view: calls.append("first")
-    second.draw_world_annotation.side_effect = lambda renderer, view: calls.append("second")
+
+    def draw(name):
+        assert depth_function["value"] == GL.GL_LEQUAL
+        calls.append(name)
+
+    first.draw_world_annotation.side_effect = lambda renderer, view: draw("first")
+    second.draw_world_annotation.side_effect = lambda renderer, view: draw("second")
     renderer = SimpleNamespace(viewer=SimpleNamespace(scene=SimpleNamespace(render_objects={1: first, 2: object(), 3: second})))
+    monkeypatch.setattr(GL, "glGetIntegerv", lambda name: depth_function["value"])
+    monkeypatch.setattr(GL, "glDepthFunc", lambda value: depth_function.__setitem__("value", value))
 
     Renderer._draw_world_annotations(renderer, object())
 
     assert calls == ["first", "second"]
+    assert depth_function["value"] == GL.GL_LESS
+
+
+def test_renderer_restores_depth_function_when_world_annotation_fails(monkeypatch):
+    depth_function = {"value": GL.GL_GREATER}
+    annotation = Mock(spec=WorldAnnotationRenderObject)
+    annotation.draw_world_annotation.side_effect = RuntimeError("annotation failed")
+    renderer = SimpleNamespace(viewer=SimpleNamespace(scene=SimpleNamespace(render_objects={1: annotation})))
+    monkeypatch.setattr(GL, "glGetIntegerv", lambda name: depth_function["value"])
+    monkeypatch.setattr(GL, "glDepthFunc", lambda value: depth_function.__setitem__("value", value))
+
+    with pytest.raises(RuntimeError, match="annotation failed"):
+        Renderer._draw_world_annotations(renderer, object())
+
+    assert depth_function["value"] == GL.GL_GREATER
 
 
 def test_annotations_are_excluded_from_instance_selection_state():

@@ -810,9 +810,14 @@ class Renderer(QOpenGLWidget, Base):
 
     def _draw_world_annotations(self, viewworld: NDArray[np.floating]) -> None:
         """Draw world annotations once, in scene insertion order."""
-        for render_object in self.viewer.scene.render_objects.values():
-            if isinstance(render_object, WorldAnnotationRenderObject):
-                render_object.draw_world_annotation(self, viewworld)
+        depth_function = int(GL.glGetIntegerv(GL.GL_DEPTH_FUNC))
+        GL.glDepthFunc(GL.GL_LEQUAL)
+        try:
+            for render_object in self.viewer.scene.render_objects.values():
+                if isinstance(render_object, WorldAnnotationRenderObject):
+                    render_object.draw_world_annotation(self, viewworld)
+        finally:
+            GL.glDepthFunc(depth_function)
 
     def project_point(self, point: Point) -> ProjectedPoint | None:
         """Project a world point to logical Viewer pixels.
