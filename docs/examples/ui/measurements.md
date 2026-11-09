@@ -2,12 +2,30 @@
 
 Configure the informational unit and display precision, add geometry with
 visible vertices and edges, and start a one-shot fixed-distance interaction.
-Move the pointer to inspect the live preview and left-click two snap points.
 The completed dimension becomes a selected root-level scene object.
 
 ```python
 --8<-- "docs/examples/ui/measurements.py"
 ```
+
+Use the example in these steps:
+
+1. Move the pointer over the rectangular Mesh. All four vertices appear as
+   available point snaps.
+2. Move near one vertex. That vertex becomes the distinct highlighted winner;
+   only this winner can be selected.
+3. Left-click the highlighted winner. The first anchor remains visible.
+4. Move toward another vertex. The available-point palette follows the hovered
+   object, and the live line and formatted distance appear when a second winner
+   is available.
+5. Left-click the second highlighted winner. The tool creates and selects one
+   root-level distance dimension, then stops.
+
+Moving to the background hides the available-point palette. The palette is
+guidance: its individual points are projected without separate occlusion
+tests. The highlighted winner is the only click-eligible result and must pass
+the configured screen-radius and depth checks. Continuous line and edge snaps
+remain selectable, but are not enumerated as hover markers in this version.
 
 The same scene also supports the other modes:
 
@@ -30,6 +48,8 @@ Associative mode links to points, vertices and nodes with stable serializable
 keys, and normalized positions on lines and edges. Face and surface
 associations are not supported yet. They remain available in fixed mode, while
 associative mode shows a rejection instead of falling back to a fixed point.
+Supported Point, Mesh-vertex, or Graph-node guidance remains visible during
+that rejection.
 
 There is no construction-plane or background fallback. A background click does
 not create an anchor. While a measurement is active, left-click input is
@@ -40,3 +60,7 @@ Measurement** to cancel.
 The unit is a label only: it never rescales coordinates. Precision controls
 display formatting only and is not a geometric tolerance. Transient inspection
 labels use the current values from the **Units and Measurement** tab.
+
+Completed dimensions are depth-tested world annotations. They remain visible
+when they coincide with the measured geometry, but closer geometry can occlude
+them.

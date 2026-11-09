@@ -241,12 +241,25 @@ Use the **Measure** menu to start one of three one-shot interactions:
 | **Add Fixed Distance Dimension** | Adds a persistent dimension containing two copied world-coordinate points. |
 | **Add Associative Distance Dimension** | Adds a persistent dimension linked to supported scene components. |
 
-Move the pointer to preview the current snap, then left-click two anchors. While
-a measurement is active, left-clicks belong to the measurement rather than
-ordinary selection. Clicking the background does not create an anchor or fall
-back to a construction plane. Right-drag rotation, Shift + right-drag panning,
-and wheel zoom remain available. Press `Escape` or choose **Measure → Cancel
-Measurement** to cancel the active interaction or a retained transient
+Move the pointer over an object, then left-click two anchors. While a
+measurement is active, hovering a Point, Mesh, or Graph displays all of that
+object's discrete point snaps: the Point itself, Mesh vertices, or Graph nodes.
+The available points are guidance markers. Only the distinct highlighted
+winner inside the snapping radius and accepted by the depth test can be
+selected. The guidance markers are not independently tested for occlusion.
+
+After the first anchor is selected, its marker remains visible while the
+available-point palette follows the next hovered object. Moving to the
+background hides the palette. The live segment and formatted distance appear
+when a second valid winner is available. Continuous line and edge locations
+can still be selected, but displaying every such location as hover guidance is
+deferred.
+
+While a measurement is active, left-clicks belong to the measurement rather
+than ordinary selection. Clicking the background does not create an anchor or
+fall back to a construction plane. Right-drag rotation, Shift + right-drag
+panning, and wheel zoom remain available. Press `Escape` or choose **Measure →
+Cancel Measurement** to cancel the active interaction or a retained transient
 inspection.
 
 Snapping prefers points, mesh vertices, and graph nodes; then lines and edges;
@@ -254,7 +267,9 @@ then faces and surfaces. Fixed measurements accept every snap type.
 Associative measurements support points, vertices and nodes with stable
 serializable keys, and normalized positions on lines and edges. Faces and
 surfaces are fixed-only in the initial implementation, so the Viewer shows a
-rejection message instead of silently creating a fixed anchor.
+rejection message instead of silently creating a fixed anchor. The supported
+point guidance remains visible during that rejection, so the pointer can move
+directly to a supported anchor.
 
 The equivalent Python entry points are:
 
@@ -270,6 +285,9 @@ inspection remains Viewer-owned: it is not a scene object, is not selected or
 serialized, and does not enter transform history. A completed fixed or
 associative interaction creates and selects one root-level
 `compas.scene.DistanceDimension`, then deactivates the tool.
+Completed dimensions remain visible when their world geometry coincides with
+the measured geometry, while geometry closer to the camera still occludes
+them.
 
 See the [distance-measurement example](examples/ui/measurements.md) for a
 step-by-step scene setup.

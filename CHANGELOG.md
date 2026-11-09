@@ -58,6 +58,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* Made active measurement targets explicit by showing all projected Point,
+  Mesh-vertex, or Graph-node snaps on the hovered object while keeping only the
+  depth-qualified winner click-eligible. The first accepted anchor remains
+  visible while the palette follows the next object.
+* Moved transient overlays and measurement feedback to one transparent,
+  input-transparent widget canvas above the OpenGL renderer, and kept completed
+  world annotations visible at equal depth while preserving occlusion by
+  closer geometry.
 * Replaced the Viewer-owned `Tag` and `ArrowOverlay` data types with the
   canonical annotation types from `compas.scene`. Distance labels display the
   configured precision and informational unit, and unresolved associative
