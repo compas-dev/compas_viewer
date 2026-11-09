@@ -218,7 +218,7 @@ class AnnotationPanel(Component):
         color = QColorDialog.getColor(current, self.widget)
         if not color.isValid():
             return
-        red, green, blue, _alpha = color.getRgb()
+        red, green, blue, _alpha = cast(tuple[int, int, int, int], color.getRgb())
         annotation.style.color = Color.from_rgb255(red, green, blue)
         self._set_color_button(annotation.style.color)
         self.viewer.refresh_annotations((annotation,))
