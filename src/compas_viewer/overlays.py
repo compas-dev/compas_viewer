@@ -246,6 +246,49 @@ class ScreenTextOverlay:
             raise TypeError("Screen-text color should be a COMPAS Color.")
 
 
+def _screen_text_origin(
+    overlay: ScreenTextOverlay,
+    context: _OverlayContext,
+    bounds: tuple[float, float, float, float],
+) -> tuple[float, float]:
+    """Resolve the text baseline origin from viewport and glyph bounds.
+
+    Parameters
+    ----------
+    overlay
+        Screen text and its normalized alignment anchor.
+    context
+        Current viewport values.
+    bounds
+        Glyph bounds as left, top, width, and height relative to the baseline.
+
+    Returns
+    -------
+    tuple[float, float]
+        Baseline origin in logical viewport pixels.
+
+    """
+    bounds_left, bounds_top, bounds_width, bounds_height = bounds
+    anchor_x = overlay.position[0] * context.width
+    anchor_y = overlay.position[1] * context.height
+
+    if overlay.horizontal_alignment == "left":
+        left = anchor_x
+    elif overlay.horizontal_alignment == "center":
+        left = anchor_x - bounds_width / 2.0
+    else:
+        left = anchor_x - bounds_width
+
+    if overlay.vertical_alignment == "top":
+        top = anchor_y
+    elif overlay.vertical_alignment == "center":
+        top = anchor_y - bounds_height / 2.0
+    else:
+        top = anchor_y - bounds_height
+
+    return left - bounds_left, top - bounds_top
+
+
 type Overlay = ScaleBarOverlay | LegendOverlay | ScreenTextOverlay
 
 
@@ -342,26 +385,15 @@ class _OverlayLayer:
             if isinstance(overlay, ScreenTextOverlay):
                 metrics = painter.fontMetrics()
                 bounds = metrics.boundingRect(overlay.text)
-                anchor_x = overlay.position[0] * context.width
-                anchor_y = overlay.position[1] * context.height
-
-                if overlay.horizontal_alignment == "left":
-                    left = anchor_x
-                elif overlay.horizontal_alignment == "center":
-                    left = anchor_x - bounds.width() / 2.0
-                else:
-                    left = anchor_x - bounds.width()
-
-                if overlay.vertical_alignment == "top":
-                    top = anchor_y
-                elif overlay.vertical_alignment == "center":
-                    top = anchor_y - bounds.height() / 2.0
-                else:
-                    top = anchor_y - bounds.height()
+                x, y = _screen_text_origin(
+                    overlay,
+                    context,
+                    (float(bounds.left()), float(bounds.top()), float(bounds.width()), float(bounds.height())),
+                )
 
                 color = QColor.fromRgbF(*overlay.color.rgba)
                 painter.setPen(QPen(color))
-                painter.drawText(round(left - bounds.left()), round(top - bounds.top()), overlay.text)
+                painter.drawText(round(x), round(y), overlay.text)
                 continue
 
             metrics = painter.fontMetrics()

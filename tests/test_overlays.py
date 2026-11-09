@@ -19,6 +19,7 @@ from compas_viewer import Viewer
 from compas_viewer.overlays import Overlay
 from compas_viewer.overlays import _OverlayContext
 from compas_viewer.overlays import _OverlayLayer
+from compas_viewer.overlays import _screen_text_origin
 from compas_viewer.renderer import Renderer
 from compas_viewer.scene import ViewerScene
 
@@ -181,7 +182,7 @@ def test_legend_keeps_order_title_and_colors():
     assert legend.title == "Categories"
 
 
-def test_overlay_layer_draws_scale_and_legend(monkeypatch):
+def test_overlay_layer_draws_approved_types_and_clips_to_viewport(monkeypatch):
     monkeypatch.setenv("QT_QPA_PLATFORM", "offscreen")
     from PySide6.QtGui import QColor
     from PySide6.QtGui import QImage
@@ -195,69 +196,47 @@ def test_overlay_layer_draws_scale_and_legend(monkeypatch):
     layer = _OverlayLayer()
     layer.add(ScaleBarOverlay())
     layer.add(LegendOverlay([("A", Color.red()), ("B", Color.blue())], title="Categories"))
+    layer.add(ScreenTextOverlay("Viewport", (0.5, 0.5), horizontal_alignment="center", vertical_alignment="center"))
 
     layer.draw(painter, _OverlayContext(width=640, height=480, camera_distance=10, field_of_view=45, perspective=False))
+    assert painter.hasClipping()
+    assert painter.clipBoundingRect().toRect() == image.rect()
     painter.end()
 
     assert app is not None
     assert image.pixelColor(20, 460).alpha() > 0
 
 
-def test_screen_text_uses_normalized_alignment_and_camera_independent_position(monkeypatch):
-    monkeypatch.setenv("QT_QPA_PLATFORM", "offscreen")
-    from PySide6.QtGui import QColor
-    from PySide6.QtGui import QImage
-    from PySide6.QtGui import QPainter
-    from PySide6.QtWidgets import QApplication
-
-    app = QApplication.instance() or QApplication([])
+@pytest.mark.parametrize(
+    ("horizontal_alignment", "vertical_alignment", "expected"),
+    [
+        ("left", "top", (52.0, 58.0)),
+        ("center", "center", (42.0, 53.0)),
+        ("right", "bottom", (32.0, 48.0)),
+    ],
+)
+def test_screen_text_origin_uses_normalized_position_and_alignment(horizontal_alignment, vertical_alignment, expected):
     overlay = ScreenTextOverlay(
         "Viewport",
         (0.25, 0.5),
-        horizontal_alignment="center",
-        vertical_alignment="center",
-        color=Color.white(),
+        horizontal_alignment=horizontal_alignment,
+        vertical_alignment=vertical_alignment,
     )
+    context = _OverlayContext(width=200, height=100, camera_distance=10, field_of_view=45, perspective=True)
 
-    def render(width, height, camera_distance):
-        image = QImage(width, height, QImage.Format.Format_ARGB32_Premultiplied)
-        image.fill(QColor(0, 0, 0, 0))
-        painter = QPainter(image)
-        layer = _OverlayLayer()
-        layer.add(overlay)
-        layer.draw(
-            painter,
-            _OverlayContext(
-                width=width,
-                height=height,
-                camera_distance=camera_distance,
-                field_of_view=45,
-                perspective=True,
-            ),
-        )
-        assert painter.hasClipping()
-        assert painter.clipBoundingRect().toRect() == image.rect()
-        painter.end()
-        return image
+    assert _screen_text_origin(overlay, context, (-2.0, -8.0, 20.0, 10.0)) == expected
 
-    def opaque_bounds(image):
-        points = [(x, y) for y in range(image.height()) for x in range(image.width()) if image.pixelColor(x, y).alpha()]
-        assert points
-        xs, ys = zip(*points, strict=True)
-        return min(xs), min(ys), max(xs), max(ys)
 
-    small = render(200, 100, 10)
-    same_viewport_different_camera = render(200, 100, 100)
-    large = render(400, 200, 10)
-    small_bounds = opaque_bounds(small)
-    large_bounds = opaque_bounds(large)
+def test_screen_text_origin_tracks_viewport_size_and_not_camera():
+    overlay = ScreenTextOverlay("Viewport", (0.25, 0.5), horizontal_alignment="center", vertical_alignment="center")
+    near = _OverlayContext(width=200, height=100, camera_distance=10, field_of_view=45, perspective=True)
+    far = _OverlayContext(width=200, height=100, camera_distance=100, field_of_view=90, perspective=False)
+    large = _OverlayContext(width=400, height=200, camera_distance=10, field_of_view=45, perspective=True)
+    bounds = (-2.0, -8.0, 20.0, 10.0)
 
-    assert small == same_viewport_different_camera
-    assert abs((small_bounds[0] + small_bounds[2]) / 2 - 50) <= 2
-    assert abs((small_bounds[1] + small_bounds[3]) / 2 - 50) <= 2
-    assert abs((large_bounds[0] + large_bounds[2]) / 2 - 100) <= 2
-    assert abs((large_bounds[1] + large_bounds[3]) / 2 - 100) <= 2
-    assert app is not None
+    assert _screen_text_origin(overlay, near, bounds) == (42.0, 53.0)
+    assert _screen_text_origin(overlay, far, bounds) == (42.0, 53.0)
+    assert _screen_text_origin(overlay, large, bounds) == (92.0, 103.0)
 
 
 def test_viewer_overlay_facade_does_not_change_scene_serialization():
