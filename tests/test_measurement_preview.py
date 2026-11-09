@@ -21,7 +21,7 @@ def snap(xyz, *, association_error=None):
     return SnapResult(
         Point(*xyz),
         uuid4(),
-        SnapKind.FACE if association_error else SnapKind.POINT,
+        SnapKind.NODE if association_error else SnapKind.POINT,
         0.0,
         association_error=association_error,
     )
@@ -91,12 +91,12 @@ def test_associative_rejection_is_drawn_at_the_projected_hover_snap():
     state = MeasurementState()
     state.start("associative")
     available = (snap([0, 0, 0]), snap([2, 0, 0]))
-    state.update_hover(SnapQuery(snap([1, 2, 0], association_error="Face snaps are fixed only"), available))
+    state.update_hover(SnapQuery(snap([1, 2, 0], association_error="The node key is not serializable"), available))
     painter = Mock()
 
     _draw_measurement_preview(painter, state, project, unit=None, precision=3)
 
-    assert drawn_text(painter) == ["Face snaps are fixed only"]
+    assert drawn_text(painter) == ["The node key is not serializable"]
     assert painter.drawRect.call_count == 3
     painter.drawLine.assert_not_called()
 
@@ -123,14 +123,14 @@ def test_rejected_second_associative_anchor_does_not_preview_a_dimension():
     state = MeasurementState()
     state.start("associative")
     state.accept(query(snap([0, 0, 0])), unit=None, precision=3)
-    state.update_hover(SnapQuery(snap([3, 4, 0], association_error="Face snaps are fixed only")))
+    state.update_hover(SnapQuery(snap([3, 4, 0], association_error="The node key is not serializable")))
     painter = Mock()
 
     _draw_measurement_preview(painter, state, project, unit="m", precision=2)
 
     assert painter.drawRect.call_count == 2
     painter.drawLine.assert_not_called()
-    assert drawn_text(painter) == ["Face snaps are fixed only"]
+    assert drawn_text(painter) == ["The node key is not serializable"]
 
 
 def test_measurement_preview_draws_with_qpainter():

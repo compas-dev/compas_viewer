@@ -31,7 +31,7 @@ __all__ = [
 type MeasurementMode = Literal["inactive", "inspection", "fixed", "associative"]
 type PersistentMeasurementMode = Literal["fixed", "associative"]
 
-SNAP_RADIUS = 12.0
+SNAP_RADIUS = 18.0
 
 
 @dataclass(frozen=True, slots=True)

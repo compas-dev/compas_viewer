@@ -12,7 +12,6 @@ from compas.scene import SceneObject
 from compas_viewer.snapping import ProjectedPoint
 from compas_viewer.snapping import SnapKind
 from compas_viewer.snapping import SnapQuery
-from compas_viewer.snapping import SurfaceHit
 from compas_viewer.snapping import query_snap
 from compas_viewer.snapping import query_snaps
 
@@ -27,7 +26,7 @@ def test_snap_contract_is_immutable():
 
     assert result is not None
     with pytest.raises(FrozenInstanceError):
-        setattr(result, "kind", SnapKind.LINE)
+        setattr(result, "kind", SnapKind.NODE)
     with pytest.raises(AttributeError):
         setattr(SnapKind.POINT, "value", "changed")
     with pytest.raises(FrozenInstanceError):
@@ -45,22 +44,25 @@ def test_hover_palette_contains_all_discrete_points_in_component_order():
     assert [point.point for point in points] == [Point(1, 2, 3), Point(11, 2, 3), Point(1, 12, 3)]
 
 
-def test_hover_palette_supports_points_and_graph_nodes_but_not_lines():
+def test_hover_palette_supports_only_points_mesh_vertices_and_graph_nodes():
     point = SceneObject(Point(1, 2, 3))
     line = SceneObject(Line([0, 0, 0], [10, 0, 0]))
+    sphere = SceneObject(Sphere(1))
     graph = Graph()
     graph.add_node("a", x=0, y=0, z=0)
     graph.add_node("b", x=1, y=0, z=0)
     graph.add_edge("a", "b")
 
     point_snaps = query_snaps([point], (0, 0), radius=0, project=orthographic).points
-    line_snaps = query_snaps([line], (0, 0), radius=0, project=orthographic).points
-    node_snaps = query_snaps([SceneObject(graph)], (0, 0), radius=0, project=orthographic).points
+    line_query = query_snaps([line], (0, 0), radius=10, project=orthographic)
+    sphere_query = query_snaps([sphere], (0, 0), radius=10, project=orthographic)
+    node_query = query_snaps([SceneObject(graph)], (0, 0), radius=0, project=orthographic)
 
     assert [snap.kind for snap in point_snaps] == [SnapKind.POINT]
-    assert line_snaps == ()
-    assert [snap.kind for snap in node_snaps] == [SnapKind.NODE, SnapKind.NODE]
-    assert [snap.component for snap in node_snaps] == ["a", "b"]
+    assert line_query == SnapQuery()
+    assert sphere_query == SnapQuery()
+    assert [snap.kind for snap in node_query.points] == [SnapKind.NODE, SnapKind.NODE]
+    assert [snap.component for snap in node_query.points] == ["a", "b"]
 
 
 def test_radius_is_inclusive_and_has_no_background_fallback():
@@ -74,7 +76,7 @@ def test_radius_is_inclusive_and_has_no_background_fallback():
     assert missing is None
 
 
-def test_priority_precedes_screen_distance():
+def test_unsupported_line_does_not_compete_with_discrete_point():
     line = SceneObject(Line([0, 0, 0], [10, 0, 0]))
     point = SceneObject(Point(2, 1, 0))
 
@@ -106,23 +108,6 @@ def test_world_transformation_is_applied_before_projection():
     assert result.point == Point(11, 22, 33)
 
 
-def test_perspective_segment_uses_normalized_world_parameter():
-    line = SceneObject(Line([0, 0, 1], [10, 0, 10]))
-
-    def perspective(point):
-        return ProjectedPoint(point.x / point.z, point.y / point.z, point.z, point.z)
-
-    result = query_snap([line], (0.5, 0), radius=0, project=perspective)
-
-    assert result is not None
-    assert result.kind is SnapKind.LINE
-    assert result.parameter == pytest.approx(1 / 11)
-    assert result.point == Point(10 / 11, 0, 20 / 11)
-    anchor = result.component_anchor()
-    assert anchor is not None
-    assert anchor.parameter == pytest.approx(1 / 11)
-
-
 def test_visibility_provider_rejects_occluded_candidates():
     occluded = SceneObject(Point(0, 0, 10))
     visible = SceneObject(Point(1, 0, 1))
@@ -139,22 +124,15 @@ def test_visibility_provider_rejects_occluded_candidates():
     assert result.object_guid == visible.guid
 
 
-def test_point_and_line_have_component_anchor_metadata():
+def test_point_acquisition_has_component_anchor_metadata():
     point = SceneObject(Point(0, 0, 0))
-    line = SceneObject(Line([0, 0, 0], [10, 0, 0]))
 
     point_result = query_snap([point], (0, 0), radius=0, project=orthographic)
-    line_result = query_snap([line], (2.5, 0), radius=0, project=orthographic)
 
     assert point_result is not None
     point_anchor = point_result.component_anchor()
     assert point_anchor is not None
     assert point_anchor.component_type == "point"
-    assert line_result is not None
-    line_anchor = line_result.component_anchor()
-    assert line_anchor is not None
-    assert line_anchor.component_type == "line"
-    assert line_result.parameter == pytest.approx(0.25)
 
 
 def test_mesh_vertices_have_stable_metadata_without_edge_acquisition():
@@ -173,7 +151,7 @@ def test_mesh_vertices_have_stable_metadata_without_edge_acquisition():
     assert edge is None
 
 
-def test_graph_node_and_edge_have_stable_component_metadata():
+def test_graph_nodes_have_stable_metadata_without_edge_acquisition():
     graph = Graph()
     graph.add_node("a", x=0, y=0, z=0)
     graph.add_node(("group", 1), x=10, y=0, z=0)
@@ -186,10 +164,7 @@ def test_graph_node_and_edge_have_stable_component_metadata():
     assert node is not None
     assert node.kind is SnapKind.NODE
     assert node.component == "a"
-    assert edge is not None
-    assert edge.kind is SnapKind.EDGE
-    assert edge.component == ("a", ("group", 1))
-    assert edge.component_anchor() is not None
+    assert edge is None
 
 
 def test_nonserializable_graph_keys_are_visibly_not_associative():
@@ -201,8 +176,6 @@ def test_nonserializable_graph_keys_are_visibly_not_associative():
     sceneobject = SceneObject(graph)
 
     node = query_snap([sceneobject], (0, 0), radius=0, project=orthographic)
-    edge = query_snap([sceneobject], (5, 0), radius=0, project=orthographic)
-
     assert node is not None
     assert node.kind is SnapKind.NODE
     assert node.component is None
@@ -210,50 +183,22 @@ def test_nonserializable_graph_keys_are_visibly_not_associative():
     assert node.association_error is not None
     assert "stable serializable key" in node.association_error
     assert node.component_anchor() is None
-    assert edge is not None
-    assert edge.kind is SnapKind.EDGE
-    assert edge.component is None
-    assert not edge.supports_association
-    assert edge.component_anchor() is None
 
 
-def test_surface_hit_is_fixed_only_and_respects_visibility():
-    sceneobject = SceneObject(Sphere(1))
-    visible_hit = SurfaceHit(Point(0, 0, 1), sceneobject.guid, ProjectedPoint(1, 1, 1), SnapKind.FACE)
-    occluded_hit = SurfaceHit(Point(0, 0, 5), sceneobject.guid, ProjectedPoint(0, 0, 5))
+def test_mesh_has_no_face_or_edge_fallback_when_no_vertex_is_in_range():
+    mesh = Mesh.from_vertices_and_faces([[0, 0, 0], [4, 0, 0], [4, 3, 0], [0, 3, 0]], [[0, 1, 2, 3]])
+    sceneobject = SceneObject(mesh)
 
-    result = query_snap(
+    query = query_snaps(
         [sceneobject],
-        (0, 0),
-        radius=2,
+        (2, 1.5),
+        radius=0.5,
         project=orthographic,
-        is_visible=lambda projected: projected.depth < 2,
-        surface_hits=lambda screen_point, radius: [occluded_hit, visible_hit],
     )
 
-    assert result is not None
-    assert result.kind is SnapKind.FACE
-    assert result.point == Point(0, 0, 1)
-    assert not result.supports_association
-    assert result.association_error is not None
-    assert "Face and surface" in result.association_error
-    assert result.component_anchor() is None
+    assert query.winner is None
+    assert [snap.kind for snap in query.points] == [SnapKind.VERTEX] * 4
 
 
-def test_surface_hits_for_hidden_or_unlisted_objects_are_ignored():
-    hidden = SceneObject(Sphere(1), show=False)
-    unlisted = SceneObject(Sphere(1))
-    hits = [
-        SurfaceHit(Point(0, 0, 0), hidden.guid, ProjectedPoint(0, 0, 0)),
-        SurfaceHit(Point(0, 0, 0), unlisted.guid, ProjectedPoint(0, 0, 0)),
-    ]
-
-    result = query_snap(
-        [hidden],
-        (0, 0),
-        radius=1,
-        project=orthographic,
-        surface_hits=lambda screen_point, radius: hits,
-    )
-
-    assert result is None
+def test_hidden_discrete_object_has_no_candidates():
+    assert query_snap([SceneObject(Point(0, 0, 0), show=False)], (0, 0), radius=1, project=orthographic) is None

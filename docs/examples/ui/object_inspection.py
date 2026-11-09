@@ -21,6 +21,7 @@ mesh.edge_attribute((0, 1), "load", 12.5)
 mesh.face_attribute(0, "thickness", 0.25)
 
 viewer = Viewer()
+viewer.sidebar_items.insert(2, {"type": "DatastructureAttributes"})
 viewer.scene.add(
     Sphere(1.0),
     name="Editable sphere",

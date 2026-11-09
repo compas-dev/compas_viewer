@@ -5,9 +5,7 @@ from unittest.mock import Mock
 import numpy as np
 import pytest
 
-from compas.datastructures import Mesh
 from compas.geometry import Point
-from compas.geometry import Sphere
 from compas.scene import SceneObject
 from compas_viewer.renderer import renderer as renderer_module
 from compas_viewer.renderer.renderer import Renderer
@@ -40,7 +38,6 @@ def projection_renderer(width=200, height=100, camera=None) -> Any:
     )
     renderer._view_projection = lambda: Renderer._view_projection(renderer)
     renderer._project_point = Renderer._project_point
-    renderer._unproject_point_with_matrix = lambda x, y, depth, matrix: Renderer._unproject_point_with_matrix(renderer, x, y, depth, matrix)
     return renderer
 
 
@@ -158,12 +155,12 @@ def state_snapshot(state):
     return {key: value.copy() if isinstance(value, dict) else value for key, value in state.items() if key != "clear_colors"}
 
 
-def test_project_point_uses_logical_top_left_pixels_and_clip_w():
+def test_project_point_uses_logical_top_left_pixels():
     renderer = projection_renderer()
 
     projected = Renderer.project_point(renderer, Point(0, 0, 0))
 
-    assert projected == ProjectedPoint(100, 50, 0.5, 1.0)
+    assert projected == ProjectedPoint(100, 50, 0.5)
 
     perspective = np.array(
         [
@@ -177,21 +174,8 @@ def test_project_point_uses_logical_top_left_pixels_and_clip_w():
 
     projected = Renderer.project_point(renderer, Point(1, 0, -2))
 
-    assert projected == ProjectedPoint(150, 50, 0.5, 2.0)
+    assert projected == ProjectedPoint(150, 50, 0.5)
     assert Renderer.project_point(renderer, Point(1, 0, 2)) is None
-
-
-def test_projection_and_unprojection_roundtrip_in_orthographic_view():
-    renderer = projection_renderer(width=100, height=100)
-    point = Point(-0.5, 0.5, 0.2)
-
-    projected = Renderer.project_point(renderer, point)
-    assert projected is not None
-    restored = Renderer._unproject_point(renderer, projected.x, projected.y, projected.depth)
-
-    assert restored == point
-    top_left = Renderer._unproject_point(renderer, 0, 0, 0.5)
-    assert top_left == Point(-1, 1, 0)
 
 
 def test_snap_region_clips_viewport_edges_without_device_pixel_scaling():
@@ -362,7 +346,6 @@ def test_query_snap_context_uses_one_hovered_object_and_balances_gl_context(monk
             np.full((3, 3), 0.5, dtype=np.float32),
         )
     )
-    renderer._surface_hits = Mock(return_value=())
     renderer._hovered_snap_object = lambda point, region, colors: Renderer._hovered_snap_object(renderer, point, region, colors)
     renderer.project_point = Mock()
     renderer._is_snap_visible = Mock()
@@ -452,37 +435,6 @@ def test_depth_visibility_uses_only_the_hovered_object_point_footprint():
     assert not Renderer._is_snap_visible(renderer, projection, region, depths, center_only)
     assert not Renderer._is_snap_visible(renderer, projection, region, depths, background_only)
     assert not Renderer._is_snap_visible(renderer, projection, region, deeper_same_object_depths, same_object)
-
-
-def test_surface_hits_unproject_face_buffer_pixels_by_object_kind():
-    mesh = SceneObject(Mesh.from_vertices_and_faces([[0, 0, 0], [1, 0, 0], [0, 1, 0]], [[0, 1, 2]]))
-    sphere = SceneObject(Sphere(1))
-    mesh_color = (10, 20, 30)
-    sphere_color = (40, 50, 60)
-    face_data = ([0.0, 0.0, 0.0], None, [0])
-    scene = SimpleNamespace(
-        instance_colors={mesh_color: mesh, sphere_color: sphere},
-        render_objects={
-            mesh.guid: SimpleNamespace(_frontfaces_data=face_data, _backfaces_data=None),
-            sphere.guid: SimpleNamespace(_frontfaces_data=face_data, _backfaces_data=None),
-        },
-    )
-    renderer = projection_renderer(width=20, height=20)
-    renderer.viewer = SimpleNamespace(scene=scene)
-    renderer._has_face_buffers = lambda guid: Renderer._has_face_buffers(renderer, guid)
-    colors = np.array([[mesh_color, sphere_color, (0, 0, 0)]], dtype=np.uint8)
-    depths = np.array([[0.2, 0.3, 1.0]], dtype=np.float32)
-
-    hits = Renderer._surface_hits(renderer, (5, 7, 12, 3, 1), colors, depths)
-
-    assert [hit.kind for hit in hits] == [SnapKind.FACE, SnapKind.SURFACE]
-    assert [hit.object_guid for hit in hits] == [mesh.guid, sphere.guid]
-    assert hits[0].point.x == pytest.approx(-0.45)
-    assert hits[0].point.y == pytest.approx(0.25)
-    assert hits[0].point.z == pytest.approx(-0.6)
-    assert hits[1].point.x == pytest.approx(-0.35)
-    assert hits[1].point.y == pytest.approx(0.25)
-    assert hits[1].point.z == pytest.approx(-0.4)
 
 
 def test_query_outside_viewport_does_not_acquire_buffers():

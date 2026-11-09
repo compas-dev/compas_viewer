@@ -363,11 +363,14 @@ Components wrap Qt widgets and share access to the active viewer through `Base`.
 
 The scene-object parameter dialog intentionally edits only writable scalar constructor parameters. Extend `ParameterForm` with explicit editors and conversion rules for structured values such as `Point`, `Vector`, `Frame`, and `Color`; do not parse arbitrary executable input.
 
-`DatastructureAttributes` is a separate Viewer-owned inspector for element
-data. It discovers the established Mesh and Graph element APIs and uses ordered
-`default_*_attributes` dictionaries as its column contract. Each tab uses a
-lazy `QAbstractTableModel`: it snapshots element keys for row lookup but fetches
-cell values through singular attribute accessors when Qt requests them.
+`DatastructureAttributes` is an opt-in Viewer-owned inspector for element data;
+it is not part of the default sidebar. Add `{"type":
+"DatastructureAttributes"}` to `viewer.sidebar_items` before showing a custom
+Viewer that requires it. The inspector discovers the established Mesh and
+Graph element APIs and uses ordered `default_*_attributes` dictionaries as its
+column contract. Each tab uses a lazy `QAbstractTableModel`: it snapshots
+element keys for row lookup but fetches cell values through singular attribute
+accessors when Qt requests them.
 
 Element edits and resets use singular setters and unsetters. Do not replace
 them with bulk attribute methods: an empty bulk key collection can mean all

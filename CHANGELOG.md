@@ -64,11 +64,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   visible while the palette follows the next object. Point guidance now uses
   larger bright hollow squares with a distinct filled winner. Visible receding
   vertices use their same-object rendered point footprint for reliable depth
-  qualification, and Mesh edges no longer compete with vertex acquisition.
+  qualification. Interactive measurement acquisition is limited to displayed
+  Point, Mesh-vertex, and Graph-node guides; invisible line, edge, face, and
+  surface fallbacks are removed. The snap radius is increased for a stronger,
+  still deterministic point lock.
 * Moved transient overlays and measurement feedback to one transparent,
-  input-transparent widget canvas above the OpenGL renderer, and kept completed
-  world annotations visible at equal depth while preserving occlusion by
-  closer geometry.
+  input-transparent widget canvas above the OpenGL renderer. Persistent
+  distance dimensions now render in a separate final pass without depth
+  testing or depth writes, so scene geometry cannot hide them.
+* Removed the datastructure Attributes component from the default sidebar. It
+  remains available to explicitly configured custom sidebars.
 * Replaced the Viewer-owned `Tag` and `ArrowOverlay` data types with the
   canonical annotation types from `compas.scene`. Distance labels display the
   configured precision and informational unit, and unresolved associative

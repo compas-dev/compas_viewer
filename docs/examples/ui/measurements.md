@@ -1,7 +1,7 @@
 # Distance Measurements
 
 Configure the informational unit and display precision, add geometry with
-visible vertices and edges, and start a one-shot fixed-distance interaction.
+visible vertices, and start a one-shot fixed-distance interaction.
 The completed dimension becomes a selected root-level scene object.
 
 ```python
@@ -24,14 +24,16 @@ Use the example in these steps:
 Moving to the background hides the available-point palette. The palette is
 guidance: its individual points are projected without separate occlusion
 tests. The highlighted winner is the only click-eligible result and must pass
-the configured screen-radius and depth checks. The depth check searches the
+the 18-logical-pixel screen radius and depth checks. The depth check searches the
 hovered object's rendered point footprint rather than relying on one pixel, so
 visible receding vertices remain reliable on steeply tilted meshes without
 making occluded vertices eligible.
 
-Mesh edges do not participate in measurement acquisition. Standalone Line
-objects and Graph edges remain selectable, but continuous locations are not
-enumerated as hover markers in this version.
+Only displayed discrete guides participate in measurement acquisition: Point
+objects, Mesh vertices, and Graph nodes. Lines, edges, faces, and surfaces are
+not snappable until they have explicit candidate overlays. Missing a point
+therefore creates no anchor instead of silently accepting nearby unmarked
+geometry.
 
 The same scene also supports the other modes:
 
@@ -48,14 +50,9 @@ serialization, or transform history. Fixed and associative modes create a
 `compas.scene.DistanceDimension`; its unit and precision are snapshots taken
 when the second anchor is accepted.
 
-Snap priority is point, vertex, or node; then standalone Line or Graph edge;
-then face or surface. Fixed mode accepts every available category and copies
-the snapped world points. Associative mode links to points, vertices and nodes
-with stable serializable keys, and normalized positions on Lines and Graph
-edges. Face and surface associations are not supported yet. They remain
-available in fixed mode, while associative mode shows a rejection instead of
-falling back to a fixed point. Supported Point, Mesh-vertex, or Graph-node
-guidance remains visible during that rejection.
+Fixed mode copies the selected point, vertex, or node coordinates. Associative
+mode links to those same displayed components using their stable serializable
+keys. The acquisition targets are identical; only persistence differs.
 
 There is no construction-plane or background fallback. A background click does
 not create an anchor. While a measurement is active, left-click input is
@@ -67,6 +64,5 @@ The unit is a label only: it never rescales coordinates. Precision controls
 display formatting only and is not a geometric tolerance. Transient inspection
 labels use the current values from the **Units and Measurement** tab.
 
-Completed dimensions are depth-tested world annotations. They remain visible
-when they coincide with the measured geometry, but closer geometry can occlude
-them.
+Completed dimensions render in a final persistent-annotation pass without
+depth testing or depth writes, so scene geometry cannot hide them.

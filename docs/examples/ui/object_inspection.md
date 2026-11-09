@@ -6,8 +6,9 @@ options from the stable scene object's declared editable state. Editing these
 controls changes durable scene data; Viewer owns the corresponding render and
 UI refresh.
 
-Select the mesh and open the **Attributes** tab. The Viewer creates separate
-tables for vertices, edges, and faces. Table columns come from the mesh's
+The example explicitly adds the opt-in **Attributes** tab to its custom
+sidebar. Select the mesh and open that tab. The Viewer creates separate tables
+for vertices, edges, and faces. Table columns come from the mesh's
 `default_vertex_attributes`, `default_edge_attributes`, and
 `default_face_attributes`; individual element values may override those
 defaults. The reset action removes explicit values from selected cells so they

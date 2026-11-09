@@ -89,40 +89,62 @@ def test_distance_dimension_formats_unit_precision_override_and_unresolved_state
     assert unresolved.display_label == "Unresolved"
 
 
-def test_renderer_draws_world_annotations_once_in_scene_order_with_equal_depth(monkeypatch):
+def test_renderer_draws_dimensions_after_depth_tested_annotations(monkeypatch):
     calls = []
-    depth_function = {"value": GL.GL_LESS}
-    first = Mock(spec=WorldAnnotationRenderObject)
-    second = Mock(spec=WorldAnnotationRenderObject)
+    depth_state = {"function": GL.GL_LESS, "test": True, "write": True}
+    first = Mock(spec=TextAnnotationRenderObject)
+    second = Mock(spec=ArrowAnnotationRenderObject)
+    first_dimension = Mock(spec=DistanceDimensionRenderObject)
+    second_dimension = Mock(spec=DistanceDimensionRenderObject)
 
-    def draw(name):
-        assert depth_function["value"] == GL.GL_LEQUAL
+    def draw_annotation(name):
+        assert depth_state == {"function": GL.GL_LEQUAL, "test": True, "write": True}
         calls.append(name)
 
-    first.draw_world_annotation.side_effect = lambda renderer, view: draw("first")
-    second.draw_world_annotation.side_effect = lambda renderer, view: draw("second")
-    renderer = SimpleNamespace(viewer=SimpleNamespace(scene=SimpleNamespace(render_objects={1: first, 2: object(), 3: second})))
-    monkeypatch.setattr(GL, "glGetIntegerv", lambda name: depth_function["value"])
-    monkeypatch.setattr(GL, "glDepthFunc", lambda value: depth_function.__setitem__("value", value))
+    def draw_dimension(name):
+        assert depth_state == {"function": GL.GL_LEQUAL, "test": False, "write": False}
+        calls.append(name)
+
+    first.draw_world_annotation.side_effect = lambda renderer, view: draw_annotation("first")
+    second.draw_world_annotation.side_effect = lambda renderer, view: draw_annotation("second")
+    first_dimension.draw_world_annotation.side_effect = lambda renderer, view: draw_dimension("first dimension")
+    second_dimension.draw_world_annotation.side_effect = lambda renderer, view: draw_dimension("second dimension")
+    renderer = SimpleNamespace(
+        viewer=SimpleNamespace(scene=SimpleNamespace(render_objects={1: first_dimension, 2: first, 3: object(), 4: second, 5: second_dimension})),
+        _set_gl_capability=lambda capability, enabled: depth_state.__setitem__("test", enabled),
+    )
+    monkeypatch.setattr(GL, "glGetIntegerv", lambda name: depth_state["function"])
+    monkeypatch.setattr(GL, "glIsEnabled", lambda capability: depth_state["test"])
+    monkeypatch.setattr(GL, "glGetBooleanv", lambda name: depth_state["write"])
+    monkeypatch.setattr(GL, "glDepthFunc", lambda value: depth_state.__setitem__("function", value))
+    monkeypatch.setattr(GL, "glDepthMask", lambda value: depth_state.__setitem__("write", bool(value)))
+    monkeypatch.setattr(GL, "glDisable", lambda capability: depth_state.__setitem__("test", False))
 
     Renderer._draw_world_annotations(renderer, object())
 
-    assert calls == ["first", "second"]
-    assert depth_function["value"] == GL.GL_LESS
+    assert calls == ["first", "second", "first dimension", "second dimension"]
+    assert depth_state == {"function": GL.GL_LESS, "test": True, "write": True}
 
 
-def test_renderer_restores_depth_function_when_world_annotation_fails(monkeypatch):
-    depth_function = {"value": GL.GL_GREATER}
-    annotation = Mock(spec=WorldAnnotationRenderObject)
-    annotation.draw_world_annotation.side_effect = RuntimeError("annotation failed")
-    renderer = SimpleNamespace(viewer=SimpleNamespace(scene=SimpleNamespace(render_objects={1: annotation})))
-    monkeypatch.setattr(GL, "glGetIntegerv", lambda name: depth_function["value"])
-    monkeypatch.setattr(GL, "glDepthFunc", lambda value: depth_function.__setitem__("value", value))
+def test_renderer_restores_depth_state_when_dimension_fails(monkeypatch):
+    depth_state = {"function": GL.GL_GREATER, "test": False, "write": False}
+    dimension = Mock(spec=DistanceDimensionRenderObject)
+    dimension.draw_world_annotation.side_effect = RuntimeError("dimension failed")
+    renderer = SimpleNamespace(
+        viewer=SimpleNamespace(scene=SimpleNamespace(render_objects={1: dimension})),
+        _set_gl_capability=lambda capability, enabled: depth_state.__setitem__("test", enabled),
+    )
+    monkeypatch.setattr(GL, "glGetIntegerv", lambda name: depth_state["function"])
+    monkeypatch.setattr(GL, "glIsEnabled", lambda capability: depth_state["test"])
+    monkeypatch.setattr(GL, "glGetBooleanv", lambda name: depth_state["write"])
+    monkeypatch.setattr(GL, "glDepthFunc", lambda value: depth_state.__setitem__("function", value))
+    monkeypatch.setattr(GL, "glDepthMask", lambda value: depth_state.__setitem__("write", bool(value)))
+    monkeypatch.setattr(GL, "glDisable", lambda capability: depth_state.__setitem__("test", False))
 
-    with pytest.raises(RuntimeError, match="annotation failed"):
+    with pytest.raises(RuntimeError, match="dimension failed"):
         Renderer._draw_world_annotations(renderer, object())
 
-    assert depth_function["value"] == GL.GL_GREATER
+    assert depth_state == {"function": GL.GL_GREATER, "test": False, "write": False}
 
 
 def test_annotations_are_excluded_from_instance_selection_state():

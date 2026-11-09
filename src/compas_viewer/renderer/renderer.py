@@ -6,7 +6,6 @@ from math import floor
 from typing import TYPE_CHECKING
 from typing import Literal
 from typing import cast
-from uuid import UUID
 
 import numpy as np
 from numpy import float32
@@ -28,20 +27,18 @@ from PySide6.QtOpenGLWidgets import QOpenGLWidget
 from PySide6.QtWidgets import QGesture
 from PySide6.QtWidgets import QGestureEvent
 
-from compas.datastructures import Mesh
 from compas.geometry import Frame
 from compas.geometry import Point
 from compas.geometry import transform_points_numpy
 from compas_viewer.base import Base
 from compas_viewer.gl import OffscreenBufferContext
+from compas_viewer.scene.annotationobject import DistanceDimensionRenderObject
 from compas_viewer.scene.annotationobject import WorldAnnotationRenderObject
 from compas_viewer.scene.buffermanager import BufferManager
 from compas_viewer.scene.gridobject import GridObject
 from compas_viewer.snapping import ProjectedPoint
-from compas_viewer.snapping import SnapKind
 from compas_viewer.snapping import SnapQuery
 from compas_viewer.snapping import SnapResult
-from compas_viewer.snapping import SurfaceHit
 from compas_viewer.snapping import query_snaps
 
 from .camera import Camera
@@ -812,15 +809,25 @@ class Renderer(QOpenGLWidget, Base):
         GL.glBindVertexArray(0)
 
     def _draw_world_annotations(self, viewworld: NDArray[np.floating]) -> None:
-        """Draw world annotations once, in scene insertion order."""
+        """Draw depth-tested annotations, then always-visible dimensions."""
         depth_function = int(GL.glGetIntegerv(GL.GL_DEPTH_FUNC))
-        GL.glDepthFunc(GL.GL_LEQUAL)
+        depth_test_enabled = bool(GL.glIsEnabled(GL.GL_DEPTH_TEST))
+        depth_write_mask = bool(GL.glGetBooleanv(GL.GL_DEPTH_WRITEMASK))
         try:
+            GL.glDepthFunc(GL.GL_LEQUAL)
             for render_object in self.viewer.scene.render_objects.values():
-                if isinstance(render_object, WorldAnnotationRenderObject):
+                if isinstance(render_object, WorldAnnotationRenderObject) and not isinstance(render_object, DistanceDimensionRenderObject):
+                    render_object.draw_world_annotation(self, viewworld)
+
+            GL.glDisable(GL.GL_DEPTH_TEST)
+            GL.glDepthMask(GL.GL_FALSE)
+            for render_object in self.viewer.scene.render_objects.values():
+                if isinstance(render_object, DistanceDimensionRenderObject):
                     render_object.draw_world_annotation(self, viewworld)
         finally:
             GL.glDepthFunc(depth_function)
+            GL.glDepthMask(depth_write_mask)
+            self._set_gl_capability(GL.GL_DEPTH_TEST, depth_test_enabled)
 
     def project_point(self, point: Point) -> ProjectedPoint | None:
         """Project a world point to logical Viewer pixels.
@@ -869,7 +876,6 @@ class Renderer(QOpenGLWidget, Base):
             x=float((ndc[0] + 1.0) * 0.5 * width),
             y=float((1.0 - ndc[1]) * 0.5 * height),
             depth=float((ndc[2] + 1.0) * 0.5),
-            clip_w=clip_w,
         )
 
     def query_snap_at(self, screen_point: tuple[float, float], radius: float) -> SnapResult | None:
@@ -885,15 +891,15 @@ class Renderer(QOpenGLWidget, Base):
         Returns
         -------
         SnapResult | None
-            Highest-priority visible snap, or `None` when the acquisition
+            Nearest visible discrete snap, or `None` when the acquisition
             region contains no eligible scene component.
 
         Notes
         -----
-        One clipped instance-color and depth pass supplies object prefiltering,
-        occlusion testing, and fixed-only face or surface hits. The depth
-        epsilon reflects the instance framebuffer precision and is independent
-        of COMPAS model tolerance and Viewer display settings.
+        One clipped instance-color and depth pass supplies object prefiltering
+        and occlusion testing. The depth epsilon reflects the instance
+        framebuffer precision and is independent of COMPAS model tolerance and
+        Viewer display settings.
 
         """
         return self.query_snap_context_at(screen_point, radius).winner
@@ -933,7 +939,6 @@ class Renderer(QOpenGLWidget, Base):
         object_color = next(color for color, obj in self.viewer.scene.instance_colors.items() if obj is sceneobject)
         object_pixels = np.all(colors == np.asarray(object_color, dtype=np.uint8), axis=2)
 
-        surface_hits = tuple(self._surface_hits(region, colors, depths))
         width = self.width()
         height = self.height()
         view_projection = self._view_projection()
@@ -947,7 +952,6 @@ class Renderer(QOpenGLWidget, Base):
             radius=radius,
             project=project,
             is_visible=lambda projection: self._is_snap_visible(projection, region, depths, object_pixels),
-            surface_hits=lambda _screen_point, _radius: surface_hits,
         )
 
     def _hovered_snap_object(
@@ -1122,82 +1126,6 @@ class Renderer(QOpenGLWidget, Base):
             return False
         sampled_depths = depths[row_slice, column_slice][pixels]
         return bool(np.any(np.abs(sampled_depths - projection.depth) <= self.SNAP_DEPTH_EPSILON))
-
-    def _surface_hits(
-        self,
-        region: tuple[int, int, int, int, int],
-        colors: NDArray[np.uint8],
-        depths: NDArray[np.float32],
-    ) -> Sequence[SurfaceHit]:
-        """Return unprojected fixed-only hits for face-buffered objects."""
-        x, y, _gl_y, _width, _height = region
-        hits = []
-        inverse_view_projection = np.linalg.inv(self._view_projection())
-        for row, column in np.ndindex(depths.shape):
-            depth = float(depths[row, column])
-            if depth >= 1.0:
-                continue
-            color = colors[row, column]
-            sceneobject = self.viewer.scene.instance_colors.get((int(color[0]), int(color[1]), int(color[2])))
-            if sceneobject is None or not self._has_face_buffers(sceneobject.guid):
-                continue
-            screen_x = x + column + 0.5
-            screen_y = y + row + 0.5
-            point = self._unproject_point_with_matrix(screen_x, screen_y, depth, inverse_view_projection)
-            if point is None:
-                continue
-            kind = SnapKind.FACE if isinstance(sceneobject.item, Mesh) else SnapKind.SURFACE
-            hits.append(
-                SurfaceHit(
-                    point=point,
-                    object_guid=sceneobject.guid,
-                    projection=ProjectedPoint(screen_x, screen_y, depth),
-                    kind=kind,
-                )
-            )
-        return hits
-
-    def _has_face_buffers(self, object_guid: UUID) -> bool:
-        """Return whether a render helper contributes face geometry."""
-        render_object = self.viewer.scene.render_objects.get(object_guid)
-        if render_object is None:
-            return False
-        for name in ("_frontfaces_data", "_backfaces_data"):
-            data = getattr(render_object, name, None)
-            if data is not None and len(data[0]) > 0:
-                return True
-        return False
-
-    def _unproject_point(self, screen_x: float, screen_y: float, depth: float) -> Point | None:
-        """Unproject a logical screen position and normalized depth."""
-        return self._unproject_point_with_matrix(screen_x, screen_y, depth, np.linalg.inv(self._view_projection()))
-
-    def _unproject_point_with_matrix(
-        self,
-        screen_x: float,
-        screen_y: float,
-        depth: float,
-        inverse_view_projection: NDArray[np.float64],
-    ) -> Point | None:
-        """Unproject a screen position with a prepared inverse matrix."""
-        width = self.width()
-        height = self.height()
-        if width <= 0 or height <= 0:
-            return None
-        ndc = np.array(
-            [
-                2.0 * screen_x / width - 1.0,
-                1.0 - 2.0 * screen_y / height,
-                2.0 * depth - 1.0,
-                1.0,
-            ],
-            dtype=np.float64,
-        )
-        world = inverse_view_projection @ ndc
-        if world[3] == 0.0:
-            return None
-        world /= world[3]
-        return Point(float(world[0]), float(world[1]), float(world[2]))
 
     def _view_projection(self) -> NDArray[np.float64]:
         """Return the current logical-pixel view-projection matrix."""

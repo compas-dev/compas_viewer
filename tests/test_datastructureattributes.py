@@ -440,7 +440,7 @@ def test_unresolved_selected_item_shows_message_without_loading_or_rendering(mon
     assert component.message.text() == "The selected data is not bound"
 
 
-def test_default_sidebar_includes_datastructure_attributes_after_object_settings():
+def test_default_sidebar_does_not_include_datastructure_attributes():
     types = [item["type"] for item in default_sidebar_items()]
 
-    assert types.index("DatastructureAttributes") == types.index("ObjectSetting") + 1
+    assert "DatastructureAttributes" not in types

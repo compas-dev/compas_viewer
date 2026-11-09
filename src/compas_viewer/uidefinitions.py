@@ -192,7 +192,6 @@ def default_sidebar_items() -> list[UIItem]:
             ],
         },
         {"type": "ObjectSetting"},
-        {"type": "DatastructureAttributes"},
         {"type": "CameraSetting"},
         {"type": "DisplaySetting"},
         {"type": "MeasurementSetting"},

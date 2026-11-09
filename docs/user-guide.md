@@ -35,8 +35,8 @@ The main window consists of:
 - A 3D viewport for navigation and selection.
 - A scene tree showing object hierarchy, groups, names, types, and visibility.
 - An Object tab for information and display settings of the current selection.
-- An Attributes tab for declared mesh and graph element attributes.
 - Camera and Display tabs for view, grid, color, and rendering settings.
+- A Units and Measurement tab for informational units and display precision.
 - Menus for creating geometry, selecting objects, changing the view, and loading or saving scenes.
 
 The sidebar is visible by default. Use **View → Sidebar** to hide or restore it.
@@ -254,9 +254,14 @@ vertices without admitting background pixels or other objects.
 After the first anchor is selected, its marker remains visible while the
 available-point palette follows the next hovered object. Moving to the
 background hides the palette. The live segment and formatted distance appear
-when a second valid winner is available. Mesh edges do not participate in
-measurement acquisition. Standalone Line objects and Graph edges remain
-selectable, but displaying continuous locations as hover guidance is deferred.
+when a second valid winner is available. The 18-logical-pixel acquisition
+radius provides a pronounced but deterministic lock to the nearest eligible
+point.
+
+Only the displayed discrete guides are snappable: Point objects, Mesh
+vertices, and Graph nodes. Lines, edges, faces, and surfaces are disabled until
+they have explicit candidate overlays. A miss creates no anchor rather than
+silently accepting unmarked geometry.
 
 While a measurement is active, left-clicks belong to the measurement rather
 than ordinary selection. Clicking the background does not create an anchor or
@@ -265,14 +270,10 @@ panning, and wheel zoom remain available. Press `Escape` or choose **Measure →
 Cancel Measurement** to cancel the active interaction or a retained transient
 inspection.
 
-Snapping prefers points, mesh vertices, and graph nodes; then standalone Lines
-and Graph edges; then faces and surfaces. Fixed measurements accept every
-available snap type. Associative measurements support points, vertices and
-nodes with stable serializable keys, and normalized positions on Lines and
-Graph edges. Faces and surfaces are fixed-only in the initial implementation,
-so the Viewer shows a rejection message instead of silently creating a fixed
-anchor. The supported point guidance remains visible during that rejection, so
-the pointer can move directly to a supported anchor.
+Fixed measurements copy the selected point, vertex, or node coordinates.
+Associative measurements link to the same displayed components using stable
+serializable keys. The acquisition targets are identical; only persistence
+differs.
 
 The equivalent Python entry points are:
 
@@ -288,9 +289,8 @@ inspection remains Viewer-owned: it is not a scene object, is not selected or
 serialized, and does not enter transform history. A completed fixed or
 associative interaction creates and selects one root-level
 `compas.scene.DistanceDimension`, then deactivates the tool.
-Completed dimensions remain visible when their world geometry coincides with
-the measured geometry, while geometry closer to the camera still occludes
-them.
+Completed dimensions render in a separate final annotation pass without depth
+testing or depth writes, so scene geometry cannot hide them.
 
 See the [distance-measurement example](examples/ui/measurements.md) for a
 step-by-step scene setup.
