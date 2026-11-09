@@ -1,9 +1,19 @@
 from types import SimpleNamespace
+from unittest.mock import Mock
 
 import pytest
 
+from compas.geometry import Sphere
+from compas.scene import TextAnnotation
 from compas_viewer import Viewer
 from compas_viewer.animation import ANIMATION_PRESETS
+from compas_viewer.config import Config
+from compas_viewer.config import WindowConfig
+from compas_viewer.components.mainwindow import MainWindow
+from compas_viewer.components.annotationpanel import AnnotationPanel
+from compas_viewer.scene import ViewerScene
+from compas_viewer.state import ViewerState
+from compas_viewer.ui import UI
 from compas_viewer import viewer as viewer_module
 
 
@@ -73,6 +83,7 @@ class FakeWindow:
     def __init__(self):
         self.attributes = []
         self.visible = False
+        self.fullscreen = False
         self.size = None
 
     def setAttribute(self, attribute, enabled):
@@ -84,8 +95,315 @@ class FakeWindow:
     def show(self):
         self.visible = True
 
+    def showFullScreen(self):
+        self.fullscreen = True
+        self.visible = True
+
     def hide(self):
         self.visible = False
+
+
+def test_viewer_assigns_configuration_before_creating_application(monkeypatch):
+    configured = Config(window=WindowConfig(title="Configured Viewer"))
+    instance = object.__new__(Viewer)
+
+    class ApplicationCreated(Exception):
+        pass
+
+    def create_app(viewer):
+        assert viewer.config is configured
+        raise ApplicationCreated
+
+    monkeypatch.setattr(Viewer, "create_app", create_app)
+
+    with pytest.raises(ApplicationCreated):
+        Viewer.__init__(instance, configured)
+
+
+@pytest.mark.parametrize("icon", ["relative.png", "icons/viewer.png"])
+def test_viewer_rejects_relative_window_icon_before_creating_application(monkeypatch, icon):
+    configured = Config(window=WindowConfig(icon=icon))
+    instance = object.__new__(Viewer)
+    created = False
+
+    def create_app(_viewer):
+        nonlocal created
+        created = True
+        raise AssertionError("application should not be created")
+
+    monkeypatch.setattr(Viewer, "create_app", create_app)
+
+    with pytest.raises(ValueError, match="window.icon.*absolute"):
+        Viewer.__init__(instance, configured)
+
+    assert not created
+
+
+def test_viewer_rejects_missing_absolute_window_icon_before_creating_application(monkeypatch, tmp_path):
+    configured = Config(window=WindowConfig(icon=str(tmp_path / "missing.png")))
+    instance = object.__new__(Viewer)
+    created = False
+
+    def create_app(_viewer):
+        nonlocal created
+        created = True
+        raise AssertionError("application should not be created")
+
+    monkeypatch.setattr(Viewer, "create_app", create_app)
+
+    with pytest.raises(ValueError, match="window.icon.*existing file"):
+        Viewer.__init__(instance, configured)
+
+    assert not created
+
+
+def test_create_app_applies_configured_identity_and_packaged_icon(monkeypatch):
+    monkeypatch.setenv("QT_QPA_PLATFORM", "offscreen")
+    from PySide6.QtWidgets import QApplication
+
+    app = QApplication.instance() or QApplication([])
+    previous_name = app.applicationName()
+    previous_display_name = app.applicationDisplayName()
+    previous_icon = app.windowIcon()
+    instance = object.__new__(Viewer)
+    instance._config = Config(window=WindowConfig(title="Configured Viewer"))
+
+    try:
+        app = Viewer.create_app(instance)
+
+        assert app.applicationName() == "Configured Viewer"
+        assert app.applicationDisplayName() == "Configured Viewer"
+        assert not app.windowIcon().isNull()
+    finally:
+        app.setApplicationName(previous_name)
+        app.setApplicationDisplayName(previous_display_name)
+        app.setWindowIcon(previous_icon)
+
+
+def test_create_app_rejects_existing_non_gui_qt_application(monkeypatch):
+    class FakeApplication:
+        @staticmethod
+        def instance():
+            return object()
+
+    instance = object.__new__(Viewer)
+    instance._config = Config()
+    monkeypatch.setattr(viewer_module, "QApplication", FakeApplication)
+
+    with pytest.raises(RuntimeError, match="non-GUI Qt core application"):
+        Viewer.create_app(instance)
+
+
+def test_window_icon_path_accepts_existing_absolute_file():
+    path = viewer_module.HERE / "assets" / "icons" / "compas_icon_white.png"
+    instance = object.__new__(Viewer)
+    instance._config = Config(window=WindowConfig(icon=str(path)))
+
+    assert instance._window_icon_path() == path
+
+
+def test_main_window_uses_configured_title(monkeypatch):
+    monkeypatch.setenv("QT_QPA_PLATFORM", "offscreen")
+    from PySide6.QtWidgets import QApplication
+
+    app = QApplication.instance() or QApplication([])
+    configured = SimpleNamespace(config=Config(window=WindowConfig(title="Configured Window")), app=app)
+    monkeypatch.setattr(MainWindow, "viewer", property(lambda _self: configured), raising=False)
+
+    window = MainWindow()
+    try:
+        assert window.title == "Configured Window"
+    finally:
+        window.widget.close()
+
+
+def test_viewer_rejects_empty_window_title_before_creating_application(monkeypatch):
+    configured = Config(window=WindowConfig(title=""))
+    instance = object.__new__(Viewer)
+    created = False
+
+    def create_app(_viewer):
+        nonlocal created
+        created = True
+        raise AssertionError("application should not be created")
+
+    monkeypatch.setattr(Viewer, "create_app", create_app)
+
+    with pytest.raises(ValueError, match="window.title.*non-empty"):
+        Viewer.__init__(instance, configured)
+
+    assert not created
+
+
+def test_viewer_validates_complete_configuration_before_creating_application(monkeypatch):
+    configured = Config(vectorsize=0.0)
+    instance = object.__new__(Viewer)
+    created = False
+
+    def create_app(_viewer):
+        nonlocal created
+        created = True
+        raise AssertionError("application should not be created")
+
+    monkeypatch.setattr(Viewer, "create_app", create_app)
+
+    with pytest.raises(ValueError, match="vectorsize"):
+        Viewer.__init__(instance, configured)
+
+    assert not created
+
+
+def test_viewer_configuration_cannot_be_replaced():
+    instance = object.__new__(Viewer)
+    instance._config = Config()
+
+    with pytest.raises(AttributeError):
+        instance.config = Config()
+
+
+def test_replacing_scene_clears_transient_selection_before_sidebar_refresh(monkeypatch):
+    from PySide6.QtWidgets import QApplication
+
+    app = QApplication.instance() or QApplication([])
+    viewer = object.__new__(Viewer)
+    viewer.running = False
+    viewer._config = Config()
+    viewer._scene = ViewerScene()
+    viewer._scene.attach(viewer)
+    viewer.state = ViewerState(
+        viewer.config,
+        lambda guid: viewer.scene.object(guid),
+        lambda guid: viewer.scene.annotation(guid),
+    )
+    viewer.ui = SimpleNamespace(sidebar=Mock(), viewport=SimpleNamespace(renderer=Mock()))
+    viewer.state.changed.connect(viewer._on_state_changed)
+    monkeypatch.setattr(AnnotationPanel, "viewer", property(lambda _self: viewer), raising=False)
+    panel = AnnotationPanel()
+    viewer.ui.sidebar = panel
+    sceneobject = viewer.scene.add(Sphere(1.0))
+    annotation = viewer.scene.add_annotation(TextAnnotation("A", [0, 0, 0]))
+    viewer.state.selection.add(sceneobject)
+    viewer.state.annotation_selection.add(annotation)
+    changes = []
+    viewer.state.changed.connect(lambda path, value: changes.append((path, value)))
+
+    viewer.scene = ViewerScene()
+
+    assert not viewer.state.selection
+    assert not viewer.state.annotation_selection
+    assert changes == [("annotation_selection", ()), ("selection", ())]
+    assert panel.tree.topLevelItemCount() == 0
+    assert app is not None
+
+
+def test_selection_changes_refresh_only_the_owning_sidebar_domain():
+    viewer = object.__new__(Viewer)
+    sidebar = Mock()
+    renderer = Mock()
+    viewer.ui = SimpleNamespace(sidebar=sidebar, viewport=SimpleNamespace(renderer=renderer))
+
+    viewer._on_state_changed("selection", ())
+
+    sidebar.update_spatial_selection.assert_called_once_with()
+    sidebar.update_annotation_selection.assert_not_called()
+    renderer.update.assert_called_once_with()
+
+    sidebar.reset_mock()
+    renderer.reset_mock()
+    viewer._on_state_changed("annotation_selection", ())
+
+    sidebar.update_annotation_selection.assert_called_once_with()
+    sidebar.update_spatial_selection.assert_not_called()
+    renderer.update.assert_called_once_with()
+
+
+def test_replacing_running_scene_balances_context_for_cleanup_and_initialization():
+    viewer = object.__new__(Viewer)
+    viewer.running = False
+    viewer._config = Config()
+    viewer._undo_transforms = []
+    viewer._redo_transforms = []
+    old_scene = ViewerScene()
+    old_scene.attach(viewer)
+    viewer._scene = old_scene
+    viewer.state = ViewerState(
+        viewer.config,
+        lambda guid: viewer.scene.object(guid),
+        lambda guid: viewer.scene.annotation(guid),
+    )
+    renderer = Mock()
+    viewer.ui = SimpleNamespace(sidebar=Mock(), viewport=SimpleNamespace(renderer=renderer))
+    annotation = old_scene.add_annotation(TextAnnotation("A", [0, 0, 0]))
+    old_scene.annotation_render_object(annotation)
+
+    class AnnotationResource:
+        def clear(self):
+            assert renderer.makeCurrent.call_count == 1
+            assert renderer.doneCurrent.call_count == 0
+
+    old_scene.annotation_render_objects[annotation.guid] = AnnotationResource()
+    replacement = ViewerScene()
+    replacement.prepare = Mock()
+    replacement_annotation = Mock()
+
+    def init_replacement():
+        assert renderer.makeCurrent.call_count == 2
+        assert renderer.doneCurrent.call_count == 1
+
+    replacement_annotation.init.side_effect = init_replacement
+    replacement.annotation_render_objects[annotation.guid] = replacement_annotation
+    viewer.running = True
+
+    viewer.scene = replacement
+
+    assert renderer.makeCurrent.call_count == 2
+    assert renderer.doneCurrent.call_count == 2
+    replacement_annotation.init.assert_called_once_with()
+
+
+def test_ui_applies_configured_statusbar_visibility_at_initialization(monkeypatch):
+    class FakeComponent:
+        def __init__(self, *args):
+            self.show = None
+
+    viewport = FakeComponent()
+    viewport.sidebar = FakeComponent()
+    configured = SimpleNamespace(
+        config=Config(),
+        state=SimpleNamespace(changed=SimpleNamespace(connect=lambda callback: None)),
+    )
+    configured.config.ui.statusbar.show = False
+
+    monkeypatch.setattr(UI, "viewer", property(lambda _self: configured), raising=False)
+    monkeypatch.setattr("compas_viewer.ui.MainWindow", FakeComponent)
+    monkeypatch.setattr("compas_viewer.ui.MenuBar", FakeComponent)
+    monkeypatch.setattr("compas_viewer.ui.ToolBar", FakeComponent)
+    monkeypatch.setattr("compas_viewer.ui.StatusBar", FakeComponent)
+    monkeypatch.setattr("compas_viewer.ui.SideDock", FakeComponent)
+    monkeypatch.setattr("compas_viewer.ui.ViewPort", lambda *args: viewport)
+
+    ui = UI()
+
+    assert ui.statusbar.show is False
+
+
+@pytest.mark.parametrize("fullscreen", [False, True])
+def test_ui_init_applies_configured_startup_window_mode(fullscreen):
+    window = FakeWindow()
+    size = []
+    sidebar_updates = []
+    ui = SimpleNamespace(
+        viewer=SimpleNamespace(config=SimpleNamespace(window=SimpleNamespace(width=900, height=600, fullscreen=fullscreen))),
+        window=SimpleNamespace(widget=window, resize=lambda width, height: size.append((width, height))),
+        sidebar=SimpleNamespace(update=lambda: sidebar_updates.append(True)),
+    )
+
+    UI.init(ui)
+
+    assert size == [(900, 600)]
+    assert window.visible
+    assert window.fullscreen is fullscreen
+    assert sidebar_updates == [True]
 
 
 def test_save_image_renders_without_starting_event_loop(tmp_path):

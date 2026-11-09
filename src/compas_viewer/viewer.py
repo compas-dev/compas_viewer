@@ -1,10 +1,13 @@
 import sys
 from collections.abc import Callable
+from collections.abc import Iterable
 from io import BytesIO
 from pathlib import Path
+from typing import TYPE_CHECKING
 from typing import Any
 from typing import Literal
 from typing import cast
+from uuid import UUID
 
 from PySide6.QtCore import QBuffer
 from PySide6.QtCore import QByteArray
@@ -17,8 +20,17 @@ from PySide6.QtGui import QPalette
 from PySide6.QtWidgets import QApplication
 
 from compas.colors import Color
+from compas.geometry import Transformation
+from compas.scene import DistanceDimension
 from compas.scene import Scene
+from compas.scene import SceneAnnotation
+from compas.scene import SceneObject
 from compas_viewer import HERE
+from compas_viewer._history import TransformTransaction
+from compas_viewer._history import copy_transformation
+from compas_viewer._scalar_measurement import ScalarMeasurementError
+from compas_viewer._scalar_measurement import ScalarMeasurementKind
+from compas_viewer._scalar_measurement import measure_sceneobject_scalar
 from compas_viewer.animation import ANIMATION_PRESETS
 from compas_viewer.animation import AnimationPreset
 from compas_viewer.commandregistry import CommandRegistry
@@ -26,19 +38,28 @@ from compas_viewer.commands import Command
 from compas_viewer.commands import builtin_commands
 from compas_viewer.config import Appearance
 from compas_viewer.config import Config
-from compas_viewer.config import Unit
 from compas_viewer.events import EventManager
+from compas_viewer.measurement import SNAP_RADIUS
+from compas_viewer.measurement import DistanceInspection
+from compas_viewer.measurement import PersistentMeasurementMode
+from compas_viewer.measurement import _draw_measurement_preview
 from compas_viewer.mouse import Mouse
+from compas_viewer.overlays import Overlay
+from compas_viewer.overlays import _OverlayContext
+from compas_viewer.overlays import _OverlayLayer
 from compas_viewer.plugins import ensure_scene_objects_registered
 from compas_viewer.renderer import Renderer
 from compas_viewer.scene import ViewerScene
-from compas_viewer.scene import ViewerSceneObject
 from compas_viewer.singleton import Singleton
 from compas_viewer.state import ViewerState
 from compas_viewer.ui import UI
 from compas_viewer.uidefinitions import UIItem
 from compas_viewer.uidefinitions import default_menu_items
 from compas_viewer.uidefinitions import default_sidebar_items
+from compas_viewer.uidefinitions import default_toolbar_items
+
+if TYPE_CHECKING:
+    from PySide6.QtGui import QPainter
 
 
 class Viewer(Singleton):
@@ -55,16 +76,24 @@ class Viewer(Singleton):
 
     def __init__(self, config: Config | None = None, **kwargs: Any) -> None:
         ensure_scene_objects_registered()
+        self._config = config if config is not None else Config()
+        self._config.validate()
         self.app = self.create_app()
         self.running = False
         self._scene: ViewerScene | None = None
+        self._overlay_layer = _OverlayLayer()
+        self._undo_transforms: list[TransformTransaction] = []
+        self._redo_transforms: list[TransformTransaction] = []
 
-        self.config = config or Config()
-        self.state = ViewerState(self.config)
+        self.state = ViewerState(
+            self.config,
+            lambda guid: self.scene.object(guid),
+            lambda guid: self.scene.annotation(guid),
+        )
         self.state.changed.connect(self._on_state_changed)
         self.commands = CommandRegistry(builtin_commands())
         self.menu_items: list[UIItem] = default_menu_items()
-        self.toolbar_items: list[UIItem] = []
+        self.toolbar_items: list[UIItem] = default_toolbar_items()
         self.sidebar_items: list[UIItem] = default_sidebar_items()
         self.app.styleHints().colorSchemeChanged.connect(self._on_system_color_scheme_changed)
         self.set_appearance(self.config.ui.appearance)
@@ -73,6 +102,15 @@ class Viewer(Singleton):
 
         self.eventmanager = EventManager()
         self.ui = UI()
+
+    @property
+    def config(self) -> Config:
+        """Config: Startup configuration owned by this viewer.
+
+        The nested configuration values may be adjusted during setup. Replacing
+        the complete configuration of an existing viewer is unsupported.
+        """
+        return self._config
 
     @property
     def renderer(self) -> Renderer:
@@ -84,30 +122,263 @@ class Viewer(Singleton):
         """The active viewer scene, created lazily on first access."""
         if self._scene is None:
             self._scene = ViewerScene()
+            self._scene.attach(self)
         return self._scene
 
     @scene.setter
     def scene(self, scene: Scene) -> None:
         """Replace the active scene from serialized COMPAS scene data."""
-        self._scene = ViewerScene.__from_data__(scene.__data__)
+        self.cancel_measurement()
+        if self._scene is not None:
+            self._scene.clear(clear_scene=False, clear_context=True, context="Viewer", runtime=self._scene)
+        if isinstance(scene, ViewerScene):
+            self._scene = scene
+        else:
+            self._scene = ViewerScene.__from_data__(scene.__data__)
+            self._scene.bind_many(scene.item_store.values())
+        self._scene.attach(self)
+        self._clear_transform_history()
+        self.state.annotation_selection.clear()
+        self.state.selection.clear()
         if self.running:
-            for obj in self._scene.objects:
-                cast(ViewerSceneObject, obj).init()
+            self.renderer.makeCurrent()
+            try:
+                self._scene.prepare()
+                for obj in self._scene.render_objects.values():
+                    obj.init()
+                for annotation in self._scene.annotation_render_objects.values():
+                    annotation.init()
+            finally:
+                self.renderer.doneCurrent()
+
+    @property
+    def overlays(self) -> tuple[Overlay, ...]:
+        """Transient screen overlays in their drawing order."""
+        return tuple(self._overlay_layer)
+
+    def add_overlay(self, overlay: Overlay) -> None:
+        """Add a transient screen overlay.
+
+        Overlays belong to the Viewer rather than the scene. They are not
+        serialized, picked, or included in scene selection.
+
+        Parameters
+        ----------
+        overlay
+            Scale bar, categorical legend, or screen text to append to the
+            drawing order.
+
+        Raises
+        ------
+        TypeError
+            If `overlay` is not an approved concrete overlay type.
+        ValueError
+            If the same overlay instance is already present.
+
+        """
+        self._overlay_layer.add(overlay)
+        if self.running:
+            self.ui.viewport.update_overlays()
+
+    def remove_overlay(self, overlay: Overlay) -> bool:
+        """Remove a transient screen overlay by identity.
+
+        Parameters
+        ----------
+        overlay
+            Overlay instance to remove.
+
+        Returns
+        -------
+        bool
+            Whether the overlay was present.
+
+        """
+        removed = self._overlay_layer.remove(overlay)
+        if removed and self.running:
+            self.ui.viewport.update_overlays()
+        return removed
+
+    def start_distance_inspection(self) -> None:
+        """Start a one-shot transient distance inspection.
+
+        The completed inspection remains Viewer-owned transient state until it
+        is canceled, another measurement starts, or the scene is replaced.
+
+        """
+        self.state.measurement.start("inspection")
+
+    def start_distance_dimension(self, mode: PersistentMeasurementMode = "fixed") -> None:
+        """Start a one-shot persistent distance-dimension interaction.
+
+        Parameters
+        ----------
+        mode
+            Fixed or associative anchor acquisition. Associative acquisition
+            never falls back to fixed point anchors.
+
+        """
+        self.state.measurement.start(mode)
+
+    def cancel_measurement(self) -> bool:
+        """Cancel active or retained transient measurement state.
+
+        Returns
+        -------
+        bool
+            Whether measurement state was cleared.
+
+        """
+        return self.state.measurement.cancel()
+
+    def inspect_selected_area(self) -> float:
+        """Return the exact world-space area of the selected scene object.
+
+        The represented item's public `area` contract defines whether this is
+        planar enclosed area or surface area. Render tessellations are never
+        used as an approximation.
+
+        Returns
+        -------
+        float
+            Nonnegative finite world-space area.
+
+        Raises
+        ------
+        ValueError
+            If exactly one spatial scene object is not selected, or the item
+            returns an invalid scalar.
+        NotImplementedError
+            If the item or its world transformation cannot provide an exact
+            area.
+
+        Notes
+        -----
+        Exceptions raised by an implemented item `area` operation propagate
+        to the caller.
+
+        """
+        return self._inspect_selected_scalar("area")
+
+    def inspect_selected_volume(self) -> float:
+        """Return the exact world-space volume of the selected scene object.
+
+        The represented item's public `volume` contract supplies the local
+        scalar. Render tessellations are never used as an approximation.
+
+        Returns
+        -------
+        float
+            Nonnegative finite world-space volume.
+
+        Raises
+        ------
+        ValueError
+            If exactly one spatial scene object is not selected, or the item
+            returns an invalid scalar.
+        NotImplementedError
+            If the item does not enclose a volume, or its world transformation
+            cannot provide an exact volume.
+
+        Notes
+        -----
+        Exceptions raised by an implemented item `volume` operation propagate
+        to the caller.
+
+        """
+        return self._inspect_selected_scalar("volume")
+
+    def _inspect_selected_scalar(self, kind: ScalarMeasurementKind) -> float:
+        """Cancel distance state and inspect one selected object's scalar."""
+        self.cancel_measurement()
+        selected = self.state.selection.objects
+        if len(selected) != 1:
+            raise ScalarMeasurementError(f"Select exactly one scene object to inspect {kind}.")
+        return measure_sceneobject_scalar(selected[0], kind)
+
+    def _update_measurement_hover(self, screen_point: tuple[float, float]) -> None:
+        """Update the active measurement's winner and point-snap palette."""
+        query = self.renderer.query_snap_context_at(screen_point, SNAP_RADIUS)
+        self.state.measurement.update_hover(query)
+
+    def _accept_measurement_at(self, screen_point: tuple[float, float]) -> None:
+        """Accept the semantic snap at one screen position."""
+        query = self.renderer.query_snap_context_at(screen_point, SNAP_RADIUS)
+        result = self.state.measurement.accept(
+            query,
+            unit=self.config.measurement.unit,
+            precision=self.config.measurement.precision,
+        )
+        if result is None or isinstance(result, DistanceInspection):
+            return
+        if not isinstance(result, DistanceDimension):
+            raise RuntimeError("Unexpected distance measurement result.")
+        annotation = self.scene.add_annotation(result)
+        self.state.annotation_selection.replace((annotation,))
+
+    def _has_overlay_content(self) -> bool:
+        """Return whether the next display frame needs 2D overlay painting."""
+        return bool(self._overlay_layer or self.state.measurement.has_transient_state)
+
+    def _draw_overlays(self, renderer: Renderer, painter: "QPainter") -> None:
+        """Draw Viewer-owned overlays with the active display-frame painter."""
+        width = renderer.width()
+        height = renderer.height()
+        measurement = self.state.measurement
+        if (not self._overlay_layer and not measurement.has_transient_state) or width <= 0 or height <= 0:
+            return
+        if self._overlay_layer:
+            context = _OverlayContext(
+                width=width,
+                height=height,
+                camera_distance=renderer.camera.distance,
+                field_of_view=renderer.camera.fov,
+                perspective=renderer.view == "perspective",
+                unit=self.config.measurement.unit,
+                precision=self.config.measurement.precision,
+            )
+            self._overlay_layer.draw(painter, context)
+        if measurement.has_transient_state:
+            _draw_measurement_preview(
+                painter,
+                measurement,
+                renderer.project_point,
+                unit=self.config.measurement.unit,
+                precision=self.config.measurement.precision,
+            )
 
     def create_app(self) -> QApplication:
-        """Create and configure the Qt application.
+        """Return the configured Qt application, creating it if necessary.
 
         Returns
         -------
         QApplication
             Configured application instance.
 
+        Raises
+        ------
+        RuntimeError
+            If a non-GUI Qt core application already exists in the process.
+
         """
-        app = QApplication(sys.argv)
-        app.setApplicationName("COMPAS Viewer")
-        app.setApplicationDisplayName("COMPAS Viewer")
-        app.setWindowIcon(QIcon(str(HERE / "assets" / "icons" / "compas_icon_white.png")))
+        instance = QApplication.instance()
+        if instance is None:
+            app = QApplication(sys.argv)
+        elif isinstance(instance, QApplication):
+            app = instance
+        else:
+            raise RuntimeError("COMPAS Viewer cannot start after a non-GUI Qt core application has been created.")
+        app.setApplicationName(self.config.window.title)
+        app.setApplicationDisplayName(self.config.window.title)
+        app.setWindowIcon(QIcon(str(self._window_icon_path())))
         return app
+
+    def _window_icon_path(self) -> Path:
+        """Return the configured absolute icon path or the packaged default."""
+        icon = self.config.window.icon
+        if icon is None:
+            return HERE / "assets" / "icons" / "compas_icon_white.png"
+        return Path(icon)
 
     def register_command(self, identifier: str, command: Command, *, replace: bool = False) -> None:
         """Register a runtime command and activate its input bindings.
@@ -149,6 +420,309 @@ class Viewer(Singleton):
             self.menu_items.append({"title": menu, "items": [item]})
         self.ui.menubar.reload()
 
+    def transform_objects(
+        self,
+        objects: Iterable[SceneObject],
+        transformation: Transformation,
+        *,
+        space: Literal["world"] = "world",
+    ) -> None:
+        """Transform scene objects atomically and record one undo transaction.
+
+        The transformation is a world-space delta applied to every object's
+        world transformation before any object is mutated. New local
+        transformations are derived from the corresponding pre-operation
+        parent world transformations. An ancestor and its descendant cannot be
+        transformed in the same request because their shared group semantics
+        are ambiguous.
+
+        Parameters
+        ----------
+        objects
+            Stable objects from the current Viewer scene. Duplicate objects
+            are transformed once in their first input position.
+        transformation
+            World-space transformation delta.
+        space
+            Transformation space. Only `"world"` is currently supported.
+
+        Raises
+        ------
+        TypeError
+            If `transformation` is not a COMPAS transformation or a target is
+            not a scene object.
+        ValueError
+            If the space is unsupported, a target is not in the current scene,
+            or the targets contain an ancestor and its descendant.
+
+        """
+        if not isinstance(transformation, Transformation):
+            raise TypeError("Expected a COMPAS Transformation.")
+        if space != "world":
+            raise ValueError(f"Unsupported transformation space: {space!r}.")
+
+        targets = self._sceneobjects(objects)
+        if not targets or transformation == Transformation():
+            return
+
+        target_guids = {sceneobject.guid for sceneobject in targets}
+        for sceneobject in targets:
+            if any(ancestor.guid in target_guids for ancestor in sceneobject.ancestors):
+                raise ValueError("Cannot transform an ancestor and its descendant in one operation.")
+
+        before = tuple((sceneobject, copy_transformation(sceneobject.transformation)) for sceneobject in targets)
+        after_states: list[tuple[SceneObject, Transformation | None]] = []
+        for sceneobject in targets:
+            world = sceneobject.worldtransformation.copy()
+            parent = sceneobject.parent
+            parent_world = parent.worldtransformation.copy() if parent is not None else Transformation()
+            local = parent_world.inverse() * (transformation * world)
+            after_states.append((sceneobject, local))
+        transaction = TransformTransaction(before=before, after=tuple(after_states))
+
+        self._apply_transform_transaction(transaction, forward=True)
+        self._undo_transforms.append(transaction)
+        self._redo_transforms.clear()
+
+    def refresh_geometry(self, objects: Iterable[SceneObject] | None = None) -> None:
+        """Rebuild render geometry after topology or geometric data changes.
+
+        Parameters
+        ----------
+        objects
+            Changed objects from the current scene. `None` means all objects.
+            Geometry buffers are combined, so the first version rebuilds the
+            complete buffer set after validating this scope.
+
+        """
+        self._sceneobjects(objects)
+        if not self.running:
+            return
+        self.renderer.rebuild_buffers()
+        self._sync_view()
+
+    def refresh_appearance(self, objects: Iterable[SceneObject] | None = None) -> None:
+        """Refresh same-topology colors and display settings.
+
+        Parameters
+        ----------
+        objects
+            Changed objects from the current scene. `None` means all objects.
+
+        """
+        targets = self._sceneobjects(objects)
+        if not self.running:
+            return
+        manager = self.renderer.buffer_manager
+        for sceneobject in targets:
+            render_object = self.scene.render_objects.get(sceneobject.guid)
+            if render_object is None:
+                continue
+            manager.update_object_data(render_object)
+            manager.update_object_settings(render_object)
+        self._sync_view()
+
+    def refresh_transform(self, objects: Iterable[SceneObject] | None = None) -> None:
+        """Refresh transforms after direct untracked scene-object mutation.
+
+        Calling this operation invalidates transform undo and redo history.
+        Use [`transform_objects`][compas_viewer.Viewer.transform_objects] when
+        the change should be reversible.
+
+        Parameters
+        ----------
+        objects
+            Changed objects from the current scene. `None` means all objects.
+
+        """
+        targets = self._sceneobjects(objects)
+        self._refresh_transform(targets, invalidate_history=True)
+
+    def refresh_hierarchy(self) -> None:
+        """Rebuild runtime hierarchy, picking, parent links, and buffers.
+
+        Surviving selected objects retain their order. Hierarchy refreshes
+        invalidate transformation history because stored local transforms may
+        no longer have the same parent meaning.
+
+        """
+        self._clear_transform_history()
+        surviving = tuple(self.scene.object(guid) for guid in self.state.selection.guids if guid in self.scene.object_store)
+        if self.running:
+            self.renderer.rebuild_buffers()
+        else:
+            self.scene.prepare()
+        if not self.state.selection.replace(surviving):
+            self._sync_view()
+
+    def refresh_annotations(self, entries: Iterable[SceneAnnotation] | None = None) -> None:
+        """Refresh annotation graphics without rebuilding spatial buffers.
+
+        Parameters
+        ----------
+        entries
+            Changed annotation entries. `None` means all annotations.
+
+        """
+        targets = self._annotations(entries)
+        if self.running:
+            self.renderer.makeCurrent()
+        try:
+            for annotation in targets:
+                render_object = self.scene.annotation_render_objects.get(annotation.guid)
+                if render_object is None:
+                    render_object = self.scene.annotation_render_object(annotation)
+                if not self.running:
+                    continue
+                if not render_object._inited:
+                    render_object.init()
+                else:
+                    render_object.update(update_data=True)
+        finally:
+            if self.running:
+                self.renderer.doneCurrent()
+        if self.running:
+            self.renderer.update()
+
+    def undo(self) -> bool:
+        """Undo the most recent reversible Viewer transformation.
+
+        Returns
+        -------
+        bool
+            `True` if a transaction was undone, otherwise `False`.
+
+        """
+        if not self._undo_transforms:
+            return False
+        transaction = self._undo_transforms[-1]
+        self._apply_transform_transaction(transaction, forward=False)
+        self._undo_transforms.pop()
+        self._redo_transforms.append(transaction)
+        return True
+
+    def redo(self) -> bool:
+        """Redo the most recently undone Viewer transformation.
+
+        Returns
+        -------
+        bool
+            `True` if a transaction was redone, otherwise `False`.
+
+        """
+        if not self._redo_transforms:
+            return False
+        transaction = self._redo_transforms[-1]
+        self._apply_transform_transaction(transaction, forward=True)
+        self._redo_transforms.pop()
+        self._undo_transforms.append(transaction)
+        return True
+
+    def _sceneobjects(self, objects: Iterable[SceneObject] | None) -> tuple[SceneObject, ...]:
+        """Validate and de-duplicate current non-root scene objects."""
+        candidates = self.scene.objects if objects is None else objects
+        result: list[SceneObject] = []
+        seen: set[UUID] = set()
+        for sceneobject in candidates:
+            if not isinstance(sceneobject, SceneObject):
+                raise TypeError("Expected stable COMPAS SceneObject values.")
+            if sceneobject.is_root:
+                raise ValueError("The Viewer scene root cannot be refreshed or transformed.")
+            try:
+                current = self.scene.object(sceneobject.guid)
+            except KeyError:
+                raise ValueError("The scene object does not belong to the current Viewer scene.") from None
+            if current is not sceneobject:
+                raise ValueError("The scene object does not belong to the current Viewer scene.")
+            if sceneobject.guid not in seen:
+                result.append(sceneobject)
+                seen.add(sceneobject.guid)
+        return tuple(result)
+
+    def _annotations(self, entries: Iterable[SceneAnnotation] | None) -> tuple[SceneAnnotation, ...]:
+        """Validate and de-duplicate current annotation entries."""
+        candidates = self.scene.annotations if entries is None else entries
+        result: list[SceneAnnotation] = []
+        seen: set[UUID] = set()
+        for annotation in candidates:
+            if not isinstance(annotation, SceneAnnotation):
+                raise TypeError("Expected stable COMPAS SceneAnnotation values.")
+            try:
+                current = self.scene.annotation(annotation.guid)
+            except KeyError:
+                raise ValueError("The annotation does not belong to the current Viewer scene.") from None
+            if current is not annotation:
+                raise ValueError("The annotation does not belong to the current Viewer scene.")
+            if annotation.guid not in seen:
+                result.append(annotation)
+                seen.add(annotation.guid)
+        return tuple(result)
+
+    def _apply_transform_transaction(self, transaction: TransformTransaction, *, forward: bool) -> None:
+        """Apply one transform snapshot atomically and refresh it once."""
+        states = transaction.after if forward else transaction.before
+        originals = tuple((sceneobject, copy_transformation(sceneobject.transformation)) for sceneobject, _ in states)
+        try:
+            for sceneobject, transformation in states:
+                sceneobject.transformation = copy_transformation(transformation)
+            self._refresh_transform(tuple(sceneobject for sceneobject, _ in states), invalidate_history=False)
+        except Exception:
+            for sceneobject, transformation in originals:
+                sceneobject.transformation = transformation
+            try:
+                self._refresh_transform(tuple(sceneobject for sceneobject, _ in originals), invalidate_history=False)
+            except Exception:
+                pass
+            raise
+
+    def _refresh_transform(self, targets: tuple[SceneObject, ...], *, invalidate_history: bool) -> None:
+        """Refresh local transform buffers and descendant world bounds."""
+        if invalidate_history:
+            self._clear_transform_history()
+
+        expanded: list[SceneObject] = []
+        expanded_guids: set[UUID] = set()
+        for sceneobject in targets:
+            for affected in (sceneobject, *sceneobject.descendants):
+                if affected.guid not in expanded_guids:
+                    expanded.append(affected)
+                    expanded_guids.add(affected.guid)
+
+        if self.running:
+            manager = self.renderer.buffer_manager
+            for sceneobject in targets:
+                render_object = self.scene.render_objects.get(sceneobject.guid)
+                if render_object is not None:
+                    manager.update_object_transform(render_object)
+
+        for sceneobject in expanded:
+            render_object = self.scene.render_objects.get(sceneobject.guid)
+            if render_object is not None and render_object._inited:
+                self._update_world_bounds(render_object)
+
+        self._sync_view()
+
+    @staticmethod
+    def _update_world_bounds(render_object: Any) -> None:
+        """Recompute one render helper's world-space bounds."""
+        refresh_annotation_bounds = getattr(render_object, "refresh_annotation_bounds", None)
+        if refresh_annotation_bounds is not None:
+            refresh_annotation_bounds()
+            return
+        render_object._update_bounding_box()
+
+    def _sync_view(self) -> None:
+        """Synchronize the sidebar and viewport once when the Viewer runs."""
+        if not self.running:
+            return
+        self.ui.sidebar.update()
+        self.renderer.update()
+
+    def _clear_transform_history(self) -> None:
+        """Discard reversible transform transactions."""
+        getattr(self, "_undo_transforms", []).clear()
+        getattr(self, "_redo_transforms", []).clear()
+
     def set_appearance(self, appearance: Appearance) -> None:
         """Apply a system, light, or dark application appearance.
 
@@ -177,6 +751,14 @@ class Viewer(Singleton):
         """Apply viewer-owned effects for a changed state value."""
         if path == "ui.appearance":
             self._apply_appearance(cast(Appearance, value))
+        elif path == "selection" and hasattr(self, "ui"):
+            self.ui.sidebar.update_spatial_selection()
+            self.renderer.update()
+        elif path == "annotation_selection" and hasattr(self, "ui"):
+            self.ui.sidebar.update_annotation_selection()
+            self.renderer.update()
+        elif path.startswith("measurement.") and hasattr(self, "ui"):
+            self.ui.viewport.update_overlays()
 
     def _on_system_color_scheme_changed(self, _scheme: Qt.ColorScheme) -> None:
         """Reapply system appearance after a platform theme change."""
@@ -245,16 +827,6 @@ class Viewer(Singleton):
         for role, color in colors.items():
             palette.setColor(role, QColor(color))
         return palette
-
-    @property
-    def unit(self) -> Unit:
-        """The display unit used by the viewport."""
-        return self.ui.viewport.unit
-
-    @unit.setter
-    def unit(self, unit: Unit) -> None:
-        """Set the display unit before the viewer starts running."""
-        self.ui.viewport.unit = unit
 
     def show(self) -> None:
         """Initialize the interface and enter the Qt event loop."""

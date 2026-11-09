@@ -1,5 +1,8 @@
 import pytest
 
+from compas.scene import SceneObject
+from compas.scene import TextAnnotation
+from compas_viewer.scene import ViewerScene
 from compas_viewer.config import Config
 from compas_viewer.components.menubar import MenuBar
 from compas_viewer.state import ViewerState
@@ -38,6 +41,40 @@ def test_state_does_not_publish_unchanged_values():
     assert changes == []
 
 
+def test_state_bridges_each_selection_batch_to_one_change():
+    first = SceneObject(name="First")
+    second = SceneObject(name="Second")
+    objects = {sceneobject.guid: sceneobject for sceneobject in (first, second)}
+    state = ViewerState(Config(), objects.__getitem__)
+    changes = []
+    state.changed.connect(lambda path, value: changes.append((path, value)))
+
+    state.selection.add(first, second)
+    state.selection.add(first)
+
+    assert changes == [("selection", (first.guid, second.guid))]
+
+
+def test_state_keeps_annotation_selection_separate_from_spatial_selection():
+    scene = ViewerScene()
+    spatial = SceneObject(name="Spatial")
+    annotation = scene.add_annotation(TextAnnotation("A", [0, 0, 0]))
+    objects = {spatial.guid: spatial}
+    state = ViewerState(Config(), objects.__getitem__, scene.annotation)
+    changes = []
+    state.changed.connect(lambda path, value: changes.append((path, value)))
+
+    state.selection.add(spatial)
+    state.annotation_selection.add(annotation)
+
+    assert state.selection.objects == (spatial,)
+    assert state.annotation_selection.objects == (annotation,)
+    assert changes == [
+        ("selection", (spatial.guid,)),
+        ("annotation_selection", (annotation.guid,)),
+    ]
+
+
 def test_state_toggles_boolean_values():
     state = ViewerState(Config())
 
@@ -51,7 +88,42 @@ def test_state_rejects_invalid_paths_and_non_boolean_toggles():
     with pytest.raises(ValueError, match="Invalid state path"):
         state.get("")
     with pytest.raises(TypeError, match="not boolean"):
-        state.toggle("unit")
+        state.toggle("renderer.rendermode")
+
+
+def test_state_updates_measurement_presentation_through_explicit_methods():
+    config = Config()
+    state = ViewerState(config)
+    changes = []
+    state.changed.connect(lambda path, value: changes.append((path, value)))
+
+    assert state.set_measurement_unit("mm")
+    assert state.set_measurement_precision(4)
+    assert not state.set_measurement_precision(4)
+
+    assert config.measurement.unit == "mm"
+    assert config.measurement.precision == 4
+    assert changes == [("measurement.unit", "mm"), ("measurement.precision", 4)]
+
+
+@pytest.mark.parametrize(
+    "method, value, error",
+    [
+        ("set_measurement_unit", " ", ValueError),
+        ("set_measurement_unit", 1, TypeError),
+        ("set_measurement_precision", -1, ValueError),
+        ("set_measurement_precision", 1.5, TypeError),
+    ],
+)
+def test_state_rejects_invalid_measurement_presentation(method, value, error):
+    config = Config()
+    state = ViewerState(config)
+
+    with pytest.raises(error, match="measurement"):
+        getattr(state, method)(value)
+
+    assert config.measurement.unit is None
+    assert config.measurement.precision == 3
 
 
 def test_menu_actions_reflect_published_state():

@@ -8,6 +8,10 @@ if TYPE_CHECKING:
     from .animation import ANIMATION_PRESETS as ANIMATION_PRESETS
     from .animation import AnimationPreset as AnimationPreset
     from .commandregistry import CommandRegistry as CommandRegistry
+    from .overlays import LegendOverlay as LegendOverlay
+    from .overlays import ScaleBarOverlay as ScaleBarOverlay
+    from .overlays import ScreenTextOverlay as ScreenTextOverlay
+    from .selection import Selection as Selection
     from .state import ViewerState as ViewerState
     from .viewer import Viewer as Viewer
 
@@ -30,6 +34,10 @@ _LAZY_EXPORTS = {
     "ANIMATION_PRESETS": ("compas_viewer.animation", "ANIMATION_PRESETS"),
     "AnimationPreset": ("compas_viewer.animation", "AnimationPreset"),
     "CommandRegistry": ("compas_viewer.commandregistry", "CommandRegistry"),
+    "LegendOverlay": ("compas_viewer.overlays", "LegendOverlay"),
+    "ScaleBarOverlay": ("compas_viewer.overlays", "ScaleBarOverlay"),
+    "ScreenTextOverlay": ("compas_viewer.overlays", "ScreenTextOverlay"),
+    "Selection": ("compas_viewer.selection", "Selection"),
     "Viewer": ("compas_viewer.viewer", "Viewer"),
     "ViewerState": ("compas_viewer.state", "ViewerState"),
 }
@@ -67,4 +75,18 @@ def __getattr__(name: str) -> object:
     return value
 
 
-__all__ = ["ANIMATION_PRESETS", "DATA", "DOCS", "HOME", "TEMP", "AnimationPreset", "CommandRegistry", "Viewer", "ViewerState"]
+__all__ = [
+    "ANIMATION_PRESETS",
+    "DATA",
+    "DOCS",
+    "HOME",
+    "TEMP",
+    "AnimationPreset",
+    "CommandRegistry",
+    "LegendOverlay",
+    "ScaleBarOverlay",
+    "ScreenTextOverlay",
+    "Selection",
+    "Viewer",
+    "ViewerState",
+]

@@ -69,6 +69,7 @@ class Sceneform(Component):
         self.widget.setHeaderHidden(not show_headers)
         self.widget.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         self._sceneobjects: list[Any] = []
+        self._widgets: dict[object, SceneTreeItem] = {}
         self._refreshing = False
 
         self.action = action
@@ -87,13 +88,16 @@ class Sceneform(Component):
         """
         self._refreshing = True
         if list(self.scene.objects) == self._sceneobjects and not refresh:
-            for scene_node in self.scene.root.traverse(strategy="breadthfirst"):
-                node = cast(Any, scene_node)
-                widget = cast(QTreeWidgetItem | None, node.attributes.get("widget"))
+            for node in self.scene.tree.nodes:
+                if node.is_root:
+                    continue
+                sceneobject = self.scene.object(node)
+                widget = self._widgets.get(sceneobject.guid)
                 if widget:
-                    widget.setSelected(node.is_selected)
-                    if node.is_selected:
-                        self.expand(node.parent)
+                    selected = sceneobject in self.viewer.state.selection
+                    widget.setSelected(selected)
+                    if selected:
+                        self.expand(widget.parent())
                         self.widget.scrollToItem(widget)
 
         else:
@@ -101,11 +105,12 @@ class Sceneform(Component):
 
             self.widget.clear()
             self.checkbox_columns = {}
+            self._widgets = {}
 
-            for scene_node in self.scene.root.traverse(strategy="breadthfirst"):
-                node = cast(Any, scene_node)
+            for node in self.scene.tree.nodes:
                 if node.is_root:
                     continue
+                sceneobject = self.scene.object(node)
 
                 strings = []
 
@@ -122,24 +127,24 @@ class Sceneform(Component):
                         text = column.get("text")
                         if not text:
                             raise ValueError("Text must be provided for label")
-                        strings.append(text(node))
+                        strings.append(text(sceneobject))
 
-                parent_widget = self.widget if node.parent is None or node.parent.is_root else node.parent.attributes["widget"]
+                parent_widget = self.widget if node.parent is None or node.parent.is_root else self._widgets[node.parent.object_guid]
                 widget = SceneTreeItem(parent_widget, strings)
-                widget.node = node
-                widget.setSelected(node.is_selected)
-                if node.is_selected:
-                    self.expand(node.parent)
+                widget.node = sceneobject
+                self._widgets[sceneobject.guid] = widget
+                selected = sceneobject in self.viewer.state.selection
+                widget.setSelected(selected)
+                if selected and isinstance(parent_widget, SceneTreeItem):
+                    self.expand(parent_widget)
 
                 widget.setFlags(widget.flags() | Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled)
 
                 for col, col_data in self.checkbox_columns.items():
                     widget.setCheckState(
                         col,
-                        Qt.CheckState.Checked if col_data["checked"](node) else Qt.CheckState.Unchecked,
+                        Qt.CheckState.Checked if col_data["checked"](sceneobject) else Qt.CheckState.Unchecked,
                     )
-
-                node.attributes["widget"] = widget
 
             self.adjust_column_widths()
             self.widget.expandToDepth(0)
@@ -154,10 +159,9 @@ class Sceneform(Component):
             Scene-tree node whose ancestors should be expanded.
 
         """
-        if node.attributes.get("widget"):
-            node.attributes["widget"].setExpanded(True)
-            if node.parent and not node.parent.is_root:
-                self.expand(node.parent)
+        if isinstance(node, QTreeWidgetItem):
+            node.setExpanded(True)
+            self.expand(node.parent())
 
     def on_item_clicked(self, item: QTreeWidgetItem, column: int) -> None:
         """Apply checkbox and selection changes from a clicked item.
@@ -184,13 +188,11 @@ class Sceneform(Component):
 
     def _sync_selection_from_widget(self) -> None:
         """Apply the widget selection to scene objects and refresh the viewer."""
-        selected_nodes = {cast(SceneTreeItem, item).node for item in self.widget.selectedItems()}
-        for node in cast(list[Any], self.scene.objects):
-            node.is_selected = node in selected_nodes
-            if self.action and node.is_selected:
-                self.action(self, node)
-        self.viewer.ui.sidebar.object_setting.update()
-        self.viewer.renderer.update()
+        selected_objects = [sceneobject for sceneobject in self._sceneobjects if self._widgets[sceneobject.guid].isSelected()]
+        self.viewer.state.selection.replace(selected_objects)
+        if self.action:
+            for sceneobject in selected_objects:
+                self.action(self, sceneobject)
 
     def adjust_column_widths(self) -> None:
         """Use a compact width for checkbox columns."""

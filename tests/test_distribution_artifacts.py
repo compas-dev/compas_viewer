@@ -35,20 +35,21 @@ Tag: py3-none-any
 """
 
 
-def write_wheel(directory, *, include_assets=True, metadata=METADATA, entry_points=ENTRY_POINTS):
+def write_wheel(directory, *, include_assets=True, excluded_asset=None, metadata=METADATA, entry_points=ENTRY_POINTS):
     wheel = directory / "compas_viewer-2.0.2-py3-none-any.whl"
     with zipfile.ZipFile(wheel, "w") as archive:
         archive.writestr("compas_viewer/__init__.py", "")
         if include_assets:
             for name in verify_distributions.REQUIRED_WHEEL_FILES:
-                archive.writestr(name, "asset")
+                if name != excluded_asset:
+                    archive.writestr(name, "asset")
         archive.writestr("compas_viewer-2.0.2.dist-info/METADATA", metadata)
         archive.writestr("compas_viewer-2.0.2.dist-info/entry_points.txt", entry_points)
         archive.writestr("compas_viewer-2.0.2.dist-info/WHEEL", WHEEL)
     return wheel
 
 
-def write_sdist(directory):
+def write_sdist(directory, *, include_icon=True):
     sdist = directory / "compas_viewer-2.0.2.tar.gz"
     names = [
         "CHANGELOG.md",
@@ -60,6 +61,8 @@ def write_sdist(directory):
         "src/compas_viewer/assets/fonts/FreeSans.ttf",
         "src/compas_viewer/renderer/shaders/model.vert",
     ]
+    if include_icon:
+        names.append("src/compas_viewer/assets/icons/compas_icon_white.png")
     with tarfile.open(sdist, "w:gz") as archive:
         for name in names:
             info = tarfile.TarInfo(f"compas_viewer-2.0.2/{name}")
@@ -84,6 +87,20 @@ def test_distribution_verification_rejects_missing_package_data(tmp_path):
     wheel = write_wheel(tmp_path, include_assets=False)
     with pytest.raises(ValueError, match="package data"):
         verify_distributions.verify_wheel(wheel)
+
+
+def test_distribution_verification_requires_runtime_icon_in_wheel(tmp_path):
+    wheel = write_wheel(tmp_path, excluded_asset="compas_viewer/assets/icons/compas_icon_white.png")
+
+    with pytest.raises(ValueError, match="compas_icon_white.png"):
+        verify_distributions.verify_wheel(wheel)
+
+
+def test_distribution_verification_requires_runtime_icon_in_sdist(tmp_path):
+    sdist = write_sdist(tmp_path, include_icon=False)
+
+    with pytest.raises(ValueError, match="compas_icon_white.png"):
+        verify_distributions.verify_sdist(sdist)
 
 
 def test_distribution_verification_rejects_wrong_runtime_dependency(tmp_path):

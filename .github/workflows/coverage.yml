@@ -32,8 +32,10 @@ jobs:
           python-version: "3.12"
           dependency-groups: dev
           extras: ""
+      - name: Install the reviewed COMPAS scene candidate
+        run: uv pip install --python .venv --reinstall "compas @ git+https://github.com/compas-dev/compas.git@70aeb1e408772f0a84213c280658d4d594bf12ea"
       - name: Run tests collecting coverage reports
-        run: uv run pytest --cov src/compas_viewer --cov-report=xml --cov-report=term
+        run: uv run --no-sync pytest --cov src/compas_viewer --cov-report=xml --cov-report=term
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@0fb7174895f61a3b6b78fc075e0cd60383518dac # v5
         with:

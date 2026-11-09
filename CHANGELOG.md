@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Added shared-vertex indexed `BufferGeometry` with convenience constructors
+  for point, edge, and triangle buffers and independent JSON serialization.
+* Added declarative persistent-state fields for viewer scene objects and
+  explicit rebinding of separately serialized COMPAS data.
 * Added multi-object selection, directional window selection, selection
   inversion, and selection by type, color, or name. Left-to-right windows
   require full containment, while right-to-left windows select intersections.
@@ -24,14 +28,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added **Edit → Modify Parameters…** with a dedicated form for writable scalar
   parameters of the selected object's underlying data. Parameter application is
   transactional and refreshes render data and bounds.
+* Added **Edit → Delete Selected** as the discoverable menu path for the
+  existing deletion command and `Delete` shortcut.
+* Added an ordered scene annotation collection outside the spatial hierarchy,
+  a flat Annotations panel with separate selection and removal, and durable
+  distance-dimension color, line width, text size, arrow size, and label offset.
 * Added System, Light, and Dark application appearances. System mode follows
   operating-system color-scheme changes while the viewer is running.
-* Added configurable units, grid extents and divisions, grid styling,
-  selection color, and viewport background controls.
-* Added camera-facing multiline text annotations with alignment, padding,
-  backgrounds, offsets, and screen- or world-space sizing.
-* Added screen-scaled arrow overlays with configurable shaft and arrowhead
-  styling and optional on-top rendering.
+* Added configurable grid extents and divisions, grid styling, selection
+  color, and viewport background controls.
+* Added ordered rendering for backend-neutral COMPAS text annotations, arrow
+  annotations, and fixed or associative distance dimensions.
+* Added one-shot distance inspection and fixed or associative dimension tools
+  with semantic snapping, live previews, and a dedicated Measure menu.
+* Added ordered transient scale-bar and categorical-legend overlays that stay
+  outside scene serialization and picking.
+* Added programmatic screen-text overlays at normalized viewport positions,
+  with explicit alignment and add/remove operations outside Scene persistence
+  and picking.
+* Added visible-by-default toolbar selectors for render mode and current view,
+  synchronized with the View menu, System form, and public Viewer state.
+* Added transient selected-object area and volume inspection with exact
+  supported world-transformation scaling, declared squared or cubed unit
+  labels, and explicit unsupported-case reporting without tessellation
+  fallback.
 * Added `Viewer.save_image` for rendering still images without launching the
   visible viewer or entering its event loop.
 * Added deterministic GIF and WebP animation recording with `preview`,
@@ -39,6 +59,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added a stable runtime command registry, namespaced command identifiers, live
   input-binding registration, and menu contributions for applications and
   plugins.
+* Added contextual editable-attribute contributions for filtering or adapting
+  the stable scene-object attributes shown by Viewer's object inspector.
+* Added lazy tabbed element-attribute tables for selected meshes and graphs,
+  including scalar cell editing and reset-to-default operations.
+* Added startup Viewer identity configuration for the application and window
+  title, packaged or absolute custom icons, and fullscreen display.
 * Added versioned configuration serialization and migration of supported legacy
   configuration layouts.
 * Added MkDocs user and developer guides, a Hello World tutorial, documentation
@@ -46,6 +72,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* Replaced the System sidebar's Units and Measurement section with Grid and
+  Units, moved grid controls out of Display, removed tolerance information from
+  Viewer UI without changing global COMPAS tolerance, and aligned System
+  editors on one consistent two-column layout.
+
+* Made active measurement targets explicit by showing all projected Point,
+  Mesh-vertex, or Graph-node snaps on the hovered object while keeping only the
+  depth-qualified winner click-eligible. The first accepted anchor remains
+  visible while the palette follows the next object. Point guidance now uses
+  larger bright hollow squares with a distinct filled winner. Visible receding
+  vertices use their same-object rendered point footprint for reliable depth
+  qualification. Interactive measurement acquisition is limited to displayed
+  Point, Mesh-vertex, and Graph-node guides; invisible line, edge, face, and
+  surface fallbacks are removed. The snap radius is increased for a stronger,
+  still deterministic point lock.
+* Moved transient overlays and measurement feedback to one transparent,
+  input-transparent widget canvas above the OpenGL renderer. Persistent
+  distance dimensions now render in a separate final pass without depth
+  testing or depth writes, so scene geometry cannot hide them.
+* Removed the datastructure Attributes component from the default sidebar. It
+  remains available to explicitly configured custom sidebars.
+* Replaced the Viewer-owned `Tag` and `ArrowOverlay` data types with the
+  canonical annotation types from `compas.scene`. Distance labels display the
+  configured precision and informational unit, and unresolved associative
+  dimensions remain visibly marked.
+
+* Audited Viewer configuration as a closed, validated schema-version-2 setup
+  contract. Removed retired unit, display-default, sidebar, window-about, and
+  renderer-opacity fields; added orthographic view serialization; and retained
+  supported values when migrating schema-version-1 data.
+* Replaced Viewer-specific scene-object substitution with stable COMPAS scene
+  objects and context-keyed Viewer draw and clear operations. Render buffers,
+  picking maps, selection, bounds, and renderer handles now live in transient
+  Viewer state keyed by the stable scene-object GUID and are never serialized.
+* Renamed the plane display-size argument from `planesize` to the framework-wide
+  `size`, and changed `Collection` insertion to create a stable group containing
+  ordinary scene entries for its items.
+* Changed Viewer buffer assembly to preserve supplied primitive indices instead
+  of expanding vertices, including per-triangle back-face winding.
+* Changed scene persistence to store durable node state and data references
+  without embedding represented geometry or transient renderer state.
 * Standardized development on a committed uv lock, direct non-mutating Ruff,
   Pyright, Pytest, and strict MkDocs commands, with thin Invoke aliases.
 * Made Qt's headless mode and Linux EGL/OpenGL provisioning explicit in local
@@ -96,8 +163,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Separated persistent configuration from runtime commands and UI composition.
   Configuration now contains serializable values only; menus and sidebar
   definitions resolve commands through stable runtime IDs.
-* Moved default scene-object presentation settings from `config.ui.display` to
-  `config.display` and added migration for existing JSON configuration files.
+* Moved default presentation settings out of Viewer configuration so stable
+  scene objects own their own colors, sizes, and opacity.
 * Made callback serialization an explicit error instead of silently omitting
   runtime data from configuration files.
 * Reworked scene hierarchy display so parenting, groups, visibility, and

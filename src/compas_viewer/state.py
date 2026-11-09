@@ -1,9 +1,24 @@
+from collections.abc import Callable
 from typing import Any
+from uuid import UUID
 
 from PySide6.QtCore import QObject
 from PySide6.QtCore import Signal
 
+from compas.scene import SceneAnnotation
+from compas.scene import SceneObject
 from compas_viewer.config import Config
+from compas_viewer.config import MeasurementConfig
+from compas_viewer.measurement import MeasurementState
+from compas_viewer.selection import Selection
+
+
+def _unbound_sceneobject(_guid: UUID) -> SceneObject:
+    raise RuntimeError("This ViewerState is not bound to a Viewer scene.")
+
+
+def _unbound_annotation(_guid: UUID) -> SceneAnnotation:
+    raise RuntimeError("This ViewerState is not bound to a Viewer scene.")
 
 
 class ViewerState(QObject):
@@ -13,14 +28,27 @@ class ViewerState(QObject):
     ----------
     config
         Persistent configuration used as the backing store.
+    resolve_sceneobject
+        Resolve stable object GUIDs in the current Viewer scene. Direct state
+        construction may omit the resolver when selection is unused.
+    resolve_annotation
+        Resolve stable annotation-entry GUIDs in the current Viewer scene.
 
     """
 
     changed = Signal(str, object)
 
-    def __init__(self, config: Config) -> None:
+    def __init__(
+        self,
+        config: Config,
+        resolve_sceneobject: Callable[[UUID], SceneObject] | None = None,
+        resolve_annotation: Callable[[UUID], SceneAnnotation] | None = None,
+    ) -> None:
         super().__init__()
         self.config = config
+        self.selection = Selection(resolve_sceneobject or _unbound_sceneobject, self._selection_changed)
+        self.annotation_selection = Selection(resolve_annotation or _unbound_annotation, self._annotation_selection_changed)
+        self.measurement = MeasurementState(self._measurement_changed)
 
     def get(self, path: str) -> Any:
         """Return a state value by dotted configuration path.
@@ -104,6 +132,55 @@ class ViewerState(QObject):
 
         """
         self.changed.emit(path, self.get(path))
+
+    def set_measurement_unit(self, unit: str | None) -> bool:
+        """Set and publish the measurement-label unit declaration.
+
+        Parameters
+        ----------
+        unit
+            Coordinate-unit declaration, or `None` to leave it unspecified.
+            The declaration does not convert coordinates.
+
+        Returns
+        -------
+        bool
+            Whether the stored declaration changed.
+
+        """
+        candidate = MeasurementConfig(unit=unit, precision=self.config.measurement.precision)
+        candidate.validate()
+        return self.set("measurement.unit", unit)
+
+    def set_measurement_precision(self, precision: int) -> bool:
+        """Set and publish the measurement-label display precision.
+
+        Parameters
+        ----------
+        precision
+            Non-negative number of decimal places.
+
+        Returns
+        -------
+        bool
+            Whether the stored precision changed.
+
+        """
+        candidate = MeasurementConfig(unit=self.config.measurement.unit, precision=precision)
+        candidate.validate()
+        return self.set("measurement.precision", precision)
+
+    def _selection_changed(self, guids: tuple[UUID, ...]) -> None:
+        """Bridge one Qt-neutral selection mutation to Viewer observers."""
+        self.changed.emit("selection", guids)
+
+    def _annotation_selection_changed(self, guids: tuple[UUID, ...]) -> None:
+        """Bridge one annotation-selection mutation to Viewer observers."""
+        self.changed.emit("annotation_selection", guids)
+
+    def _measurement_changed(self) -> None:
+        """Bridge transient measurement mutation to Viewer observers."""
+        self.changed.emit("measurement.runtime", self.measurement)
 
     @staticmethod
     def _parts(path: str) -> list[str]:

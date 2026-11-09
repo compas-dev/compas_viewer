@@ -41,11 +41,16 @@ from compas.geometry import PolygonalSurface
 from compas.geometry import Polyline
 from compas.geometry import Sphere
 from compas.geometry import Torus
+from compas.geometry import Transformation
 from compas.scene import Scene
+from compas.scene import SceneObject
+from compas_viewer._scalar_measurement import ScalarMeasurementError
+from compas_viewer._scalar_measurement import ScalarMeasurementKind
+from compas_viewer._scalar_measurement import UnsupportedScalarMeasurementError
 
 if TYPE_CHECKING:
     from compas_viewer import Viewer
-    from compas_viewer.scene import ViewerSceneObject
+    from compas_viewer.scene.sceneobject import ViewerSceneObject
 
 
 class Command:
@@ -156,7 +161,7 @@ def create_geometry(kind: str) -> Geometry:
         raise ValueError(f"Unknown geometry preset: {kind!r}.") from error
 
 
-def add_geometry(viewer: "Viewer", kind: str, name: str | None = None) -> "ViewerSceneObject":
+def add_geometry(viewer: "Viewer", kind: str, name: str | None = None) -> SceneObject:
     """Add default geometry to the scene from a named preset.
 
     Parameters
@@ -170,16 +175,15 @@ def add_geometry(viewer: "Viewer", kind: str, name: str | None = None) -> "Viewe
 
     Returns
     -------
-    ViewerSceneObject
+    SceneObject
         Scene object created for the geometry.
 
     """
     geometry = create_geometry(kind)
-    for obj in cast(list["ViewerSceneObject"], viewer.scene.objects):
-        obj.is_selected = False
-    sceneobject = cast("ViewerSceneObject", viewer.scene.add(geometry, name=name or kind.replace("_", " ").title(), is_selected=True))
+    sceneobject = viewer.scene.add(geometry, name=name or kind.replace("_", " ").title())
+    viewer.state.selection.replace((sceneobject,))
     if viewer.running:
-        _zoom_objects(viewer, [sceneobject])
+        _zoom_objects(viewer, [viewer.scene.render_object(sceneobject)])
     return sceneobject
 
 
@@ -332,7 +336,7 @@ change_view_cmd = Command(title="Set View3D View", callback=change_view)
 
 
 def camera_settings(viewer: "Viewer") -> None:
-    """Focus the camera settings in the sidebar when available.
+    """Open the camera section of the System sidebar tab.
 
     Parameters
     ----------
@@ -340,17 +344,7 @@ def camera_settings(viewer: "Viewer") -> None:
         Viewer whose camera settings should be focused.
 
     """
-    # Try to focus on the camera settings tab in the sidebar
-    if hasattr(viewer.ui, "sidebar") and hasattr(viewer.ui.sidebar, "tabform"):
-        tabform = viewer.ui.sidebar.tabform
-        if "Camera" in tabform.tabs:
-            tabform.set_current_tab("Camera")
-            if hasattr(viewer.ui.sidebar, "camera_setting"):
-                viewer.ui.sidebar.camera_setting.update()
-        else:
-            print("Camera settings tab not found in sidebar")
-    else:
-        print("Camera settings are available in the sidebar")
+    viewer.ui.sidebar.focus_system_section("Camera")
 
 
 camera_settings_cmd = Command(title="Camera Settings", callback=camera_settings)
@@ -453,8 +447,8 @@ def zoom_selected(viewer: "Viewer") -> None:
         Viewer whose camera should be updated.
 
     """
-    objects = cast(list["ViewerSceneObject"], viewer.scene.objects)
-    _zoom_objects(viewer, [obj for obj in objects if obj.is_selected])
+    objects = [viewer.scene.render_object(obj) for obj in viewer.state.selection]
+    _zoom_objects(viewer, objects)
 
 
 def _zoom_objects(viewer: "Viewer", objects: list["ViewerSceneObject"]) -> bool:
@@ -504,7 +498,7 @@ def zoom_extents(viewer: "Viewer") -> None:
         Viewer whose visible scene extents should be framed.
 
     """
-    objects = cast(list["ViewerSceneObject"], viewer.scene.objects)
+    objects = [viewer.scene.render_object(obj) for obj in viewer.scene.objects]
     _zoom_objects(viewer, objects)
 
 
@@ -520,8 +514,8 @@ def isolate_selected(viewer: "Viewer") -> None:
         Viewer containing the selection to isolate.
 
     """
-    objects = cast(list["ViewerSceneObject"], viewer.scene.objects)
-    selected = [obj for obj in objects if obj.is_selected]
+    objects = viewer.scene.objects
+    selected = list(viewer.state.selection.objects)
     if not selected:
         return
 
@@ -529,7 +523,7 @@ def isolate_selected(viewer: "Viewer") -> None:
     for obj in selected:
         parent = obj.parent
         while parent is not None and not getattr(parent, "is_root", False):
-            visible.add(cast("ViewerSceneObject", parent))
+            visible.add(parent)
             parent = parent.parent
 
     for obj in objects:
@@ -537,7 +531,7 @@ def isolate_selected(viewer: "Viewer") -> None:
 
     viewer.ui.sidebar.update()
     viewer.renderer.update()
-    _zoom_objects(viewer, selected)
+    _zoom_objects(viewer, [viewer.scene.render_object(obj) for obj in selected])
 
 
 isolate_selected_cmd = Command(title="Isolate Selected", callback=isolate_selected)
@@ -552,7 +546,7 @@ def show_all(viewer: "Viewer") -> None:
         Viewer whose scene objects should be made visible.
 
     """
-    for obj in cast(list["ViewerSceneObject"], viewer.scene.objects):
+    for obj in viewer.scene.objects:
         obj.show = True
 
     viewer.ui.sidebar.update()
@@ -615,12 +609,7 @@ def select_all(viewer: "Viewer") -> None:
         Viewer containing the objects to select.
 
     """
-    for obj in cast(list["ViewerSceneObject"], viewer.scene.objects):
-        if obj.show:
-            obj.is_selected = True
-
-    viewer.ui.sidebar.update()
-    viewer.renderer.update()
+    viewer.state.selection.add(*(obj for obj in viewer.scene.objects if obj.show))
 
 
 select_all_cmd = Command(title="Select All", callback=select_all)
@@ -635,42 +624,34 @@ def invert_selection(viewer: "Viewer") -> None:
         Viewer containing the objects whose selection should be inverted.
 
     """
-    for obj in cast(list["ViewerSceneObject"], viewer.scene.objects):
-        if obj.show:
-            obj.is_selected = not obj.is_selected
-
-    viewer.ui.sidebar.update()
-    viewer.renderer.update()
+    selection = viewer.state.selection
+    objects = [obj for obj in selection if not obj.show]
+    objects.extend(obj for obj in viewer.scene.objects if obj.show and obj not in selection)
+    selection.replace(objects)
 
 
 invert_selection_cmd = Command(title="Select Inverted", callback=invert_selection)
 
 
 def deselect_all(viewer: "Viewer") -> None:
-    """Clear the current scene selection.
+    """Clear both Viewer selections.
 
     Parameters
     ----------
     viewer
-        Viewer whose selection should be cleared.
+        Viewer whose spatial and annotation selections should be cleared.
 
     """
-    for obj in cast(list["ViewerSceneObject"], viewer.scene.objects):
-        obj.is_selected = False
-
-    viewer.ui.sidebar.update()
-    viewer.renderer.update()
+    viewer.state.selection.clear()
+    viewer.state.annotation_selection.clear()
 
 
 deselect_all_cmd = Command(title="Deselect All", callback=deselect_all, keybinding="Escape")
 
 
-def _select_matching(viewer: "Viewer", predicate: Callable[["ViewerSceneObject"], bool]) -> None:
+def _select_matching(viewer: "Viewer", predicate: Callable[[SceneObject], bool]) -> None:
     """Replace the selection with objects matching a predicate."""
-    for obj in cast(list["ViewerSceneObject"], viewer.scene.objects):
-        obj.is_selected = predicate(obj)
-    viewer.ui.sidebar.update()
-    viewer.renderer.update()
+    viewer.state.selection.replace(obj for obj in viewer.scene.objects if predicate(obj))
 
 
 def select_by_type(viewer: "Viewer", type_name: str | type | None = None) -> None:
@@ -684,7 +665,7 @@ def select_by_type(viewer: "Viewer", type_name: str | type | None = None) -> Non
         Type or case-insensitive class name. A chooser is shown when omitted.
 
     """
-    objects = cast(list["ViewerSceneObject"], viewer.scene.objects)
+    objects = viewer.scene.objects
     if type_name is None:
         names = sorted({type(obj).__name__ for obj in objects} | {type(obj.item).__name__ for obj in objects if getattr(obj, "item", None) is not None})
         if not names:
@@ -695,13 +676,13 @@ def select_by_type(viewer: "Viewer", type_name: str | type | None = None) -> Non
 
     if isinstance(type_name, type):
 
-        def predicate(obj: "ViewerSceneObject") -> bool:
+        def predicate(obj: SceneObject) -> bool:
             return isinstance(obj, type_name) or isinstance(getattr(obj, "item", None), type_name)
 
     else:
         normalized = type_name.casefold()
 
-        def predicate(obj: "ViewerSceneObject") -> bool:
+        def predicate(obj: SceneObject) -> bool:
             return type(obj).__name__.casefold() == normalized or type(getattr(obj, "item", None)).__name__.casefold() == normalized
 
     _select_matching(viewer, predicate)
@@ -752,7 +733,7 @@ def select_by_color(viewer: "Viewer", color: Color | str | None = None) -> None:
     if target is None:
         return
 
-    def matches(obj: "ViewerSceneObject") -> bool:
+    def matches(obj: SceneObject) -> bool:
         for name in ("color", "pointcolor", "linecolor", "facecolor", "surfacecolor"):
             value = getattr(obj, name, None)
             if isinstance(value, Color) and value.rgba == target.rgba:
@@ -784,25 +765,21 @@ def select_object(viewer: "Viewer", event: QMouseEvent) -> None:
     etype = event.type()
 
     if etype == QEvent.Type.MouseButtonPress:
-        for _, obj in viewer.scene.instance_colors.items():
-            obj.is_selected = False
-
         x = viewer.mouse.last_pos.x()
         y = viewer.mouse.last_pos.y()
         instance_color = viewer.renderer.read_instance_color((x, y, x, y))
         selected_obj = _object_from_instance_colors(viewer, instance_color)
-        if selected_obj:
-            selected_obj.is_selected = True
-
-        viewer.ui.sidebar.update()
-
-    viewer.renderer.update()
+        if selected_obj is None:
+            viewer.state.selection.clear()
+            viewer.state.annotation_selection.clear()
+        else:
+            viewer.state.selection.replace((selected_obj,))
 
 
 select_object_cmd = Command(title="Select Object", callback=select_object, mousebinding="LEFT")
 
 
-def _object_from_instance_colors(viewer: "Viewer", pixels: NDArray[np.uint8]) -> "ViewerSceneObject | None":
+def _object_from_instance_colors(viewer: "Viewer", pixels: NDArray[np.uint8]) -> SceneObject | None:
     """Resolve the most frequently sampled registered instance color."""
     colors, counts = unique(pixels, axis=0, return_counts=True)
     candidates = [(int(count), viewer.scene.instance_colors.get((int(color[0]), int(color[1]), int(color[2])))) for color, count in zip(colors, counts, strict=True)]
@@ -848,10 +825,7 @@ def select_multiple(viewer: "Viewer", event: QMouseEvent) -> None:
         instance_color = viewer.renderer.read_instance_color((x, y, x, y))
         selected_obj = _object_from_instance_colors(viewer, instance_color)
         if selected_obj:
-            selected_obj.is_selected = True
-            viewer.ui.sidebar.update()
-
-    viewer.renderer.update()
+            viewer.state.selection.add(selected_obj)
 
 
 select_multiple_cmd = Command(title="Add to Selection", callback=select_multiple, mousebinding="LEFT + CTRL")
@@ -880,6 +854,7 @@ def select_window(viewer: "Viewer", event: QMouseEvent) -> None:
         viewer.mouse.is_tracing_a_window = True  # this results in the drawing of the selection window
         if not viewer.mouse.window_start_point:
             viewer.mouse.window_start_point = event.pos()
+        viewer.renderer.update()
 
     elif etype == QEvent.Type.MouseButtonRelease:
         viewer.mouse.is_tracing_a_window = False  # this stops the drawing of the selection window
@@ -891,11 +866,8 @@ def select_window(viewer: "Viewer", event: QMouseEvent) -> None:
 
         # ignore small windows
         if abs(start.x() - end.x()) * abs(start.y() - end.y()) <= 4:
+            viewer.renderer.update()
             return
-
-        # Deselect all objects first
-        for _, obj in viewer.scene.instance_colors.items():
-            obj.is_selected = False
 
         box = (start.x(), start.y(), end.x(), end.y())
         fully_contained = end.x() >= start.x()
@@ -906,14 +878,9 @@ def select_window(viewer: "Viewer", event: QMouseEvent) -> None:
             all_instance_colors = None
         selected_colors = _window_instance_colors(viewer, instance_color, all_instance_colors)
 
-        # Select based on instance colors
-        for color, obj in viewer.scene.instance_colors.items():
-            if color in selected_colors:
-                obj.is_selected = True
-
-        viewer.ui.sidebar.update()
-
-    viewer.renderer.update()
+        selected = [obj for color, obj in viewer.scene.instance_colors.items() if color in selected_colors]
+        if not viewer.state.selection.replace(selected):
+            viewer.renderer.update()
 
 
 select_window_cmd = Command(title="Select Box", callback=select_window, mousebinding="LEFT + SHIFT")
@@ -938,11 +905,7 @@ def deselect_object(viewer: "Viewer", event: QMouseEvent) -> None:
         instance_color = viewer.renderer.read_instance_color((x, y, x, y))
         selected_obj = _object_from_instance_colors(viewer, instance_color)
         if selected_obj:
-            selected_obj.is_selected = False
-
-        viewer.ui.sidebar.update()
-
-    viewer.renderer.update()
+            viewer.state.selection.remove(selected_obj)
 
 
 deselect_object_cmd = Command(title="Deselect Object", callback=deselect_object, mousebinding="LEFT")
@@ -979,14 +942,14 @@ def modify_selected(viewer: "Viewer") -> bool:
     from compas_viewer.components import ParameterForm
     from compas_viewer.scene import modify_object_parameters
 
-    selected = [obj for obj in cast(list["ViewerSceneObject"], viewer.scene.objects) if obj.is_selected]
+    selected = list(viewer.state.selection.objects)
     parent = viewer.ui.window.widget
     if len(selected) != 1:
         QMessageBox.information(parent, "Modify Parameters", "Select exactly one object to modify.")
         return False
 
     sceneobject = selected[0]
-    data = sceneobject.data
+    data = sceneobject.item
     if data is None:
         QMessageBox.information(parent, "Modify Parameters", "The selected scene object has no underlying data object.")
         return False
@@ -1006,7 +969,7 @@ def modify_selected(viewer: "Viewer") -> bool:
         QMessageBox.critical(parent, "Could Not Modify Object", str(error))
         return False
 
-    sceneobject.refresh_data()
+    viewer.scene.render_object(sceneobject).refresh_data()
     if viewer.running:
         viewer.renderer.rebuild_buffers()
         viewer.renderer.update()
@@ -1015,6 +978,68 @@ def modify_selected(viewer: "Viewer") -> bool:
 
 
 modify_selected_cmd = Command(title="Modify Parameters...", callback=modify_selected)
+
+
+# =============================================================================
+
+
+def transform_selected(viewer: "Viewer", transformation: Transformation, space: Literal["world"] = "world") -> None:
+    """Transform the current object selection through the Viewer transaction.
+
+    Parameters
+    ----------
+    viewer
+        Viewer containing the selected objects.
+    transformation
+        World-space transformation delta.
+    space
+        Transformation space. Only `"world"` is supported.
+
+    """
+    viewer.transform_objects(viewer.state.selection.objects, transformation, space=space)
+
+
+transform_selected_cmd = Command(title="Transform Selected", callback=transform_selected)
+
+
+def undo(viewer: "Viewer") -> bool:
+    """Undo the most recent reversible Viewer transaction.
+
+    Parameters
+    ----------
+    viewer
+        Viewer whose transaction history should move backward.
+
+    Returns
+    -------
+    bool
+        Whether a transaction was undone.
+
+    """
+    return viewer.undo()
+
+
+undo_cmd = Command(title="Undo", callback=undo)
+
+
+def redo(viewer: "Viewer") -> bool:
+    """Redo the most recently undone Viewer transaction.
+
+    Parameters
+    ----------
+    viewer
+        Viewer whose transaction history should move forward.
+
+    Returns
+    -------
+    bool
+        Whether a transaction was redone.
+
+    """
+    return viewer.redo()
+
+
+redo_cmd = Command(title="Redo", callback=redo)
 
 
 # =============================================================================
@@ -1029,11 +1054,22 @@ def delete_selected(viewer: "Viewer") -> None:
         Viewer containing the objects to remove.
 
     """
-    for obj in cast(list["ViewerSceneObject"], viewer.scene.objects):
-        if obj.is_selected:
-            viewer.scene.remove(obj)
-            del obj
-    viewer.renderer.update()
+    selected = viewer.state.selection.objects
+    if not selected:
+        return
+    renderer = viewer.renderer if viewer.running else None
+    if renderer is not None:
+        renderer.makeCurrent()
+    try:
+        for obj in selected:
+            if obj in viewer.scene.objects:
+                viewer.scene._remove(obj, rebuild_buffers=False, cleanup_selection=False, context_is_current=renderer is not None)
+    finally:
+        if renderer is not None:
+            renderer.doneCurrent()
+    if viewer.running:
+        viewer.renderer.rebuild_buffers()
+    viewer.state.selection.clear()
 
 
 delete_selected_cmd = Command(title="Delete Selected", callback=delete_selected, keybinding="Delete")
@@ -1057,13 +1093,7 @@ def clear_scene(viewer: "Viewer") -> None:
         Viewer whose scene should be cleared.
 
     """
-    for obj in cast(list["ViewerSceneObject"], viewer.scene.objects):
-        viewer.scene.remove(obj, rebuild_buffers=False)
-        del obj
-
-    viewer.renderer.rebuild_buffers()
-    viewer.renderer.update()
-    viewer.ui.sidebar.update()
+    viewer.scene.clear()
 
 
 clear_scene_cmd = Command(title="Clear Scene", callback=clear_scene)
@@ -1149,6 +1179,140 @@ save_scene_cmd = Command(title="Save Scene", callback=save_scene)
 # =============================================================================
 # =============================================================================
 # =============================================================================
+# Measure
+# =============================================================================
+# =============================================================================
+# =============================================================================
+
+
+def inspect_distance(viewer: "Viewer") -> None:
+    """Start a one-shot transient distance inspection.
+
+    Parameters
+    ----------
+    viewer
+        Viewer receiving the interaction.
+
+    """
+    viewer.start_distance_inspection()
+
+
+inspect_distance_cmd = Command(title="Inspect Distance", callback=inspect_distance)
+
+
+def inspect_selected_area(viewer: "Viewer") -> float | None:
+    """Inspect the exact area of one selected spatial scene object.
+
+    Parameters
+    ----------
+    viewer
+        Viewer containing the selected object.
+
+    Returns
+    -------
+    float | None
+        World-space area, or `None` when inspection fails.
+
+    """
+    return _inspect_selected_scalar(viewer, "area")
+
+
+inspect_selected_area_cmd = Command(title="Inspect Selected Area", callback=inspect_selected_area)
+
+
+def inspect_selected_volume(viewer: "Viewer") -> float | None:
+    """Inspect the exact volume of one selected spatial scene object.
+
+    Parameters
+    ----------
+    viewer
+        Viewer containing the selected object.
+
+    Returns
+    -------
+    float | None
+        World-space volume, or `None` when inspection fails.
+
+    """
+    return _inspect_selected_scalar(viewer, "volume")
+
+
+inspect_selected_volume_cmd = Command(title="Inspect Selected Volume", callback=inspect_selected_volume)
+
+
+def _inspect_selected_scalar(viewer: "Viewer", kind: ScalarMeasurementKind) -> float | None:
+    """Inspect one scalar and own its result or error dialog."""
+    parent = viewer.ui.window.widget
+    label = kind.title()
+    try:
+        value = viewer.inspect_selected_area() if kind == "area" else viewer.inspect_selected_volume()
+    except (ScalarMeasurementError, UnsupportedScalarMeasurementError) as error:
+        QMessageBox.information(parent, f"Could Not Inspect {label}", str(error))
+        return None
+    except Exception as error:
+        QMessageBox.critical(parent, f"Could Not Inspect {label}", str(error))
+        return None
+
+    precision = viewer.config.measurement.precision
+    unit = viewer.config.measurement.unit
+    suffix = f" {unit}{'²' if kind == 'area' else '³'}" if unit else ""
+    QMessageBox.information(parent, f"Selected {label}", f"{label}: {value:.{precision}f}{suffix}")
+    return value
+
+
+def add_fixed_distance_dimension(viewer: "Viewer") -> None:
+    """Start a one-shot fixed distance-dimension interaction.
+
+    Parameters
+    ----------
+    viewer
+        Viewer receiving the interaction.
+
+    """
+    viewer.start_distance_dimension("fixed")
+
+
+add_fixed_distance_dimension_cmd = Command(title="Add Fixed Distance Dimension", callback=add_fixed_distance_dimension)
+
+
+def add_associative_distance_dimension(viewer: "Viewer") -> None:
+    """Start a one-shot associative distance-dimension interaction.
+
+    Parameters
+    ----------
+    viewer
+        Viewer receiving the interaction.
+
+    """
+    viewer.start_distance_dimension("associative")
+
+
+add_associative_distance_dimension_cmd = Command(title="Add Associative Distance Dimension", callback=add_associative_distance_dimension)
+
+
+def cancel_measurement(viewer: "Viewer") -> bool:
+    """Cancel active or retained transient measurement state.
+
+    Parameters
+    ----------
+    viewer
+        Viewer whose measurement state should be cleared.
+
+    Returns
+    -------
+    bool
+        Whether measurement state was cleared.
+
+    """
+    return viewer.cancel_measurement()
+
+
+cancel_measurement_cmd = Command(title="Cancel Measurement", callback=cancel_measurement)
+
+
+# =============================================================================
+# =============================================================================
+# =============================================================================
 # Data
 # =============================================================================
 # =============================================================================
@@ -1173,7 +1337,10 @@ def builtin_commands() -> dict[str, Command]:
 
     """
     return {
+        "viewer.add_associative_distance_dimension": add_associative_distance_dimension_cmd,
+        "viewer.add_fixed_distance_dimension": add_fixed_distance_dimension_cmd,
         "viewer.add_geometry": add_geometry_cmd,
+        "viewer.cancel_measurement": cancel_measurement_cmd,
         "viewer.capture_view": capture_view_cmd,
         "viewer.change_appearance": change_appearance_cmd,
         "viewer.change_rendermode": change_rendermode_cmd,
@@ -1182,11 +1349,15 @@ def builtin_commands() -> dict[str, Command]:
         "viewer.delete_selected": delete_selected_cmd,
         "viewer.deselect_all": deselect_all_cmd,
         "viewer.invert_selection": invert_selection_cmd,
+        "viewer.inspect_distance": inspect_distance_cmd,
+        "viewer.inspect_selected_area": inspect_selected_area_cmd,
+        "viewer.inspect_selected_volume": inspect_selected_volume_cmd,
         "viewer.isolate_selected": isolate_selected_cmd,
         "viewer.load_scene": load_scene_cmd,
         "viewer.modify_selected": modify_selected_cmd,
         "viewer.open_url": open_url_cmd,
         "viewer.pan_view": pan_view_cmd,
+        "viewer.redo": redo_cmd,
         "viewer.rotate_view": rotate_view_cmd,
         "viewer.save_scene": save_scene_cmd,
         "viewer.select_all": select_all_cmd,
@@ -1202,6 +1373,8 @@ def builtin_commands() -> dict[str, Command]:
         "viewer.toggle_sidedock": toggle_sidedock_cmd,
         "viewer.toggle_statusbar": toggle_statusbar_cmd,
         "viewer.toggle_toolbar": toggle_toolbar_cmd,
+        "viewer.transform_selected": transform_selected_cmd,
+        "viewer.undo": undo_cmd,
         "viewer.zoom_extents": zoom_extents_cmd,
         "viewer.zoom_selected": zoom_selected_cmd,
         "viewer.zoom_view": zoom_view_cmd,

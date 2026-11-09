@@ -5,17 +5,18 @@ from compas.geometry import Polygon
 from compas.geometry import PolygonalSurface
 from compas.geometry import Polyhedron
 from compas.geometry import Tessellation
-from compas_viewer.scene import BRepObject
-from compas_viewer.scene import PolygonObject
-from compas_viewer.scene import PolygonalSurfaceObject
-from compas_viewer.scene import PolyhedronObject
+from compas.scene import get_sceneobject_cls
+from compas_viewer.scene.brepobject import BRepObject
+from compas_viewer.scene.polygonobject import PolygonObject
+from compas_viewer.scene.polygonalsurfaceobject import PolygonalSurfaceObject
+from compas_viewer.scene.polyhedronobject import PolyhedronObject
+from compas_viewer.scene import ViewerScene
 
 
 def test_polygon_scene_object_uses_nonmutating_triangulation():
     polygon = Polygon([[0, 0, 0], [1, 0, 0], [1, 1, 0], [0, 1, 0]])
     data = polygon.__data__
-    sceneobject = object.__new__(PolygonObject)
-    PolygonObject.__init__(sceneobject, item=polygon)
+    sceneobject = PolygonObject(sceneobject=get_sceneobject_cls(polygon)(item=polygon), runtime=ViewerScene())
 
     first = sceneobject.tessellation
     second = sceneobject.tessellation
@@ -31,8 +32,7 @@ def test_polygonal_surface_scene_object_uses_nonmutating_triangulation():
         [[0, 1, 2, 3]],
     )
     data = surface.__data__
-    sceneobject = object.__new__(PolygonalSurfaceObject)
-    PolygonalSurfaceObject.__init__(sceneobject, item=surface)
+    sceneobject = PolygonalSurfaceObject(sceneobject=get_sceneobject_cls(surface)(item=surface), runtime=ViewerScene())
 
     first = sceneobject.tessellation
     second = sceneobject.tessellation
@@ -46,8 +46,7 @@ def test_polyhedron_scene_object_uses_nonmutating_triangulation():
     polygonal_surface = Box(1.0).to_polygonal_surface()
     polyhedron = Polyhedron(polygonal_surface.vertices, polygonal_surface.faces)
     data = polyhedron.__data__
-    sceneobject = object.__new__(PolyhedronObject)
-    PolyhedronObject.__init__(sceneobject, item=polyhedron)
+    sceneobject = PolyhedronObject(sceneobject=get_sceneobject_cls(polyhedron)(item=polyhedron), runtime=ViewerScene())
 
     first = sceneobject.tessellation
     second = sceneobject.tessellation
@@ -89,9 +88,7 @@ def test_brep_scene_object_refreshes_one_current_tessellation():
         polylines=[[[0, 0, 0], [3, 0, 0], [3, 3, 0]]],
     )
     brep = StubBrep(initial)
-    sceneobject = object.__new__(BRepObject)
-
-    BRepObject.__init__(sceneobject, item=brep)
+    sceneobject = BRepObject(sceneobject=get_sceneobject_cls(brep)(item=brep), runtime=ViewerScene())
     brep.tessellation = before_first_draw
     sceneobject.refresh_data()
 

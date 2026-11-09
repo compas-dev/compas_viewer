@@ -294,7 +294,7 @@ wheels = [
 [[package]]
 name = "compas"
 version = "3.0.0"
-source = { git = "https://github.com/compas-dev/compas.git?rev=3c1a2e8e0e5c4c14292ecf4bb38c82e5b977273e#3c1a2e8e0e5c4c14292ecf4bb38c82e5b977273e" }
+source = { git = "https://github.com/compas-dev/compas.git?rev=70aeb1e408772f0a84213c280658d4d594bf12ea#70aeb1e408772f0a84213c280658d4d594bf12ea" }
 dependencies = [
     { name = "mapbox-earcut" },
     { name = "networkx" },
@@ -344,7 +344,7 @@ docs = [
 
 [package.metadata]
 requires-dist = [
-    { name = "compas", git = "https://github.com/compas-dev/compas.git?rev=3c1a2e8e0e5c4c14292ecf4bb38c82e5b977273e" },
+    { name = "compas", git = "https://github.com/compas-dev/compas.git?rev=70aeb1e408772f0a84213c280658d4d594bf12ea" },
     { name = "freetype-py" },
     { name = "pillow" },
     { name = "pyopengl" },

@@ -1,33 +1,28 @@
-from compas.colors import Color
 from compas.geometry import Box
-from compas.geometry import Frame
-from compas.geometry import Scale
 from compas.geometry import Translation
 from compas_viewer import Viewer
 
 viewer = Viewer()
 
-box1 = Box(1, 1, 1, Frame([0, 0, 0], [1, 0, 0], [0, 1, 0]))
-box2 = Box(1, 1, 1, Frame([0, 0, 0], [1, 0, 0], [0, 1, 0]))
-box3 = Box(1, 1, 1, Frame([0, 0, 0], [1, 0, 0], [0, 1, 0]))
-obj1 = viewer.scene.add(box1, surfacecolor=Color.red())
-obj2 = viewer.scene.add(box2, surfacecolor=Color.blue())
-obj3 = viewer.scene.add(box3, surfacecolor=Color.green())
+left = viewer.scene.add(
+    Box(1.0),
+    name="Left box",
+    transformation=Translation.from_vector([-2.0, 0.0, 0.0]),
+)
+right = viewer.scene.add(
+    Box(1.0),
+    name="Right box",
+    transformation=Translation.from_vector([2.0, 0.0, 0.0]),
+)
 
-s = 1
+# Apply one world-space delta to both objects as a single transaction.
+viewer.transform_objects(
+    (left, right),
+    Translation.from_vector([0.0, 0.0, 2.0]),
+)
 
-
-@viewer.on(interval=100)
-def transform(frame):
-    obj1.transformation = Translation.from_vector([0, 0, 0.01 * frame])
-    obj1.update()
-
-    obj2.transformation = Translation.from_vector([0, 0.01 * frame, 0])
-    obj2.update()
-
-    S = Scale.from_factors([0.01 * frame, 0.01 * frame, 0.01 * frame])
-    obj3.transformation = S
-    obj3.update()
-
+# Undo and redo operate on the complete transaction.
+viewer.undo()
+viewer.redo()
 
 viewer.show()

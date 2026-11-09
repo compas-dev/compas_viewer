@@ -36,7 +36,7 @@ def remap_rgb(value: Sequence[float], to_range_one: bool = True) -> tuple[float,
     return tuple(v * factor for v in value)
 
 
-class ColorPicker(BoundComponent[Color]):
+class ColorPicker(BoundComponent[Color | ColorDict]):
     """Create a labeled color picker bound to a COMPAS color value.
     (either a dictionary key or object attribute). When the color changes, it automatically
     updates the bound attribute and optionally calls a action function.
@@ -67,7 +67,7 @@ class ColorPicker(BoundComponent[Color]):
         obj: object | dict[str, Color],
         attr: str,
         title: str | None = None,
-        action: Callable[[Component, Color], None] | None = None,
+        action: Callable[[Component, Color | ColorDict], None] | None = None,
     ) -> None:
         super().__init__(obj, attr, action=action)
 
@@ -81,14 +81,7 @@ class ColorPicker(BoundComponent[Color]):
 
         # Get the initial color from the bound attribute
         default_color = self.get_attr()
-        if isinstance(default_color, Color):
-            default_color = default_color.rgb
-        elif isinstance(default_color, ColorDict):
-            default_color = default_color.default.rgb
-        else:
-            raise ValueError("Invalid color type. : {}".format(type(default_color)))
-
-        default_color = QColor(*remap_rgb(default_color, to_range_one=False))
+        default_color = QColor(*remap_rgb(self._color(default_color).rgb, to_range_one=False))
         self.current_color = default_color
 
         self.layout.addWidget(self.label)
@@ -137,6 +130,15 @@ class ColorPicker(BoundComponent[Color]):
         new_color = Color(red=rgb[0], green=rgb[1], blue=rgb[2])
         self.on_value_changed(new_color)
 
-    def sync_from_bound_object(self, value: Color) -> None:
-        """Synchronize the button with a changed COMPAS color."""
-        self.set_button_color(QColor(*remap_rgb(value.rgb, to_range_one=False)))
+    def sync_from_bound_object(self, value: Color | ColorDict) -> None:
+        """Synchronize the button with a color or color-dictionary default."""
+        self.set_button_color(QColor(*remap_rgb(self._color(value).rgb, to_range_one=False)))
+
+    @staticmethod
+    def _color(value: Color | ColorDict | None) -> Color:
+        """Return the displayed color without discarding mapping entries."""
+        if isinstance(value, Color):
+            return value
+        if isinstance(value, ColorDict):
+            return value.default
+        raise ValueError(f"Invalid color type: {type(value).__name__}.")

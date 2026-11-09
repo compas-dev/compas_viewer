@@ -1,41 +1,37 @@
-from random import random
+from random import Random
 
 from compas.geometry import Box
 from compas.geometry import Translation
 from compas_viewer import Viewer
 
 viewer = Viewer()
+rng = Random(42)
 
-mesh = Box.from_width_height_depth(2, 2, 2).to_polygonal_surface().to_mesh()
-obj1 = viewer.scene.add(mesh)
-obj2 = viewer.scene.add(mesh, transformation=Translation.from_vector([5, 0, 0]))
-obj3 = viewer.scene.add(mesh, transformation=Translation.from_vector([-5, 0, 0]))
+mesh = Box(2, 2, 2).to_polygonal_surface().to_mesh()
+moving_object = viewer.scene.add(mesh)
+static_object = viewer.scene.add(mesh, transformation=Translation.from_vector([5, 0, 0]))
+rotating_object = viewer.scene.add(mesh, transformation=Translation.from_vector([-5, 0, 0]))
 
-obj1.opacity = 0.7
+moving_object.opacity = 0.7
 
 
 @viewer.on(interval=100)
 def deform_mesh(frame: int) -> None:
-    obj1.opacity = (frame / 20) % 1
-    for v in mesh.vertices():
-        vertex = mesh.vertex_point(v)
-        vertex[0] += (random() - 0.5) * 0.1
-        vertex[1] += (random() - 0.5) * 0.1
-        vertex[2] += (random() - 0.5) * 0.1
-        mesh.vertex_attributes(v, "xyz", vertex)
+    moving_object.opacity = (frame / 20) % 1
+    for vertex in mesh.vertices():
+        point = mesh.vertex_point(vertex)
+        point[0] += (rng.random() - 0.5) * 0.1
+        point[1] += (rng.random() - 0.5) * 0.1
+        point[2] += (rng.random() - 0.5) * 0.1
+        mesh.set_vertex_point(vertex, point)
 
-    obj1.transformation = Translation.from_vector([random() - 0.5, random() - 0.5, random() - 0.5])
-    obj3.transformation *= Translation.from_euler_angles([0.05, 0, 0])
+    moving_object.transformation = Translation.from_vector([rng.random() - 0.5, rng.random() - 0.5, rng.random() - 0.5])
+    rotating_object.transformation *= Translation.from_euler_angles([0.05, 0, 0])
 
-    # Three objects share the same geometry data, but updated differently
-    # obj1 should move around and deform
-    obj1.update(update_transform=True, update_data=True)
-
-    # obj2 will not move but will deform
-    obj2.update(update_transform=False, update_data=True)
-
-    # obj3 will rotate but not deform
-    obj3.update(update_transform=True, update_data=False)
+    # All three scene objects share the modified mesh, so regenerate their
+    # geometry. Then synchronize the two externally assigned transformations.
+    viewer.refresh_geometry()
+    viewer.refresh_transform((moving_object, rotating_object))
 
 
 viewer.show()

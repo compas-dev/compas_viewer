@@ -1,13 +1,48 @@
-from typing import cast
-
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QPainter
+from PySide6.QtGui import QPaintEvent
 from PySide6.QtWidgets import QSplitter
+from PySide6.QtWidgets import QStackedLayout
+from PySide6.QtWidgets import QWidget
 
+from compas_viewer.base import Base
 from compas_viewer.components.component import Component
-from compas_viewer.config import Unit
 from compas_viewer.renderer import Renderer
 
 from .mainwindow import MainWindow
 from .sidebar import SideBarRight
+
+
+class _OverlayCanvas(QWidget, Base):
+    """Paint transient 2D feedback above the OpenGL renderer."""
+
+    def __init__(self, renderer: Renderer) -> None:
+        super().__init__()
+        self.renderer = renderer
+        self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+        self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.setAutoFillBackground(False)
+
+    def sync(self) -> None:
+        """Synchronize visibility and schedule one overlay repaint."""
+        visible = self.viewer._has_overlay_content()
+        self.setVisible(visible)
+        if visible:
+            self.update()
+
+    def paintEvent(self, event: QPaintEvent) -> None:
+        """Draw overlays inside the ordinary QWidget paint lifecycle."""
+        del event
+        if not self.viewer._has_overlay_content():
+            return
+        painter = QPainter()
+        if not painter.begin(self):
+            return
+        try:
+            self.viewer._draw_overlays(self.renderer, painter)
+        finally:
+            painter.end()
 
 
 class ViewPort(Component):
@@ -24,9 +59,17 @@ class ViewPort(Component):
         super().__init__()
         self.widget = QSplitter()
         self.renderer = Renderer()
-        self._unit: Unit | None = None
-        self.widget.addWidget(self.renderer)
-        self.unit = self.viewer.config.unit
+        self._canvas = QWidget()
+        self._canvas_layout = QStackedLayout(self._canvas)
+        self._canvas_layout.setContentsMargins(0, 0, 0, 0)
+        self._canvas_layout.setStackingMode(QStackedLayout.StackingMode.StackAll)
+        self._canvas_layout.addWidget(self.renderer)
+        self._overlay_canvas = _OverlayCanvas(self.renderer)
+        self._canvas_layout.addWidget(self._overlay_canvas)
+        self._canvas_layout.setCurrentWidget(self._overlay_canvas)
+        self.renderer.frameSwapped.connect(self._overlay_canvas.sync)
+        self._overlay_canvas.sync()
+        self.widget.addWidget(self._canvas)
         self.sidebar = SideBarRight(self)
         self.widget.addWidget(self.sidebar.widget)
         sidebar_width = self.viewer.config.ui.sidebar.width
@@ -34,38 +77,7 @@ class ViewPort(Component):
         self.widget.setStretchFactor(0, 1)
         self.widget.setStretchFactor(1, 0)
         window.widget.setCentralWidget(self.widget)
-        self.viewer.state.changed.connect(self._on_state_changed)
 
-    @property
-    def unit(self) -> Unit:
-        """Unit: Display unit controlling the camera and grid scale."""
-        return cast(Unit, self._unit)
-
-    @unit.setter
-    def unit(self, unit: Unit) -> None:
-        if unit != self._unit:
-            previous_scale = self.renderer.camera.scale
-            if unit == "m":
-                self.viewer.state.set("renderer.gridsize", (10.0, 10, 10.0, 10))
-                self.renderer.camera.scale = 1.0
-            elif unit == "cm":
-                self.viewer.state.set("renderer.gridsize", (1000.0, 10, 1000.0, 10))
-                self.renderer.camera.scale = 100.0
-            elif unit == "mm":
-                self.viewer.state.set("renderer.gridsize", (10000.0, 10, 10000.0, 10))
-                self.renderer.camera.scale = 1000.0
-            else:
-                raise ValueError(f"Invalid unit: {unit}. Valid units are 'm', 'cm', 'mm'.")
-            self.renderer.camera.distance *= self.renderer.camera.scale / previous_scale
-            self.viewer.state.set("camera.scale", self.renderer.camera.scale)
-
-        self._unit = unit
-        self.viewer.state.set("unit", unit)
-        if self.viewer.running:
-            self.renderer.rebuild_grid()
-            self.renderer.update()
-
-    def _on_state_changed(self, path: str, value: object) -> None:
-        """Apply unit changes originating from another UI surface."""
-        if path == "unit" and value != self._unit:
-            self.unit = cast(Unit, value)
+    def update_overlays(self) -> None:
+        """Synchronize and repaint transient screen overlays."""
+        self._overlay_canvas.sync()

@@ -98,7 +98,7 @@ nav:
           - Geometries: examples/object/geometries.md
           - Lines: examples/object/lines.md
           - Mesh Display: examples/object/mesh_display.md
-          - NURBS: examples/object/nurbs.md
+          - NURBS Surface: examples/object/nurbs.md
           - Point Clouds: examples/object/pointcloud.md
           - Points: examples/object/points.md
           - Polylines: examples/object/polyline.md
@@ -115,7 +115,7 @@ nav:
           - Overview: examples/color.md
           - Blending: examples/color/blending.md
           - Colors: examples/color/colors.md
-          - Face and Vertex Colors: examples/color/face_vertext_color.md
+          - Vertex Colors: examples/color/vertex_colors.md
       - Dynamic:
           - Overview: examples/dynamic.md
           - Dynamic Objects: examples/dynamic/dynamic.md
@@ -127,15 +127,20 @@ nav:
           - Overview: examples/ui.md
           - Side-dock Controls: examples/ui/sidedock.md
           - Camera Controls: examples/ui/camera.md
+          - Object and Attribute Inspection: examples/ui/object_inspection.md
+          - Distance Measurements: examples/ui/measurements.md
+          - Scale and Legend Overlays: examples/ui/overlays.md
       - Configuration:
           - Overview: examples/configuration.md
-          - Units and Grid Scale: examples/configuration/units.md
+          - Viewer Window: examples/configuration/window.md
   - API Reference:
       - Overview: api.md
       - compas_viewer: api/compas_viewer.md
       - Commands: api/compas_viewer.commands.md
       - Components: api/compas_viewer.components.md
+      - Configuration: api/compas_viewer.config.md
       - Events: api/compas_viewer.events.md
+      - Forms: api/compas_viewer.forms.md
       - Renderer: api/compas_viewer.renderer.md
       - Scene: api/compas_viewer.scene.md
       - UI: api/compas_viewer.ui.md

@@ -1,4 +1,5 @@
 from types import SimpleNamespace
+from unittest.mock import Mock
 
 import pytest
 
@@ -53,8 +54,8 @@ def test_create_geometry_rejects_unknown_preset():
 
 
 def test_add_geometry_selects_only_the_new_object():
-    existing = SimpleNamespace(is_selected=True)
-    created = SimpleNamespace(is_selected=True)
+    existing = object()
+    created = object()
 
     class Scene:
         objects = [existing]
@@ -65,13 +66,14 @@ def test_add_geometry_selects_only_the_new_object():
             return created
 
     scene = Scene()
-    viewer = SimpleNamespace(scene=scene, running=False)
+    selection = Mock()
+    viewer = SimpleNamespace(scene=scene, state=SimpleNamespace(selection=selection), running=False)
 
     result = add_geometry(viewer, "sphere")
 
     assert result is created
-    assert not existing.is_selected
-    assert scene.kwargs == {"name": "Sphere", "is_selected": True}
+    selection.replace.assert_called_once_with((created,))
+    assert scene.kwargs == {"name": "Sphere"}
 
 
 def test_add_menu_contains_geometry_categories():

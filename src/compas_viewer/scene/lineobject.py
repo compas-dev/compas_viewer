@@ -9,10 +9,6 @@ from .geometryobject import GeometryObject
 class LineObject(GeometryObject):
     """Viewer scene object for displaying COMPAS Line geometry."""
 
-    def __init__(self, **kwargs) -> None:
-        super().__init__(**kwargs)
-        self.show_lines = True
-
     @property
     def points(self) -> list[Point] | None:
         line = cast(Line, self.geometry)

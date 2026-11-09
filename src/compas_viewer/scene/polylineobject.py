@@ -10,10 +10,6 @@ from .geometryobject import GeometryObject
 class PolylineObject(GeometryObject):
     """Viewer scene object for displaying COMPAS Polyline geometry."""
 
-    def __init__(self, **kwargs) -> None:
-        super().__init__(**kwargs)
-        self.show_lines = True
-
     @property
     def points(self) -> list[Point] | None:
         return cast(Polyline, self.geometry).points
