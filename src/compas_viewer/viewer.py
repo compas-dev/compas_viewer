@@ -28,6 +28,9 @@ from compas.scene import SceneObject
 from compas_viewer import HERE
 from compas_viewer._history import TransformTransaction
 from compas_viewer._history import copy_transformation
+from compas_viewer._scalar_measurement import ScalarMeasurementError
+from compas_viewer._scalar_measurement import ScalarMeasurementKind
+from compas_viewer._scalar_measurement import measure_sceneobject_scalar
 from compas_viewer.animation import ANIMATION_PRESETS
 from compas_viewer.animation import AnimationPreset
 from compas_viewer.commandregistry import CommandRegistry
@@ -53,6 +56,7 @@ from compas_viewer.ui import UI
 from compas_viewer.uidefinitions import UIItem
 from compas_viewer.uidefinitions import default_menu_items
 from compas_viewer.uidefinitions import default_sidebar_items
+from compas_viewer.uidefinitions import default_toolbar_items
 
 if TYPE_CHECKING:
     from PySide6.QtGui import QPainter
@@ -89,7 +93,7 @@ class Viewer(Singleton):
         self.state.changed.connect(self._on_state_changed)
         self.commands = CommandRegistry(builtin_commands())
         self.menu_items: list[UIItem] = default_menu_items()
-        self.toolbar_items: list[UIItem] = []
+        self.toolbar_items: list[UIItem] = default_toolbar_items()
         self.sidebar_items: list[UIItem] = default_sidebar_items()
         self.app.styleHints().colorSchemeChanged.connect(self._on_system_color_scheme_changed)
         self.set_appearance(self.config.ui.appearance)
@@ -161,7 +165,8 @@ class Viewer(Singleton):
         Parameters
         ----------
         overlay
-            Scale bar or categorical legend to append to the drawing order.
+            Scale bar, categorical legend, or screen text to append to the
+            drawing order.
 
         Raises
         ------
@@ -225,6 +230,71 @@ class Viewer(Singleton):
 
         """
         return self.state.measurement.cancel()
+
+    def inspect_selected_area(self) -> float:
+        """Return the exact world-space area of the selected scene object.
+
+        The represented item's public `area` contract defines whether this is
+        planar enclosed area or surface area. Render tessellations are never
+        used as an approximation.
+
+        Returns
+        -------
+        float
+            Nonnegative finite world-space area.
+
+        Raises
+        ------
+        ValueError
+            If exactly one spatial scene object is not selected, or the item
+            returns an invalid scalar.
+        NotImplementedError
+            If the item or its world transformation cannot provide an exact
+            area.
+
+        Notes
+        -----
+        Exceptions raised by an implemented item `area` operation propagate
+        to the caller.
+
+        """
+        return self._inspect_selected_scalar("area")
+
+    def inspect_selected_volume(self) -> float:
+        """Return the exact world-space volume of the selected scene object.
+
+        The represented item's public `volume` contract supplies the local
+        scalar. Render tessellations are never used as an approximation.
+
+        Returns
+        -------
+        float
+            Nonnegative finite world-space volume.
+
+        Raises
+        ------
+        ValueError
+            If exactly one spatial scene object is not selected, or the item
+            returns an invalid scalar.
+        NotImplementedError
+            If the item does not enclose a volume, or its world transformation
+            cannot provide an exact volume.
+
+        Notes
+        -----
+        Exceptions raised by an implemented item `volume` operation propagate
+        to the caller.
+
+        """
+        return self._inspect_selected_scalar("volume")
+
+    def _inspect_selected_scalar(self, kind: ScalarMeasurementKind) -> float:
+        """Cancel distance state and inspect one selected object's scalar."""
+        self.cancel_measurement()
+        selected = self.state.selection.objects
+        if len(selected) != 1:
+            raise ScalarMeasurementError(f"Select exactly one scene object to inspect {kind}.")
+        return measure_sceneobject_scalar(selected[0], kind)
 
     def _update_measurement_hover(self, screen_point: tuple[float, float]) -> None:
         """Update the active measurement's winner and point-snap palette."""

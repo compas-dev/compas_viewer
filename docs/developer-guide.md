@@ -97,14 +97,21 @@ Versions 0 and 1 also drop only these known retired fields:
 Each nested configuration group validates its own values and reports complete
 paths such as `renderer.gridmode`.
 
-At runtime, the **Units and Measurement** section of the **System** sidebar tab
+At runtime, the **Grid and Units** section of the **System** sidebar tab
 updates these settings through `ViewerState.set_measurement_unit` and
-`ViewerState.set_measurement_precision`. The section reads the active
-process-wide `compas.tolerance.TOL` values for context but never mutates them.
-Unit and precision affect labels only: they do not convert coordinates,
-configure snapping, or define geometry tolerance. The sidebar is the sole
-settings surface; a future Settings-menu action may focus this same section but
-must not create a second form or state path.
+`ViewerState.set_measurement_precision`. It also owns the existing grid state
+paths. Unit and precision affect labels only: they do not convert coordinates,
+grid spacing, configure snapping, or define geometry tolerance. Process-wide
+`compas.tolerance.TOL` remains a computational service and is not exposed as a
+Viewer setting. Camera, Display, and Grid and Units use one private aligned
+two-column layout; this is not a generic component-extension API.
+
+The default toolbar contains state-bound Render Mode and View selectors and is
+visible unless `ui.toolbar.show` is explicitly false. The selectors reuse the
+same commands and `renderer.rendermode` or `renderer.view` state paths as the
+View menu and Display form. State-driven synchronization blocks selector
+signals so it does not invoke commands recursively. Custom
+`viewer.toolbar_items` remains the runtime composition boundary.
 
 Applications may subclass `Config` and add typed nested `ConfigBase`
 dataclasses. Declared fields round-trip through dictionaries and JSON; dynamic
@@ -236,8 +243,41 @@ They refer to command IDs rather than importing callbacks, keeping UI
 composition separate from serialization. The built-in right sidebar has three
 stable domains: **Scene** for the spatial hierarchy and object details,
 **Annotations** for the ordered annotation list and annotation details, and
-**System** for Camera, Display, and Units and Measurement. Dynamic detail
+**System** for Camera, Display, and Grid and Units. Dynamic detail
 updates do not resize or rebuild unrelated domains.
+
+`GridUnitSetting` is the only built-in component for grid, unit, and precision
+controls. The retired `MeasurementSetting` item type and `"Units and
+Measurement"` section identifier have no compatibility alias.
+
+## Transient overlays and scalar inspections
+
+Viewer-owned screen overlays remain outside Scene, picking, and serialization.
+`ScreenTextOverlay` stores text, a normalized viewport position, horizontal and
+vertical alignment, and color. `(0, 0)` is the top-left corner and `(1, 1)` is
+the bottom-right. Add and remove instances through `viewer.add_overlay` and
+`viewer.remove_overlay`; the initial contract has no interactive placement,
+management UI, or persistence.
+
+`viewer.inspect_selected_area()` and `viewer.inspect_selected_volume()` are
+UI-independent scalar operations. They require exactly one spatially selected
+scene object and use its represented item's public `area` or `volume` method or
+property. The methods return a finite nonnegative world-coordinate scalar.
+Command callbacks alone format the current declared `unit²` or `unit³`, apply
+display precision, and show result or error dialogs.
+
+Scalar inspection uses the complete inherited world transformation. Area is
+scaled exactly only for rigid, reflected, or uniformly scaled transformations;
+non-uniform scale, shear, and projective transformations are rejected. Volume
+uses the absolute determinant of an affine transformation's linear part and
+rejects projective transformations. Missing APIs, unresolved items,
+`NotImplementedError`, and `None` results are unsupported. Other backend
+exceptions remain operation failures. Render tessellations are never an
+implicit measurement fallback.
+
+Both operations clear active or retained distance inspection before
+validation, but retain no scalar-measurement state and do not modify Scene,
+either selection, annotations, serialization, or transform history.
 
 ## COMPAS plugin discovery
 
@@ -410,7 +450,7 @@ viewer.ui.sidebar.focus_system_section("Camera")
 
 `set_current_tab` accepts only `"Scene"`, `"Annotations"`, or `"System"`.
 `focus_system_section` accepts only `"Camera"`, `"Display"`, or
-`"Units and Measurement"`, activates System, and focuses that section. Both
+`"Grid and Units"`, activates System, and focuses that section. Both
 methods raise `ValueError` for unsupported identifiers. Components should use
 this boundary instead of reaching into the sidebar's internal layouts.
 

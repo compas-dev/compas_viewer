@@ -44,6 +44,9 @@ from compas.geometry import Torus
 from compas.geometry import Transformation
 from compas.scene import Scene
 from compas.scene import SceneObject
+from compas_viewer._scalar_measurement import ScalarMeasurementError
+from compas_viewer._scalar_measurement import ScalarMeasurementKind
+from compas_viewer._scalar_measurement import UnsupportedScalarMeasurementError
 
 if TYPE_CHECKING:
     from compas_viewer import Viewer
@@ -1197,6 +1200,66 @@ def inspect_distance(viewer: "Viewer") -> None:
 inspect_distance_cmd = Command(title="Inspect Distance", callback=inspect_distance)
 
 
+def inspect_selected_area(viewer: "Viewer") -> float | None:
+    """Inspect the exact area of one selected spatial scene object.
+
+    Parameters
+    ----------
+    viewer
+        Viewer containing the selected object.
+
+    Returns
+    -------
+    float | None
+        World-space area, or `None` when inspection fails.
+
+    """
+    return _inspect_selected_scalar(viewer, "area")
+
+
+inspect_selected_area_cmd = Command(title="Inspect Selected Area", callback=inspect_selected_area)
+
+
+def inspect_selected_volume(viewer: "Viewer") -> float | None:
+    """Inspect the exact volume of one selected spatial scene object.
+
+    Parameters
+    ----------
+    viewer
+        Viewer containing the selected object.
+
+    Returns
+    -------
+    float | None
+        World-space volume, or `None` when inspection fails.
+
+    """
+    return _inspect_selected_scalar(viewer, "volume")
+
+
+inspect_selected_volume_cmd = Command(title="Inspect Selected Volume", callback=inspect_selected_volume)
+
+
+def _inspect_selected_scalar(viewer: "Viewer", kind: ScalarMeasurementKind) -> float | None:
+    """Inspect one scalar and own its result or error dialog."""
+    parent = viewer.ui.window.widget
+    label = kind.title()
+    try:
+        value = viewer.inspect_selected_area() if kind == "area" else viewer.inspect_selected_volume()
+    except (ScalarMeasurementError, UnsupportedScalarMeasurementError) as error:
+        QMessageBox.information(parent, f"Could Not Inspect {label}", str(error))
+        return None
+    except Exception as error:
+        QMessageBox.critical(parent, f"Could Not Inspect {label}", str(error))
+        return None
+
+    precision = viewer.config.measurement.precision
+    unit = viewer.config.measurement.unit
+    suffix = f" {unit}{'²' if kind == 'area' else '³'}" if unit else ""
+    QMessageBox.information(parent, f"Selected {label}", f"{label}: {value:.{precision}f}{suffix}")
+    return value
+
+
 def add_fixed_distance_dimension(viewer: "Viewer") -> None:
     """Start a one-shot fixed distance-dimension interaction.
 
@@ -1287,6 +1350,8 @@ def builtin_commands() -> dict[str, Command]:
         "viewer.deselect_all": deselect_all_cmd,
         "viewer.invert_selection": invert_selection_cmd,
         "viewer.inspect_distance": inspect_distance_cmd,
+        "viewer.inspect_selected_area": inspect_selected_area_cmd,
+        "viewer.inspect_selected_volume": inspect_selected_volume_cmd,
         "viewer.isolate_selected": isolate_selected_cmd,
         "viewer.load_scene": load_scene_cmd,
         "viewer.modify_selected": modify_selected_cmd,

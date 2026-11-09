@@ -3,8 +3,10 @@
 from typing import Literal
 
 from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QBoxLayout
 from PySide6.QtWidgets import QFrame
 from PySide6.QtWidgets import QGroupBox
+from PySide6.QtWidgets import QLabel
 from PySide6.QtWidgets import QScrollArea
 from PySide6.QtWidgets import QSizePolicy
 from PySide6.QtWidgets import QVBoxLayout
@@ -12,7 +14,7 @@ from PySide6.QtWidgets import QWidget
 
 from .component import Component
 
-SystemSection = Literal["Camera", "Display", "Units and Measurement"]
+SystemSection = Literal["Camera", "Display", "Grid and Units"]
 
 
 class SystemPanel(Component):
@@ -50,6 +52,7 @@ class SystemPanel(Component):
         self._fit_component(component)
         self.layout.addWidget(group)
         self.sections[name] = (group, component)
+        self._align_field_columns()
 
     def focus_section(self, name: SystemSection) -> None:
         """Scroll one system-settings section into view.
@@ -77,7 +80,33 @@ class SystemPanel(Component):
         for _group, component in self.sections.values():
             component.update()
             self._fit_component(component)
+        self._align_field_columns()
         self.widget.update()
+
+    def _align_field_columns(self) -> None:
+        """Align labels and editors across the configured System sections."""
+        rows: list[tuple[QLabel, QWidget, QBoxLayout]] = []
+        for _group, component in self.sections.values():
+            for child in getattr(component, "children", ()):
+                label = getattr(child, "label", None)
+                layout = child.widget.layout()
+                if not isinstance(label, QLabel) or not isinstance(layout, QBoxLayout) or layout.count() < 2:
+                    continue
+                field = layout.itemAt(1).widget()
+                if field is not None:
+                    rows.append((label, field, layout))
+        if not rows:
+            return
+
+        label_width = max(label.sizeHint().width() for label, _field, _layout in rows)
+        for label, field, layout in rows:
+            label.setFixedWidth(label_width)
+            label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+            field.setAttribute(Qt.WidgetAttribute.WA_LayoutUsesWidgetRect, True)
+            field.setMaximumWidth(16_777_215)
+            field.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+            layout.setStretch(0, 0)
+            layout.setStretch(1, 1)
 
     @staticmethod
     def _fit_component(component: Component) -> None:

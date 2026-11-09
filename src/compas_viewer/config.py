@@ -296,7 +296,7 @@ class WindowConfig(ConfigBase):
 class ToolbarConfig(ConfigBase):
     """Configure the viewer toolbar."""
 
-    show: bool = False
+    show: bool = True
 
     def validate(self, path: str = "ui.toolbar") -> None:
         _require_bool(f"{path}.show", self.show)

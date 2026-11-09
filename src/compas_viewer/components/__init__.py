@@ -11,9 +11,9 @@ from .component import Component
 from .container import Container
 from .datastructureattributes import DatastructureAttributes
 from .displaysetting import DisplaySetting
+from .gridunitsetting import GridUnitSetting
 from .mainwindow import MainWindow
 from .menubar import MenuBar
-from .measurementsetting import MeasurementSetting
 from .numberedit import NumberEdit
 from .objectsetting import ObjectSetting
 from .parameterform import ParameterForm
@@ -41,9 +41,9 @@ __all__ = [
     "Container",
     "DatastructureAttributes",
     "DisplaySetting",
+    "GridUnitSetting",
     "MainWindow",
     "MenuBar",
-    "MeasurementSetting",
     "NumberEdit",
     "ObjectSetting",
     "ParameterForm",

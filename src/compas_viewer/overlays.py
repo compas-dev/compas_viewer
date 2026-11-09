@@ -11,6 +11,7 @@ from math import radians
 from math import tan
 from numbers import Real
 from typing import TYPE_CHECKING
+from typing import Literal
 
 from compas.colors import Color
 
@@ -196,7 +197,56 @@ class LegendOverlay:
         object.__setattr__(self, "title", title)
 
 
-type Overlay = ScaleBarOverlay | LegendOverlay
+@dataclass(frozen=True, slots=True)
+class ScreenTextOverlay:
+    """Display text at a normalized viewport position.
+
+    The position is independent of the camera. `(0, 0)` is the top-left of
+    the viewport and `(1, 1)` is the bottom-right. Alignment determines which
+    point of the rendered text bounds is placed at that position.
+
+    Parameters
+    ----------
+    text
+        Text to display.
+    position
+        Normalized viewport position.
+    horizontal_alignment
+        Horizontal alignment relative to the position.
+    vertical_alignment
+        Vertical alignment relative to the position.
+    color
+        Text color.
+
+    """
+
+    text: str
+    position: tuple[float, float]
+    horizontal_alignment: Literal["left", "center", "right"] = "left"
+    vertical_alignment: Literal["top", "center", "bottom"] = "top"
+    color: Color = field(default_factory=Color.white)
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.text, str):
+            raise TypeError("Screen-text content should be a string.")
+        if not isinstance(self.position, tuple) or len(self.position) != 2:
+            raise TypeError("Screen-text position should be a pair of normalized coordinates.")
+        for coordinate in self.position:
+            if isinstance(coordinate, bool) or not isinstance(coordinate, Real):
+                raise TypeError("Screen-text position coordinates should be non-boolean numbers.")
+            if not isfinite(coordinate):
+                raise ValueError("Screen-text position coordinates should be finite.")
+            if not 0 <= coordinate <= 1:
+                raise ValueError("Screen-text position coordinates should be between zero and one.")
+        if self.horizontal_alignment not in {"left", "center", "right"}:
+            raise ValueError("Screen-text horizontal alignment should be left, center, or right.")
+        if self.vertical_alignment not in {"top", "center", "bottom"}:
+            raise ValueError("Screen-text vertical alignment should be top, center, or bottom.")
+        if not isinstance(self.color, Color):
+            raise TypeError("Screen-text color should be a COMPAS Color.")
+
+
+type Overlay = ScaleBarOverlay | LegendOverlay | ScreenTextOverlay
 
 
 class _OverlayLayer:
@@ -219,7 +269,7 @@ class _OverlayLayer:
         Parameters
         ----------
         overlay
-            Scale bar or categorical legend to add.
+            Scale bar, categorical legend, or screen text to add.
 
         Raises
         ------
@@ -229,8 +279,8 @@ class _OverlayLayer:
             If the same overlay instance is already present.
 
         """
-        if not isinstance(overlay, (ScaleBarOverlay, LegendOverlay)):
-            raise TypeError("Viewer overlays must be ScaleBarOverlay or LegendOverlay values.")
+        if not isinstance(overlay, (ScaleBarOverlay, LegendOverlay, ScreenTextOverlay)):
+            raise TypeError("Viewer overlays must be ScaleBarOverlay, LegendOverlay, or ScreenTextOverlay values.")
         if any(item is overlay for item in self._items):
             raise ValueError("The overlay is already present in this Viewer.")
         self._items.append(overlay)
@@ -273,6 +323,7 @@ class _OverlayLayer:
         from PySide6.QtGui import QPen
 
         painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
+        painter.setClipRect(QRectF(0.0, 0.0, float(context.width), float(context.height)))
         for overlay in self._items:
             if isinstance(overlay, ScaleBarOverlay):
                 layout = overlay._layout(context)
@@ -286,6 +337,31 @@ class _OverlayLayer:
                 painter.drawLine(round(x), round(y - 4), round(x), round(y + 4))
                 painter.drawLine(round(x + layout.pixel_length), round(y - 4), round(x + layout.pixel_length), round(y + 4))
                 painter.drawText(round(x), round(y - 8), layout.label)
+                continue
+
+            if isinstance(overlay, ScreenTextOverlay):
+                metrics = painter.fontMetrics()
+                bounds = metrics.boundingRect(overlay.text)
+                anchor_x = overlay.position[0] * context.width
+                anchor_y = overlay.position[1] * context.height
+
+                if overlay.horizontal_alignment == "left":
+                    left = anchor_x
+                elif overlay.horizontal_alignment == "center":
+                    left = anchor_x - bounds.width() / 2.0
+                else:
+                    left = anchor_x - bounds.width()
+
+                if overlay.vertical_alignment == "top":
+                    top = anchor_y
+                elif overlay.vertical_alignment == "center":
+                    top = anchor_y - bounds.height() / 2.0
+                else:
+                    top = anchor_y - bounds.height()
+
+                color = QColor.fromRgbF(*overlay.color.rgba)
+                painter.setPen(QPen(color))
+                painter.drawText(round(left - bounds.left()), round(top - bounds.top()), overlay.text)
                 continue
 
             metrics = painter.fontMetrics()
@@ -328,4 +404,4 @@ def _nice_length(value: float) -> float:
     return factor * base
 
 
-__all__ = ["LegendOverlay", "Overlay", "ScaleBarOverlay"]
+__all__ = ["LegendOverlay", "Overlay", "ScaleBarOverlay", "ScreenTextOverlay"]

@@ -12,7 +12,7 @@ from compas_viewer.components.camerasetting import CameraSetting
 from compas_viewer.components.component import Component
 from compas_viewer.components.datastructureattributes import DatastructureAttributes
 from compas_viewer.components.displaysetting import DisplaySetting
-from compas_viewer.components.measurementsetting import MeasurementSetting
+from compas_viewer.components.gridunitsetting import GridUnitSetting
 from compas_viewer.components.objectsetting import ObjectSetting
 from compas_viewer.components.sceneform import SceneColumn
 from compas_viewer.components.sceneform import SceneTree
@@ -72,8 +72,10 @@ class SideBarRight(Component):
                 self.camera_setting = CameraSetting()
             elif itemtype == "DisplaySetting":
                 self.display_setting = DisplaySetting(self.viewport)
+            elif itemtype == "GridUnitSetting":
+                self.grid_unit_setting = GridUnitSetting()
             elif itemtype == "MeasurementSetting":
-                self.measurement_setting = MeasurementSetting()
+                raise ValueError("Unsupported sidebar item type: 'MeasurementSetting'. Use 'GridUnitSetting'.")
 
         self._compose_scene_page()
         self._compose_annotations_page()
@@ -103,7 +105,7 @@ class SideBarRight(Component):
         Parameters
         ----------
         section
-            One of `"Camera"`, `"Display"`, or `"Units and Measurement"`.
+            One of `"Camera"`, `"Display"`, or `"Grid and Units"`.
 
         Raises
         ------
@@ -111,7 +113,7 @@ class SideBarRight(Component):
             If `section` is unsupported or not configured.
 
         """
-        if section not in {"Camera", "Display", "Units and Measurement"}:
+        if section not in {"Camera", "Display", "Grid and Units"}:
             raise ValueError(f"Unsupported system section: {section!r}.")
         self.set_current_tab("System")
         self.system_panel.focus_section(section)
@@ -172,8 +174,8 @@ class SideBarRight(Component):
             self.system_panel.add_section("Camera", self.camera_setting)
         if hasattr(self, "display_setting"):
             self.system_panel.add_section("Display", self.display_setting)
-        if hasattr(self, "measurement_setting"):
-            self.system_panel.add_section("Units and Measurement", self.measurement_setting)
+        if hasattr(self, "grid_unit_setting"):
+            self.system_panel.add_section("Grid and Units", self.grid_unit_setting)
         layout.addWidget(self.system_panel.widget)
 
 

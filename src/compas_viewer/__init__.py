@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     from .commandregistry import CommandRegistry as CommandRegistry
     from .overlays import LegendOverlay as LegendOverlay
     from .overlays import ScaleBarOverlay as ScaleBarOverlay
+    from .overlays import ScreenTextOverlay as ScreenTextOverlay
     from .selection import Selection as Selection
     from .state import ViewerState as ViewerState
     from .viewer import Viewer as Viewer
@@ -35,6 +36,7 @@ _LAZY_EXPORTS = {
     "CommandRegistry": ("compas_viewer.commandregistry", "CommandRegistry"),
     "LegendOverlay": ("compas_viewer.overlays", "LegendOverlay"),
     "ScaleBarOverlay": ("compas_viewer.overlays", "ScaleBarOverlay"),
+    "ScreenTextOverlay": ("compas_viewer.overlays", "ScreenTextOverlay"),
     "Selection": ("compas_viewer.selection", "Selection"),
     "Viewer": ("compas_viewer.viewer", "Viewer"),
     "ViewerState": ("compas_viewer.state", "ViewerState"),
@@ -83,6 +85,7 @@ __all__ = [
     "CommandRegistry",
     "LegendOverlay",
     "ScaleBarOverlay",
+    "ScreenTextOverlay",
     "Selection",
     "Viewer",
     "ViewerState",

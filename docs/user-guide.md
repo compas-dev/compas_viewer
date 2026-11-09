@@ -37,11 +37,13 @@ The main window consists of:
   selected spatial object.
 - An **Annotations** sidebar tab with the ordered annotation list and details
   for the selected annotation.
-- A **System** sidebar tab with Camera, Display, and Units and Measurement
+- A **System** sidebar tab with Camera, Display, and Grid and Units
   sections.
+- A visible toolbar with Render Mode and View selectors.
 - Menus for creating geometry, selecting objects, changing the view, and loading or saving scenes.
 
-The sidebar is visible by default. Use **View → Sidebar** to hide or restore it.
+The sidebar and toolbar are visible by default. Use **View → Sidebar** or
+**View → Toolbar** to hide or restore them.
 
 ## Navigate the viewport
 
@@ -52,7 +54,7 @@ The sidebar is visible by default. Use **View → Sidebar** to hide or restore i
 | Zoom | Mouse wheel |
 | Zoom extents | `H` or **View → Zoom Extents** |
 | Zoom selected | `F` or **View → Zoom Selected** |
-| Set a standard view | **View → Set Current View** |
+| Set a standard view | Toolbar **View** selector or **View → Set Current View** |
 
 Zoom extents frames all visible objects. Zoom selected frames only the current selection.
 
@@ -317,6 +319,49 @@ testing or depth writes, so scene geometry cannot hide them.
 See the [distance-measurement example](examples/ui/measurements.md) for a
 step-by-step scene setup.
 
+## Inspect area and volume
+
+Area and volume are transient properties of one selected spatial object. Select
+exactly one object, then choose **Measure → Inspect Selected Area** or
+**Measure → Inspect Selected Volume**. The Viewer displays one read-only result
+and retains no measurement state, annotation, or scene data. Starting either
+inspection cancels an active or retained distance inspection.
+
+The represented item must provide a public `area` or `volume` method or
+property. Open meshes do not enclose a measurable volume. Unsupported items,
+unresolved scene references, invalid scalar results, and unsupported
+transformations produce an explicit error; the Viewer never substitutes a
+render tessellation.
+
+Area is exact for rigid, reflected, and uniformly scaled world
+transformations. Non-uniform scale, shear, and projective transforms are
+rejected because a local scalar does not contain enough information for an
+exact transformed surface area. Volume is exact for affine transformations,
+including non-uniform scale and shear, and is multiplied by the absolute
+determinant of the transformation's linear part. Projective transforms are
+rejected.
+
+The same operations are available from Python:
+
+```python
+from compas.geometry import Box
+from compas_viewer import Viewer
+
+viewer = Viewer()
+box = viewer.scene.add(Box(2.0), name="Box")
+viewer.state.selection.replace((box,))
+
+area = viewer.inspect_selected_area()
+volume = viewer.inspect_selected_volume()
+
+print(area)
+print(volume)
+```
+
+The methods return world-coordinate scalars. Result dialogs use the current
+display precision and append the declared coordinate unit as `unit²` or
+`unit³`; no unit conversion is performed.
+
 ## Change appearance and display settings
 
 Use **View → Appearance** to select:
@@ -330,22 +375,30 @@ The **Display** section of the **System** tab controls:
 - Shaded, lighted, ghosted, and wireframe rendering.
 - Perspective, orthographic, and standard views.
 - Viewport background and selection colors.
+
+The visible toolbar provides synchronized **Render Mode** and **View**
+selectors for the same settings. Changes through the toolbar, View menu,
+Display section, or Python API update every other surface. Set
+`config.ui.toolbar.show = False` before constructing the Viewer to start with
+the toolbar hidden.
+
+The **Grid and Units** section of the **System** tab controls:
+
 - Grid visibility, axes, mode, color, extents, and divisions.
-
-The **Units and Measurement** section of the **System** tab controls how
-measurements are presented:
-
 - **Coordinate Unit** declares the unit suffix shown with measurement labels.
   Leaving it blank keeps the unit unspecified.
 - **Display Precision** sets the number of decimal places shown.
-- The active `compas.tolerance.TOL` values are shown read-only as process-wide
-  numerical context.
 
 The unit declaration does not convert coordinates, and display precision is
 not a geometry tolerance. These presentation settings do not control snapping
-or component association. A persistent dimension snapshots the unit and
-precision when it is completed. A transient inspection uses the current
-settings whenever it is drawn.
+or component association, and the unit does not change grid spacing. Global
+`compas.tolerance.TOL` remains available to computational code but is not a
+Viewer control or System-sidebar field. A persistent dimension snapshots the
+unit and precision when it is completed. A transient inspection uses the
+current settings whenever it is drawn.
+
+Camera, Display, and Grid and Units use the same two-column field layout:
+labels are left-aligned and editors share one right-hand column.
 
 ## Configure the viewer in Python
 

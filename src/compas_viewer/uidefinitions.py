@@ -18,6 +18,37 @@ class UIItem(TypedDict, total=False):
     exclusive: bool
     items: list["UIItem"]
     columns: list[dict[str, Any]]
+    tooltip: str
+    icon: str
+
+
+def default_toolbar_items() -> list[UIItem]:
+    """Return the built-in toolbar composition.
+
+    Returns
+    -------
+    list[UIItem]
+        State-bound render-mode and current-view selectors.
+
+    """
+    return [
+        {
+            "title": "Render Mode",
+            "type": "select",
+            "state": "renderer.rendermode",
+            "items": [
+                {"title": mode.title(), "command": "viewer.change_rendermode", "value": mode, "kwargs": {"mode": mode}} for mode in ("shaded", "ghosted", "lighted", "wireframe")
+            ],
+        },
+        {
+            "title": "View",
+            "type": "select",
+            "state": "renderer.view",
+            "items": [
+                {"title": view.title(), "command": "viewer.change_view", "value": view, "kwargs": {"mode": view}} for view in ("perspective", "top", "front", "right", "ortho")
+            ],
+        },
+    ]
 
 
 def default_menu_items() -> list[UIItem]:
@@ -145,6 +176,8 @@ def default_menu_items() -> list[UIItem]:
             "title": "Measure",
             "items": [
                 {"title": "Inspect Distance", "command": "viewer.inspect_distance"},
+                {"title": "Inspect Selected Area", "command": "viewer.inspect_selected_area"},
+                {"title": "Inspect Selected Volume", "command": "viewer.inspect_selected_volume"},
                 {"type": "separator"},
                 {"title": "Add Fixed Distance Dimension", "command": "viewer.add_fixed_distance_dimension"},
                 {"title": "Add Associative Distance Dimension", "command": "viewer.add_associative_distance_dimension"},
@@ -197,8 +230,8 @@ def default_sidebar_items() -> list[UIItem]:
         {"type": "ObjectSetting"},
         {"type": "CameraSetting"},
         {"type": "DisplaySetting"},
-        {"type": "MeasurementSetting"},
+        {"type": "GridUnitSetting"},
     ]
 
 
-__all__ = ["UIItem", "default_menu_items", "default_sidebar_items"]
+__all__ = ["UIItem", "default_menu_items", "default_sidebar_items", "default_toolbar_items"]

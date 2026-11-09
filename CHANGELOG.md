@@ -43,6 +43,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   with semantic snapping, live previews, and a dedicated Measure menu.
 * Added ordered transient scale-bar and categorical-legend overlays that stay
   outside scene serialization and picking.
+* Added programmatic screen-text overlays at normalized viewport positions,
+  with explicit alignment and add/remove operations outside Scene persistence
+  and picking.
+* Added visible-by-default toolbar selectors for render mode and current view,
+  synchronized with the View menu, System form, and public Viewer state.
+* Added transient selected-object area and volume inspection with exact
+  supported world-transformation scaling, declared squared or cubed unit
+  labels, and explicit unsupported-case reporting without tessellation
+  fallback.
 * Added `Viewer.save_image` for rendering still images without launching the
   visible viewer or entering its event loop.
 * Added deterministic GIF and WebP animation recording with `preview`,
@@ -62,6 +71,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   build instructions, modernized examples, and a generated API reference.
 
 ### Changed
+
+* Replaced the System sidebar's Units and Measurement section with Grid and
+  Units, moved grid controls out of Display, removed tolerance information from
+  Viewer UI without changing global COMPAS tolerance, and aligned System
+  editors on one consistent two-column layout.
 
 * Made active measurement targets explicit by showing all projected Point,
   Mesh-vertex, or Graph-node snaps on the hovered object while keeping only the

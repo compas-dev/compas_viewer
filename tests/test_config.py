@@ -33,6 +33,16 @@ def test_config_dict_roundtrip_preserves_nested_types_and_colors(tmp_path):
     assert restored.schema_version == 3
 
 
+def test_toolbar_is_visible_by_default_and_explicit_false_roundtrips():
+    config_value = config.Config()
+    assert config_value.ui.toolbar.show
+
+    config_value.ui.toolbar.show = False
+    restored = config.Config.from_dict(config_value.to_dict())
+
+    assert not restored.ui.toolbar.show
+
+
 def test_config_json_roundtrip_uses_declared_fields_only(tmp_path):
     filepath = tmp_path / "viewer.json"
     original = config.Config()

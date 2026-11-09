@@ -6,6 +6,7 @@ import subprocess
 import sys
 from types import SimpleNamespace
 from typing import cast
+from typing import Literal
 from unittest.mock import Mock
 
 import pytest
@@ -13,6 +14,7 @@ import pytest
 from compas.colors import Color
 from compas_viewer import LegendOverlay
 from compas_viewer import ScaleBarOverlay
+from compas_viewer import ScreenTextOverlay
 from compas_viewer import Viewer
 from compas_viewer.overlays import Overlay
 from compas_viewer.overlays import _OverlayContext
@@ -28,13 +30,15 @@ def test_overlay_layer_preserves_insertion_order_and_removes_by_identity():
     layer = _OverlayLayer()
     scale = ScaleBarOverlay()
     legend = LegendOverlay([("Structure", Color.red()), ("Context", Color.grey())], title="Objects")
+    text = ScreenTextOverlay("Origin", (0.0, 0.0))
 
     layer.add(scale)
     layer.add(legend)
+    layer.add(text)
 
-    assert tuple(layer) == (scale, legend)
+    assert tuple(layer) == (scale, legend, text)
     assert layer.remove(scale)
-    assert tuple(layer) == (legend,)
+    assert tuple(layer) == (legend, text)
     assert not layer.remove(scale)
 
 
@@ -45,8 +49,30 @@ def test_overlay_layer_rejects_duplicates_and_unapproved_types():
 
     with pytest.raises(ValueError, match="already present"):
         layer.add(scale)
-    with pytest.raises(TypeError, match="ScaleBarOverlay or LegendOverlay"):
+    with pytest.raises(TypeError, match="ScaleBarOverlay, LegendOverlay, or ScreenTextOverlay"):
         layer.add(cast(Overlay, object()))
+
+
+@pytest.mark.parametrize(
+    ("kwargs", "error", "message"),
+    [
+        ({"text": cast(str, object())}, TypeError, "content.*string"),
+        ({"position": cast(tuple[float, float], [0.0, 0.0])}, TypeError, "position.*pair"),
+        ({"position": (True, 0.0)}, TypeError, "coordinates.*non-boolean numbers"),
+        ({"position": (float("nan"), 0.0)}, ValueError, "coordinates.*finite"),
+        ({"position": (float("inf"), 0.0)}, ValueError, "coordinates.*finite"),
+        ({"position": (-0.1, 0.0)}, ValueError, "coordinates.*between zero and one"),
+        ({"position": (0.0, 1.1)}, ValueError, "coordinates.*between zero and one"),
+        ({"horizontal_alignment": cast(Literal["left", "center", "right"], "middle")}, ValueError, "horizontal alignment"),
+        ({"vertical_alignment": cast(Literal["top", "center", "bottom"], "middle")}, ValueError, "vertical alignment"),
+        ({"color": cast(Color, object())}, TypeError, "COMPAS Color"),
+    ],
+)
+def test_screen_text_rejects_invalid_presentation(kwargs, error, message):
+    values = {"text": "Label", "position": (0.5, 0.5)}
+    values.update(kwargs)
+    with pytest.raises(error, match=message):
+        ScreenTextOverlay(**values)
 
 
 @pytest.mark.parametrize(
@@ -177,20 +203,77 @@ def test_overlay_layer_draws_scale_and_legend(monkeypatch):
     assert image.pixelColor(20, 460).alpha() > 0
 
 
+def test_screen_text_uses_normalized_alignment_and_camera_independent_position(monkeypatch):
+    monkeypatch.setenv("QT_QPA_PLATFORM", "offscreen")
+    from PySide6.QtGui import QColor
+    from PySide6.QtGui import QImage
+    from PySide6.QtGui import QPainter
+    from PySide6.QtWidgets import QApplication
+
+    app = QApplication.instance() or QApplication([])
+    overlay = ScreenTextOverlay(
+        "Viewport",
+        (0.25, 0.5),
+        horizontal_alignment="center",
+        vertical_alignment="center",
+        color=Color.white(),
+    )
+
+    def render(width, height, camera_distance):
+        image = QImage(width, height, QImage.Format.Format_ARGB32_Premultiplied)
+        image.fill(QColor(0, 0, 0, 0))
+        painter = QPainter(image)
+        layer = _OverlayLayer()
+        layer.add(overlay)
+        layer.draw(
+            painter,
+            _OverlayContext(
+                width=width,
+                height=height,
+                camera_distance=camera_distance,
+                field_of_view=45,
+                perspective=True,
+            ),
+        )
+        assert painter.hasClipping()
+        assert painter.clipBoundingRect().toRect() == image.rect()
+        painter.end()
+        return image
+
+    def opaque_bounds(image):
+        points = [(x, y) for y in range(image.height()) for x in range(image.width()) if image.pixelColor(x, y).alpha()]
+        assert points
+        xs, ys = zip(*points, strict=True)
+        return min(xs), min(ys), max(xs), max(ys)
+
+    small = render(200, 100, 10)
+    same_viewport_different_camera = render(200, 100, 100)
+    large = render(400, 200, 10)
+    small_bounds = opaque_bounds(small)
+    large_bounds = opaque_bounds(large)
+
+    assert small == same_viewport_different_camera
+    assert abs((small_bounds[0] + small_bounds[2]) / 2 - 50) <= 2
+    assert abs((small_bounds[1] + small_bounds[3]) / 2 - 50) <= 2
+    assert abs((large_bounds[0] + large_bounds[2]) / 2 - 100) <= 2
+    assert abs((large_bounds[1] + large_bounds[3]) / 2 - 100) <= 2
+    assert app is not None
+
+
 def test_viewer_overlay_facade_does_not_change_scene_serialization():
     viewer = object.__new__(Viewer)
     viewer._overlay_layer = _OverlayLayer()
     viewer._scene = ViewerScene()
     viewer.running = False
     before = viewer.scene.__data__
-    scale = ScaleBarOverlay()
+    text = ScreenTextOverlay("Status", (1.0, 0.0), horizontal_alignment="right")
 
-    viewer.add_overlay(scale)
+    viewer.add_overlay(text)
 
-    assert viewer.overlays == (scale,)
+    assert viewer.overlays == (text,)
     assert viewer.scene.__data__ == before
     assert viewer.scene.objects == []
-    assert viewer.remove_overlay(scale)
+    assert viewer.remove_overlay(text)
     assert viewer.overlays == ()
 
 
@@ -395,9 +478,9 @@ def test_public_overlay_imports_remain_graphics_free(tmp_path):
     source_path = str(ROOT / "src")
     environment["PYTHONPATH"] = os.pathsep.join(filter(None, [source_path, environment.get("PYTHONPATH")]))
     code = (
-        "from compas_viewer import LegendOverlay, ScaleBarOverlay; "
+        "from compas_viewer import LegendOverlay, ScaleBarOverlay, ScreenTextOverlay; "
         "import sys; "
-        "assert LegendOverlay and ScaleBarOverlay; "
+        "assert LegendOverlay and ScaleBarOverlay and ScreenTextOverlay; "
         "assert not any(name.startswith('PySide6') for name in sys.modules)"
     )
 
