@@ -6,6 +6,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QAction
 from PySide6.QtGui import QKeySequence
 from PySide6.QtTest import QTest
+from PySide6.QtWidgets import QAbstractItemView
 from PySide6.QtWidgets import QApplication
 from PySide6.QtWidgets import QPushButton
 from PySide6.QtWidgets import QVBoxLayout
@@ -55,8 +56,12 @@ def test_annotation_panel_is_flat_ordered_and_keeps_type_read_only(monkeypatch):
     assert panel.tree.topLevelItem(0).text(1) == "TextAnnotation"
     assert panel.tree.topLevelItem(1).text(0) == second.name
     assert panel.tree.topLevelItem(1).text(1) == "DistanceDimension"
-    type_index = panel.tree.model().index(0, 1)
-    assert panel.tree.itemDelegate().createEditor(panel.tree, None, type_index) is None
+    assert panel.tree.editTriggers() == QAbstractItemView.EditTrigger.NoEditTriggers
+    panel.tree.editItem = Mock()
+    panel._edit_name(panel.tree.topLevelItem(0), 1)
+    panel.tree.editItem.assert_not_called()
+    panel._edit_name(panel.tree.topLevelItem(0), 0)
+    panel.tree.editItem.assert_called_once_with(panel.tree.topLevelItem(0), 0)
     assert app is not None
 
 

@@ -66,7 +66,7 @@ Issues = "https://github.com/compas-dev/compas_viewer/issues"
 Forum = "https://forum.compas-framework.org/"
 
 [tool.uv.sources]
-compas = { git = "https://github.com/compas-dev/compas.git", rev = "353cebfd21cd3623f7d950527d71f4770ff2a21c" }
+compas = { git = "https://github.com/compas-dev/compas.git", rev = "70aeb1e408772f0a84213c280658d4d594bf12ea" }
 
 [project.entry-points."compas.plugins"]
 compas_viewer = "compas_viewer.plugins"

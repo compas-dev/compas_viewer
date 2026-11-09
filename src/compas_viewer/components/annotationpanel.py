@@ -15,7 +15,6 @@ from PySide6.QtWidgets import QFormLayout
 from PySide6.QtWidgets import QGroupBox
 from PySide6.QtWidgets import QLabel
 from PySide6.QtWidgets import QPushButton
-from PySide6.QtWidgets import QStyledItemDelegate
 from PySide6.QtWidgets import QTreeWidget
 from PySide6.QtWidgets import QTreeWidgetItem
 from PySide6.QtWidgets import QVBoxLayout
@@ -33,16 +32,6 @@ class AnnotationPanelItem(QTreeWidgetItem):
     """Tree item carrying one durable annotation-entry GUID."""
 
     annotation_guid: UUID
-
-
-class AnnotationItemDelegate(QStyledItemDelegate):
-    """Restrict inline editing to the annotation name column."""
-
-    def createEditor(self, parent, option, index):  # noqa: N802
-        """Create an editor only for the Name column."""
-        if index.column() != 0:
-            return None
-        return super().createEditor(parent, option, index)
 
 
 class AnnotationTree(QTreeWidget):
@@ -85,7 +74,8 @@ class AnnotationPanel(Component):
         self.tree.setColumnCount(3)
         self.tree.setHeaderLabels(["Name", "Type", "Visible"])
         self.tree.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
-        self.tree.setItemDelegate(AnnotationItemDelegate(self.tree))
+        self.tree.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.tree.itemDoubleClicked.connect(self._edit_name)
         self.tree.itemChanged.connect(self._on_item_changed)
         self.tree.itemSelectionChanged.connect(self._on_selection_changed)
         self.layout.addWidget(self.tree)
@@ -151,6 +141,11 @@ class AnnotationPanel(Component):
         for annotation in entries:
             self.scene.remove_annotation(annotation)
         self.update()
+
+    def _edit_name(self, item: QTreeWidgetItem, column: int) -> None:
+        """Start explicit inline editing only for the Name column."""
+        if column == 0:
+            self.tree.editItem(item, column)
 
     def _on_item_changed(self, item: QTreeWidgetItem, column: int) -> None:
         """Apply durable name and visibility edits from the flat list."""
