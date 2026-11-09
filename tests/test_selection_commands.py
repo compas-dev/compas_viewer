@@ -1,4 +1,5 @@
 from types import SimpleNamespace
+from unittest.mock import Mock
 from uuid import uuid4
 
 import numpy as np
@@ -8,6 +9,8 @@ from PySide6.QtCore import QPoint
 from compas.colors import Color
 from compas.geometry import Point
 
+from compas_viewer.commands import camera_settings
+from compas_viewer.commands import deselect_all
 from compas_viewer.commands import isolate_selected
 from compas_viewer.commands import invert_selection
 from compas_viewer.commands import deselect_object
@@ -35,6 +38,26 @@ class MeshItem:
 
 def test_deselect_all_uses_escape_key():
     assert deselect_all_cmd.keybinding == "Escape"
+
+
+def test_deselect_all_clears_both_selection_domains():
+    viewer = SimpleNamespace(
+        state=SimpleNamespace(selection=Mock(), annotation_selection=Mock()),
+    )
+
+    deselect_all(viewer)
+
+    viewer.state.selection.clear.assert_called_once_with()
+    viewer.state.annotation_selection.clear.assert_called_once_with()
+
+
+def test_camera_settings_uses_system_sidebar_navigation():
+    sidebar = SimpleNamespace(focus_system_section=Mock())
+    viewer = SimpleNamespace(ui=SimpleNamespace(sidebar=sidebar))
+
+    camera_settings(viewer)
+
+    sidebar.focus_system_section.assert_called_once_with("Camera")
 
 
 class PointItem:
@@ -213,6 +236,7 @@ def test_grid_toggle_and_multiple_selection_binding():
 
 def test_pointer_commands_replace_add_and_remove_selection():
     viewer, group, red_mesh, blue_point = make_viewer()
+    viewer.state.annotation_selection = Mock()
     viewer.scene.instance_colors = {
         (10, 20, 30): group,
         (40, 50, 60): blue_point,
@@ -229,12 +253,37 @@ def test_pointer_commands_replace_add_and_remove_selection():
 
     select_object(viewer, event)
     assert viewer.state.selection.objects == (group,)
+    viewer.state.annotation_selection.clear.assert_not_called()
 
     select_multiple(viewer, event)
     assert viewer.state.selection.objects == (group, blue_point)
 
     deselect_object(viewer, event)
     assert viewer.state.selection.objects == (blue_point,)
+
+
+def test_unmodified_background_click_clears_both_selection_domains():
+    viewer, _, red_mesh, _ = make_viewer()
+    viewer.state.annotation_selection = Mock()
+    viewer.renderer.read_instance_color = lambda _box: np.array([[0, 0, 0]], dtype=np.uint8)
+    event = SimpleNamespace(type=lambda: QEvent.Type.MouseButtonPress)
+
+    select_object(viewer, event)
+
+    assert red_mesh not in viewer.state.selection
+    viewer.state.annotation_selection.clear.assert_called_once_with()
+
+
+def test_ctrl_background_click_preserves_both_selection_domains():
+    viewer, _, red_mesh, _ = make_viewer()
+    viewer.state.annotation_selection = Mock()
+    viewer.renderer.read_instance_color = lambda _box: np.array([[0, 0, 0]], dtype=np.uint8)
+    event = SimpleNamespace(type=lambda: QEvent.Type.MouseButtonPress)
+
+    select_multiple(viewer, event)
+
+    assert viewer.state.selection.objects == (red_mesh,)
+    viewer.state.annotation_selection.clear.assert_not_called()
 
 
 def test_window_command_preserves_directional_selection_semantics():

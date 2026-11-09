@@ -296,6 +296,27 @@ def test_replacing_scene_clears_transient_selection_before_sidebar_refresh(monke
     assert app is not None
 
 
+def test_selection_changes_refresh_only_the_owning_sidebar_domain():
+    viewer = object.__new__(Viewer)
+    sidebar = Mock()
+    renderer = Mock()
+    viewer.ui = SimpleNamespace(sidebar=sidebar, viewport=SimpleNamespace(renderer=renderer))
+
+    viewer._on_state_changed("selection", ())
+
+    sidebar.update_spatial_selection.assert_called_once_with()
+    sidebar.update_annotation_selection.assert_not_called()
+    renderer.update.assert_called_once_with()
+
+    sidebar.reset_mock()
+    renderer.reset_mock()
+    viewer._on_state_changed("annotation_selection", ())
+
+    sidebar.update_annotation_selection.assert_called_once_with()
+    sidebar.update_spatial_selection.assert_not_called()
+    renderer.update.assert_called_once_with()
+
+
 def test_replacing_running_scene_balances_context_for_cleanup_and_initialization():
     viewer = object.__new__(Viewer)
     viewer.running = False

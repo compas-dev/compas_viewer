@@ -1,10 +1,18 @@
 from types import SimpleNamespace
+from typing import Any
+from typing import cast
+from unittest.mock import Mock
 
+import pytest
 from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QSplitter
 
 from compas.geometry import Sphere
+from compas_viewer.base import Base
+from compas_viewer.components import ObjectSetting
 from compas_viewer.components import Sceneform
 from compas_viewer.components import SceneTree
+from compas_viewer.components import SideBarRight
 from compas_viewer.config import Config
 from compas_viewer.config import SidebarConfig
 from compas_viewer.scene import ViewerScene
@@ -56,4 +64,114 @@ def test_scene_tree_replaces_selection_in_scene_order(monkeypatch):
 
     assert state.selection.objects == (first, second)
     assert changes == [("selection", (first.guid, second.guid))]
+    assert app is not None
+
+
+def test_sidebar_has_exactly_three_stable_domains_without_splitters(monkeypatch):
+    app = QApplication.instance() or QApplication([])
+    config = Config()
+    viewer = SimpleNamespace(config=config, state=ViewerState(config), sidebar_items=[])
+    monkeypatch.setattr(Base, "viewer", property(lambda _self: viewer))
+
+    sidebar = SideBarRight(SimpleNamespace())
+
+    assert [sidebar.widget.tabText(index) for index in range(sidebar.widget.count())] == ["Scene", "Annotations", "System"]
+    assert sidebar.widget.currentIndex() == 0
+    assert sidebar.widget.findChildren(QSplitter) == []
+    assert app is not None
+
+
+def test_sidebar_navigation_accepts_only_closed_domain_and_section_names(monkeypatch):
+    app = QApplication.instance() or QApplication([])
+    config = Config()
+    viewer = SimpleNamespace(
+        config=config,
+        state=ViewerState(config),
+        sidebar_items=[{"type": "MeasurementSetting"}],
+    )
+    monkeypatch.setattr(Base, "viewer", property(lambda _self: viewer))
+    sidebar = SideBarRight(SimpleNamespace())
+
+    sidebar.set_current_tab("Annotations")
+    assert sidebar.widget.tabText(sidebar.widget.currentIndex()) == "Annotations"
+    sidebar.focus_system_section("Units and Measurement")
+    assert sidebar.widget.tabText(sidebar.widget.currentIndex()) == "System"
+    assert list(sidebar.system_panel.sections) == ["Units and Measurement"]
+
+    with pytest.raises(ValueError, match="Unsupported sidebar tab"):
+        cast(Any, sidebar).set_current_tab("Other")
+    with pytest.raises(ValueError, match="Unsupported system section"):
+        cast(Any, sidebar).focus_system_section("Other")
+    with pytest.raises(ValueError, match="not configured"):
+        sidebar.focus_system_section("Camera")
+    assert app is not None
+
+
+def test_scene_domain_uses_stable_master_detail_and_routes_optional_attributes(monkeypatch):
+    app = QApplication.instance() or QApplication([])
+    config = Config()
+    scene = ViewerScene()
+    state = ViewerState(config, scene.object)
+    viewer = SimpleNamespace(
+        config=config,
+        scene=scene,
+        state=state,
+        sidebar_items=[
+            {
+                "type": "SceneTree",
+                "columns": [{"title": "Name", "type": "label", "text": lambda obj: obj.name}],
+            },
+            {"type": "ObjectSetting"},
+            {"type": "DatastructureAttributes"},
+        ],
+    )
+    monkeypatch.setattr(Base, "viewer", property(lambda _self: viewer))
+
+    sidebar = SideBarRight(SimpleNamespace())
+    layout = sidebar._page_layouts["Scene"]
+
+    assert isinstance(sidebar.sceneform, SceneTree)
+    assert isinstance(sidebar.object_setting, ObjectSetting)
+    assert [sidebar.scene_details.tabText(index) for index in range(sidebar.scene_details.count())] == ["Object", "Attributes"]
+    assert layout.stretch(0) == 3
+    assert layout.stretch(1) == 2
+    assert "DatastructureAttributes" not in [item["type"] for item in default_sidebar_items()]
+    assert app is not None
+
+
+def test_selection_updates_are_scoped_to_their_sidebar_domain(monkeypatch):
+    app = QApplication.instance() or QApplication([])
+    config = Config()
+    scene = ViewerScene()
+    state = ViewerState(config, scene.object, scene.annotation)
+    viewer = SimpleNamespace(
+        config=config,
+        scene=scene,
+        state=state,
+        sidebar_items=[
+            {
+                "type": "SceneTree",
+                "columns": [{"title": "Name", "type": "label", "text": lambda obj: obj.name}],
+            },
+            {"type": "ObjectSetting"},
+            {"type": "AnnotationPanel"},
+        ],
+    )
+    monkeypatch.setattr(Base, "viewer", property(lambda _self: viewer))
+    sidebar = SideBarRight(SimpleNamespace())
+    sidebar.sceneform.update = Mock()
+    sidebar.object_setting.update = Mock()
+    sidebar.annotation_panel.update = Mock()
+
+    sidebar.update_spatial_selection()
+
+    sidebar.sceneform.update.assert_called_once_with()
+    sidebar.object_setting.update.assert_called_once_with()
+    sidebar.annotation_panel.update.assert_not_called()
+
+    sidebar.update_annotation_selection()
+
+    sidebar.annotation_panel.update.assert_called_once_with()
+    sidebar.sceneform.update.assert_called_once_with()
+    sidebar.object_setting.update.assert_called_once_with()
     assert app is not None

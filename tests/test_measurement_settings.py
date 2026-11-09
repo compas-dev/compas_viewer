@@ -63,7 +63,7 @@ def test_default_sidebar_contains_one_units_and_measurement_panel():
     assert item_types.count("MeasurementSetting") == 1
 
 
-def test_sidebar_loads_one_units_and_measurement_tab(monkeypatch):
+def test_sidebar_loads_one_units_and_measurement_system_section(monkeypatch):
     app = QApplication.instance() or QApplication([])
     config = Config()
     viewer = SimpleNamespace(
@@ -75,6 +75,6 @@ def test_sidebar_loads_one_units_and_measurement_tab(monkeypatch):
 
     sidebar = SideBarRight(SimpleNamespace())
 
-    assert list(sidebar.tabform.tabs) == ["Units and Measurement"]
+    assert list(sidebar.system_panel.sections) == ["Units and Measurement"]
     assert isinstance(sidebar.measurement_setting, MeasurementSetting)
     assert app is not None

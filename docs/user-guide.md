@@ -33,11 +33,12 @@ viewer.show()
 The main window consists of:
 
 - A 3D viewport for navigation and selection.
-- A scene tree showing object hierarchy, groups, names, types, and visibility.
-- A flat Annotations panel for persistent text, arrows, and dimensions.
-- An Object tab for information and display settings of the current selection.
-- Camera and Display tabs for view, grid, color, and rendering settings.
-- A Units and Measurement tab for informational units and display precision.
+- A **Scene** sidebar tab with the spatial hierarchy and details for the
+  selected spatial object.
+- An **Annotations** sidebar tab with the ordered annotation list and details
+  for the selected annotation.
+- A **System** sidebar tab with Camera, Display, and Units and Measurement
+  sections.
 - Menus for creating geometry, selecting objects, changing the view, and loading or saving scenes.
 
 The sidebar is visible by default. Use **View → Sidebar** to hide or restore it.
@@ -61,9 +62,15 @@ Zoom extents frames all visible objects. Zoom selected frames only the current s
 | --- | --- |
 | Replace the selection | Left-click an object |
 | Add an object to the selection | Ctrl + left-click |
-| Clear the selection | `Escape` |
+| Clear spatial and annotation selection | Click empty viewport background or press `Escape` |
 | Delete selected objects | `Delete` or **Edit → Delete Selected** |
 | Rectangular selection | Shift + left-drag |
+
+When no measurement tool is active, an unmodified click on empty viewport
+background clears both spatial and annotation selection. Ctrl-clicking empty
+background leaves both selections unchanged. If a measurement is active,
+`Escape` cancels the measurement first and leaves selection unchanged; press it
+again to clear both selections.
 
 Rectangular selection is directional:
 
@@ -89,6 +96,11 @@ must belong to the Viewer's current scene. Replacing the scene or removing an
 object removes the corresponding transient selection; saved scenes do not
 contain selection state.
 
+Spatial and annotation selections are independent and may both contain values.
+Changing sidebar tabs preserves both selections. Picking in the viewport or
+Scene tree changes only spatial selection; selecting an entry in Annotations
+changes only annotation selection.
+
 Deleting a selected group removes its complete scene subtree but does not
 delete the independently owned geometry or data. Deletion is not part of the
 transform-only undo history and clears that history. Associative dimensions
@@ -97,7 +109,9 @@ they are not silently converted or deleted.
 
 ## Work with the scene tree
 
-The scene tree mirrors parent-child relationships in the scene. Create explicit groups when related objects should appear under a shared node:
+The scene tree in the **Scene** tab mirrors parent-child relationships in the
+scene. The detail area below it shows controls for the selected spatial object.
+Create explicit groups when related objects should appear under a shared node:
 
 ```python
 from compas.geometry import Point
@@ -311,14 +325,15 @@ Use **View → Appearance** to select:
 - **Light** to force a light application palette.
 - **Dark** to force a dark application palette.
 
-The Display tab controls:
+The **Display** section of the **System** tab controls:
 
 - Shaded, lighted, ghosted, and wireframe rendering.
 - Perspective, orthographic, and standard views.
 - Viewport background and selection colors.
 - Grid visibility, axes, mode, color, extents, and divisions.
 
-The **Units and Measurement** tab controls how measurements are presented:
+The **Units and Measurement** section of the **System** tab controls how
+measurements are presented:
 
 - **Coordinate Unit** declares the unit suffix shown with measurement labels.
   Leaving it blank keeps the unit unspecified.
@@ -472,10 +487,17 @@ viewer.show()
 ```
 
 Annotations live in `viewer.scene.annotations`, not in the spatial scene tree.
-They have no parent, children, or inherited transformation. Use the flat
-**Annotations** panel to rename entries, change visibility, select or remove
-them, and edit the style of one selected distance dimension. Style sizes and
-offsets use logical screen pixels.
+They have no parent, children, or inherited transformation. The
+**Annotations** tab lists them in collection order. Select exactly one entry to
+show an explicit Name field, its read-only Type, and, for a distance dimension,
+its color, line width, text size, arrow size, and label offset. Multiple
+selection shows a summary and removal controls instead of a single-entry form.
+Style sizes and offsets use logical screen pixels.
+
+Pressing `Delete` while the annotation list has focus removes the selected
+annotations only. **Edit → Delete Selected** and the viewport's Delete binding
+operate on spatial selection; neither operation crosses into the other
+collection.
 
 Scripts use `viewer.state.annotation_selection` for annotations and
 `viewer.state.selection` for spatial objects. Removing a spatial object does

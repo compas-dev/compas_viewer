@@ -680,8 +680,11 @@ class Viewer(Singleton):
         """Apply viewer-owned effects for a changed state value."""
         if path == "ui.appearance":
             self._apply_appearance(cast(Appearance, value))
-        elif path in {"selection", "annotation_selection"} and hasattr(self, "ui"):
-            self.ui.sidebar.update()
+        elif path == "selection" and hasattr(self, "ui"):
+            self.ui.sidebar.update_spatial_selection()
+            self.renderer.update()
+        elif path == "annotation_selection" and hasattr(self, "ui"):
+            self.ui.sidebar.update_annotation_selection()
             self.renderer.update()
         elif path.startswith("measurement.") and hasattr(self, "ui"):
             self.ui.viewport.update_overlays()

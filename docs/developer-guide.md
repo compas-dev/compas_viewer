@@ -97,13 +97,13 @@ Versions 0 and 1 also drop only these known retired fields:
 Each nested configuration group validates its own values and reports complete
 paths such as `renderer.gridmode`.
 
-At runtime, the **Units and Measurement** sidebar tab updates these settings
-through `ViewerState.set_measurement_unit` and
-`ViewerState.set_measurement_precision`. The tab reads the active
+At runtime, the **Units and Measurement** section of the **System** sidebar tab
+updates these settings through `ViewerState.set_measurement_unit` and
+`ViewerState.set_measurement_precision`. The section reads the active
 process-wide `compas.tolerance.TOL` values for context but never mutates them.
 Unit and precision affect labels only: they do not convert coordinates,
 configure snapping, or define geometry tolerance. The sidebar is the sole
-settings surface; a future Settings-menu action may focus this same tab but
+settings surface; a future Settings-menu action may focus this same section but
 must not create a second form or state path.
 
 Applications may subclass `Config` and add typed nested `ConfigBase`
@@ -216,11 +216,28 @@ viewer.refresh_annotations((entry,))
 
 `viewer.scene.annotations` preserves durable collection order independently of
 the scene hierarchy. `viewer.state.annotation_selection` is transient and
-unserialized. The flat **Annotations** panel owns annotation naming,
-visibility, removal, and distance-style editing; the scene tree and spatial
-selection remain unchanged.
+unserialized. The **Annotations** tab owns annotation naming, visibility,
+removal, and distance-style editing; the **Scene** tab and spatial selection
+remain unchanged.
 
-Default menu and sidebar structures live in `compas_viewer.uidefinitions`. They refer to command IDs rather than importing callbacks, keeping UI composition separate from serialization.
+Spatial and annotation selections may coexist. Sidebar tab changes preserve
+both, object picking changes only spatial selection, and annotation-list
+interaction changes only annotation selection. Outside an active measurement,
+an unmodified empty viewport click clears both selections and Ctrl-clicking
+empty background changes neither. Escape cancels an active measurement first
+and otherwise clears both selections.
+
+Delete remains focus-owned: the annotation list removes selected annotations,
+whereas the spatial Delete command removes selected scene objects. Neither
+operation crosses the collection boundary.
+
+Default menu and sidebar structures live in `compas_viewer.uidefinitions`.
+They refer to command IDs rather than importing callbacks, keeping UI
+composition separate from serialization. The built-in right sidebar has three
+stable domains: **Scene** for the spatial hierarchy and object details,
+**Annotations** for the ordered annotation list and annotation details, and
+**System** for Camera, Display, and Units and Measurement. Dynamic detail
+updates do not resize or rebuild unrelated domains.
 
 ## COMPAS plugin discovery
 
@@ -384,6 +401,19 @@ Components wrap Qt widgets and share access to the active viewer through `Base`.
 - `NumberEdit`
 - `TextEdit`
 
+Commands that navigate the built-in sidebar use its closed domain API:
+
+```python
+viewer.ui.sidebar.set_current_tab("System")
+viewer.ui.sidebar.focus_system_section("Camera")
+```
+
+`set_current_tab` accepts only `"Scene"`, `"Annotations"`, or `"System"`.
+`focus_system_section` accepts only `"Camera"`, `"Display"`, or
+`"Units and Measurement"`, activates System, and focuses that section. Both
+methods raise `ValueError` for unsupported identifiers. Components should use
+this boundary instead of reaching into the sidebar's internal layouts.
+
 `Container(..., compact=True)` applies the shared compact sidebar policy: content margins, row margins, spacing, size policy, and maximum row height. Use this for inspector-style forms instead of repeating layout constants.
 
 The scene-object parameter dialog intentionally edits only writable scalar constructor parameters. Extend `ParameterForm` with explicit editors and conversion rules for structured values such as `Point`, `Vector`, `Frame`, and `Color`; do not parse arbitrary executable input.
@@ -391,7 +421,8 @@ The scene-object parameter dialog intentionally edits only writable scalar const
 `DatastructureAttributes` is an opt-in Viewer-owned inspector for element data;
 it is not part of the default sidebar. Add `{"type":
 "DatastructureAttributes"}` to `viewer.sidebar_items` before showing a custom
-Viewer that requires it. The inspector discovers the established Mesh and
+Viewer that requires it; the explicitly configured inspector appears in the
+**Scene** domain. The inspector discovers the established Mesh and
 Graph element APIs and uses ordered `default_*_attributes` dictionaries as its
 column contract. Each tab uses a lazy `QAbstractTableModel`: it snapshots
 element keys for row lookup but fetches cell values through singular attribute

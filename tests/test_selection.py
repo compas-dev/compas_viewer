@@ -95,5 +95,6 @@ def test_viewer_refresh_handler_synchronizes_sidebar_and_renderer_once():
     viewer.state.selection.add(first, second)
     viewer.state.selection.add(first)
 
-    sidebar.update.assert_called_once_with()
+    sidebar.update_spatial_selection.assert_called_once_with()
+    sidebar.update.assert_not_called()
     renderer.update.assert_called_once_with()

@@ -294,8 +294,6 @@ class EventManager(Base):
             Qt key event to dispatch.
 
         """
-        if event.key() == Qt.Key.Key_Escape and event.modifiers() == Qt.KeyboardModifier.NoModifier and self.viewer.cancel_measurement():
-            return
         for keyevent in self.key_events:
             if keyevent == event:
                 keyevent.triggered.emit()

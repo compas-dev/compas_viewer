@@ -1,10 +1,18 @@
 from types import SimpleNamespace
 from unittest.mock import Mock
 
+from PySide6.QtCore import QEvent
 from PySide6.QtCore import QPoint
 from PySide6.QtCore import QPointF
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QKeyEvent
+from PySide6.QtTest import QTest
+from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QLineEdit
+from PySide6.QtWidgets import QWidget
 
+from compas_viewer.components.menubar import _GlobalEscapeFilter
+from compas_viewer.components.menubar import MenuBar
 from compas_viewer.events import EventManager
 
 
@@ -65,7 +73,7 @@ def viewer_stub(*, active=True, cancel=True):
     )
 
 
-def test_escape_cancels_measurement_before_deselection(monkeypatch):
+def test_escape_dispatches_registered_command_without_preprocessing(monkeypatch):
     viewer = viewer_stub(cancel=True)
     manager = manager_for(monkeypatch, viewer)
     deselect = Binding()
@@ -73,19 +81,60 @@ def test_escape_cancels_measurement_before_deselection(monkeypatch):
 
     manager.delegate_keypress(KeyEvent(Qt.Key.Key_Escape))
 
-    viewer.cancel_measurement.assert_called_once_with()
-    deselect.triggered.emit.assert_not_called()
-
-
-def test_escape_dispatches_normally_without_measurement_state(monkeypatch):
-    viewer = viewer_stub(cancel=False)
-    manager = manager_for(monkeypatch, viewer)
-    deselect = Binding()
-    manager.key_events = [deselect]  # type: ignore[list-item]
-
-    manager.delegate_keypress(KeyEvent(Qt.Key.Key_Escape))
-
     deselect.triggered.emit.assert_called_once_with()
+    viewer.cancel_measurement.assert_not_called()
+
+
+def test_global_escape_filter_routes_non_editor_escape_once(monkeypatch):
+    monkeypatch.setenv("QT_QPA_PLATFORM", "offscreen")
+    app = QApplication.instance() or QApplication([])
+    callback = Mock()
+    event_filter = _GlobalEscapeFilter(callback)
+    event = QKeyEvent(QEvent.Type.KeyPress, Qt.Key.Key_Escape, Qt.KeyboardModifier.NoModifier)
+
+    assert event_filter.eventFilter(QWidget(), event)
+    callback.assert_called_once_with()
+    assert event.isAccepted()
+    assert app is not None
+
+
+def test_global_escape_filter_leaves_propagated_escape_to_focused_editor(monkeypatch):
+    monkeypatch.setenv("QT_QPA_PLATFORM", "offscreen")
+    app = QApplication.instance() or QApplication([])
+    callback = Mock()
+    event_filter = _GlobalEscapeFilter(callback)
+    editor = QLineEdit()
+    editor.show()
+    editor.setFocus()
+    app.processEvents()
+    app.installEventFilter(event_filter)
+
+    QTest.keyClick(editor, Qt.Key.Key_Escape)
+    app.processEvents()
+
+    callback.assert_not_called()
+    app.removeEventFilter(event_filter)
+    editor.hide()
+
+
+def test_global_escape_cancels_measurement_before_deselecting(monkeypatch):
+    command = SimpleNamespace(callback=Mock())
+    viewer = SimpleNamespace(
+        cancel_measurement=Mock(return_value=True),
+        commands={"viewer.deselect_all": command},
+    )
+    monkeypatch.setattr(MenuBar, "viewer", property(lambda _self: viewer), raising=False)
+    menu = object.__new__(MenuBar)
+
+    menu._deselect_or_cancel()
+
+    viewer.cancel_measurement.assert_called_once_with()
+    command.callback.assert_not_called()
+
+    viewer.cancel_measurement.return_value = False
+    menu._deselect_or_cancel()
+
+    command.callback.assert_called_once_with(viewer)
 
 
 def test_active_measurement_consumes_left_press_before_selection(monkeypatch):

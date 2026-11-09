@@ -333,7 +333,7 @@ change_view_cmd = Command(title="Set View3D View", callback=change_view)
 
 
 def camera_settings(viewer: "Viewer") -> None:
-    """Focus the camera settings in the sidebar when available.
+    """Open the camera section of the System sidebar tab.
 
     Parameters
     ----------
@@ -341,17 +341,7 @@ def camera_settings(viewer: "Viewer") -> None:
         Viewer whose camera settings should be focused.
 
     """
-    # Try to focus on the camera settings tab in the sidebar
-    if hasattr(viewer.ui, "sidebar") and hasattr(viewer.ui.sidebar, "tabform"):
-        tabform = viewer.ui.sidebar.tabform
-        if "Camera" in tabform.tabs:
-            tabform.set_current_tab("Camera")
-            if hasattr(viewer.ui.sidebar, "camera_setting"):
-                viewer.ui.sidebar.camera_setting.update()
-        else:
-            print("Camera settings tab not found in sidebar")
-    else:
-        print("Camera settings are available in the sidebar")
+    viewer.ui.sidebar.focus_system_section("Camera")
 
 
 camera_settings_cmd = Command(title="Camera Settings", callback=camera_settings)
@@ -641,15 +631,16 @@ invert_selection_cmd = Command(title="Select Inverted", callback=invert_selectio
 
 
 def deselect_all(viewer: "Viewer") -> None:
-    """Clear the current scene selection.
+    """Clear both Viewer selections.
 
     Parameters
     ----------
     viewer
-        Viewer whose selection should be cleared.
+        Viewer whose spatial and annotation selections should be cleared.
 
     """
     viewer.state.selection.clear()
+    viewer.state.annotation_selection.clear()
 
 
 deselect_all_cmd = Command(title="Deselect All", callback=deselect_all, keybinding="Escape")
@@ -775,7 +766,11 @@ def select_object(viewer: "Viewer", event: QMouseEvent) -> None:
         y = viewer.mouse.last_pos.y()
         instance_color = viewer.renderer.read_instance_color((x, y, x, y))
         selected_obj = _object_from_instance_colors(viewer, instance_color)
-        viewer.state.selection.replace((selected_obj,) if selected_obj is not None else ())
+        if selected_obj is None:
+            viewer.state.selection.clear()
+            viewer.state.annotation_selection.clear()
+        else:
+            viewer.state.selection.replace((selected_obj,))
 
 
 select_object_cmd = Command(title="Select Object", callback=select_object, mousebinding="LEFT")

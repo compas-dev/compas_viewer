@@ -14,6 +14,7 @@ from PySide6.QtWidgets import QDoubleSpinBox
 from PySide6.QtWidgets import QFormLayout
 from PySide6.QtWidgets import QGroupBox
 from PySide6.QtWidgets import QLabel
+from PySide6.QtWidgets import QLineEdit
 from PySide6.QtWidgets import QPushButton
 from PySide6.QtWidgets import QTreeWidget
 from PySide6.QtWidgets import QTreeWidgetItem
@@ -60,30 +61,66 @@ class AnnotationTree(QTreeWidget):
         return event.key() == Qt.Key.Key_Delete and event.modifiers() == Qt.KeyboardModifier.NoModifier
 
 
+class AnnotationNameEdit(QLineEdit):
+    """Name editor that owns Escape while annotation details have focus."""
+
+    escape_requested = Signal()
+
+    def event(self, event: QEvent) -> bool:
+        """Reserve Escape before window-level shortcuts are activated."""
+        if event.type() == QEvent.Type.ShortcutOverride and isinstance(event, QKeyEvent) and self._is_escape(event):
+            event.accept()
+            return True
+        return super().event(event)
+
+    def keyPressEvent(self, event: QKeyEvent) -> None:  # noqa: N802
+        """Request local edit cancellation for unmodified Escape."""
+        if self._is_escape(event):
+            self.escape_requested.emit()
+            event.accept()
+            return
+        super().keyPressEvent(event)
+
+    @staticmethod
+    def _is_escape(event: QKeyEvent) -> bool:
+        """Return whether an event is an unmodified Escape key press."""
+        return event.key() == Qt.Key.Key_Escape and event.modifiers() == Qt.KeyboardModifier.NoModifier
+
+
 class AnnotationPanel(Component):
-    """Display and edit the scene's ordered non-spatial annotations."""
+    """Display ordered annotations and details for the current selection."""
 
     def __init__(self) -> None:
         super().__init__()
         self.widget = QWidget()
         self.layout = QVBoxLayout(self.widget)
         self.layout.setContentsMargins(0, 0, 0, 0)
-        self.title = QLabel("Annotations")
-        self.layout.addWidget(self.title)
+
         self.tree = AnnotationTree()
         self.tree.setColumnCount(3)
         self.tree.setHeaderLabels(["Name", "Type", "Visible"])
         self.tree.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         self.tree.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.tree.itemDoubleClicked.connect(self._edit_name)
         self.tree.itemChanged.connect(self._on_item_changed)
         self.tree.itemSelectionChanged.connect(self._on_selection_changed)
-        self.layout.addWidget(self.tree)
-
-        self.remove_button = QPushButton("Remove")
-        self.remove_button.clicked.connect(self.remove_selected)
-        self.layout.addWidget(self.remove_button)
         self.tree.delete_requested.connect(self.remove_selected)
+        self.layout.addWidget(self.tree, 3)
+
+        self.details_group = QGroupBox("Details")
+        self.details_layout = QVBoxLayout(self.details_group)
+        self.details_message = QLabel("No annotation selected")
+        self.details_message.setWordWrap(True)
+        self.details_layout.addWidget(self.details_message)
+
+        self.details_form_widget = QWidget()
+        self.details_form = QFormLayout(self.details_form_widget)
+        self.name_edit = AnnotationNameEdit()
+        self.name_edit.editingFinished.connect(self._commit_name)
+        self.name_edit.escape_requested.connect(self._cancel_name_edit)
+        self.type_label = QLabel()
+        self.details_form.addRow("Name", self.name_edit)
+        self.details_form.addRow("Type", self.type_label)
+        self.details_layout.addWidget(self.details_form_widget)
 
         self.style_group = QGroupBox("Dimension Style")
         self.style_layout = QFormLayout(self.style_group)
@@ -98,7 +135,12 @@ class AnnotationPanel(Component):
         self.style_layout.addRow("Text Size", self.text_size)
         self.style_layout.addRow("Arrow Size", self.arrow_size)
         self.style_layout.addRow("Label Offset", self.label_offset)
-        self.layout.addWidget(self.style_group)
+        self.details_layout.addWidget(self.style_group)
+
+        self.remove_button = QPushButton("Remove")
+        self.remove_button.clicked.connect(self.remove_selected)
+        self.details_layout.addWidget(self.remove_button)
+        self.layout.addWidget(self.details_group, 2)
 
         self.line_width.valueChanged.connect(lambda value: self._set_style("line_width", value))
         self.text_size.valueChanged.connect(lambda value: self._set_style("text_size", value))
@@ -107,31 +149,25 @@ class AnnotationPanel(Component):
 
         self._items: dict[UUID, AnnotationPanelItem] = {}
         self._refreshing = False
-        self.style_group.hide()
+        self._sync_details()
 
     def update(self) -> None:
-        """Synchronize the flat list, selection, visibility, and style controls."""
+        """Synchronize the list, selection, visibility, and detail controls."""
         self._refreshing = True
         try:
             self.tree.clear()
             self._items = {}
             for annotation in self.scene.annotations:
-                item = AnnotationPanelItem(
-                    [
-                        annotation.name,
-                        self._item_type_name(annotation),
-                        "",
-                    ]
-                )
+                item = AnnotationPanelItem([annotation.name, self._item_type_name(annotation), ""])
                 item.annotation_guid = annotation.guid
-                item.setFlags(item.flags() | Qt.ItemFlag.ItemIsEditable | Qt.ItemFlag.ItemIsUserCheckable)
+                item.setFlags(item.flags() | Qt.ItemFlag.ItemIsUserCheckable)
                 item.setCheckState(2, Qt.CheckState.Checked if annotation.show else Qt.CheckState.Unchecked)
                 self.tree.addTopLevelItem(item)
                 item.setSelected(annotation in self.viewer.state.annotation_selection)
                 self._items[annotation.guid] = item
             self.tree.resizeColumnToContents(0)
             self.tree.resizeColumnToContents(1)
-            self._sync_style_controls()
+            self._sync_details()
         finally:
             self._refreshing = False
 
@@ -142,22 +178,12 @@ class AnnotationPanel(Component):
             self.scene.remove_annotation(annotation)
         self.update()
 
-    def _edit_name(self, item: QTreeWidgetItem, column: int) -> None:
-        """Start explicit inline editing only for the Name column."""
-        if column == 0:
-            self.tree.editItem(item, column)
-
     def _on_item_changed(self, item: QTreeWidgetItem, column: int) -> None:
-        """Apply durable name and visibility edits from the flat list."""
-        if self._refreshing:
+        """Apply durable visibility edits from the flat list."""
+        if self._refreshing or column != 2:
             return
         annotation = self.scene.annotation(cast(AnnotationPanelItem, item).annotation_guid)
-        if column == 0:
-            annotation.name = item.text(0)
-        elif column == 2:
-            annotation.show = item.checkState(2) == Qt.CheckState.Checked
-        else:
-            return
+        annotation.show = item.checkState(2) == Qt.CheckState.Checked
         self.viewer.refresh_annotations((annotation,))
 
     def _on_selection_changed(self) -> None:
@@ -166,6 +192,32 @@ class AnnotationPanel(Component):
             return
         selected = tuple(self.scene.annotation(cast(AnnotationPanelItem, item).annotation_guid) for item in self.tree.selectedItems())
         self.viewer.state.annotation_selection.replace(selected)
+        self._sync_details()
+
+    def _sync_details(self) -> None:
+        """Display details for zero, one, or multiple selected annotations."""
+        selected = self.viewer.state.annotation_selection.objects
+        if len(selected) == 0:
+            self.details_message.setText("No annotation selected")
+            self.details_message.show()
+            self.details_form_widget.hide()
+            self.style_group.hide()
+            self.remove_button.hide()
+            return
+        if len(selected) > 1:
+            self.details_message.setText(f"{len(selected)} annotations selected")
+            self.details_message.show()
+            self.details_form_widget.hide()
+            self.style_group.hide()
+            self.remove_button.show()
+            return
+
+        annotation = selected[0]
+        self.details_message.hide()
+        self.details_form_widget.show()
+        self.remove_button.show()
+        self.name_edit.setText(annotation.name)
+        self.type_label.setText(self._item_type_name(annotation))
         self._sync_style_controls()
 
     def _sync_style_controls(self) -> None:
@@ -188,16 +240,40 @@ class AnnotationPanel(Component):
             control.blockSignals(False)
         self._set_color_button(style.color)
 
+    def _selected_annotation(self) -> SceneAnnotation | None:
+        """Return the only selected annotation entry."""
+        selected = self.viewer.state.annotation_selection.objects
+        return selected[0] if len(selected) == 1 else None
+
     def _selected_dimension(self) -> SceneAnnotation | None:
         """Return the only selected distance-dimension entry."""
-        selected = self.viewer.state.annotation_selection.objects
-        if len(selected) != 1:
+        annotation = self._selected_annotation()
+        if annotation is None:
             return None
-        annotation = selected[0]
         try:
             return annotation if isinstance(annotation.item, DistanceDimension) else None
         except LookupError:
             return None
+
+    def _commit_name(self) -> None:
+        """Commit the explicit Name field without rebuilding render resources."""
+        annotation = self._selected_annotation()
+        if annotation is None:
+            return
+        name = self.name_edit.text()
+        if name == annotation.name:
+            return
+        annotation.name = name
+        item = self._items.get(annotation.guid)
+        if item is not None:
+            item.setText(0, name)
+
+    def _cancel_name_edit(self) -> None:
+        """Restore the current durable name and leave the editor."""
+        annotation = self._selected_annotation()
+        if annotation is not None:
+            self.name_edit.setText(annotation.name)
+        self.name_edit.clearFocus()
 
     def _set_style(self, name: str, value: float) -> None:
         """Set one durable dimension-style field and refresh its render layer."""

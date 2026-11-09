@@ -3,15 +3,46 @@ from functools import partial
 from typing import Any
 from typing import cast
 
+from PySide6.QtCore import QEvent
+from PySide6.QtCore import QObject
+from PySide6.QtCore import Qt
 from PySide6.QtGui import QAction
 from PySide6.QtGui import QActionGroup
+from PySide6.QtGui import QKeyEvent
+from PySide6.QtWidgets import QAbstractSpinBox
+from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QComboBox
+from PySide6.QtWidgets import QLineEdit
 from PySide6.QtWidgets import QMenu
 from PySide6.QtWidgets import QMenuBar
+from PySide6.QtWidgets import QPlainTextEdit
+from PySide6.QtWidgets import QTextEdit
 
 from compas_viewer.components.component import Component
 from compas_viewer.uidefinitions import UIItem
 
 from .mainwindow import MainWindow
+
+
+class _GlobalEscapeFilter(QObject):
+    """Route unmodified Escape through one window-level command path."""
+
+    def __init__(self, callback: Callable[[], object], parent: QObject | None = None) -> None:
+        super().__init__(parent)
+        self._callback = callback
+
+    def eventFilter(self, watched: QObject, event: QEvent) -> bool:  # noqa: N802
+        """Handle Escape unless a focused editor owns the key event."""
+        if event.type() != QEvent.Type.KeyPress or not isinstance(event, QKeyEvent):
+            return False
+        if event.key() != Qt.Key.Key_Escape or event.modifiers() != Qt.KeyboardModifier.NoModifier:
+            return False
+        editor_types = (QLineEdit, QTextEdit, QPlainTextEdit, QAbstractSpinBox, QComboBox)
+        if isinstance(QApplication.focusWidget(), editor_types) or isinstance(watched, editor_types):
+            return False
+        self._callback()
+        event.accept()
+        return True
 
 
 class MenuBar(Component):
@@ -31,8 +62,17 @@ class MenuBar(Component):
         self._groups: list[QActionGroup] = []
         self._actions: list[QAction] = []
         self._state_actions: dict[str, list[tuple[QAction, object]]] = {}
+        self._escape_filter = _GlobalEscapeFilter(self._deselect_or_cancel, self.widget)
+        self.viewer.app.installEventFilter(self._escape_filter)
         self.viewer.state.changed.connect(self._on_state_changed)
         self.load_items()
+
+    def _deselect_or_cancel(self) -> object:
+        """Cancel measurement or invoke Deselect All for global Escape."""
+        if self.viewer.cancel_measurement():
+            return None
+        command = self.viewer.commands["viewer.deselect_all"]
+        return command.callback(self.viewer)
 
     @property
     def items(self) -> list[UIItem]:
@@ -93,7 +133,7 @@ class MenuBar(Component):
                     state = item.get("checked", False)
                     a.setChecked(state if not callable(state) else state(self.viewer))
 
-                if action.keybinding is not None:
+                if action.keybinding is not None and action.keybinding != "Escape":
                     a.setShortcut(action.keybinding)
 
             else:

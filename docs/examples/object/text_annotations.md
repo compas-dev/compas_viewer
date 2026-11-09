@@ -18,7 +18,9 @@ segment.
 --8<-- "docs/examples/object/text_annotations.py"
 ```
 
-The flat **Annotations** panel controls annotation names, visibility,
-selection, removal, and the style of one selected distance dimension.
+The **Annotations** sidebar tab controls annotation names, visibility,
+selection, removal, and the style of one selected distance dimension. The
+ordered list and selected-annotation details occupy separate stable areas.
 Annotations have no parent, children, or inherited transformation. Their
-selection is independent from viewport and scene-tree object selection.
+selection is independent from viewport and scene-tree object selection, and
+switching tabs preserves both selections.

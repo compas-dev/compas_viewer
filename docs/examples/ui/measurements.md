@@ -65,13 +65,14 @@ Measurement** to cancel.
 
 The unit is a label only: it never rescales coordinates. Precision controls
 display formatting only and is not a geometric tolerance. Transient inspection
-labels use the current values from the **Units and Measurement** tab.
+labels use the current values from the **Units and Measurement** section of the
+**System** tab.
 
 Completed dimensions render in a final persistent-annotation pass without
 depth testing or depth writes, so scene geometry cannot hide them.
 
-Use the flat **Annotations** panel to rename, hide, select, or remove a
-dimension. When exactly one distance dimension is selected, the panel also
-edits its color, line width, text size, arrow size, and label offset. These
-style sizes and offsets use logical screen pixels and do not alter anchors,
-unit, precision, or label text.
+Use the **Annotations** tab to hide, select, or remove a dimension. When exactly
+one distance dimension is selected, the detail area provides an explicit Name
+field, its read-only Type, and controls for color, line width, text size, arrow
+size, and label offset. These style sizes and offsets use logical screen pixels
+and do not alter anchors, unit, precision, or label text.

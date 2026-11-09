@@ -35,7 +35,11 @@ def connected_viewer(scene):
         makeCurrent=events.make_current,
         doneCurrent=events.done_current,
     )
-    sidebar = SimpleNamespace(update=events.sidebar_update)
+    sidebar = SimpleNamespace(
+        update=events.sidebar_update,
+        update_spatial_selection=events.sidebar_update,
+        update_annotation_selection=events.sidebar_update,
+    )
     viewer = object.__new__(Viewer)
     viewer._config = Config()
     viewer._scene = scene
@@ -347,7 +351,11 @@ def test_direct_clear_removes_entries_before_resolver_sensitive_sidebar_refresh(
     viewer.state.annotation_selection.add(annotation)
     monkeypatch.setattr(AnnotationPanel, "viewer", property(lambda _self: viewer), raising=False)
     panel = AnnotationPanel()
-    viewer.ui.sidebar = panel
+    viewer.ui.sidebar = SimpleNamespace(
+        update=panel.update,
+        update_spatial_selection=lambda: None,
+        update_annotation_selection=panel.update,
+    )
     panel.update()
 
     scene.clear()

@@ -241,7 +241,7 @@ def test_refresh_categories_have_distinct_buffer_scope():
     renderer.update.assert_called_once_with()
 
     renderer.reset_mock()
-    sidebar.update.reset_mock()
+    sidebar.reset_mock()
     viewer.refresh_geometry([sceneobject])
 
     renderer.rebuild_buffers.assert_called_once_with()
@@ -323,11 +323,12 @@ def test_refresh_hierarchy_preserves_surviving_selection_order():
     viewer.state.selection.add(first, removed, last)
     scene._remove(removed, rebuild_buffers=False, cleanup_selection=False)
     renderer.reset_mock()
-    sidebar.update.reset_mock()
+    sidebar.reset_mock()
 
     viewer.refresh_hierarchy()
 
     assert viewer.state.selection.objects == (first, last)
     renderer.rebuild_buffers.assert_called_once_with()
-    sidebar.update.assert_called_once_with()
+    sidebar.update_spatial_selection.assert_called_once_with()
+    sidebar.update.assert_not_called()
     renderer.update.assert_called_once_with()
