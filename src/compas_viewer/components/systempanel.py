@@ -92,7 +92,10 @@ class SystemPanel(Component):
                 layout = child.widget.layout()
                 if not isinstance(label, QLabel) or not isinstance(layout, QBoxLayout) or layout.count() < 2:
                     continue
-                field = layout.itemAt(1).widget()
+                field_item = layout.itemAt(1)
+                if field_item is None:
+                    continue
+                field = field_item.widget()
                 if field is not None:
                     rows.append((label, field, layout))
         if not rows:
