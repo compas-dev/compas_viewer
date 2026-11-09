@@ -284,7 +284,7 @@ def _draw_measurement_preview(
 
     painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
     preview_color = QColor(255, 140, 0)
-    available_color = QColor(80, 170, 230, 190)
+    available_color = QColor(90, 210, 255, 235)
     rejection_color = QColor(210, 45, 45)
 
     inspection = state.completed_inspection
@@ -369,24 +369,26 @@ def _draw_measurement_segment(
 
 
 def _draw_measurement_marker(painter: "QPainter", point: "QPointF", color: "QColor") -> None:
-    """Draw one fixed-size screen marker."""
+    """Draw one filled square screen marker."""
+    from PySide6.QtCore import QRectF
     from PySide6.QtGui import QBrush
     from PySide6.QtGui import QPen
 
     painter.setPen(QPen(color, 2.0))
     painter.setBrush(QBrush(color))
-    painter.drawEllipse(point, 4.0, 4.0)
+    painter.drawRect(QRectF(point.x() - 5.0, point.y() - 5.0, 10.0, 10.0))
 
 
 def _draw_available_snap_marker(painter: "QPainter", point: "QPointF", color: "QColor") -> None:
-    """Draw one subdued hollow point-snap guide."""
+    """Draw one bright hollow square point-snap guide."""
+    from PySide6.QtCore import QRectF
     from PySide6.QtCore import Qt
     from PySide6.QtGui import QBrush
     from PySide6.QtGui import QPen
 
-    painter.setPen(QPen(color, 1.5))
+    painter.setPen(QPen(color, 2.0))
     painter.setBrush(QBrush(Qt.BrushStyle.NoBrush))
-    painter.drawEllipse(point, 3.5, 3.5)
+    painter.drawRect(QRectF(point.x() - 5.0, point.y() - 5.0, 10.0, 10.0))
 
 
 def _format_distance(distance: float, unit: str | None, precision: int) -> str:

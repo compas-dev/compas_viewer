@@ -36,6 +36,7 @@ def projection_renderer(width=200, height=100, camera=None) -> Any:
         height=lambda: height,
         camera=camera or Camera(),
         SNAP_DEPTH_EPSILON=Renderer.SNAP_DEPTH_EPSILON,
+        SNAP_POINT_FOOTPRINT_RADIUS=Renderer.SNAP_POINT_FOOTPRINT_RADIUS,
     )
     renderer._view_projection = lambda: Renderer._view_projection(renderer)
     renderer._project_point = Renderer._project_point
@@ -414,15 +415,43 @@ def test_query_snap_at_remains_the_winner_only_compatibility_path():
 def test_depth_visibility_rejects_occluded_and_outside_candidates():
     renderer = projection_renderer(width=20, height=20)
     depths = np.full((3, 3), 0.25, dtype=np.float32)
+    object_pixels = np.ones((3, 3), dtype=np.bool_)
     region = (9, 9, 8, 3, 3)
 
-    visible = Renderer._is_snap_visible(renderer, ProjectedPoint(10.5, 10.5, 0.25), region, depths)
-    occluded = Renderer._is_snap_visible(renderer, ProjectedPoint(10.5, 10.5, 0.5), region, depths)
-    outside = Renderer._is_snap_visible(renderer, ProjectedPoint(20, 20, 0.1), region, depths)
+    visible = Renderer._is_snap_visible(renderer, ProjectedPoint(10.5, 10.5, 0.25), region, depths, object_pixels)
+    occluded = Renderer._is_snap_visible(renderer, ProjectedPoint(10.5, 10.5, 0.5), region, depths, object_pixels)
+    outside = Renderer._is_snap_visible(renderer, ProjectedPoint(20, 20, 0.1), region, depths, object_pixels)
 
     assert visible
     assert not occluded
     assert not outside
+
+
+def test_depth_visibility_uses_only_the_hovered_object_point_footprint():
+    renderer = projection_renderer(width=20, height=20)
+    renderer.SNAP_POINT_FOOTPRINT_RADIUS = 1
+    region = (9, 9, 8, 3, 3)
+    projection = ProjectedPoint(10.5, 10.5, 0.5)
+    depths = np.array(
+        [
+            [1.0, 1.0, 1.0],
+            [1.0, 0.4, 0.5],
+            [1.0, 1.0, 1.0],
+        ],
+        dtype=np.float32,
+    )
+    same_object = np.zeros((3, 3), dtype=np.bool_)
+    same_object[1, 1:] = True
+    center_only = np.zeros((3, 3), dtype=np.bool_)
+    center_only[1, 1] = True
+    background_only = np.zeros((3, 3), dtype=np.bool_)
+    deeper_same_object_depths = depths.copy()
+    deeper_same_object_depths[1, 2] = 0.75
+
+    assert Renderer._is_snap_visible(renderer, projection, region, depths, same_object)
+    assert not Renderer._is_snap_visible(renderer, projection, region, depths, center_only)
+    assert not Renderer._is_snap_visible(renderer, projection, region, depths, background_only)
+    assert not Renderer._is_snap_visible(renderer, projection, region, deeper_same_object_depths, same_object)
 
 
 def test_surface_hits_unproject_face_buffer_pixels_by_object_kind():

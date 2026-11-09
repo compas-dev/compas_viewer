@@ -52,7 +52,7 @@ def test_active_preview_reprojects_markers_and_formats_live_distance():
     assert projection.call_count == 2
     painter.drawLine.assert_called_once_with(QPointF(0, 0), QPointF(30, 40))
     assert drawn_text(painter) == ["5.00 m"]
-    assert painter.drawEllipse.call_count == 2
+    assert painter.drawRect.call_count == 2
 
 
 def test_completed_inspection_uses_current_unit_and_precision_each_frame():
@@ -82,7 +82,7 @@ def test_preview_skips_hidden_segment_endpoints_but_keeps_visible_marker():
 
     _draw_measurement_preview(painter, state, partially_visible, unit=None, precision=3)
 
-    painter.drawEllipse.assert_called_once()
+    painter.drawRect.assert_called_once()
     painter.drawLine.assert_not_called()
     painter.drawText.assert_not_called()
 
@@ -97,11 +97,11 @@ def test_associative_rejection_is_drawn_at_the_projected_hover_snap():
     _draw_measurement_preview(painter, state, project, unit=None, precision=3)
 
     assert drawn_text(painter) == ["Face snaps are fixed only"]
-    assert painter.drawEllipse.call_count == 3
+    assert painter.drawRect.call_count == 3
     painter.drawLine.assert_not_called()
 
 
-def test_hover_palette_draws_all_points_hollow_and_winner_filled():
+def test_hover_palette_draws_large_hollow_squares_and_filled_winner():
     state = MeasurementState()
     state.start("fixed")
     available = (snap([0, 0, 0]), snap([1, 0, 0]), snap([2, 0, 0]))
@@ -110,7 +110,10 @@ def test_hover_palette_draws_all_points_hollow_and_winner_filled():
 
     _draw_measurement_preview(painter, state, project, unit=None, precision=3)
 
-    assert painter.drawEllipse.call_count == 4
+    assert painter.drawRect.call_count == 4
+    assert painter.drawEllipse.call_count == 0
+    rectangles = [call.args[0] for call in painter.drawRect.call_args_list]
+    assert [(rectangle.width(), rectangle.height()) for rectangle in rectangles] == [(10.0, 10.0)] * 4
     brushes = [call.args[0] for call in painter.setBrush.call_args_list]
     assert [brush.style() for brush in brushes[:3]] == [Qt.BrushStyle.NoBrush] * 3
     assert brushes[-1].style() == Qt.BrushStyle.SolidPattern
@@ -125,7 +128,7 @@ def test_rejected_second_associative_anchor_does_not_preview_a_dimension():
 
     _draw_measurement_preview(painter, state, project, unit="m", precision=2)
 
-    assert painter.drawEllipse.call_count == 2
+    assert painter.drawRect.call_count == 2
     painter.drawLine.assert_not_called()
     assert drawn_text(painter) == ["Face snaps are fixed only"]
 

@@ -61,7 +61,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Made active measurement targets explicit by showing all projected Point,
   Mesh-vertex, or Graph-node snaps on the hovered object while keeping only the
   depth-qualified winner click-eligible. The first accepted anchor remains
-  visible while the palette follows the next object.
+  visible while the palette follows the next object. Point guidance now uses
+  larger bright hollow squares with a distinct filled winner. Visible receding
+  vertices use their same-object rendered point footprint for reliable depth
+  qualification, and Mesh edges no longer compete with vertex acquisition.
 * Moved transient overlays and measurement feedback to one transparent,
   input-transparent widget canvas above the OpenGL renderer, and kept completed
   world annotations visible at equal depth while preserving occlusion by

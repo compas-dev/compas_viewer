@@ -157,7 +157,7 @@ def test_point_and_line_have_component_anchor_metadata():
     assert line_result.parameter == pytest.approx(0.25)
 
 
-def test_mesh_vertex_and_edge_have_stable_component_metadata():
+def test_mesh_vertices_have_stable_metadata_without_edge_acquisition():
     mesh = Mesh.from_vertices_and_faces([[0, 0, 0], [10, 0, 0], [0, 10, 0]], [[0, 1, 2]])
     sceneobject = SceneObject(mesh)
 
@@ -170,10 +170,7 @@ def test_mesh_vertex_and_edge_have_stable_component_metadata():
     vertex_anchor = vertex.component_anchor()
     assert vertex_anchor is not None
     assert vertex_anchor.component == 0
-    assert edge is not None
-    assert edge.kind is SnapKind.EDGE
-    assert edge.component == (0, 1)
-    assert edge.parameter == pytest.approx(0.5)
+    assert edge is None
 
 
 def test_graph_node_and_edge_have_stable_component_metadata():

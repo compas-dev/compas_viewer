@@ -346,7 +346,7 @@ def _object_candidates(
         return (candidate,) if candidate is not None else ()
     if isinstance(item, Mesh):
         points = ((key, item.vertex_point(key).transformed(transformation)) for key in item.vertices())
-        return _network_candidates(sceneobject.guid, SnapKind.VERTEX, points, item.edges(), screen_point, project)
+        return _network_candidates(sceneobject.guid, SnapKind.VERTEX, points, (), screen_point, project)
     if isinstance(item, Graph):
         points = ((key, item.node_point(key).transformed(transformation)) for key in item.nodes())
         return _network_candidates(sceneobject.guid, SnapKind.NODE, points, item.edges(), screen_point, project)

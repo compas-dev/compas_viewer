@@ -101,6 +101,9 @@ class Renderer(QOpenGLWidget, Base):
     # Two units of the 24-bit instance-buffer depth resolution.
     SNAP_DEPTH_EPSILON = 2.0 / ((1 << 24) - 1)
 
+    # Half-width of the rendered point footprint used for snap visibility.
+    SNAP_POINT_FOOTPRINT_RADIUS = 6
+
     # Outside the generated instance-color range, including its rare 255 red.
     INSTANCE_BACKGROUND = (1.0, 1.0, 1.0, 1.0)
 
@@ -927,6 +930,9 @@ class Renderer(QOpenGLWidget, Base):
         if sceneobject is None:
             return SnapQuery()
 
+        object_color = next(color for color, obj in self.viewer.scene.instance_colors.items() if obj is sceneobject)
+        object_pixels = np.all(colors == np.asarray(object_color, dtype=np.uint8), axis=2)
+
         surface_hits = tuple(self._surface_hits(region, colors, depths))
         width = self.width()
         height = self.height()
@@ -940,7 +946,7 @@ class Renderer(QOpenGLWidget, Base):
             screen_point,
             radius=radius,
             project=project,
-            is_visible=lambda projection: self._is_snap_visible(projection, region, depths),
+            is_visible=lambda projection: self._is_snap_visible(projection, region, depths, object_pixels),
             surface_hits=lambda _screen_point, _radius: surface_hits,
         )
 
@@ -1099,14 +1105,23 @@ class Renderer(QOpenGLWidget, Base):
         projection: ProjectedPoint,
         region: tuple[int, int, int, int, int],
         depths: NDArray[np.float32],
+        object_pixels: NDArray[np.bool_],
     ) -> bool:
-        """Return whether a projection is no farther than the sampled depth."""
+        """Return whether the hovered object's point footprint is visible."""
         x, y, _gl_y, width, height = region
         column = floor(projection.x) - x
         row = floor(projection.y) - y
         if column < 0 or row < 0 or column >= width or row >= height:
             return False
-        return projection.depth <= float(depths[row, column]) + self.SNAP_DEPTH_EPSILON
+
+        footprint = self.SNAP_POINT_FOOTPRINT_RADIUS
+        row_slice = slice(max(0, row - footprint), min(height, row + footprint + 1))
+        column_slice = slice(max(0, column - footprint), min(width, column + footprint + 1))
+        pixels = object_pixels[row_slice, column_slice]
+        if not np.any(pixels):
+            return False
+        sampled_depths = depths[row_slice, column_slice][pixels]
+        return bool(np.any(np.abs(sampled_depths - projection.depth) <= self.SNAP_DEPTH_EPSILON))
 
     def _surface_hits(
         self,
