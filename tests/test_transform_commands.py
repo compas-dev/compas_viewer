@@ -48,7 +48,7 @@ def test_transform_history_commands_are_registered():
     assert commands["viewer.redo"].callback is redo
 
 
-def test_edit_menu_exposes_undo_and_redo_without_transform_ui():
+def test_edit_menu_exposes_history_editing_and_deletion_commands_once():
     edit_menu = next(item for item in default_menu_items() if item["title"] == "Edit")
 
     assert edit_menu["items"] == [
@@ -56,4 +56,8 @@ def test_edit_menu_exposes_undo_and_redo_without_transform_ui():
         {"title": "Redo", "command": "viewer.redo"},
         {"type": "separator"},
         {"title": "Modify Parameters...", "command": "viewer.modify_selected"},
+        {"type": "separator"},
+        {"title": "Delete Selected", "command": "viewer.delete_selected"},
     ]
+    assert [item.get("command") for item in edit_menu["items"]].count("viewer.delete_selected") == 1
+    assert builtin_commands()["viewer.delete_selected"].keybinding == "Delete"

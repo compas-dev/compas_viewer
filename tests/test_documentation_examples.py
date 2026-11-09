@@ -15,10 +15,12 @@ import sys
 from compas_viewer import Viewer
 
 expected_objects = int(sys.argv[2])
+expected_annotations = int(sys.argv[3])
 
 
 def verify_scene(viewer):
     assert len(viewer.scene.objects) == expected_objects
+    assert len(viewer.scene.annotations) == expected_annotations
 
 
 Viewer.show = verify_scene
@@ -52,23 +54,23 @@ assert refreshes == json.loads(sys.argv[4])
 
 
 @pytest.mark.parametrize(
-    ("relative_path", "expected_objects"),
+    ("relative_path", "expected_objects", "expected_annotations"),
     [
-        ("docs/examples/object/points.py", 10),
-        ("docs/examples/scene/groups.py", 4),
-        ("docs/examples/configuration/window.py", 1),
-        ("docs/examples/dynamic/orbiting.py", 1),
-        ("docs/examples/dynamic/transform.py", 2),
-        ("docs/examples/ui/camera.py", 25),
-        ("docs/examples/ui/object_inspection.py", 2),
-        ("docs/examples/ui/sidedock.py", 1),
+        ("docs/examples/object/points.py", 10, 0),
+        ("docs/examples/scene/groups.py", 3, 1),
+        ("docs/examples/configuration/window.py", 1, 0),
+        ("docs/examples/dynamic/orbiting.py", 1, 0),
+        ("docs/examples/dynamic/transform.py", 2, 0),
+        ("docs/examples/ui/camera.py", 25, 0),
+        ("docs/examples/ui/object_inspection.py", 2, 0),
+        ("docs/examples/ui/sidedock.py", 1, 0),
     ],
 )
-def test_documentation_example_smoke(relative_path, expected_objects):
+def test_documentation_example_smoke(relative_path, expected_objects, expected_annotations):
     environment = os.environ.copy()
     environment["QT_QPA_PLATFORM"] = "offscreen"
     subprocess.run(
-        [sys.executable, "-c", RUN_EXAMPLE, str(ROOT / relative_path), str(expected_objects)],
+        [sys.executable, "-c", RUN_EXAMPLE, str(ROOT / relative_path), str(expected_objects), str(expected_annotations)],
         check=True,
         cwd=ROOT,
         env=environment,

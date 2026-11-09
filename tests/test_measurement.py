@@ -62,7 +62,7 @@ def connected_viewer(*, results=()):
     viewer._redo_transforms = []
     viewer.running = False
     viewer.ui = SimpleNamespace(viewport=SimpleNamespace(renderer=renderer), sidebar=Mock())  # type: ignore[assignment]
-    viewer.state = ViewerState(viewer.config, scene.object)
+    viewer.state = ViewerState(viewer.config, scene.object, scene.annotation)
     viewer.state.changed.connect(viewer._on_state_changed)
     scene.attach(viewer)
     return viewer, scene, renderer
@@ -306,7 +306,7 @@ def test_transient_inspection_does_not_mutate_scene_selection_or_history():
 
 
 @pytest.mark.parametrize("mode", ["fixed", "associative"])
-def test_persistent_completion_adds_one_root_dimension_and_selects_it(mode):
+def test_persistent_completion_adds_one_annotation_and_selects_it(mode):
     first_guid = uuid4()
     second_guid = uuid4()
     if mode == "fixed":
@@ -324,13 +324,14 @@ def test_persistent_completion_adds_one_root_dimension_and_selects_it(mode):
     viewer._accept_measurement_at((10, 20))
     viewer._accept_measurement_at((30, 40))
 
-    assert len(scene.objects) == 1
-    created = scene.objects[0]
-    assert created.parent is not None and created.parent.is_root
+    assert scene.objects == []
+    assert len(scene.annotations) == 1
+    created = scene.annotations[0]
     assert isinstance(created.item, DistanceDimension)
     assert created.item.unit == "cm"
     assert created.item.precision == 1
-    assert viewer.state.selection.objects == (created,)
+    assert viewer.state.selection.objects == ()
+    assert viewer.state.annotation_selection.objects == (created,)
     assert not viewer.state.measurement.active
     assert renderer.query_snap_context_at.call_count == 2
 

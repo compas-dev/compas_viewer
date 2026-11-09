@@ -574,10 +574,11 @@ class Renderer(QOpenGLWidget, Base):
         self.viewer.scene.prepare()
         for obj in self.viewer.scene.render_objects.values():
             obj.init()
+        for annotation in self.viewer.scene.annotation_render_objects.values():
+            annotation.init()
 
         for obj in self.viewer.scene.render_objects.values():
-            if not isinstance(obj, WorldAnnotationRenderObject):
-                self.buffer_manager.add_object(obj)
+            self.buffer_manager.add_object(obj)
 
         self.buffer_manager.create_buffers()
 
@@ -623,10 +624,12 @@ class Renderer(QOpenGLWidget, Base):
                 for obj in self.viewer.scene.render_objects.values():
                     if not obj._inited:
                         obj.init()
+                for annotation in self.viewer.scene.annotation_render_objects.values():
+                    if not annotation._inited:
+                        annotation.init()
 
                 for obj in self.viewer.scene.render_objects.values():
-                    if not isinstance(obj, WorldAnnotationRenderObject):
-                        self.buffer_manager.add_object(obj)
+                    self.buffer_manager.add_object(obj)
                 self.buffer_manager.create_buffers()
             finally:
                 GL.glBindVertexArray(0)
@@ -815,13 +818,13 @@ class Renderer(QOpenGLWidget, Base):
         depth_write_mask = bool(GL.glGetBooleanv(GL.GL_DEPTH_WRITEMASK))
         try:
             GL.glDepthFunc(GL.GL_LEQUAL)
-            for render_object in self.viewer.scene.render_objects.values():
+            for render_object in self.viewer.scene.annotation_render_objects.values():
                 if isinstance(render_object, WorldAnnotationRenderObject) and not isinstance(render_object, DistanceDimensionRenderObject):
                     render_object.draw_world_annotation(self, viewworld)
 
             GL.glDisable(GL.GL_DEPTH_TEST)
             GL.glDepthMask(GL.GL_FALSE)
-            for render_object in self.viewer.scene.render_objects.values():
+            for render_object in self.viewer.scene.annotation_render_objects.values():
                 if isinstance(render_object, DistanceDimensionRenderObject):
                     render_object.draw_world_annotation(self, viewworld)
         finally:
@@ -840,9 +843,8 @@ class Renderer(QOpenGLWidget, Base):
         Returns
         -------
         ProjectedPoint | None
-            Screen position, normalized depth, and clip-space $w$, or `None`
-            when the point lies behind the camera or outside the near or far
-            clipping planes.
+            Screen position and normalized depth, or `None` when the point lies
+            behind the camera or outside the near or far clipping planes.
 
         Notes
         -----

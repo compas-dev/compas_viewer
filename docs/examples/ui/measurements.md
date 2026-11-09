@@ -2,7 +2,8 @@
 
 Configure the informational unit and display precision, add geometry with
 visible vertices, and start a one-shot fixed-distance interaction.
-The completed dimension becomes a selected root-level scene object.
+The completed dimension becomes a selected entry in the flat annotation
+collection.
 
 ```python
 --8<-- "docs/examples/ui/measurements.py"
@@ -19,7 +20,7 @@ Use the example in these steps:
    object, and the live line and formatted distance appear when a second winner
    is available.
 5. Left-click the second highlighted winner. The tool creates and selects one
-   root-level distance dimension, then stops.
+   distance-dimension annotation, then stops.
 
 Moving to the background hides the available-point palette. The palette is
 guidance: its individual points are projected without separate occlusion
@@ -47,8 +48,10 @@ Starting a mode replaces any active measurement or retained transient
 inspection. Each interaction completes after two valid anchors and then stops.
 An inspection remains transient and does not change scene data, selection,
 serialization, or transform history. Fixed and associative modes create a
-`compas.scene.DistanceDimension`; its unit and precision are snapshots taken
-when the second anchor is accepted.
+`compas.scene.DistanceDimension` in `viewer.scene.annotations`; its unit and
+precision are snapshots taken when the second anchor is accepted. The entry is
+selected through `viewer.state.annotation_selection`, independently from
+spatial object selection.
 
 Fixed mode copies the selected point, vertex, or node coordinates. Associative
 mode links to those same displayed components using their stable serializable
@@ -66,3 +69,9 @@ labels use the current values from the **Units and Measurement** tab.
 
 Completed dimensions render in a final persistent-annotation pass without
 depth testing or depth writes, so scene geometry cannot hide them.
+
+Use the flat **Annotations** panel to rename, hide, select, or remove a
+dimension. When exactly one distance dimension is selected, the panel also
+edits its color, line width, text size, arrow size, and label offset. These
+style sizes and offsets use logical screen pixels and do not alter anchors,
+unit, precision, or label text.

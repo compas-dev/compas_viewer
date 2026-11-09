@@ -1059,9 +1059,16 @@ def delete_selected(viewer: "Viewer") -> None:
     selected = viewer.state.selection.objects
     if not selected:
         return
-    for obj in selected:
-        if obj in viewer.scene.objects:
-            viewer.scene._remove(obj, rebuild_buffers=False, cleanup_selection=False)
+    renderer = viewer.renderer if viewer.running else None
+    if renderer is not None:
+        renderer.makeCurrent()
+    try:
+        for obj in selected:
+            if obj in viewer.scene.objects:
+                viewer.scene._remove(obj, rebuild_buffers=False, cleanup_selection=False, context_is_current=renderer is not None)
+    finally:
+        if renderer is not None:
+            renderer.doneCurrent()
     if viewer.running:
         viewer.renderer.rebuild_buffers()
     viewer.state.selection.clear()

@@ -38,15 +38,16 @@ The main responsibilities are deliberately separated:
 | Layer | Responsibility |
 | --- | --- |
 | `Viewer` | Application lifecycle and coordination |
-| `ViewerScene` | Scene hierarchy and COMPAS scene-object creation |
+| `ViewerScene` | Spatial hierarchy plus the separate ordered annotation collection |
 | Scene objects | Adapt COMPAS data to renderable points, lines, and faces |
+| Annotation render objects | Render non-spatial text, arrows, and dimensions outside shared geometry buffers |
 | `Renderer` | OpenGL resources, drawing, picking, camera, and overlays |
 | Components | Qt presentation and interaction |
 | Commands | User operations and input-binding metadata |
 | Command registry | Stable runtime lookup for commands |
 | UI definitions | Runtime menu and sidebar composition |
 | Configuration | Serializable startup preferences and defaults |
-| Viewer state | Observable transient selection and runtime state |
+| Viewer state | Observable spatial selection, annotation selection, and runtime state |
 | Transform history | Reversible Viewer transform transactions |
 
 `Viewer`, scene objects, and UI components use the shared viewer instance exposed by the project's singleton infrastructure. Avoid constructing hidden secondary viewers inside extensions.
@@ -199,6 +200,26 @@ their ordered stable identifiers. Selection is transient Viewer state: it is
 not stored on scene objects and does not participate in scene or configuration
 serialization.
 
+Annotations use a separate runtime selection and never enter spatial transform
+commands:
+
+```python
+from compas.scene import TextAnnotation
+
+entry = viewer.scene.add_annotation(
+    TextAnnotation("Result", (0, 0, 0)),
+    name="Result label",
+)
+viewer.state.annotation_selection.replace((entry,))
+viewer.refresh_annotations((entry,))
+```
+
+`viewer.scene.annotations` preserves durable collection order independently of
+the scene hierarchy. `viewer.state.annotation_selection` is transient and
+unserialized. The flat **Annotations** panel owns annotation naming,
+visibility, removal, and distance-style editing; the scene tree and spatial
+selection remain unchanged.
+
 Default menu and sidebar structures live in `compas_viewer.uidefinitions`. They refer to command IDs rather than importing callbacks, keeping UI composition separate from serialization.
 
 ## COMPAS plugin discovery
@@ -210,8 +231,9 @@ The package exposes its COMPAS plugin module through a project entry point:
 compas_viewer = "compas_viewer.plugins"
 ```
 
-`compas_viewer.plugins` registers Viewer `draw` and `clear` operations in the
-`factories` plugin category. Plugin discovery imports neither Qt nor OpenGL.
+`compas_viewer.plugins` registers Viewer `draw` and `clear` operations for
+spatial scene objects and `SceneAnnotation` entries in the `factories` plugin
+category. Plugin discovery imports neither Qt nor OpenGL.
 `Viewer` also ensures these operations are registered during startup for source
 checkouts without installed entry-point metadata.
 
@@ -310,8 +332,11 @@ operations:
   rebuilding geometry.
 - `refresh_hierarchy()` reconstructs transient render helpers, parent indices,
   picking state, selection membership, and buffers after hierarchy changes.
+- `refresh_annotations(entries=None)` refreshes only annotation graphics and
+  repaints the annotation layer; it never rebuilds shared spatial buffers.
 
-`None` means all current scene objects for the object-scoped operations. Direct
+`None` means all current targets for the corresponding object- or
+annotation-scoped operation. Direct
 external transformation mutation followed by `refresh_transform` invalidates
 transform history because the Viewer cannot construct a reversible transaction
 for the earlier value. Hierarchy refresh also invalidates transform history;

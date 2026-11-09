@@ -34,6 +34,7 @@ The main window consists of:
 
 - A 3D viewport for navigation and selection.
 - A scene tree showing object hierarchy, groups, names, types, and visibility.
+- A flat Annotations panel for persistent text, arrows, and dimensions.
 - An Object tab for information and display settings of the current selection.
 - Camera and Display tabs for view, grid, color, and rendering settings.
 - A Units and Measurement tab for informational units and display precision.
@@ -61,7 +62,7 @@ Zoom extents frames all visible objects. Zoom selected frames only the current s
 | Replace the selection | Left-click an object |
 | Add an object to the selection | Ctrl + left-click |
 | Clear the selection | `Escape` |
-| Delete selected objects | `Delete` |
+| Delete selected objects | `Delete` or **Edit → Delete Selected** |
 | Rectangular selection | Shift + left-drag |
 
 Rectangular selection is directional:
@@ -87,6 +88,12 @@ The selection also provides `add`, `toggle`, and `clear`. Every selected object
 must belong to the Viewer's current scene. Replacing the scene or removing an
 object removes the corresponding transient selection; saved scenes do not
 contain selection state.
+
+Deleting a selected group removes its complete scene subtree but does not
+delete the independently owned geometry or data. Deletion is not part of the
+transform-only undo history and clears that history. Associative dimensions
+that reference a removed object remain in the scene and become unresolved;
+they are not silently converted or deleted.
 
 ## Work with the scene tree
 
@@ -287,8 +294,9 @@ viewer.cancel_measurement()
 Starting a new mode clears the previous transient result. A completed
 inspection remains Viewer-owned: it is not a scene object, is not selected or
 serialized, and does not enter transform history. A completed fixed or
-associative interaction creates and selects one root-level
-`compas.scene.DistanceDimension`, then deactivates the tool.
+associative interaction creates and selects one `compas.scene.DistanceDimension`
+entry in the flat annotation collection, then deactivates the tool. Annotation
+selection is independent from spatial object selection.
 Completed dimensions render in a separate final annotation pass without depth
 testing or depth writes, so scene geometry cannot hide them.
 
@@ -426,31 +434,53 @@ GIF and animated WebP output are supported. Pass `width`, `height`, or `fps` to 
 Text and arrow annotations remain legible as the camera changes:
 
 ```python
+from compas.colors import Color
 from compas.scene import ArrowAnnotation
+from compas.scene import DimensionStyle
 from compas.scene import DistanceDimension
 from compas.scene import PointAnchor
 from compas.scene import TextAnnotation
 from compas_viewer import Viewer
 
 viewer = Viewer()
-viewer.scene.add(ArrowAnnotation((0, 0, 0), (1, 1, 0)))
-viewer.scene.add(
+viewer.scene.add_annotation(ArrowAnnotation((0, 0, 0), (1, 1, 0)), name="Force direction")
+viewer.scene.add_annotation(
     TextAnnotation(
         "Resultant force",
         anchor=(1, 1, 0),
         horizontal_alignment="center",
-    )
+    ),
+    name="Force label",
 )
-viewer.scene.add(
+viewer.scene.add_annotation(
     DistanceDimension(
         PointAnchor((0, 0, 0)),
         PointAnchor((1, 1, 0)),
         unit="m",
         precision=2,
-    )
+    ),
+    name="Force length",
+    style=DimensionStyle(
+        color=Color.red(),
+        line_width=4.0,
+        text_size=14.0,
+        arrow_size=12.0,
+        label_offset=8.0,
+    ),
 )
 viewer.show()
 ```
+
+Annotations live in `viewer.scene.annotations`, not in the spatial scene tree.
+They have no parent, children, or inherited transformation. Use the flat
+**Annotations** panel to rename entries, change visibility, select or remove
+them, and edit the style of one selected distance dimension. Style sizes and
+offsets use logical screen pixels.
+
+Scripts use `viewer.state.annotation_selection` for annotations and
+`viewer.state.selection` for spatial objects. Removing a spatial object does
+not cascade to an associative dimension that references it; the dimension
+remains present and displays an unresolved state.
 
 See the [examples](examples.md) for geometry-specific display options, dynamic scenes, annotations, groups, and custom controls.
 

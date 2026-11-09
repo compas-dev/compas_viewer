@@ -23,6 +23,7 @@ from compas.colors import Color
 from compas.geometry import Transformation
 from compas.scene import DistanceDimension
 from compas.scene import Scene
+from compas.scene import SceneAnnotation
 from compas.scene import SceneObject
 from compas_viewer import HERE
 from compas_viewer._history import TransformTransaction
@@ -80,7 +81,11 @@ class Viewer(Singleton):
         self._undo_transforms: list[TransformTransaction] = []
         self._redo_transforms: list[TransformTransaction] = []
 
-        self.state = ViewerState(self.config, lambda guid: self.scene.object(guid))
+        self.state = ViewerState(
+            self.config,
+            lambda guid: self.scene.object(guid),
+            lambda guid: self.scene.annotation(guid),
+        )
         self.state.changed.connect(self._on_state_changed)
         self.commands = CommandRegistry(builtin_commands())
         self.menu_items: list[UIItem] = default_menu_items()
@@ -120,6 +125,8 @@ class Viewer(Singleton):
     def scene(self, scene: Scene) -> None:
         """Replace the active scene from serialized COMPAS scene data."""
         self.cancel_measurement()
+        if self._scene is not None:
+            self._scene.clear(clear_scene=False, clear_context=True, context="Viewer", runtime=self._scene)
         if isinstance(scene, ViewerScene):
             self._scene = scene
         else:
@@ -127,11 +134,18 @@ class Viewer(Singleton):
             self._scene.bind_many(scene.item_store.values())
         self._scene.attach(self)
         self._clear_transform_history()
+        self.state.annotation_selection.clear()
         self.state.selection.clear()
         if self.running:
-            self._scene.prepare()
-            for obj in self._scene.render_objects.values():
-                obj.init()
+            self.renderer.makeCurrent()
+            try:
+                self._scene.prepare()
+                for obj in self._scene.render_objects.values():
+                    obj.init()
+                for annotation in self._scene.annotation_render_objects.values():
+                    annotation.init()
+            finally:
+                self.renderer.doneCurrent()
 
     @property
     def overlays(self) -> tuple[Overlay, ...]:
@@ -229,8 +243,8 @@ class Viewer(Singleton):
             return
         if not isinstance(result, DistanceDimension):
             raise RuntimeError("Unexpected distance measurement result.")
-        sceneobject = self.scene.add(result)
-        self.state.selection.replace((sceneobject,))
+        annotation = self.scene.add_annotation(result)
+        self.state.annotation_selection.replace((annotation,))
 
     def _has_overlay_content(self) -> bool:
         """Return whether the next display frame needs 2D overlay painting."""
@@ -471,6 +485,34 @@ class Viewer(Singleton):
         if not self.state.selection.replace(surviving):
             self._sync_view()
 
+    def refresh_annotations(self, entries: Iterable[SceneAnnotation] | None = None) -> None:
+        """Refresh annotation graphics without rebuilding spatial buffers.
+
+        Parameters
+        ----------
+        entries
+            Changed annotation entries. `None` means all annotations.
+
+        """
+        targets = self._annotations(entries)
+        if self.running:
+            self.renderer.makeCurrent()
+        try:
+            for annotation in targets:
+                render_object = self.scene.annotation_render_objects.get(annotation.guid)
+                if render_object is None:
+                    render_object = self.scene.annotation_render_object(annotation)
+                if not self.running:
+                    continue
+                if not render_object._inited:
+                    render_object.init()
+                else:
+                    render_object.update(update_data=True)
+        finally:
+            if self.running:
+                self.renderer.doneCurrent()
+        self._sync_view()
+
     def undo(self) -> bool:
         """Undo the most recent reversible Viewer transformation.
 
@@ -524,6 +566,25 @@ class Viewer(Singleton):
             if sceneobject.guid not in seen:
                 result.append(sceneobject)
                 seen.add(sceneobject.guid)
+        return tuple(result)
+
+    def _annotations(self, entries: Iterable[SceneAnnotation] | None) -> tuple[SceneAnnotation, ...]:
+        """Validate and de-duplicate current annotation entries."""
+        candidates = self.scene.annotations if entries is None else entries
+        result: list[SceneAnnotation] = []
+        seen: set[UUID] = set()
+        for annotation in candidates:
+            if not isinstance(annotation, SceneAnnotation):
+                raise TypeError("Expected stable COMPAS SceneAnnotation values.")
+            try:
+                current = self.scene.annotation(annotation.guid)
+            except KeyError:
+                raise ValueError("The annotation does not belong to the current Viewer scene.") from None
+            if current is not annotation:
+                raise ValueError("The annotation does not belong to the current Viewer scene.")
+            if annotation.guid not in seen:
+                result.append(annotation)
+                seen.add(annotation.guid)
         return tuple(result)
 
     def _apply_transform_transaction(self, transaction: TransformTransaction, *, forward: bool) -> None:
@@ -619,7 +680,7 @@ class Viewer(Singleton):
         """Apply viewer-owned effects for a changed state value."""
         if path == "ui.appearance":
             self._apply_appearance(cast(Appearance, value))
-        elif path == "selection" and hasattr(self, "ui"):
+        elif path in {"selection", "annotation_selection"} and hasattr(self, "ui"):
             self.ui.sidebar.update()
             self.renderer.update()
         elif path.startswith("measurement.") and hasattr(self, "ui"):

@@ -41,6 +41,7 @@ def test_source_entry_point_discovery_is_graphics_free(tmp_path):
 
 
 def test_scene_plugin_registers_viewer_operations_without_replacing_types():
+    from compas.scene import SceneAnnotation
     from compas.scene import SceneObject
     from compas.scene.context import SCENE_OPERATIONS
     import compas_viewer.plugins as viewer_plugins
@@ -49,6 +50,7 @@ def test_scene_plugin_registers_viewer_operations_without_replacing_types():
     viewer_plugins.register_scene_operations()
 
     assert set(SCENE_OPERATIONS["Viewer"][SceneObject]) == {"draw", "clear"}
+    assert set(SCENE_OPERATIONS["Viewer"][SceneAnnotation]) == {"draw", "clear"}
 
 
 def test_scene_attribute_plugin_is_lightweight():

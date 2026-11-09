@@ -28,6 +28,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added **Edit → Modify Parameters…** with a dedicated form for writable scalar
   parameters of the selected object's underlying data. Parameter application is
   transactional and refreshes render data and bounds.
+* Added **Edit → Delete Selected** as the discoverable menu path for the
+  existing deletion command and `Delete` shortcut.
+* Added an ordered scene annotation collection outside the spatial hierarchy,
+  a flat Annotations panel with separate selection and removal, and durable
+  distance-dimension color, line width, text size, arrow size, and label offset.
 * Added System, Light, and Dark application appearances. System mode follows
   operating-system color-scheme changes while the viewer is running.
 * Added configurable grid extents and divisions, grid styling, selection

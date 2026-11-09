@@ -4,6 +4,7 @@ from typing import cast
 from PySide6.QtWidgets import QSplitter
 
 from compas_viewer.components import SceneTree
+from compas_viewer.components.annotationpanel import AnnotationPanel
 from compas_viewer.components.camerasetting import CameraSetting
 from compas_viewer.components.container import Container
 from compas_viewer.components.datastructureattributes import DatastructureAttributes
@@ -52,6 +53,10 @@ class SideBarRight(Container):
                     raise ValueError("Please setup config for Sceneform")
                 self.sceneform = SceneTree(columns=cast(list[SceneColumn], columns))
                 self.add(self.sceneform)
+
+            if itemtype == "AnnotationPanel":
+                self.annotation_panel = AnnotationPanel()
+                self.add(self.annotation_panel)
 
             if itemtype == "ObjectSetting":
                 self.object_setting = ObjectSetting()

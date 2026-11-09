@@ -38,6 +38,7 @@ def after_draw(drawn_objects: list[object]) -> None:
 @plugin(category="factories")
 def register_scene_operations() -> None:
     """Register lightweight Viewer draw and clear operations."""
+    from compas.scene import SceneAnnotation
     from compas.scene import SceneObject
     from compas.scene import register_scene_operation
     from compas_viewer.scene.runtime import clear
@@ -45,6 +46,8 @@ def register_scene_operations() -> None:
 
     register_scene_operation("Viewer", SceneObject, "draw", draw)
     register_scene_operation("Viewer", SceneObject, "clear", clear)
+    register_scene_operation("Viewer", SceneAnnotation, "draw", draw)
+    register_scene_operation("Viewer", SceneAnnotation, "clear", clear)
 
 
 @plugin(category="factories")
@@ -55,12 +58,15 @@ def register_scene_attribute_contributions() -> None:
 def ensure_scene_objects_registered() -> None:
     """Ensure Viewer scene operations are available from source checkouts."""
     from compas.plugins import plugin_manager
+    from compas.scene import SceneAnnotation
     from compas.scene import SceneObject
     from compas.scene import register_scene_operations as register_all_scene_operations
     from compas.scene.context import SCENE_OPERATIONS
 
-    operations = SCENE_OPERATIONS.get("Viewer", {}).get(SceneObject, {})
-    if {"draw", "clear"} <= operations.keys():
+    registry = SCENE_OPERATIONS.get("Viewer", {})
+    object_operations = registry.get(SceneObject, {})
+    annotation_operations = registry.get(SceneAnnotation, {})
+    if {"draw", "clear"} <= object_operations.keys() and {"draw", "clear"} <= annotation_operations.keys():
         return
 
     plugin_manager.register_module(sys.modules[__name__])

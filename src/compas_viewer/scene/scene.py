@@ -8,13 +8,20 @@ from uuid import UUID
 from compas.colors import Color
 from compas.data import Data
 from compas.scene import Scene
+from compas.scene import SceneAnnotation
 from compas.scene import SceneNode
 from compas.scene import SceneObject
 
 from .sceneobject import ViewerSceneObject
 
 if TYPE_CHECKING:
+    from compas.scene import ArrowAnnotation
+    from compas.scene import DimensionStyle
+    from compas.scene import DistanceDimension
+    from compas.scene import TextAnnotation
     from compas_viewer import Viewer
+
+    from .annotationobject import WorldAnnotationRenderObject
 
 
 def instance_colors_generator(i: int = 0) -> Generator[tuple[int, int, int], None, None]:
@@ -71,9 +78,18 @@ class ViewerScene(Scene):
         _detect_context: bool = True,
         _objects: dict[UUID, SceneObject] | None = None,
         _root: SceneNode | None = None,
+        _annotations: list[SceneAnnotation] | None = None,
     ) -> None:
-        super().__init__(name=name, context=context, _detect_context=_detect_context, _objects=_objects, _root=_root)
+        super().__init__(
+            name=name,
+            context=context,
+            _detect_context=_detect_context,
+            _objects=_objects,
+            _root=_root,
+            _annotations=_annotations,
+        )
         self.render_objects: dict[UUID, ViewerSceneObject] = {}
+        self.annotation_render_objects: dict[UUID, WorldAnnotationRenderObject] = {}
         self.instance_colors: dict[tuple[int, int, int], SceneObject] = {}
         self._instance_colors_generator = instance_colors_generator()
         self._viewer: Viewer | None = None
@@ -104,6 +120,8 @@ class ViewerScene(Scene):
         self._reset_instance_colors()
         for sceneobject in self.objects:
             self.draw_object(sceneobject, context="Viewer", runtime=self)
+        for annotation in self.annotations:
+            self.draw_annotation(annotation, context="Viewer", runtime=self)
 
     def render_object(self, sceneobject: SceneObject) -> ViewerSceneObject:
         """Return the transient render state for a stable scene object."""
@@ -112,6 +130,26 @@ class ViewerScene(Scene):
         except KeyError:
             self.draw_object(sceneobject, context="Viewer", runtime=self)
             return self.render_objects[sceneobject.guid]
+
+    def annotation_render_object(self, annotation: SceneAnnotation) -> "WorldAnnotationRenderObject":
+        """Return transient render state for one annotation entry.
+
+        Parameters
+        ----------
+        annotation
+            Entry belonging to this scene.
+
+        Returns
+        -------
+        WorldAnnotationRenderObject
+            Existing or newly prepared annotation render helper.
+
+        """
+        try:
+            return self.annotation_render_objects[annotation.guid]
+        except KeyError:
+            self.draw_annotation(annotation, context="Viewer", runtime=self)
+            return self.annotation_render_objects[annotation.guid]
 
     def release_picking(self, sceneobject: SceneObject) -> None:
         """Remove transient picking entries for a stable scene object."""
@@ -302,6 +340,95 @@ class ViewerScene(Scene):
 
         return sceneobject
 
+    def add_annotation(
+        self,
+        item: "TextAnnotation | ArrowAnnotation | DistanceDimension",
+        *,
+        name: str | None = None,
+        show: bool = True,
+        style: "DimensionStyle | None" = None,
+    ) -> SceneAnnotation:
+        """Add a durable annotation outside the spatial hierarchy.
+
+        Parameters
+        ----------
+        item
+            Text, arrow, or distance-dimension annotation data.
+        name
+            Optional entry name.
+        show
+            Whether the annotation is visible.
+        style
+            Distance-dimension presentation style.
+
+        Returns
+        -------
+        SceneAnnotation
+            Added scene annotation entry.
+
+        """
+        return super().add_annotation(item, name=name, show=show, style=style)
+
+    def add_annotation_entry(self, entry: SceneAnnotation) -> SceneAnnotation:
+        """Attach an annotation entry and refresh only the annotation layer.
+
+        Parameters
+        ----------
+        entry
+            Detached durable annotation entry.
+
+        Returns
+        -------
+        SceneAnnotation
+            The attached entry.
+
+        """
+        annotation = super().add_annotation_entry(entry)
+        self._refresh_after_annotation_change()
+        return annotation
+
+    def remove_annotation(self, entry: SceneAnnotation | UUID) -> None:
+        """Remove one annotation entry and its transient render resources.
+
+        Parameters
+        ----------
+        entry
+            Entry or entry GUID to remove.
+
+        """
+        annotation = self.annotation(entry) if isinstance(entry, UUID) else entry
+        viewer = self._viewer
+        if viewer is not None and viewer.running:
+            viewer.renderer.makeCurrent()
+        try:
+            super().remove_annotation(annotation)
+        finally:
+            if viewer is not None and viewer.running:
+                viewer.renderer.doneCurrent()
+        self.annotation_render_objects.pop(annotation.guid, None)
+        selection_changed = False
+        if self._viewer is not None:
+            selection_changed = self._viewer.state.annotation_selection.remove(annotation)
+        self._refresh_after_annotation_change(selection_changed=selection_changed)
+
+    def _refresh_after_annotation_change(self, *, selection_changed: bool = False) -> None:
+        """Prepare and repaint annotations without rebuilding spatial buffers."""
+        if self._viewer is None or not self._viewer.running:
+            return
+        self._viewer.renderer.makeCurrent()
+        try:
+            for annotation in self.annotations:
+                render_object = self.annotation_render_objects.get(annotation.guid)
+                if render_object is None:
+                    render_object = self.annotation_render_object(annotation)
+                if not render_object._inited:
+                    render_object.init()
+        finally:
+            self._viewer.renderer.doneCurrent()
+        if not selection_changed:
+            self._viewer.ui.sidebar.update()
+            self._viewer.renderer.update()
+
     def remove(self, sceneobject: SceneObject | SceneNode, rebuild_buffers: bool = True) -> None:
         """Remove a scene object from the scene.
 
@@ -322,11 +449,20 @@ class ViewerScene(Scene):
         *,
         rebuild_buffers: bool,
         cleanup_selection: bool,
+        context_is_current: bool = False,
     ) -> None:
         """Remove one hierarchy with optional deferred selection cleanup."""
         stable_object = self.object(sceneobject) if isinstance(sceneobject, SceneNode) else sceneobject
         removed_objects = [self.object(node) for node in self.node(stable_object.guid).traverse()]
-        super().remove(sceneobject)
+        viewer = self._viewer
+        renderer = viewer.renderer if viewer is not None and viewer.running and not context_is_current else None
+        if renderer is not None:
+            renderer.makeCurrent()
+        try:
+            super().remove(sceneobject)
+        finally:
+            if renderer is not None:
+                renderer.doneCurrent()
         for removed_object in removed_objects:
             self.render_objects.pop(removed_object.guid, None)
             self.release_picking(removed_object)
@@ -353,13 +489,24 @@ class ViewerScene(Scene):
         runtime: object | None = None,
     ) -> None:
         """Clear scene state, runtime buffers, and transient picking colors."""
-        if clear_context:
-            super().clear(clear_scene=False, clear_context=True, context=context, runtime=runtime)
-        if clear_scene:
-            for child in tuple(self.root_node.children):
-                self._remove(child, rebuild_buffers=False, cleanup_selection=False)
+        viewer = self._viewer
+        renderer = viewer.renderer if viewer is not None and viewer.running and (clear_scene or clear_context) else None
+        if renderer is not None:
+            renderer.makeCurrent()
+        try:
+            if clear_context:
+                super().clear(clear_scene=False, clear_context=True, context=context, runtime=runtime)
+            if clear_scene:
+                for child in tuple(self.root_node.children):
+                    self._remove(child, rebuild_buffers=False, cleanup_selection=False, context_is_current=True)
+                for annotation in tuple(self.annotations):
+                    super().remove_annotation(annotation)
+        finally:
+            if renderer is not None:
+                renderer.doneCurrent()
         if clear_context:
             self.render_objects.clear()
+            self.annotation_render_objects.clear()
         self._reset_instance_colors()
 
         if clear_scene and self._viewer is not None:
@@ -367,8 +514,10 @@ class ViewerScene(Scene):
             clear_history = getattr(self._viewer, "_clear_transform_history", None)
             if clear_history is not None:
                 clear_history()
+            annotation_selection_changed = self._viewer.state.annotation_selection.clear()
             if self._viewer.running:
                 self._viewer.renderer.rebuild_buffers()
-            if not self._viewer.state.selection.clear():
+            selection_changed = self._viewer.state.selection.clear()
+            if not selection_changed and not annotation_selection_changed:
                 self._viewer.ui.sidebar.update()
                 self._viewer.renderer.update()

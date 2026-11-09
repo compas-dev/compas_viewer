@@ -1,6 +1,7 @@
 """Reusable Qt interface components for COMPAS Viewer."""
 
 from .booleantoggle import BooleanToggle
+from .annotationpanel import AnnotationPanel
 from .boundcomponent import BoundComponent
 from .button import Button
 from .camerasetting import CameraSetting
@@ -29,6 +30,7 @@ from .treeform import Treeform
 from .viewport import ViewPort
 
 __all__ = [
+    "AnnotationPanel",
     "BooleanToggle",
     "BoundComponent",
     "Button",

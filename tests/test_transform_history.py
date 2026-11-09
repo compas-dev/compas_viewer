@@ -3,21 +3,16 @@ from unittest.mock import Mock
 from math import pi
 
 import pytest
-from numpy import allclose
 
 from compas.geometry import Rotation
 from compas.geometry import Scale
 from compas.geometry import Sphere
 from compas.geometry import Transformation
 from compas.geometry import Translation
-from compas.geometry import Point
-from compas.scene import ArrowAnnotation
 from compas.scene import DistanceDimension
 from compas.scene import PointAnchor
-from compas.scene import TextAnnotation
 from compas.scene import SceneObject
 from compas_viewer import Viewer
-from compas_viewer.commands import zoom_extents
 from compas_viewer.config import Config
 from compas_viewer.plugins import ensure_scene_objects_registered
 from compas_viewer.scene import ViewerScene
@@ -41,7 +36,7 @@ def connected_viewer(*, running: bool = False):
         viewport=SimpleNamespace(renderer=renderer),
         sidebar=sidebar,
     )
-    viewer.state = ViewerState(viewer.config, scene.object)
+    viewer.state = ViewerState(viewer.config, scene.object, scene.annotation)
     viewer.state.changed.connect(viewer._on_state_changed)
     scene.attach(viewer)
     return viewer, scene, renderer, sidebar
@@ -217,53 +212,15 @@ def test_transforming_parent_moves_cached_child_bounds_without_geometry_rebuild(
     renderer.buffer_manager.update_object_data.assert_not_called()
 
 
-def test_transforming_annotation_group_refreshes_bounds_used_by_zoom():
-    class Camera:
-        def __init__(self):
-            self._target = Point(0, 0, 0)
-            self._position = Point(0, -10, 0)
-            self.scale = 1.0
-
-        @property
-        def target(self):
-            return self._target
-
-        @target.setter
-        def target(self, value):
-            self._target = Point(*value)
-
-        @property
-        def position(self):
-            return self._position
-
-        @position.setter
-        def position(self, value):
-            self._position = Point(*value)
-
-    viewer, scene, renderer, _ = connected_viewer(running=True)
-    renderer.camera = Camera()
-    group = scene.add_group("Annotations")
-    text = scene.add(TextAnnotation("A", [0, 0, 0]), parent=group)
-    arrow = scene.add(ArrowAnnotation([1, 0, 0], [2, 0, 0]), parent=group)
-    dimension = scene.add(
-        DistanceDimension(PointAnchor([2, 0, 0]), PointAnchor([3, 0, 0])),
-        parent=group,
+def test_annotation_entries_are_not_spatial_transform_targets():
+    viewer, scene, _, _ = connected_viewer()
+    annotation = scene.add_annotation(
+        DistanceDimension(PointAnchor([0, 0, 0]), PointAnchor([1, 0, 0])),
     )
-    scene.prepare()
-    for sceneobject in (text, arrow, dimension):
-        render_object = scene.render_object(sceneobject)
-        render_object._inited = True
-        render_object.refresh_annotation_bounds()
 
-    viewer.transform_objects([group], Translation.from_vector([10, 0, 0]))
-
-    assert allclose(scene.render_object(text).bounding_box, [[10.0, 0.0, 0.0], [10.0, 0.0, 0.0]])
-    assert allclose(scene.render_object(arrow).bounding_box, [[11.0, 0.0, 0.0], [12.0, 0.0, 0.0]])
-    assert allclose(scene.render_object(dimension).bounding_box, [[12.0, 0.0, 0.0], [13.0, 0.0, 0.0]])
-
-    zoom_extents(viewer)
-
-    assert renderer.camera.target == Point(11.5, 0, 0)
+    assert annotation not in scene.objects
+    with pytest.raises(TypeError, match="SceneObject"):
+        viewer.transform_objects([annotation], Translation.from_vector([10, 0, 0]))
 
 
 def test_refresh_categories_have_distinct_buffer_scope():

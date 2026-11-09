@@ -5,6 +5,7 @@ from uuid import UUID
 from PySide6.QtCore import QObject
 from PySide6.QtCore import Signal
 
+from compas.scene import SceneAnnotation
 from compas.scene import SceneObject
 from compas_viewer.config import Config
 from compas_viewer.config import MeasurementConfig
@@ -13,6 +14,10 @@ from compas_viewer.selection import Selection
 
 
 def _unbound_sceneobject(_guid: UUID) -> SceneObject:
+    raise RuntimeError("This ViewerState is not bound to a Viewer scene.")
+
+
+def _unbound_annotation(_guid: UUID) -> SceneAnnotation:
     raise RuntimeError("This ViewerState is not bound to a Viewer scene.")
 
 
@@ -26,6 +31,8 @@ class ViewerState(QObject):
     resolve_sceneobject
         Resolve stable object GUIDs in the current Viewer scene. Direct state
         construction may omit the resolver when selection is unused.
+    resolve_annotation
+        Resolve stable annotation-entry GUIDs in the current Viewer scene.
 
     """
 
@@ -35,10 +42,12 @@ class ViewerState(QObject):
         self,
         config: Config,
         resolve_sceneobject: Callable[[UUID], SceneObject] | None = None,
+        resolve_annotation: Callable[[UUID], SceneAnnotation] | None = None,
     ) -> None:
         super().__init__()
         self.config = config
         self.selection = Selection(resolve_sceneobject or _unbound_sceneobject, self._selection_changed)
+        self.annotation_selection = Selection(resolve_annotation or _unbound_annotation, self._annotation_selection_changed)
         self.measurement = MeasurementState(self._measurement_changed)
 
     def get(self, path: str) -> Any:
@@ -164,6 +173,10 @@ class ViewerState(QObject):
     def _selection_changed(self, guids: tuple[UUID, ...]) -> None:
         """Bridge one Qt-neutral selection mutation to Viewer observers."""
         self.changed.emit("selection", guids)
+
+    def _annotation_selection_changed(self, guids: tuple[UUID, ...]) -> None:
+        """Bridge one annotation-selection mutation to Viewer observers."""
+        self.changed.emit("annotation_selection", guids)
 
     def _measurement_changed(self) -> None:
         """Bridge transient measurement mutation to Viewer observers."""

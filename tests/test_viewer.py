@@ -1,13 +1,16 @@
 from types import SimpleNamespace
+from unittest.mock import Mock
 
 import pytest
 
-from compas_viewer import Viewer
 from compas.geometry import Sphere
+from compas.scene import TextAnnotation
+from compas_viewer import Viewer
 from compas_viewer.animation import ANIMATION_PRESETS
 from compas_viewer.config import Config
 from compas_viewer.config import WindowConfig
 from compas_viewer.components.mainwindow import MainWindow
+from compas_viewer.components.annotationpanel import AnnotationPanel
 from compas_viewer.scene import ViewerScene
 from compas_viewer.state import ViewerState
 from compas_viewer.ui import UI
@@ -258,22 +261,83 @@ def test_viewer_configuration_cannot_be_replaced():
         instance.config = Config()
 
 
-def test_replacing_scene_clears_transient_selection_once():
+def test_replacing_scene_clears_transient_selection_before_sidebar_refresh(monkeypatch):
+    from PySide6.QtWidgets import QApplication
+
+    app = QApplication.instance() or QApplication([])
     viewer = object.__new__(Viewer)
     viewer.running = False
     viewer._config = Config()
     viewer._scene = ViewerScene()
     viewer._scene.attach(viewer)
-    viewer.state = ViewerState(viewer.config, lambda guid: viewer.scene.object(guid))
+    viewer.state = ViewerState(
+        viewer.config,
+        lambda guid: viewer.scene.object(guid),
+        lambda guid: viewer.scene.annotation(guid),
+    )
+    viewer.ui = SimpleNamespace(sidebar=Mock(), viewport=SimpleNamespace(renderer=Mock()))
+    viewer.state.changed.connect(viewer._on_state_changed)
+    monkeypatch.setattr(AnnotationPanel, "viewer", property(lambda _self: viewer), raising=False)
+    panel = AnnotationPanel()
+    viewer.ui.sidebar = panel
     sceneobject = viewer.scene.add(Sphere(1.0))
+    annotation = viewer.scene.add_annotation(TextAnnotation("A", [0, 0, 0]))
     viewer.state.selection.add(sceneobject)
+    viewer.state.annotation_selection.add(annotation)
     changes = []
     viewer.state.changed.connect(lambda path, value: changes.append((path, value)))
 
     viewer.scene = ViewerScene()
 
     assert not viewer.state.selection
-    assert changes == [("selection", ())]
+    assert not viewer.state.annotation_selection
+    assert changes == [("annotation_selection", ()), ("selection", ())]
+    assert panel.tree.topLevelItemCount() == 0
+    assert app is not None
+
+
+def test_replacing_running_scene_balances_context_for_cleanup_and_initialization():
+    viewer = object.__new__(Viewer)
+    viewer.running = False
+    viewer._config = Config()
+    viewer._undo_transforms = []
+    viewer._redo_transforms = []
+    old_scene = ViewerScene()
+    old_scene.attach(viewer)
+    viewer._scene = old_scene
+    viewer.state = ViewerState(
+        viewer.config,
+        lambda guid: viewer.scene.object(guid),
+        lambda guid: viewer.scene.annotation(guid),
+    )
+    renderer = Mock()
+    viewer.ui = SimpleNamespace(sidebar=Mock(), viewport=SimpleNamespace(renderer=renderer))
+    annotation = old_scene.add_annotation(TextAnnotation("A", [0, 0, 0]))
+    old_scene.annotation_render_object(annotation)
+
+    class AnnotationResource:
+        def clear(self):
+            assert renderer.makeCurrent.call_count == 1
+            assert renderer.doneCurrent.call_count == 0
+
+    old_scene.annotation_render_objects[annotation.guid] = AnnotationResource()
+    replacement = ViewerScene()
+    replacement.prepare = Mock()
+    replacement_annotation = Mock()
+
+    def init_replacement():
+        assert renderer.makeCurrent.call_count == 2
+        assert renderer.doneCurrent.call_count == 1
+
+    replacement_annotation.init.side_effect = init_replacement
+    replacement.annotation_render_objects[annotation.guid] = replacement_annotation
+    viewer.running = True
+
+    viewer.scene = replacement
+
+    assert renderer.makeCurrent.call_count == 2
+    assert renderer.doneCurrent.call_count == 2
+    replacement_annotation.init.assert_called_once_with()
 
 
 def test_ui_applies_configured_statusbar_visibility_at_initialization(monkeypatch):

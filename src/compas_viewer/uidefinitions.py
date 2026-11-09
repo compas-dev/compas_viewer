@@ -121,6 +121,8 @@ def default_menu_items() -> list[UIItem]:
                 {"title": "Redo", "command": "viewer.redo"},
                 {"type": "separator"},
                 {"title": "Modify Parameters...", "command": "viewer.modify_selected"},
+                {"type": "separator"},
+                {"title": "Delete Selected", "command": "viewer.delete_selected"},
             ],
         },
         {
@@ -191,6 +193,7 @@ def default_sidebar_items() -> list[UIItem]:
                 {"title": "Show", "type": "checkbox", "checked": lambda obj: obj.show, "action": lambda obj, checked: setattr(obj, "show", checked)},
             ],
         },
+        {"type": "AnnotationPanel"},
         {"type": "ObjectSetting"},
         {"type": "CameraSetting"},
         {"type": "DisplaySetting"},

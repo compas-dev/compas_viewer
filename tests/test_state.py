@@ -1,6 +1,8 @@
 import pytest
 
 from compas.scene import SceneObject
+from compas.scene import TextAnnotation
+from compas_viewer.scene import ViewerScene
 from compas_viewer.config import Config
 from compas_viewer.components.menubar import MenuBar
 from compas_viewer.state import ViewerState
@@ -51,6 +53,26 @@ def test_state_bridges_each_selection_batch_to_one_change():
     state.selection.add(first)
 
     assert changes == [("selection", (first.guid, second.guid))]
+
+
+def test_state_keeps_annotation_selection_separate_from_spatial_selection():
+    scene = ViewerScene()
+    spatial = SceneObject(name="Spatial")
+    annotation = scene.add_annotation(TextAnnotation("A", [0, 0, 0]))
+    objects = {spatial.guid: spatial}
+    state = ViewerState(Config(), objects.__getitem__, scene.annotation)
+    changes = []
+    state.changed.connect(lambda path, value: changes.append((path, value)))
+
+    state.selection.add(spatial)
+    state.annotation_selection.add(annotation)
+
+    assert state.selection.objects == (spatial,)
+    assert state.annotation_selection.objects == (annotation,)
+    assert changes == [
+        ("selection", (spatial.guid,)),
+        ("annotation_selection", (annotation.guid,)),
+    ]
 
 
 def test_state_toggles_boolean_values():

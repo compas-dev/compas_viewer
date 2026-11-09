@@ -21,6 +21,7 @@ def test_sidebar_is_visible_with_scene_tree_by_default():
     assert items[0]["type"] == "SceneTree"
     assert [item["type"] for item in items] == [
         "SceneTree",
+        "AnnotationPanel",
         "ObjectSetting",
         "CameraSetting",
         "DisplaySetting",

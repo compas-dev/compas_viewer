@@ -13,22 +13,23 @@ from numpy import maximum
 from numpy import zeros
 from OpenGL import GL
 
+from compas.colors import Color
 from compas.geometry import Point
 from compas.scene import ArrowAnnotation
+from compas.scene import DimensionStyle
 from compas.scene import DistanceDimension
+from compas.scene import SceneAnnotation
 from compas.scene import TextAnnotation
 from compas_viewer import HERE
 from compas_viewer.gl import make_index_buffer
 from compas_viewer.gl import make_vertex_buffer
-
-from .sceneobject import ViewerSceneObject
 
 FONT = HERE / "assets" / "fonts" / "FreeSans.ttf"
 RASTER_HEIGHT = 48
 UNRESOLVED_LABEL = "Unresolved"
 
 
-class WorldAnnotationRenderObject(ViewerSceneObject):
+class WorldAnnotationRenderObject:
     """Base class for render-only world annotations.
 
     World annotations own their OpenGL resources and do not contribute geometry
@@ -36,9 +37,75 @@ class WorldAnnotationRenderObject(ViewerSceneObject):
 
     """
 
+    def __init__(self, annotation: SceneAnnotation, runtime: Any) -> None:
+        self.annotation_entry = annotation
+        self.runtime = runtime
+        self._bounding_box: list[list[float]] | None = None
+        self._bounding_box_center: Point | None = None
+        self._inited = False
+
+    @property
+    def item(self) -> TextAnnotation | ArrowAnnotation | DistanceDimension:
+        """Semantic annotation item bound to the durable entry."""
+        return cast(TextAnnotation | ArrowAnnotation | DistanceDimension, self.annotation_entry.item)
+
+    @property
+    def runtime_scene(self) -> Any:
+        """ViewerScene that owns this transient render state."""
+        return getattr(self.runtime, "scene", self.runtime)
+
+    @property
+    def viewer(self) -> Any:
+        """Viewer that owns this transient render state."""
+        return self.runtime_scene.viewer
+
+    @property
+    def show(self) -> bool:
+        """Whether the durable annotation entry is visible."""
+        return self.annotation_entry.show
+
+    @property
+    def is_selected(self) -> bool:
+        """Whether the durable annotation entry is selected."""
+        try:
+            return self.annotation_entry in self.viewer.state.annotation_selection
+        except RuntimeError:
+            return False
+
+    @property
+    def bounding_box(self) -> list[list[float]] | None:
+        """World-coordinate annotation bounds, when resolved."""
+        return self._bounding_box
+
+    @property
+    def bounding_box_center(self) -> Point | None:
+        """Center of the world-coordinate annotation bounds, when resolved."""
+        return self._bounding_box_center
+
+    def init(self) -> None:
+        """Initialize annotation-specific graphics resources."""
+        self._inited = True
+
+    def update(self, update_data: bool = False) -> None:
+        """Refresh annotation graphics after durable data or style changes."""
+        if update_data:
+            self.refresh_annotation_bounds()
+
+    def clear(self) -> None:
+        """Release annotation-specific graphics resources."""
+        self._inited = False
+
     def refresh_annotation_bounds(self) -> None:
         """Recompute the annotation's current world-space bounds."""
         raise NotImplementedError
+
+    def _set_bounds(self, points: list[Point]) -> None:
+        """Store the axis-aligned bounds of world-coordinate points."""
+        self._bounding_box = [
+            [min(point[index] for point in points) for index in range(3)],
+            [max(point[index] for point in points) for index in range(3)],
+        ]
+        self._bounding_box_center = Point(*[(a + b) * 0.5 for a, b in zip(*self._bounding_box, strict=True)])
 
     def draw_world_annotation(self, renderer: Any, viewworld: Any) -> None:
         """Draw the annotation in the display pass.
@@ -52,18 +119,6 @@ class WorldAnnotationRenderObject(ViewerSceneObject):
 
         """
         raise NotImplementedError
-
-    def _read_points_data(self) -> None:
-        return None
-
-    def _read_lines_data(self) -> None:
-        return None
-
-    def _read_frontfaces_data(self) -> None:
-        return None
-
-    def _read_backfaces_data(self) -> None:
-        return None
 
 
 class TextAnnotationRenderObject(WorldAnnotationRenderObject):
@@ -86,13 +141,11 @@ class TextAnnotationRenderObject(WorldAnnotationRenderObject):
         self.refresh_annotation_bounds()
         self._inited = True
 
-    def update(self, update_transform: bool = True, update_data: bool = False) -> None:
+    def update(self, update_data: bool = False) -> None:
         """Update annotation resources after a data or transform change."""
         if update_data:
             self.clear()
             self.init()
-        if update_transform or update_data:
-            self.viewer.renderer.update()
 
     def clear(self) -> None:
         """Release the annotation's OpenGL resources."""
@@ -113,9 +166,9 @@ class TextAnnotationRenderObject(WorldAnnotationRenderObject):
             shader,
             self._text_buffer,
             position=self.annotation.anchor,
-            transform=self.worldtransformation.matrix,
-            color=self.color.rgb,
-            opacity=self.opacity,
+            transform=identity(4, dtype=float32),
+            color=Color.white().rgb,
+            opacity=1.0,
             screen_space=self.annotation.height_mode == "screen",
             screen_size=(renderer.width(), renderer.height()),
             text_aspect=self.text_aspect,
@@ -123,12 +176,13 @@ class TextAnnotationRenderObject(WorldAnnotationRenderObject):
             vertical_align=self.VERTICAL_ALIGN[self.annotation.vertical_alignment],
             horizontal_align=self.HORIZONTAL_ALIGN[self.annotation.horizontal_alignment],
             is_selected=self.is_selected,
+            text_offset=(0.0, 0.0),
         )
         shader.release()
 
     def refresh_annotation_bounds(self) -> None:
         """Recompute the transformed text-anchor bounds."""
-        self._update_bounding_box([self.annotation.anchor])
+        self._set_bounds([self.annotation.anchor])
 
 
 class ArrowAnnotationRenderObject(WorldAnnotationRenderObject):
@@ -145,12 +199,10 @@ class ArrowAnnotationRenderObject(WorldAnnotationRenderObject):
         self.refresh_annotation_bounds()
         self._inited = True
 
-    def update(self, update_transform: bool = True, update_data: bool = False) -> None:
+    def update(self, update_data: bool = False) -> None:
         """Update annotation bounds after a data or transform change."""
         if update_data:
             self.refresh_annotation_bounds()
-        if update_transform or update_data:
-            self.viewer.renderer.update()
 
     def clear(self) -> None:
         """Release the annotation's OpenGL resources."""
@@ -172,17 +224,19 @@ class ArrowAnnotationRenderObject(WorldAnnotationRenderObject):
             self._arrow_buffer,
             start=self.annotation.start,
             end=self.annotation.end,
-            transform=self.worldtransformation.matrix,
-            color=self.color.rgb,
-            opacity=self.opacity,
+            transform=identity(4, dtype=float32),
+            color=Color.white().rgb,
+            opacity=1.0,
             screen_size=(renderer.width(), renderer.height()),
             is_selected=self.is_selected,
+            line_width=3.0,
+            arrow_size=12.0,
         )
         shader.release()
 
     def refresh_annotation_bounds(self) -> None:
         """Recompute the transformed arrow bounds."""
-        self._update_bounding_box([self.annotation.start, self.annotation.end])
+        self._set_bounds([self.annotation.start, self.annotation.end])
 
 
 class DistanceDimensionRenderObject(WorldAnnotationRenderObject):
@@ -193,23 +247,32 @@ class DistanceDimensionRenderObject(WorldAnnotationRenderObject):
         """Return the represented distance dimension."""
         return cast(DistanceDimension, self.item)
 
+    @property
+    def style(self) -> DimensionStyle:
+        """Durable dimension style owned by the annotation entry."""
+        style = self.annotation_entry.style
+        if style is None:
+            raise RuntimeError("Distance-dimension annotation entries require a DimensionStyle.")
+        return style
+
     def init(self) -> None:
         """Create arrow and label resources for the dimension."""
         self._arrow_buffer = _make_arrow_buffer()
         self._label = self.display_label
-        self._text_buffer, self.text_aspect, self.rendered_height = _make_text_buffer(self._label, 12.0)
+        self._text_size = self.style.text_size
+        self._text_buffer, self.text_aspect, self.rendered_height = _make_text_buffer(self._label, self.style.text_size)
         self.refresh_annotation_bounds()
         self._inited = True
 
     @property
     def resolved_points(self) -> tuple[Point, Point] | None:
         """Return the dimension's current world-coordinate endpoints."""
-        return self.dimension.resolve(self.runtime_scene, self.worldtransformation)
+        return self.dimension.resolve(self.runtime_scene)
 
     @property
     def display_label(self) -> str:
         """Return the resolved label or an explicit unresolved-state label."""
-        label = self.dimension.formatted_label(self.runtime_scene, self.worldtransformation)
+        label = self.dimension.formatted_label(self.runtime_scene)
         if self.resolved_points is not None:
             return cast(str, label)
         if label:
@@ -226,16 +289,12 @@ class DistanceDimensionRenderObject(WorldAnnotationRenderObject):
                 0.5 * (points[0].y + points[1].y),
                 0.5 * (points[0].z + points[1].z),
             )
-        point = Point(0, 0, 0)
-        point.transform(self.worldtransformation)
-        return point
+        return Point(0, 0, 0)
 
-    def update(self, update_transform: bool = True, update_data: bool = False) -> None:
-        """Refresh dynamic dimension state and request a redraw."""
-        if update_transform or update_data:
-            self._refresh_label()
-            self.refresh_annotation_bounds()
-            self.viewer.renderer.update()
+    def update(self, update_data: bool = False) -> None:
+        """Refresh dynamic dimension state and graphics resources."""
+        self._refresh_label()
+        self.refresh_annotation_bounds()
 
     def clear(self) -> None:
         """Release the dimension's OpenGL resources."""
@@ -265,10 +324,12 @@ class DistanceDimensionRenderObject(WorldAnnotationRenderObject):
                 start=points[0],
                 end=points[1],
                 transform=identity(4, dtype=float32),
-                color=self.color.rgb,
-                opacity=self.opacity,
+                color=self.style.color.rgb,
+                opacity=1.0,
                 screen_size=(renderer.width(), renderer.height()),
                 is_selected=self.is_selected,
+                line_width=self.style.line_width,
+                arrow_size=self.style.arrow_size,
             )
             shader.release()
 
@@ -280,8 +341,8 @@ class DistanceDimensionRenderObject(WorldAnnotationRenderObject):
             self._text_buffer,
             position=self.label_position,
             transform=identity(4, dtype=float32),
-            color=self.color.rgb,
-            opacity=self.opacity,
+            color=self.style.color.rgb,
+            opacity=1.0,
             screen_space=True,
             screen_size=(renderer.width(), renderer.height()),
             text_aspect=self.text_aspect,
@@ -289,17 +350,36 @@ class DistanceDimensionRenderObject(WorldAnnotationRenderObject):
             vertical_align=0,
             horizontal_align=0,
             is_selected=self.is_selected,
+            text_offset=self._label_offset(renderer, points),
         )
         shader.release()
 
     def _refresh_label(self) -> None:
         label = self.display_label
-        if label == getattr(self, "_label", None):
+        text_size = self.style.text_size
+        if label == getattr(self, "_label", None) and text_size == getattr(self, "_text_size", None):
             return
         if hasattr(self, "_text_buffer"):
             _delete_text_buffer(self._text_buffer)
         self._label = label
-        self._text_buffer, self.text_aspect, self.rendered_height = _make_text_buffer(label, 12.0)
+        self._text_size = text_size
+        self._text_buffer, self.text_aspect, self.rendered_height = _make_text_buffer(label, text_size)
+
+    def _label_offset(self, renderer: Any, points: tuple[Point, Point] | None) -> tuple[float, float]:
+        """Return the logical-pixel label offset along the segment's left normal."""
+        if points is None or self.style.label_offset == 0.0:
+            return (0.0, 0.0)
+        start = renderer.project_point(points[0])
+        end = renderer.project_point(points[1])
+        if start is None or end is None:
+            return (0.0, 0.0)
+        dx = end.x - start.x
+        dy = end.y - start.y
+        length = (dx * dx + dy * dy) ** 0.5
+        if length == 0.0:
+            return (0.0, 0.0)
+        distance = self.style.label_offset
+        return (dy * distance / length, -dx * distance / length)
 
     def refresh_annotation_bounds(self) -> None:
         """Recompute the dimension's resolved world-space bounds."""
@@ -439,6 +519,7 @@ def _draw_text(
     vertical_align: int,
     horizontal_align: int,
     is_selected: bool,
+    text_offset: tuple[float, float],
 ) -> None:
     shader.enable_attribute("position")
     shader.uniform4x4("transform", transform)
@@ -446,7 +527,7 @@ def _draw_text(
     shader.uniform1f("is_selected", is_selected)
     shader.uniform1i("screen_space", screen_space)
     shader.uniform2f("screen_size", screen_size)
-    shader.uniform2f("text_offset", (0, 0))
+    shader.uniform2f("text_offset", (text_offset[0], -text_offset[1]))
     shader.uniform1f("text_aspect", text_aspect)
     shader.uniform1f("text_height", text_height)
     shader.uniform3f("text_position", position)
@@ -472,6 +553,8 @@ def _draw_arrow(
     opacity: float,
     screen_size: tuple[int, int],
     is_selected: bool,
+    line_width: float,
+    arrow_size: float,
 ) -> None:
     shader.enable_attribute("position")
     shader.uniform4x4("transform", transform)
@@ -480,9 +563,9 @@ def _draw_arrow(
     shader.uniform3f("end_position", end)
     shader.uniform3f("arrow_color", color)
     shader.uniform1f("arrow_opacity", opacity)
-    shader.uniform1f("line_width", 3)
-    shader.uniform1f("head_length", 16)
-    shader.uniform1f("head_width", 12)
+    shader.uniform1f("line_width", line_width)
+    shader.uniform1f("head_length", arrow_size * (4.0 / 3.0))
+    shader.uniform1f("head_width", arrow_size)
     shader.uniform1f("is_selected", is_selected)
     shader.bind_attribute("position", buffer["positions"])
     shader.draw_triangles(elements=buffer["elements"], n=buffer["n"])
