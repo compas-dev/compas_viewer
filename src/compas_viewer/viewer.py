@@ -511,7 +511,8 @@ class Viewer(Singleton):
         finally:
             if self.running:
                 self.renderer.doneCurrent()
-        self._sync_view()
+        if self.running:
+            self.renderer.update()
 
     def undo(self) -> bool:
         """Undo the most recent reversible Viewer transformation.

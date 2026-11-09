@@ -260,6 +260,8 @@ def test_annotation_refresh_does_not_rebuild_spatial_buffers():
 
     render_object.update.assert_called_once_with(update_data=True)
     events.rebuild_buffers.assert_not_called()
+    events.sidebar_update.assert_not_called()
+    events.renderer_update.assert_called_once_with()
     assert events.make_current.call_count == 1
     assert events.done_current.call_count == 1
 

@@ -16,6 +16,7 @@ from compas.geometry import Point
 from compas.scene import DistanceDimension
 from compas.scene import PointAnchor
 from compas.scene import TextAnnotation
+from compas_viewer import Viewer
 from compas_viewer.components.annotationpanel import AnnotationPanel
 from compas_viewer.config import Config
 from compas_viewer.scene import ViewerScene
@@ -124,6 +125,46 @@ def test_annotation_panel_edits_explicit_name_visibility_selection_and_style(mon
     assert entry.style.line_width == 6.0
     assert not panel.style_group.isHidden()
     assert viewer.refresh_annotations.call_count >= 2
+
+
+def test_visibility_checkbox_redraws_without_rebuilding_emitting_item(monkeypatch):
+    app = QApplication.instance() or QApplication([])
+    scene = ViewerScene()
+    config = Config()
+    viewer = object.__new__(Viewer)
+    viewer._config = config
+    viewer._scene = scene
+    viewer.running = False
+    viewer.state = ViewerState(config, scene.object, scene.annotation)
+    renderer = Mock()
+    sidebar = Mock()
+    viewer.ui = SimpleNamespace(
+        viewport=SimpleNamespace(renderer=renderer),
+        sidebar=sidebar,
+    )
+    scene.attach(viewer)
+    annotation = scene.add_annotation(TextAnnotation("A", Point(0, 0, 0)))
+    render_object = Mock(_inited=True)
+    scene.annotation_render_objects[annotation.guid] = render_object
+    viewer.running = True
+    monkeypatch.setattr(AnnotationPanel, "viewer", property(lambda _self: viewer), raising=False)
+    panel = AnnotationPanel()
+    panel.update()
+    item = panel.tree.topLevelItem(0)
+
+    item.setCheckState(2, Qt.CheckState.Unchecked)
+
+    assert not annotation.show
+    assert panel.tree.topLevelItem(0) is item
+    assert item.text(0) == annotation.name
+    render_object.update.assert_called_once_with(update_data=True)
+    renderer.makeCurrent.assert_called_once_with()
+    renderer.doneCurrent.assert_called_once_with()
+    renderer.update.assert_called_once_with()
+    sidebar.update.assert_not_called()
+    sidebar.update_spatial_selection.assert_not_called()
+    sidebar.update_annotation_selection.assert_not_called()
+    assert app is not None
 
 
 def test_annotation_panel_shows_none_multiple_and_single_detail_states(monkeypatch):

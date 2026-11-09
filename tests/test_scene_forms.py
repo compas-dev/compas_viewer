@@ -13,6 +13,7 @@ from compas.scene import ShapeObject
 from compas_viewer import forms
 from compas_viewer.components.boundcomponent import BoundComponent
 from compas_viewer.components.colorpicker import ColorPicker
+from compas_viewer.components.numberedit import NumberEdit
 from compas_viewer.components.objectsetting import ObjectSetting
 from compas_viewer.components.objectsetting import _EditableAttributeBinding
 from compas_viewer.forms import REMOVE_EDITABLE_ATTRIBUTE
@@ -219,6 +220,80 @@ def test_integer_attribute_preserves_type_and_serializes_after_edit(isolated_reg
     restored = ShapeObject.__from_data__(sceneobject.__data__)
     assert restored.u == 32
     assert type(restored.u) is int
+
+
+def test_fractional_scene_field_uses_fractional_editor_for_integer_initial_value(isolated_registry, monkeypatch):
+    from PySide6.QtWidgets import QApplication
+
+    app = QApplication.instance() or QApplication([])
+    mesh = Mesh.from_vertices_and_faces([[0, 0, 0], [1, 0, 0], [0, 1, 0]], [[0, 1, 2]])
+    sceneobject = MeshObject(item=mesh, vertexsize=10)
+    setting = ObjectSetting()
+    viewer = Mock()
+    monkeypatch.setattr(ObjectSetting, "viewer", viewer)
+    binding = _EditableAttributeBinding(sceneobject, "vertexsize", None)
+
+    control = setting._create_control(binding)
+
+    assert isinstance(control, NumberEdit)
+    assert control.spinbox.decimals() == 1
+    assert control.spinbox.singleStep() == 0.1
+
+    control.spinbox.setValue(10.5)
+
+    assert sceneobject.vertexsize == 10.5
+    assert type(sceneobject.vertexsize) is float
+    viewer.scene.render_object.assert_called_once_with(sceneobject)
+    assert app is not None
+
+
+def test_integer_scene_field_uses_integer_editor_and_preserves_type(isolated_registry, monkeypatch):
+    from PySide6.QtWidgets import QApplication
+
+    app = QApplication.instance() or QApplication([])
+
+    def update_resolution(sceneobject: ShapeObject, value: object) -> None:
+        if not isinstance(value, int):
+            raise TypeError("Shape resolution should be an integer.")
+        sceneobject.u = value
+
+    sceneobject = ShapeObject(item=Sphere(1.0))
+    register_scene_attribute_contribution("Viewer", ShapeObject, "resolution", {"u": update_resolution})
+    setting = ObjectSetting()
+    viewer = Mock()
+    monkeypatch.setattr(ObjectSetting, "viewer", viewer)
+    binding = _EditableAttributeBinding(sceneobject, "u", scene_editable_attributes("Viewer", sceneobject)["u"])
+
+    control = setting._create_control(binding)
+
+    assert isinstance(control, NumberEdit)
+    assert control.spinbox.decimals() == 0
+    assert control.spinbox.singleStep() == 1.0
+
+    control.spinbox.stepUp()
+
+    assert sceneobject.u == 17
+    assert type(sceneobject.u) is int
+    viewer.scene.render_object.assert_called_once_with(sceneobject)
+    assert app is not None
+
+
+def test_fractional_integer_edit_restores_control_without_refresh(isolated_registry):
+    sceneobject = ShapeObject(item=Sphere(1.0))
+    register_scene_attribute_contribution("Viewer", ShapeObject, "resolution", {"u": None})
+    binding = _EditableAttributeBinding(sceneobject, "u", scene_editable_attributes("Viewer", sceneobject)["u"])
+    component = object.__new__(BoundComponent)
+    component.obj = binding
+    component.attr = "value"
+    component.action = Mock()
+    component.sync_from_bound_object = Mock()
+
+    with pytest.raises(ValueError, match="requires a whole number"):
+        component.on_value_changed(16.5)
+
+    assert sceneobject.u == 16
+    component.sync_from_bound_object.assert_called_once_with(16)
+    component.action.assert_not_called()
 
 
 def test_registration_and_resolution_do_not_change_scene_json(isolated_registry):

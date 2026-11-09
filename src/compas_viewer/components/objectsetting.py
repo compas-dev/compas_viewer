@@ -36,7 +36,7 @@ class _EditableAttributeBinding:
     def value(self, value: object) -> None:
         """Update the attribute and restore its prior value on failure."""
         previous = _snapshot_value(self.value)
-        if isinstance(previous, int) and not isinstance(previous, bool) and isinstance(value, float):
+        if self.integer_only and isinstance(value, float):
             if not value.is_integer():
                 raise ValueError(f"Editable integer attribute {self.name} requires a whole number.")
             value = int(value)
@@ -51,6 +51,22 @@ class _EditableAttributeBinding:
             except Exception:
                 pass
             raise
+
+    @property
+    def integer_only(self) -> bool:
+        """Whether the attribute's declared numeric contract requires integers."""
+        for fields in self.sceneobject.scene_state_fields().values():
+            for field in fields:
+                if field.attribute != self.name:
+                    continue
+                accepted = field.value_type if isinstance(field.value_type, tuple) else (field.value_type,)
+                if float in accepted:
+                    return False
+                if int in accepted:
+                    return True
+                break
+        value = self.value
+        return isinstance(value, int) and not isinstance(value, bool)
 
 
 def _snapshot_value(value: object) -> object:
@@ -128,6 +144,8 @@ class ObjectSetting(Container):
         if isinstance(value, bool):
             return BooleanToggle(binding, "value", title=title, action=refresh)
         if isinstance(value, (int, float)) and not isinstance(value, bool):
+            if binding.integer_only:
+                return NumberEdit(binding, "value", title=title, step=1.0, decimals=0, action=refresh)
             return NumberEdit(binding, "value", title=title, action=refresh)
         if isinstance(value, str):
             return TextEdit(binding, "value", title=title, action=refresh)
