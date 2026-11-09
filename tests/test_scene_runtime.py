@@ -2,6 +2,8 @@ from unittest.mock import Mock
 from unittest.mock import call
 from types import SimpleNamespace
 
+import pytest
+
 from compas.colors import Color
 from compas.datastructures import Mesh
 from compas.geometry import Sphere
@@ -18,6 +20,7 @@ from compas_viewer.scene import ViewerScene
 from compas_viewer.scene.annotationobject import ArrowAnnotationRenderObject
 from compas_viewer.scene.annotationobject import TextAnnotationRenderObject
 from compas_viewer.config import Config
+from compas_viewer.renderer import Renderer
 from compas_viewer.state import ViewerState
 
 
@@ -40,6 +43,82 @@ def connected_viewer(scene):
     viewer.state.changed.connect(viewer._on_state_changed)
     scene.attach(viewer)
     return viewer, events
+
+
+def rebuild_renderer(*, running=True, create_buffers=None):
+    events = []
+    render_object = SimpleNamespace(
+        _inited=False,
+        init=lambda: events.append("init"),
+    )
+    scene = SimpleNamespace(
+        prepare=lambda: events.append("prepare"),
+        render_objects={"object": render_object},
+    )
+    manager = SimpleNamespace(
+        clear=lambda: events.append("clear"),
+        add_object=lambda obj: events.append(("add", obj)),
+        create_buffers=create_buffers or (lambda: events.append("create")),
+    )
+    renderer = SimpleNamespace(
+        viewer=SimpleNamespace(running=running, scene=scene),
+        makeCurrent=lambda: events.append("make-current"),
+        doneCurrent=lambda: events.append("done-current"),
+        buffer_manager=manager,
+        _vao=17,
+    )
+    return renderer, render_object, events
+
+
+def test_rebuild_buffers_owns_gl_context_while_viewer_is_running(monkeypatch):
+    import compas_viewer.renderer.renderer as renderer_module
+
+    renderer, render_object, events = rebuild_renderer()
+    monkeypatch.setattr(renderer_module.GL, "glBindVertexArray", lambda value: events.append(("bind", value)))
+
+    Renderer.rebuild_buffers(renderer)
+
+    assert events == [
+        "make-current",
+        ("bind", 17),
+        "clear",
+        "prepare",
+        "init",
+        ("add", render_object),
+        "create",
+        ("bind", 0),
+        "done-current",
+    ]
+
+
+def test_rebuild_buffers_balances_context_and_vertex_array_after_failure(monkeypatch):
+    import compas_viewer.renderer.renderer as renderer_module
+
+    def fail():
+        events.append("create")
+        raise RuntimeError("buffer creation failed")
+
+    renderer, _render_object, events = rebuild_renderer(create_buffers=fail)
+    monkeypatch.setattr(renderer_module.GL, "glBindVertexArray", lambda value: events.append(("bind", value)))
+
+    with pytest.raises(RuntimeError, match="buffer creation failed"):
+        Renderer.rebuild_buffers(renderer)
+
+    assert events[-2:] == [("bind", 0), "done-current"]
+
+
+def test_rebuild_buffers_preserves_pre_running_current_context(monkeypatch):
+    import compas_viewer.renderer.renderer as renderer_module
+
+    renderer, _render_object, events = rebuild_renderer(running=False)
+    monkeypatch.setattr(renderer_module.GL, "glBindVertexArray", lambda value: events.append(("bind", value)))
+
+    Renderer.rebuild_buffers(renderer)
+
+    assert "make-current" not in events
+    assert "done-current" not in events
+    assert events[0] == ("bind", 17)
+    assert events[-1] == ("bind", 0)
 
 
 def test_standalone_viewer_scenes_keep_picking_state_local():

@@ -177,16 +177,15 @@ def test_viewer_draws_measurement_after_regular_overlays(monkeypatch):
         project_point=project,
     )
     painter = Mock()
-    monkeypatch.setattr(viewer_module, "QPainter", Mock(return_value=painter))
     monkeypatch.setattr(viewer_module, "_draw_measurement_preview", lambda *args, **kwargs: order.append("measurement"))
 
-    Viewer._draw_overlays(viewer, renderer)
+    Viewer._draw_overlays(viewer, renderer, painter)
 
     assert order == ["overlay", "measurement"]
-    painter.end.assert_called_once_with()
+    painter.end.assert_not_called()
 
 
-def test_viewer_creates_painter_for_measurement_without_regular_overlays(monkeypatch):
+def test_viewer_draws_measurement_with_given_painter_without_regular_overlays(monkeypatch):
     measurement = MeasurementState()
     measurement.start("inspection")
     viewer = SimpleNamespace(
@@ -196,27 +195,26 @@ def test_viewer_creates_painter_for_measurement_without_regular_overlays(monkeyp
     )
     renderer = SimpleNamespace(width=lambda: 640, height=lambda: 480, project_point=project)
     painter = Mock()
-    painter_type = Mock(return_value=painter)
     preview = Mock()
-    monkeypatch.setattr(viewer_module, "QPainter", painter_type)
     monkeypatch.setattr(viewer_module, "_draw_measurement_preview", preview)
 
-    Viewer._draw_overlays(viewer, renderer)
+    Viewer._draw_overlays(viewer, renderer, painter)
 
-    painter_type.assert_called_once_with(renderer)
     preview.assert_called_once()
-    painter.end.assert_called_once_with()
+    painter.end.assert_not_called()
 
 
-def test_viewer_skips_painter_without_overlays_or_measurement(monkeypatch):
+def test_viewer_skips_drawing_without_overlays_or_measurement(monkeypatch):
     viewer = SimpleNamespace(
         _overlay_layer=_OverlayLayer(),
         state=SimpleNamespace(measurement=MeasurementState()),
     )
     renderer = SimpleNamespace(width=lambda: 640, height=lambda: 480)
-    painter_type = Mock()
-    monkeypatch.setattr(viewer_module, "QPainter", painter_type)
+    painter = Mock()
+    preview = Mock()
+    monkeypatch.setattr(viewer_module, "_draw_measurement_preview", preview)
 
-    Viewer._draw_overlays(viewer, renderer)
+    Viewer._draw_overlays(viewer, renderer, painter)
 
-    painter_type.assert_not_called()
+    preview.assert_not_called()
+    assert painter.mock_calls == []

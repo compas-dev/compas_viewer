@@ -6,6 +6,7 @@ import subprocess
 import sys
 from types import SimpleNamespace
 from typing import cast
+from unittest.mock import Mock
 
 import pytest
 
@@ -193,28 +194,200 @@ def test_viewer_overlay_facade_does_not_change_scene_serialization():
     assert viewer.overlays == ()
 
 
-def test_renderer_draws_overlays_only_for_display_rendering(monkeypatch):
+def test_running_viewer_repaints_overlay_canvas_without_rendering_scene():
+    viewport = SimpleNamespace(renderer=Mock(), update_overlays=Mock())
+    viewer = object.__new__(Viewer)
+    viewer._overlay_layer = _OverlayLayer()
+    viewer.running = True
+    viewer.ui = SimpleNamespace(viewport=viewport)
+    scale = ScaleBarOverlay()
+
+    viewer.add_overlay(scale)
+    assert viewer.remove_overlay(scale)
+
+    assert viewport.update_overlays.call_count == 2
+    viewport.renderer.update.assert_not_called()
+
+
+def test_measurement_state_repaints_overlay_canvas_without_rendering_scene():
+    viewport = SimpleNamespace(renderer=Mock(), update_overlays=Mock())
+    viewer = SimpleNamespace(ui=SimpleNamespace(viewport=viewport))
+
+    Viewer._on_state_changed(viewer, "measurement.runtime", object())
+
+    viewport.update_overlays.assert_called_once_with()
+    viewport.renderer.update.assert_not_called()
+
+
+def test_renderer_keeps_display_and_instance_frames_in_native_gl(monkeypatch):
     renderer_module = import_module("compas_viewer.renderer.renderer")
-    overlay_draws = []
-    paint_modes = []
+    order = []
     fake = SimpleNamespace(
-        viewer=SimpleNamespace(_draw_overlays=lambda renderer: overlay_draws.append(renderer)),
         rendermode="shaded",
         _frames=0,
         _now=float("inf"),
-        clear=lambda: None,
+        clear=lambda: order.append("clear"),
         width=lambda: 640,
         height=lambda: 480,
         devicePixelRatio=lambda: 2,
-        paint=lambda is_instance=False: paint_modes.append(is_instance),
+        paint=lambda is_instance=False: order.append(("paint", is_instance)),
     )
-    monkeypatch.setattr(renderer_module.GL, "glViewport", lambda *_args: None)
+    monkeypatch.setattr(renderer_module.GL, "glViewport", lambda *args: order.append(("viewport", args)))
 
     Renderer.paintGL(fake)
     Renderer.paintGL(fake, is_instance=True)
 
-    assert paint_modes == [False, True]
-    assert overlay_draws == [fake]
+    assert order == [
+        "clear",
+        ("viewport", (0, 0, 1280, 960)),
+        ("paint", False),
+        "clear",
+        ("viewport", (0, 0, 640, 480)),
+        ("paint", True),
+    ]
+
+
+def test_overlay_canvas_is_transparent_to_input_and_tracks_content(monkeypatch):
+    monkeypatch.setenv("QT_QPA_PLATFORM", "offscreen")
+    from PySide6.QtCore import Qt
+    from PySide6.QtWidgets import QApplication
+
+    from compas_viewer.components.viewport import _OverlayCanvas
+
+    app = QApplication.instance() or QApplication([])
+    content = {"visible": False}
+    viewer = SimpleNamespace(_has_overlay_content=lambda: content["visible"])
+    monkeypatch.setattr(_OverlayCanvas, "viewer", property(lambda _self: viewer), raising=False)
+    canvas = _OverlayCanvas(cast(Renderer, object()))
+    update = Mock()
+    monkeypatch.setattr(canvas, "update", update)
+
+    canvas.sync()
+    assert not canvas.isVisible()
+    update.assert_not_called()
+
+    content["visible"] = True
+    canvas.sync()
+
+    assert canvas.isVisible()
+    update.assert_called_once_with()
+    assert canvas.testAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+    assert canvas.testAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+    assert canvas.focusPolicy() == Qt.FocusPolicy.NoFocus
+    assert app is not None
+
+
+def test_overlay_canvas_owns_and_ends_painter_inside_paint_event(monkeypatch):
+    monkeypatch.setenv("QT_QPA_PLATFORM", "offscreen")
+    from PySide6.QtWidgets import QApplication
+
+    import compas_viewer.components.viewport as viewport_module
+    from compas_viewer.components.viewport import _OverlayCanvas
+
+    app = QApplication.instance() or QApplication([])
+    renderer = cast(Renderer, object())
+    viewer = SimpleNamespace(
+        _has_overlay_content=lambda: True,
+        _draw_overlays=Mock(side_effect=RuntimeError("draw failed")),
+    )
+    monkeypatch.setattr(_OverlayCanvas, "viewer", property(lambda _self: viewer), raising=False)
+    canvas = _OverlayCanvas(renderer)
+    painter = Mock()
+    painter.begin.return_value = True
+    monkeypatch.setattr(viewport_module, "QPainter", Mock(return_value=painter))
+
+    with pytest.raises(RuntimeError, match="draw failed"):
+        canvas.paintEvent(Mock())
+
+    painter.begin.assert_called_once_with(canvas)
+    viewer._draw_overlays.assert_called_once_with(renderer, painter)
+    painter.end.assert_called_once_with()
+    assert app is not None
+
+
+def test_overlay_canvas_skips_drawing_when_painter_cannot_begin(monkeypatch):
+    monkeypatch.setenv("QT_QPA_PLATFORM", "offscreen")
+    from PySide6.QtWidgets import QApplication
+
+    import compas_viewer.components.viewport as viewport_module
+    from compas_viewer.components.viewport import _OverlayCanvas
+
+    app = QApplication.instance() or QApplication([])
+    viewer = SimpleNamespace(_has_overlay_content=lambda: True, _draw_overlays=Mock())
+    monkeypatch.setattr(_OverlayCanvas, "viewer", property(lambda _self: viewer), raising=False)
+    canvas = _OverlayCanvas(cast(Renderer, object()))
+    painter = Mock()
+    painter.begin.return_value = False
+    monkeypatch.setattr(viewport_module, "QPainter", Mock(return_value=painter))
+
+    canvas.paintEvent(Mock())
+
+    viewer._draw_overlays.assert_not_called()
+    painter.end.assert_not_called()
+    assert app is not None
+
+
+def test_viewport_stacks_overlay_above_renderer_and_repaints_after_frame(monkeypatch):
+    monkeypatch.setenv("QT_QPA_PLATFORM", "offscreen")
+    from PySide6.QtWidgets import QApplication
+    from PySide6.QtWidgets import QMainWindow
+    from PySide6.QtWidgets import QStackedLayout
+    from PySide6.QtWidgets import QWidget
+
+    import compas_viewer.components.viewport as viewport_module
+
+    class Signal:
+        def __init__(self):
+            self.callback = None
+
+        def connect(self, callback):
+            self.callback = callback
+
+        def emit(self):
+            assert self.callback is not None
+            self.callback()
+
+    class FakeRenderer(QWidget):
+        def __init__(self):
+            super().__init__()
+            self.frameSwapped = Signal()
+
+    class FakeSidebar:
+        def __init__(self, _viewport):
+            self.widget = QWidget()
+
+    app = QApplication.instance() or QApplication([])
+    content = {"visible": False}
+    viewer = SimpleNamespace(
+        config=SimpleNamespace(
+            ui=SimpleNamespace(sidebar=SimpleNamespace(width=200)),
+            window=SimpleNamespace(width=800),
+        ),
+        _has_overlay_content=lambda: content["visible"],
+    )
+    monkeypatch.setattr(viewport_module, "Renderer", FakeRenderer)
+    monkeypatch.setattr(viewport_module, "SideBarRight", FakeSidebar)
+    monkeypatch.setattr(viewport_module.ViewPort, "viewer", property(lambda _self: viewer), raising=False)
+    monkeypatch.setattr(viewport_module._OverlayCanvas, "viewer", property(lambda _self: viewer), raising=False)
+    window = SimpleNamespace(widget=QMainWindow())
+
+    viewport = viewport_module.ViewPort(window)
+
+    assert viewport.widget.widget(0) is viewport._canvas
+    assert viewport._canvas_layout.stackingMode() == QStackedLayout.StackingMode.StackAll
+    assert viewport._canvas_layout.indexOf(viewport.renderer) >= 0
+    assert viewport._canvas_layout.indexOf(viewport._overlay_canvas) >= 0
+    assert viewport._canvas_layout.currentWidget() is viewport._overlay_canvas
+    assert viewport._overlay_canvas.isHidden()
+
+    update = Mock()
+    monkeypatch.setattr(viewport._overlay_canvas, "update", update)
+    content["visible"] = True
+    viewport.renderer.frameSwapped.emit()
+
+    assert not viewport._overlay_canvas.isHidden()
+    update.assert_called_once_with()
+    assert app is not None
 
 
 def test_public_overlay_imports_remain_graphics_free(tmp_path):

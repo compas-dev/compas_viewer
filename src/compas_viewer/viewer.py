@@ -3,6 +3,7 @@ from collections.abc import Callable
 from collections.abc import Iterable
 from io import BytesIO
 from pathlib import Path
+from typing import TYPE_CHECKING
 from typing import Any
 from typing import Literal
 from typing import cast
@@ -15,7 +16,6 @@ from PySide6.QtCore import Qt
 from PySide6.QtCore import QTimer
 from PySide6.QtGui import QColor
 from PySide6.QtGui import QIcon
-from PySide6.QtGui import QPainter
 from PySide6.QtGui import QPalette
 from PySide6.QtWidgets import QApplication
 
@@ -52,6 +52,9 @@ from compas_viewer.ui import UI
 from compas_viewer.uidefinitions import UIItem
 from compas_viewer.uidefinitions import default_menu_items
 from compas_viewer.uidefinitions import default_sidebar_items
+
+if TYPE_CHECKING:
+    from PySide6.QtGui import QPainter
 
 
 class Viewer(Singleton):
@@ -156,7 +159,7 @@ class Viewer(Singleton):
         """
         self._overlay_layer.add(overlay)
         if self.running:
-            self.renderer.update()
+            self.ui.viewport.update_overlays()
 
     def remove_overlay(self, overlay: Overlay) -> bool:
         """Remove a transient screen overlay by identity.
@@ -174,7 +177,7 @@ class Viewer(Singleton):
         """
         removed = self._overlay_layer.remove(overlay)
         if removed and self.running:
-            self.renderer.update()
+            self.ui.viewport.update_overlays()
         return removed
 
     def start_distance_inspection(self) -> None:
@@ -229,36 +232,36 @@ class Viewer(Singleton):
         sceneobject = self.scene.add(result)
         self.state.selection.replace((sceneobject,))
 
-    def _draw_overlays(self, renderer: Renderer) -> None:
-        """Draw Viewer-owned overlays after normal scene rendering."""
+    def _has_overlay_content(self) -> bool:
+        """Return whether the next display frame needs 2D overlay painting."""
+        return bool(self._overlay_layer or self.state.measurement.has_transient_state)
+
+    def _draw_overlays(self, renderer: Renderer, painter: "QPainter") -> None:
+        """Draw Viewer-owned overlays with the active display-frame painter."""
         width = renderer.width()
         height = renderer.height()
         measurement = self.state.measurement
         if (not self._overlay_layer and not measurement.has_transient_state) or width <= 0 or height <= 0:
             return
-        painter = QPainter(renderer)
-        try:
-            if self._overlay_layer:
-                context = _OverlayContext(
-                    width=width,
-                    height=height,
-                    camera_distance=renderer.camera.distance,
-                    field_of_view=renderer.camera.fov,
-                    perspective=renderer.view == "perspective",
-                    unit=self.config.measurement.unit,
-                    precision=self.config.measurement.precision,
-                )
-                self._overlay_layer.draw(painter, context)
-            if measurement.has_transient_state:
-                _draw_measurement_preview(
-                    painter,
-                    measurement,
-                    renderer.project_point,
-                    unit=self.config.measurement.unit,
-                    precision=self.config.measurement.precision,
-                )
-        finally:
-            painter.end()
+        if self._overlay_layer:
+            context = _OverlayContext(
+                width=width,
+                height=height,
+                camera_distance=renderer.camera.distance,
+                field_of_view=renderer.camera.fov,
+                perspective=renderer.view == "perspective",
+                unit=self.config.measurement.unit,
+                precision=self.config.measurement.precision,
+            )
+            self._overlay_layer.draw(painter, context)
+        if measurement.has_transient_state:
+            _draw_measurement_preview(
+                painter,
+                measurement,
+                renderer.project_point,
+                unit=self.config.measurement.unit,
+                precision=self.config.measurement.precision,
+            )
 
     def create_app(self) -> QApplication:
         """Return the configured Qt application, creating it if necessary.
@@ -620,7 +623,7 @@ class Viewer(Singleton):
             self.ui.sidebar.update()
             self.renderer.update()
         elif path.startswith("measurement.") and hasattr(self, "ui"):
-            self.renderer.update()
+            self.ui.viewport.update_overlays()
 
     def _on_system_color_scheme_changed(self, _scheme: Qt.ColorScheme) -> None:
         """Reapply system appearance after a platform theme change."""

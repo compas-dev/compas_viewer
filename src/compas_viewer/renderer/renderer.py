@@ -344,13 +344,12 @@ class Renderer(QOpenGLWidget, Base):
         self.clear()
 
         if is_instance or self.rendermode == "instance":
-            GL.glViewport(0, 0, self.width(), self.height())  # Use unscaled viewport for FBO
+            GL.glViewport(0, 0, self.width(), self.height())
             self.paint(is_instance=True)
         else:
-            r = self.devicePixelRatio()
-            GL.glViewport(0, 0, int(self.width() * r), int(self.height() * r))  # Normal scaled viewport
+            ratio = self.devicePixelRatio()
+            GL.glViewport(0, 0, int(self.width() * ratio), int(self.height() * ratio))
             self.paint()
-            self.viewer._draw_overlays(self)
 
         self._frames += 1
         if time.time() - self._now > 1:
@@ -611,20 +610,29 @@ class Renderer(QOpenGLWidget, Base):
 
     def rebuild_buffers(self) -> None:
         """Rebuild the buffers."""
-        GL.glBindVertexArray(self._vao)
-        self.buffer_manager.clear()
+        owns_context = self.viewer.running
+        if owns_context:
+            self.makeCurrent()
+        try:
+            GL.glBindVertexArray(self._vao)
+            try:
+                self.buffer_manager.clear()
 
-        # Ensure all objects are initialized before adding to buffer
-        self.viewer.scene.prepare()
-        for obj in self.viewer.scene.render_objects.values():
-            if not obj._inited:
-                obj.init()
+                # Ensure all objects are initialized before adding to buffer
+                self.viewer.scene.prepare()
+                for obj in self.viewer.scene.render_objects.values():
+                    if not obj._inited:
+                        obj.init()
 
-        for obj in self.viewer.scene.render_objects.values():
-            if not isinstance(obj, WorldAnnotationRenderObject):
-                self.buffer_manager.add_object(obj)
-        self.buffer_manager.create_buffers()
-        GL.glBindVertexArray(0)
+                for obj in self.viewer.scene.render_objects.values():
+                    if not isinstance(obj, WorldAnnotationRenderObject):
+                        self.buffer_manager.add_object(obj)
+                self.buffer_manager.create_buffers()
+            finally:
+                GL.glBindVertexArray(0)
+        finally:
+            if owns_context:
+                self.doneCurrent()
 
     def rebuild_grid(self) -> None:
         """Rebuild the grid from the current renderer configuration."""
