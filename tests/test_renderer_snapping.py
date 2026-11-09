@@ -14,6 +14,8 @@ from compas_viewer.renderer.renderer import Renderer
 from compas_viewer.scene.buffermanager import BufferManager
 from compas_viewer.snapping import ProjectedPoint
 from compas_viewer.snapping import SnapKind
+from compas_viewer.snapping import SnapQuery
+from compas_viewer.snapping import SnapResult
 
 
 class Camera:
@@ -339,7 +341,7 @@ def test_pixel_read_restores_pack_state_on_success_and_error(monkeypatch, reader
     assert state_snapshot(state) == initial
 
 
-def test_query_snap_prefilters_objects_and_balances_gl_context(monkeypatch):
+def test_query_snap_context_uses_one_hovered_object_and_balances_gl_context(monkeypatch):
     first = SceneObject(Point(-0.5, 0, 0))
     second = SceneObject(Point(0.5, 0, 0))
     first_color = (10, 20, 30)
@@ -360,20 +362,53 @@ def test_query_snap_prefilters_objects_and_balances_gl_context(monkeypatch):
         )
     )
     renderer._surface_hits = Mock(return_value=())
+    renderer._hovered_snap_object = lambda point, region, colors: Renderer._hovered_snap_object(renderer, point, region, colors)
     renderer.project_point = Mock()
     renderer._is_snap_visible = Mock()
-    result = object()
-    semantic_query = Mock(return_value=result)
-    monkeypatch.setattr(renderer_module, "query_snap", semantic_query)
+    result = SnapResult(Point(0, 0, 0), second.guid, SnapKind.POINT, 0)
+    points = (result,)
+    semantic_query = Mock(return_value=SnapQuery(result, points))
+    monkeypatch.setattr(renderer_module, "query_snaps", semantic_query)
 
-    snapped = Renderer.query_snap_at(renderer, (10, 10), 1)
+    query = Renderer.query_snap_context_at(renderer, (10, 10), 1)
 
-    assert snapped is result
+    assert query == SnapQuery(result, points)
     renderer.makeCurrent.assert_called_once_with()
     renderer.doneCurrent.assert_called_once_with()
     renderer._acquire_snap_buffers.assert_called_once_with((9, 9, 9, 3, 3))
     assert semantic_query.call_args.args[0] == (second,)
     assert semantic_query.call_args.args[1] == (10, 10)
+
+
+def test_hovered_snap_object_prefers_the_instance_pixel_nearest_the_pointer():
+    first = SceneObject(Point(0, 0, 0))
+    second = SceneObject(Point(1, 0, 0))
+    first_color = (10, 20, 30)
+    second_color = (40, 50, 60)
+    renderer = projection_renderer(width=20, height=20)
+    renderer.viewer = SimpleNamespace(scene=SimpleNamespace(instance_colors={first_color: first, second_color: second}))
+    colors = np.array(
+        [
+            [second_color, second_color, second_color],
+            [second_color, first_color, second_color],
+            [second_color, second_color, second_color],
+        ],
+        dtype=np.uint8,
+    )
+
+    hovered = Renderer._hovered_snap_object(renderer, (10.5, 10.5), (9, 9, 8, 3, 3), colors)
+
+    assert hovered is first
+
+
+def test_query_snap_at_remains_the_winner_only_compatibility_path():
+    winner = SnapResult(Point(0, 0, 0), SceneObject(Point(0, 0, 0)).guid, SnapKind.POINT, 0)
+    renderer: Any = SimpleNamespace(query_snap_context_at=Mock(return_value=SnapQuery(winner, (winner,))))
+
+    result = Renderer.query_snap_at(renderer, (10, 20), 12)
+
+    assert result is winner
+    renderer.query_snap_context_at.assert_called_once_with((10, 20), 12)
 
 
 def test_depth_visibility_rejects_occluded_and_outside_candidates():
@@ -426,7 +461,7 @@ def test_query_outside_viewport_does_not_acquire_buffers():
     renderer._snap_region = lambda point, radius: Renderer._snap_region(renderer, point, radius)
     renderer._acquire_snap_buffers = Mock()
 
-    result = Renderer.query_snap_at(renderer, (-10, -10), 1)
+    result = Renderer.query_snap_context_at(renderer, (-10, -10), 1)
 
-    assert result is None
+    assert result == SnapQuery()
     renderer._acquire_snap_buffers.assert_not_called()

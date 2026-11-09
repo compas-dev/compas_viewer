@@ -11,8 +11,10 @@ from compas.geometry import Translation
 from compas.scene import SceneObject
 from compas_viewer.snapping import ProjectedPoint
 from compas_viewer.snapping import SnapKind
+from compas_viewer.snapping import SnapQuery
 from compas_viewer.snapping import SurfaceHit
 from compas_viewer.snapping import query_snap
+from compas_viewer.snapping import query_snaps
 
 
 def orthographic(point):
@@ -28,6 +30,37 @@ def test_snap_contract_is_immutable():
         setattr(result, "kind", SnapKind.LINE)
     with pytest.raises(AttributeError):
         setattr(SnapKind.POINT, "value", "changed")
+    with pytest.raises(FrozenInstanceError):
+        setattr(SnapQuery(result, (result,)), "winner", None)
+
+
+def test_hover_palette_contains_all_discrete_points_in_component_order():
+    mesh = Mesh.from_vertices_and_faces([[0, 0, 0], [10, 0, 0], [0, 10, 0]], [[0, 1, 2]])
+    sceneobject = SceneObject(mesh, transformation=Translation.from_vector([1, 2, 3]))
+
+    points = query_snaps([sceneobject], (0, 0), radius=0, project=orthographic).points
+
+    assert [point.kind for point in points] == [SnapKind.VERTEX] * 3
+    assert [point.component for point in points] == [0, 1, 2]
+    assert [point.point for point in points] == [Point(1, 2, 3), Point(11, 2, 3), Point(1, 12, 3)]
+
+
+def test_hover_palette_supports_points_and_graph_nodes_but_not_lines():
+    point = SceneObject(Point(1, 2, 3))
+    line = SceneObject(Line([0, 0, 0], [10, 0, 0]))
+    graph = Graph()
+    graph.add_node("a", x=0, y=0, z=0)
+    graph.add_node("b", x=1, y=0, z=0)
+    graph.add_edge("a", "b")
+
+    point_snaps = query_snaps([point], (0, 0), radius=0, project=orthographic).points
+    line_snaps = query_snaps([line], (0, 0), radius=0, project=orthographic).points
+    node_snaps = query_snaps([SceneObject(graph)], (0, 0), radius=0, project=orthographic).points
+
+    assert [snap.kind for snap in point_snaps] == [SnapKind.POINT]
+    assert line_snaps == ()
+    assert [snap.kind for snap in node_snaps] == [SnapKind.NODE, SnapKind.NODE]
+    assert [snap.component for snap in node_snaps] == ["a", "b"]
 
 
 def test_radius_is_inclusive_and_has_no_background_fallback():

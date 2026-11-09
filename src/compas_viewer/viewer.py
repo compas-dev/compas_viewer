@@ -210,15 +210,15 @@ class Viewer(Singleton):
         return self.state.measurement.cancel()
 
     def _update_measurement_hover(self, screen_point: tuple[float, float]) -> None:
-        """Update the active measurement's hover snap."""
-        snap = self.renderer.query_snap_at(screen_point, SNAP_RADIUS)
-        self.state.measurement.update_hover(snap)
+        """Update the active measurement's winner and point-snap palette."""
+        query = self.renderer.query_snap_context_at(screen_point, SNAP_RADIUS)
+        self.state.measurement.update_hover(query)
 
     def _accept_measurement_at(self, screen_point: tuple[float, float]) -> None:
         """Accept the semantic snap at one screen position."""
-        snap = self.renderer.query_snap_at(screen_point, SNAP_RADIUS)
+        query = self.renderer.query_snap_context_at(screen_point, SNAP_RADIUS)
         result = self.state.measurement.accept(
-            snap,
+            query,
             unit=self.config.measurement.unit,
             precision=self.config.measurement.precision,
         )

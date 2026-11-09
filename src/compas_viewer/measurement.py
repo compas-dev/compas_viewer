@@ -9,6 +9,7 @@ from compas.geometry import Point
 from compas.geometry import distance_point_point
 from compas.scene import DistanceDimension
 from compas.scene import PointAnchor
+from compas_viewer.snapping import SnapQuery
 from compas_viewer.snapping import SnapResult
 
 if TYPE_CHECKING:
@@ -75,6 +76,7 @@ class MeasurementState:
         self.mode: MeasurementMode = "inactive"
         self.first_snap: SnapResult | None = None
         self.hover_snap: SnapResult | None = None
+        self.available_points: tuple[SnapResult, ...] = ()
         self.completed_inspection: DistanceInspection | None = None
         self.rejection: str | None = None
 
@@ -107,6 +109,7 @@ class MeasurementState:
         self.mode = mode
         self.first_snap = None
         self.hover_snap = None
+        self.available_points = ()
         self.completed_inspection = None
         self.rejection = None
         self._notify()
@@ -125,34 +128,30 @@ class MeasurementState:
         self.mode = "inactive"
         self.first_snap = None
         self.hover_snap = None
+        self.available_points = ()
         self.completed_inspection = None
         self.rejection = None
         self._notify()
         return True
 
-    def update_hover(self, snap: SnapResult | None) -> None:
-        """Update the current hover snap without changing the first anchor.
+    def update_hover(self, query: SnapQuery) -> None:
+        """Update hover guidance without changing the first anchor.
 
         Parameters
         ----------
-        snap
-            Current semantic snap, or `None` over the background.
+        query
+            Current accepted winner and all projected discrete point snaps of
+            the hovered object. An empty query represents the background.
 
         """
         if not self.active:
             return
-        rejection = None
-        if self.mode == "associative" and snap is not None and not snap.supports_association:
-            rejection = snap.association_error
-        if self.hover_snap is snap and self.rejection == rejection:
-            return
-        self.hover_snap = snap
-        self.rejection = rejection
-        self._notify()
+        if self._set_hover(query):
+            self._notify()
 
     def accept(
         self,
-        snap: SnapResult | None,
+        query: SnapQuery,
         *,
         unit: str | None,
         precision: int,
@@ -161,8 +160,9 @@ class MeasurementState:
 
         Parameters
         ----------
-        snap
-            Semantic snap under the pointer, or `None` over the background.
+        query
+            Current depth-qualified winner and projected point palette. An
+            empty query represents the background.
         unit
             Informational unit snapshot for a persistent dimension.
         precision
@@ -177,14 +177,18 @@ class MeasurementState:
         """
         if not self.active:
             return None
+        snap = query.winner
         if snap is None:
-            self.update_hover(None)
+            if self._set_hover(query):
+                self._notify()
             return None
         if self.mode == "associative" and not snap.supports_association:
-            self.update_hover(snap)
+            if self._set_hover(query):
+                self._notify()
             return None
 
         self.hover_snap = snap
+        self.available_points = query.points
         self.rejection = None
         if self.first_snap is None:
             self.first_snap = snap
@@ -216,9 +220,23 @@ class MeasurementState:
         self.mode = "inactive"
         self.first_snap = None
         self.hover_snap = None
+        self.available_points = ()
         self.rejection = None
         self._notify()
         return result
+
+    def _set_hover(self, query: SnapQuery) -> bool:
+        """Apply one hover query and report whether transient state changed."""
+        snap = query.winner
+        rejection = None
+        if self.mode == "associative" and snap is not None and not snap.supports_association:
+            rejection = snap.association_error
+        if self.hover_snap == snap and self.available_points == query.points and self.rejection == rejection:
+            return False
+        self.hover_snap = snap
+        self.available_points = query.points
+        self.rejection = rejection
+        return True
 
     def _notify(self) -> None:
         if self._changed is not None:
@@ -266,6 +284,7 @@ def _draw_measurement_preview(
 
     painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
     preview_color = QColor(255, 140, 0)
+    available_color = QColor(80, 170, 230, 190)
     rejection_color = QColor(210, 45, 45)
 
     inspection = state.completed_inspection
@@ -279,6 +298,11 @@ def _draw_measurement_preview(
             _format_distance(inspection.distance, unit, precision),
         )
         return
+
+    for snap in state.available_points:
+        projected = project(snap.point)
+        if projected is not None:
+            _draw_available_snap_marker(painter, QPointF(projected.x, projected.y), available_color)
 
     first = state.first_snap
     hover = state.hover_snap
@@ -352,6 +376,17 @@ def _draw_measurement_marker(painter: "QPainter", point: "QPointF", color: "QCol
     painter.setPen(QPen(color, 2.0))
     painter.setBrush(QBrush(color))
     painter.drawEllipse(point, 4.0, 4.0)
+
+
+def _draw_available_snap_marker(painter: "QPainter", point: "QPointF", color: "QColor") -> None:
+    """Draw one subdued hollow point-snap guide."""
+    from PySide6.QtCore import Qt
+    from PySide6.QtGui import QBrush
+    from PySide6.QtGui import QPen
+
+    painter.setPen(QPen(color, 1.5))
+    painter.setBrush(QBrush(Qt.BrushStyle.NoBrush))
+    painter.drawEllipse(point, 3.5, 3.5)
 
 
 def _format_distance(distance: float, unit: str | None, precision: int) -> str:

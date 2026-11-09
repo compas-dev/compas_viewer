@@ -39,14 +39,16 @@ from compas_viewer.scene.buffermanager import BufferManager
 from compas_viewer.scene.gridobject import GridObject
 from compas_viewer.snapping import ProjectedPoint
 from compas_viewer.snapping import SnapKind
+from compas_viewer.snapping import SnapQuery
 from compas_viewer.snapping import SnapResult
 from compas_viewer.snapping import SurfaceHit
-from compas_viewer.snapping import query_snap
+from compas_viewer.snapping import query_snaps
 
 from .camera import Camera
 from .shaders import Shader
 
 if TYPE_CHECKING:
+    from compas.scene import SceneObject
     from compas_viewer.scene.gridobject import GridObject
     from compas_viewer.scene.meshobject import MeshObject
 
@@ -878,9 +880,29 @@ class Renderer(QOpenGLWidget, Base):
         of COMPAS model tolerance and Viewer display settings.
 
         """
+        return self.query_snap_context_at(screen_point, radius).winner
+
+    def query_snap_context_at(self, screen_point: tuple[float, float], radius: float) -> SnapQuery:
+        """Return the active winner and point palette for one hovered object.
+
+        Parameters
+        ----------
+        screen_point
+            Pointer position in logical Viewer pixels, with a top-left origin.
+        radius
+            Inclusive acquisition radius in logical pixels.
+
+        Returns
+        -------
+        SnapQuery
+            Depth-qualified winner and all projected discrete point snaps of
+            the hovered object. Palette points are display guidance and are not
+            independently depth-qualified.
+
+        """
         region = self._snap_region(screen_point, radius)
         if region is None:
-            return None
+            return SnapQuery()
 
         self.makeCurrent()
         try:
@@ -888,28 +910,55 @@ class Renderer(QOpenGLWidget, Base):
         finally:
             self.doneCurrent()
 
-        scene = self.viewer.scene
-        encountered = {
-            sceneobject.guid
-            for color in np.unique(colors.reshape(-1, 3), axis=0)
-            if (sceneobject := scene.instance_colors.get((int(color[0]), int(color[1]), int(color[2])))) is not None
-        }
-        sceneobjects = tuple(sceneobject for sceneobject in scene.objects if sceneobject.guid in encountered)
-        if not sceneobjects:
-            return None
+        sceneobject = self._hovered_snap_object(screen_point, region, colors)
+        if sceneobject is None:
+            return SnapQuery()
 
         surface_hits = tuple(self._surface_hits(region, colors, depths))
         width = self.width()
         height = self.height()
         view_projection = self._view_projection()
-        return query_snap(
-            sceneobjects,
+
+        def project(point: Point) -> ProjectedPoint | None:
+            return self._project_point(point, view_projection, width, height)
+
+        return query_snaps(
+            (sceneobject,),
             screen_point,
             radius=radius,
-            project=lambda point: self._project_point(point, view_projection, width, height),
+            project=project,
             is_visible=lambda projection: self._is_snap_visible(projection, region, depths),
             surface_hits=lambda _screen_point, _radius: surface_hits,
         )
+
+    def _hovered_snap_object(
+        self,
+        screen_point: tuple[float, float],
+        region: tuple[int, int, int, int, int],
+        colors: NDArray[np.uint8],
+    ) -> "SceneObject | None":
+        """Return the registered object at or nearest the pointer.
+
+        The nearest registered instance pixel inside the acquisition region
+        provides a deterministic fallback when the pointer lies immediately
+        beside a rendered point or edge.
+
+        """
+        x, y, _gl_y, _width, _height = region
+        scene = self.viewer.scene
+        candidates = []
+        for row, column in np.ndindex(colors.shape[:2]):
+            color = colors[row, column]
+            sceneobject = scene.instance_colors.get((int(color[0]), int(color[1]), int(color[2])))
+            if sceneobject is None:
+                continue
+            pixel_x = x + column + 0.5
+            pixel_y = y + row + 0.5
+            distance = (pixel_x - screen_point[0]) ** 2 + (pixel_y - screen_point[1]) ** 2
+            candidates.append((distance, row, column, sceneobject))
+        if not candidates:
+            return None
+        return min(candidates, key=lambda candidate: candidate[:3])[3]
 
     def _snap_region(self, screen_point: tuple[float, float], radius: float) -> tuple[int, int, int, int, int] | None:
         """Return a clipped logical and OpenGL acquisition region.

@@ -17,6 +17,7 @@ from compas_viewer.measurement import MeasurementState
 from compas_viewer.plugins import ensure_scene_objects_registered
 from compas_viewer.scene import ViewerScene
 from compas_viewer.snapping import SnapKind
+from compas_viewer.snapping import SnapQuery
 from compas_viewer.snapping import SnapResult
 from compas_viewer.state import ViewerState
 
@@ -41,11 +42,16 @@ def snap(
     )
 
 
+def query(result=None, points=()):
+    return SnapQuery(result, points)
+
+
 def connected_viewer(*, results=()):
     ensure_scene_objects_registered()
     scene = ViewerScene()
     renderer = Mock()
-    renderer.query_snap_at.side_effect = results
+    if results:
+        renderer.query_snap_context_at.side_effect = [query(result) for result in results]
     viewer = object.__new__(Viewer)
     viewer._config = Config()
     viewer._scene = scene
@@ -62,8 +68,8 @@ def connected_viewer(*, results=()):
 def test_measurement_state_activation_clears_previous_mode_and_result():
     state = MeasurementState()
     state.start("inspection")
-    state.accept(snap([0, 0, 0]), unit=None, precision=3)
-    completed = state.accept(snap([3, 4, 0]), unit=None, precision=3)
+    state.accept(query(snap([0, 0, 0])), unit=None, precision=3)
+    completed = state.accept(query(snap([3, 4, 0])), unit=None, precision=3)
 
     assert isinstance(completed, DistanceInspection)
     assert completed.distance == 5.0
@@ -82,14 +88,97 @@ def test_background_clears_hover_without_clearing_first_anchor():
     state = MeasurementState()
     first = snap([0, 0, 0])
     state.start("fixed")
-    state.accept(first, unit=None, precision=3)
-    state.update_hover(snap([1, 0, 0]))
+    state.accept(query(first), unit=None, precision=3)
+    state.update_hover(SnapQuery(snap([1, 0, 0]), (snap([2, 0, 0]),)))
 
-    state.accept(None, unit=None, precision=3)
+    state.accept(query(), unit=None, precision=3)
 
     assert state.first_snap is first
     assert state.hover_snap is None
+    assert state.available_points == ()
     assert state.active
+
+
+def test_hover_point_palette_follows_context_and_clears_on_cancel_and_completion():
+    state = MeasurementState()
+    first = snap([0, 0, 0])
+    first_palette = (first, snap([1, 0, 0]))
+    second = snap([2, 0, 0])
+    second_palette = (second, snap([3, 0, 0]))
+    state.start("fixed")
+
+    state.update_hover(SnapQuery(first, first_palette))
+    state.accept(query(first, first_palette), unit=None, precision=3)
+
+    assert state.available_points == first_palette
+    assert state.first_snap is first
+
+    state.update_hover(SnapQuery(second, second_palette))
+
+    assert state.available_points == second_palette
+    assert state.first_snap is first
+
+    result = state.accept(query(second, second_palette), unit=None, precision=3)
+
+    assert isinstance(result, DistanceDimension)
+    assert state.available_points == ()
+
+    state.start("inspection")
+    state.update_hover(SnapQuery(first, first_palette))
+    assert state.cancel()
+    assert state.available_points == ()
+
+
+def test_viewer_hover_stores_renderer_snap_context():
+    winner = snap([0, 0, 0])
+    query = SnapQuery(winner, (winner, snap([1, 0, 0])))
+    viewer, _, renderer = connected_viewer()
+    renderer.query_snap_context_at.return_value = query
+    viewer.start_distance_dimension("fixed")
+
+    viewer._update_measurement_hover((10, 20))
+
+    assert viewer.state.measurement.hover_snap is winner
+    assert viewer.state.measurement.available_points == query.points
+    renderer.query_snap_context_at.assert_called_once_with((10, 20), 12.0)
+
+
+def test_click_before_hover_keeps_associative_face_rejection_and_point_palette():
+    face = snap([1, 1, 0], kind=SnapKind.FACE, association_error="Face snaps are fixed only")
+    palette = (
+        snap([0, 0, 0], kind=SnapKind.VERTEX, component=0),
+        snap([2, 0, 0], kind=SnapKind.VERTEX, component=1),
+    )
+    viewer, _, renderer = connected_viewer()
+    renderer.query_snap_context_at.return_value = SnapQuery(face, palette)
+    viewer.start_distance_dimension("associative")
+
+    viewer._accept_measurement_at((10, 20))
+
+    measurement = viewer.state.measurement
+    assert measurement.first_snap is None
+    assert measurement.hover_snap is face
+    assert measurement.available_points == palette
+    assert measurement.rejection == "Face snaps are fixed only"
+
+
+def test_click_replaces_stale_hover_palette_atomically():
+    stale = snap([0, 0, 0])
+    stale_query = SnapQuery(stale, (stale, snap([1, 0, 0])))
+    winner = snap([10, 0, 0])
+    current_query = SnapQuery(winner, (winner, snap([11, 0, 0])))
+    viewer, _, renderer = connected_viewer()
+    renderer.query_snap_context_at.return_value = stale_query
+    viewer.start_distance_dimension("fixed")
+    viewer._update_measurement_hover((1, 1))
+    renderer.query_snap_context_at.return_value = current_query
+
+    viewer._accept_measurement_at((10, 20))
+
+    measurement = viewer.state.measurement
+    assert measurement.first_snap is winner
+    assert measurement.hover_snap is winner
+    assert measurement.available_points == current_query.points
 
 
 def test_fixed_dimensions_accept_fixed_only_surface_snaps_and_copy_points():
@@ -97,9 +186,9 @@ def test_fixed_dimensions_accept_fixed_only_surface_snaps_and_copy_points():
     first = snap([0, 0, 0], kind=SnapKind.FACE, association_error="Fixed only")
     second = snap([2, 0, 0], kind=SnapKind.SURFACE, association_error="Fixed only")
     state.start("fixed")
-    state.accept(first, unit="mm", precision=4)
+    state.accept(query(first), unit="mm", precision=4)
 
-    result = state.accept(second, unit="mm", precision=4)
+    result = state.accept(query(second), unit="mm", precision=4)
     first.point.x = 100
     second.point.x = 200
 
@@ -117,7 +206,7 @@ def test_associative_dimensions_reject_unsupported_snaps_without_fallback():
     first = snap([0, 0, 0], kind=SnapKind.FACE, association_error="Face snaps are fixed only")
     state.start("associative")
 
-    result = state.accept(first, unit=None, precision=3)
+    result = state.accept(query(first), unit=None, precision=3)
 
     assert result is None
     assert state.first_snap is None
@@ -133,9 +222,9 @@ def test_associative_dimensions_keep_component_anchors():
     first = snap([0, 0, 0], object_guid=first_guid, kind=SnapKind.VERTEX, component=1)
     second = snap([2, 0, 0], object_guid=second_guid, kind=SnapKind.EDGE, component=(2, 3), parameter=0.25)
     state.start("associative")
-    state.accept(first, unit=None, precision=3)
+    state.accept(query(first), unit=None, precision=3)
 
-    result = state.accept(second, unit=None, precision=3)
+    result = state.accept(query(second), unit=None, precision=3)
 
     assert isinstance(result, DistanceDimension)
     assert result.start == ComponentAnchor(first_guid, "vertex", component=1)
@@ -155,9 +244,9 @@ def test_associative_dimensions_keep_component_anchors():
 def test_associative_measurement_accepts_every_supported_snap_kind(kind, component, parameter):
     state = MeasurementState()
     state.start("associative")
-    state.accept(snap([0, 0, 0], kind=kind, component=component, parameter=parameter), unit=None, precision=3)
+    state.accept(query(snap([0, 0, 0], kind=kind, component=component, parameter=parameter)), unit=None, precision=3)
 
-    result = state.accept(snap([1, 0, 0], kind=kind, component=component, parameter=parameter), unit=None, precision=3)
+    result = state.accept(query(snap([1, 0, 0], kind=kind, component=component, parameter=parameter)), unit=None, precision=3)
 
     assert isinstance(result, DistanceDimension)
     assert isinstance(result.start, ComponentAnchor)
@@ -211,20 +300,20 @@ def test_persistent_completion_adds_one_root_dimension_and_selects_it(mode):
     assert created.item.precision == 1
     assert viewer.state.selection.objects == (created,)
     assert not viewer.state.measurement.active
-    assert renderer.query_snap_at.call_count == 2
+    assert renderer.query_snap_context_at.call_count == 2
 
 
 def test_new_measurement_scene_replacement_and_scene_clear_cancel_transient_state():
     viewer, scene, _ = connected_viewer()
     viewer.start_distance_inspection()
-    viewer.state.measurement.accept(snap([0, 0, 0]), unit=None, precision=3)
+    viewer.state.measurement.accept(query(snap([0, 0, 0])), unit=None, precision=3)
 
     viewer.scene = ViewerScene()
 
     assert not viewer.state.measurement.has_transient_state
 
     viewer.start_distance_dimension("fixed")
-    viewer.state.measurement.accept(snap([0, 0, 0]), unit=None, precision=3)
+    viewer.state.measurement.accept(query(snap([0, 0, 0])), unit=None, precision=3)
     viewer.scene.clear()
 
     assert not viewer.state.measurement.has_transient_state

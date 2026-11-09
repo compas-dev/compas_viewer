@@ -3,6 +3,7 @@ from unittest.mock import Mock
 from uuid import uuid4
 
 from PySide6.QtCore import QPointF
+from PySide6.QtCore import Qt
 
 from compas.geometry import Point
 from compas_viewer import Viewer
@@ -11,6 +12,7 @@ from compas_viewer.measurement import _draw_measurement_preview
 from compas_viewer.overlays import _OverlayLayer
 from compas_viewer.snapping import ProjectedPoint
 from compas_viewer.snapping import SnapKind
+from compas_viewer.snapping import SnapQuery
 from compas_viewer.snapping import SnapResult
 import compas_viewer.viewer as viewer_module
 
@@ -25,6 +27,10 @@ def snap(xyz, *, association_error=None):
     )
 
 
+def query(result):
+    return SnapQuery(result)
+
+
 def project(point):
     return ProjectedPoint(point.x * 10.0, point.y * 10.0, 0.5)
 
@@ -36,8 +42,8 @@ def drawn_text(painter):
 def test_active_preview_reprojects_markers_and_formats_live_distance():
     state = MeasurementState()
     state.start("fixed")
-    state.accept(snap([0, 0, 0]), unit=None, precision=3)
-    state.update_hover(snap([3, 4, 0]))
+    state.accept(query(snap([0, 0, 0])), unit=None, precision=3)
+    state.update_hover(SnapQuery(snap([3, 4, 0])))
     painter = Mock()
     projection = Mock(side_effect=project)
 
@@ -52,8 +58,8 @@ def test_active_preview_reprojects_markers_and_formats_live_distance():
 def test_completed_inspection_uses_current_unit_and_precision_each_frame():
     state = MeasurementState()
     state.start("inspection")
-    state.accept(snap([0, 0, 0]), unit="stored", precision=0)
-    state.accept(snap([3, 4, 0]), unit="stored", precision=0)
+    state.accept(query(snap([0, 0, 0])), unit="stored", precision=0)
+    state.accept(query(snap([3, 4, 0])), unit="stored", precision=0)
     painter = Mock()
 
     _draw_measurement_preview(painter, state, project, unit="cm", precision=1)
@@ -65,8 +71,8 @@ def test_completed_inspection_uses_current_unit_and_precision_each_frame():
 def test_preview_skips_hidden_segment_endpoints_but_keeps_visible_marker():
     state = MeasurementState()
     state.start("fixed")
-    state.accept(snap([0, 0, 0]), unit=None, precision=3)
-    state.update_hover(snap([1, 0, 0]))
+    state.accept(query(snap([0, 0, 0])), unit=None, precision=3)
+    state.update_hover(SnapQuery(snap([1, 0, 0])))
     painter = Mock()
 
     def partially_visible(point):
@@ -84,21 +90,37 @@ def test_preview_skips_hidden_segment_endpoints_but_keeps_visible_marker():
 def test_associative_rejection_is_drawn_at_the_projected_hover_snap():
     state = MeasurementState()
     state.start("associative")
-    state.update_hover(snap([1, 2, 0], association_error="Face snaps are fixed only"))
+    available = (snap([0, 0, 0]), snap([2, 0, 0]))
+    state.update_hover(SnapQuery(snap([1, 2, 0], association_error="Face snaps are fixed only"), available))
     painter = Mock()
 
     _draw_measurement_preview(painter, state, project, unit=None, precision=3)
 
     assert drawn_text(painter) == ["Face snaps are fixed only"]
-    assert painter.drawEllipse.call_count == 1
+    assert painter.drawEllipse.call_count == 3
     painter.drawLine.assert_not_called()
+
+
+def test_hover_palette_draws_all_points_hollow_and_winner_filled():
+    state = MeasurementState()
+    state.start("fixed")
+    available = (snap([0, 0, 0]), snap([1, 0, 0]), snap([2, 0, 0]))
+    state.update_hover(SnapQuery(available[1], available))
+    painter = Mock()
+
+    _draw_measurement_preview(painter, state, project, unit=None, precision=3)
+
+    assert painter.drawEllipse.call_count == 4
+    brushes = [call.args[0] for call in painter.setBrush.call_args_list]
+    assert [brush.style() for brush in brushes[:3]] == [Qt.BrushStyle.NoBrush] * 3
+    assert brushes[-1].style() == Qt.BrushStyle.SolidPattern
 
 
 def test_rejected_second_associative_anchor_does_not_preview_a_dimension():
     state = MeasurementState()
     state.start("associative")
-    state.accept(snap([0, 0, 0]), unit=None, precision=3)
-    state.update_hover(snap([3, 4, 0], association_error="Face snaps are fixed only"))
+    state.accept(query(snap([0, 0, 0])), unit=None, precision=3)
+    state.update_hover(SnapQuery(snap([3, 4, 0], association_error="Face snaps are fixed only")))
     painter = Mock()
 
     _draw_measurement_preview(painter, state, project, unit="m", precision=2)
@@ -120,8 +142,8 @@ def test_measurement_preview_draws_with_qpainter():
     painter = QPainter(image)
     state = MeasurementState()
     state.start("inspection")
-    state.accept(snap([1, 2, 0]), unit=None, precision=3)
-    state.update_hover(snap([5, 2, 0]))
+    state.accept(query(snap([1, 2, 0])), unit=None, precision=3)
+    state.update_hover(SnapQuery(snap([5, 2, 0])))
 
     _draw_measurement_preview(painter, state, project, unit="m", precision=2)
     painter.end()

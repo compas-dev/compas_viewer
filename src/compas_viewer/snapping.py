@@ -21,11 +21,13 @@ __all__ = [
     "ProjectedPoint",
     "ProjectionProvider",
     "SnapKind",
+    "SnapQuery",
     "SnapResult",
     "SurfaceHit",
     "SurfaceHitProvider",
     "VisibilityProvider",
     "query_snap",
+    "query_snaps",
 ]
 
 
@@ -179,6 +181,26 @@ class SnapResult:
 
 
 @dataclass(frozen=True, slots=True)
+class SnapQuery:
+    """One measurement hover query.
+
+    Parameters
+    ----------
+    winner
+        Depth-qualified result that a click will accept, or `None` when no
+        candidate lies within the acquisition radius.
+    points
+        All projected discrete point snaps of the hovered object. These points
+        guide the user toward available snaps; they are not independently
+        depth-qualified and are not accepted unless one becomes `winner`.
+
+    """
+
+    winner: SnapResult | None = None
+    points: tuple[SnapResult, ...] = ()
+
+
+@dataclass(frozen=True, slots=True)
 class _Candidate:
     point: Point
     object_guid: UUID
@@ -239,6 +261,51 @@ def query_snap(
     surface. Equal candidates retain input and component iteration order.
 
     """
+    return query_snaps(
+        sceneobjects,
+        screen_point,
+        radius=radius,
+        project=project,
+        is_visible=is_visible,
+        surface_hits=surface_hits,
+    ).winner
+
+
+def query_snaps(
+    sceneobjects: Iterable[SceneObject],
+    screen_point: ScreenPoint,
+    *,
+    radius: float,
+    project: ProjectionProvider,
+    is_visible: VisibilityProvider | None = None,
+    surface_hits: SurfaceHitProvider | None = None,
+) -> SnapQuery:
+    """Return one winner and all discrete point snaps from one candidate pass.
+
+    Parameters
+    ----------
+    sceneobjects
+        Stable scene objects eligible for snapping, in deterministic order.
+        Measurement hover supplies one object.
+    screen_point
+        Pointer position in screen pixels.
+    radius
+        Inclusive acquisition radius in screen pixels.
+    project
+        Renderer-provided world-to-screen projection.
+    is_visible
+        Optional renderer-provided depth or visibility test for the winner.
+    surface_hits
+        Optional renderer-provided face and surface hits.
+
+    Returns
+    -------
+    SnapQuery
+        Highest-priority depth-qualified winner and every projected Point,
+        Mesh-vertex, or Graph-node candidate. Palette points are collected
+        before radius and visibility filtering and are display guidance only.
+
+    """
     objects = tuple(sceneobjects)
     visible_guids = {sceneobject.guid for sceneobject in objects if sceneobject.show}
     candidates: list[_Candidate] = []
@@ -246,12 +313,13 @@ def query_snap(
         if not sceneobject.show:
             continue
         candidates.extend(_object_candidates(sceneobject, screen_point, project))
+    points = tuple(candidate.result() for candidate in candidates if candidate.kind in {SnapKind.POINT, SnapKind.VERTEX, SnapKind.NODE})
     if surface_hits is not None:
         candidates.extend(_surface_candidates(surface_hits(screen_point, radius), screen_point, visible_guids))
 
     eligible = (candidate for candidate in candidates if candidate.screen_distance <= radius and (is_visible is None or is_visible(candidate.projection)))
     candidate = min(eligible, key=lambda item: (_priority(item.kind), item.screen_distance), default=None)
-    return candidate.result() if candidate is not None else None
+    return SnapQuery(candidate.result() if candidate is not None else None, points)
 
 
 def _object_candidates(
