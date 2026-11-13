@@ -39,7 +39,7 @@ class ObjectParameter:
     writable: bool
 
 
-def inspect_object_parameters(obj: object | None) -> dict[str, ObjectParameter]:
+def inspect_object_parameters(obj: object | None, *, use_serialized_fallback: bool = True) -> dict[str, ObjectParameter]:
     """Inspect constructor parameters and resolve their current values.
 
     Values are resolved from public attributes first and from COMPAS
@@ -50,6 +50,10 @@ def inspect_object_parameters(obj: object | None) -> dict[str, ObjectParameter]:
     ----------
     obj
         Object whose constructor and state should be inspected.
+    use_serialized_fallback
+        Whether unavailable public attributes may fall back to the object's
+        `__data__` mapping. Disable this for read-only inspection of arbitrary
+        data whose serialized payload should not be materialized.
 
     Returns
     -------
@@ -66,8 +70,8 @@ def inspect_object_parameters(obj: object | None) -> dict[str, ObjectParameter]:
         return {}
 
     try:
-        serialized = getattr(obj, "__data__", None)
-    except (AttributeError, RuntimeError, TypeError, ValueError):
+        serialized = getattr(obj, "__data__", None) if use_serialized_fallback else None
+    except Exception:
         serialized = None
     if not isinstance(serialized, dict):
         serialized = {}
@@ -84,7 +88,7 @@ def inspect_object_parameters(obj: object | None) -> dict[str, ObjectParameter]:
             value = getattr(obj, parameter.name)
             available = not callable(value)
             resolved_from_attribute = available
-        except (AttributeError, RuntimeError, TypeError, ValueError):
+        except Exception:
             pass
 
         if not available and parameter.name in serialized:

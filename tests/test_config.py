@@ -8,6 +8,25 @@ from compas.colors import Color
 from compas_viewer import config
 
 
+def test_schema_four_default_renderer_background_is_automatic():
+    for appearance in ("system", "light", "dark"):
+        configured = config.Config.from_dict({"schema_version": 4, "ui": {"appearance": appearance}})
+
+        assert configured.renderer.backgroundcolor is None
+
+
+def test_automatic_renderer_background_roundtrips_and_explicit_override_wins():
+    default = config.Config()
+    restored_default = config.Config.from_dict(default.to_dict())
+
+    assert restored_default.renderer.backgroundcolor is None
+
+    override = Color(0.1, 0.2, 0.3, 0.4)
+    configured = config.Config.from_dict({"schema_version": 4, "renderer": {"backgroundcolor": {"__color__": list(override.rgba)}}})
+
+    assert configured.renderer.backgroundcolor == override
+
+
 def test_config_dict_roundtrip_preserves_nested_types_and_colors(tmp_path):
     original = config.Config()
     icon = tmp_path / "viewer-icon.png"
@@ -30,7 +49,7 @@ def test_config_dict_roundtrip_preserves_nested_types_and_colors(tmp_path):
     assert isinstance(restored.measurement, config.MeasurementConfig)
     assert restored.measurement.unit == "mm"
     assert restored.measurement.precision == 4
-    assert restored.schema_version == 3
+    assert restored.schema_version == 4
 
 
 def test_toolbar_is_visible_by_default_and_explicit_false_roundtrips():
@@ -75,7 +94,7 @@ def test_schema_one_config_drops_retired_fields_and_preserves_retained_values():
         }
     )
 
-    assert restored.schema_version == 3
+    assert restored.schema_version == 4
     assert restored.window.title == "Legacy Viewer"
     assert restored.window.fullscreen is True
     assert restored.renderer.view == "top"
@@ -89,7 +108,7 @@ def test_schema_one_config_drops_retired_fields_and_preserves_retained_values():
 def test_schema_two_config_adds_default_measurement_group():
     restored = config.Config.from_dict({"schema_version": 2, "renderer": {"view": "top"}})
 
-    assert restored.schema_version == 3
+    assert restored.schema_version == 4
     assert restored.renderer.view == "top"
     assert restored.measurement == config.MeasurementConfig()
 
@@ -114,7 +133,21 @@ def test_config_rejects_unknown_or_retired_fields(data, path):
         config.Config.from_dict(data)
 
 
-@pytest.mark.parametrize("version", [-1, 4, "3", True])
+def test_schema_three_background_migrates_as_explicit_without_guessing():
+    omitted = config.Config.from_dict({"schema_version": 3})
+    explicit = config.Config.from_dict(
+        {
+            "schema_version": 3,
+            "renderer": {"backgroundcolor": {"__color__": list(Color(0.1, 0.2, 0.3, 0.4).rgba)}},
+        }
+    )
+
+    assert omitted.schema_version == 4
+    assert omitted.renderer.backgroundcolor == Color.from_hex("#D8DDE2")
+    assert explicit.renderer.backgroundcolor == Color(0.1, 0.2, 0.3, 0.4)
+
+
+@pytest.mark.parametrize("version", [-1, 5, "4", True])
 def test_unsupported_config_schema_is_rejected(version):
     with pytest.raises(ValueError, match="schema version"):
         config.Config.from_dict({"schema_version": version})
@@ -135,12 +168,20 @@ def test_unsupported_config_schema_is_rejected(version):
         ({"schema_version": 3, "measurement": {"unit": "  "}}, ValueError, "measurement.unit"),
         ({"schema_version": 3, "measurement": {"unit": 1}}, TypeError, "measurement.unit"),
         ({"schema_version": 3, "measurement": {"precision": -1}}, ValueError, "measurement.precision"),
+        ({"schema_version": 3, "measurement": {"precision": 16}}, ValueError, "measurement.precision"),
         ({"schema_version": 3, "measurement": {"precision": 2.5}}, TypeError, "measurement.precision"),
     ],
 )
 def test_config_validation_reports_full_paths(data, error, path):
     with pytest.raises(error, match=path.replace(".", r"\.")):
         config.Config.from_dict(data)
+
+
+@pytest.mark.parametrize("precision", [0, 15])
+def test_measurement_precision_accepts_closed_boundaries(precision):
+    configured = config.Config.from_dict({"schema_version": 3, "measurement": {"precision": precision}})
+
+    assert configured.measurement.precision == precision
 
 
 @pytest.mark.parametrize(

@@ -1,9 +1,12 @@
+from copy import deepcopy
 from unittest.mock import Mock
 
 import pytest
 
 from compas.colors import Color
 from compas.data import json_dumps
+from compas.data import json_dump
+from compas.data import json_load
 from compas.data import json_loads
 from compas.geometry import Frame
 from compas.geometry import Box
@@ -22,6 +25,9 @@ from compas.scene import ShapeObject
 from compas.scene import VectorObject
 from compas_viewer import Viewer
 from compas_viewer.commands import zoom_extents
+from compas_viewer.components.objectsetting import ObjectSetting
+from compas_viewer.components.objectsetting import _EditableAttributeBinding
+from compas_viewer.forms import scene_editable_attributes
 from compas_viewer.scene.shapeobject import ShapeObject as ViewerShapeObject
 from compas_viewer.scene.vectorobject import VectorObject as ViewerVectorObject
 
@@ -222,3 +228,65 @@ def test_active_resolution_refresh_rebuilds_runtime_buffers(viewer, monkeypatch)
     refresh_data.assert_called_once_with()
     rebuild_buffers.assert_called_once_with()
     update.assert_called_once_with()
+
+
+def test_resolution_edit_rebuilds_only_affected_representation_and_roundtrips(viewer, monkeypatch, tmp_path):
+    shape = Sphere(1.0)
+    shape_data = json_dumps(shape)
+    sceneobject = viewer.scene.add(shape, u=6, v=4)
+    unrelated = viewer.scene.add(Box(2.0))
+    render_object = viewer.scene.render_object(sceneobject)
+    unrelated_render_object = viewer.scene.render_object(unrelated)
+    render_object.init()
+    unrelated_render_object.init()
+    unrelated_data = deepcopy(
+        (
+            unrelated_render_object._points_data,
+            unrelated_render_object._lines_data,
+            unrelated_render_object._frontfaces_data,
+            unrelated_render_object._backfaces_data,
+        )
+    )
+    unrelated_bounds = deepcopy(unrelated_render_object.bounding_box)
+    rebuild_buffers = Mock()
+    renderer_update = Mock()
+    monkeypatch.setattr(viewer.renderer, "rebuild_buffers", rebuild_buffers)
+    monkeypatch.setattr(viewer.renderer, "update", renderer_update)
+    monkeypatch.setattr(ObjectSetting, "viewer", viewer)
+    setting = ObjectSetting()
+    monkeypatch.setattr(setting, "update", Mock())
+    monkeypatch.setattr(viewer.ui.sidebar.sceneform, "update", Mock())
+
+    before_vertices = len(render_object._frontfaces_data[0])
+    before_faces = len(render_object._frontfaces_data[2])
+    for name, value in (("u", 8), ("v", 6)):
+        callback = scene_editable_attributes("Viewer", sceneobject)[name]
+        binding = _EditableAttributeBinding(sceneobject, name, callback)
+        binding.value = value
+        setting._refresh_object(sceneobject, name)
+
+    assert (before_vertices, before_faces) == (20, 36)
+    assert (len(render_object._frontfaces_data[0]), len(render_object._frontfaces_data[2])) == (42, 80)
+    assert render_object.bounding_box is not None
+    assert render_object.bounding_box[0] == pytest.approx([-1.0, -1.0, -1.0])
+    assert render_object.bounding_box[1] == pytest.approx([1.0, 1.0, 1.0])
+    assert json_dumps(shape) == shape_data
+    assert (
+        unrelated_render_object._points_data,
+        unrelated_render_object._lines_data,
+        unrelated_render_object._frontfaces_data,
+        unrelated_render_object._backfaces_data,
+    ) == unrelated_data
+    assert unrelated_render_object.bounding_box is not None
+    for actual, expected in zip(unrelated_render_object.bounding_box, unrelated_bounds, strict=True):
+        assert actual == pytest.approx(expected)
+    assert rebuild_buffers.call_count == 2
+    assert renderer_update.call_count == 2
+
+    filepath = tmp_path / "edited-resolution.json"
+    json_dump(viewer.scene, filepath)
+    restored = json_load(filepath)
+    restored.bind(shape)
+
+    assert restored.objects[0].u == 8
+    assert restored.objects[0].v == 6

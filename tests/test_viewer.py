@@ -366,6 +366,9 @@ def test_ui_applies_configured_statusbar_visibility_at_initialization(monkeypatc
         def __init__(self, *args):
             self.show = None
 
+        def bind_sidebar(self, sidebar):
+            self.sidebar = sidebar
+
     viewport = FakeComponent()
     viewport.sidebar = FakeComponent()
     configured = SimpleNamespace(
@@ -385,6 +388,7 @@ def test_ui_applies_configured_statusbar_visibility_at_initialization(monkeypatc
     ui = UI()
 
     assert ui.statusbar.show is False
+    assert ui.menubar.sidebar is viewport.sidebar
 
 
 @pytest.mark.parametrize("fullscreen", [False, True])

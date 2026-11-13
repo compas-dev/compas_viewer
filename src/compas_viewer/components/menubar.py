@@ -1,5 +1,6 @@
 from collections.abc import Callable
 from functools import partial
+from typing import TYPE_CHECKING
 from typing import Any
 from typing import cast
 
@@ -23,6 +24,11 @@ from compas_viewer.uidefinitions import UIItem
 
 from .mainwindow import MainWindow
 
+if TYPE_CHECKING:
+    from .sidebar import SideBarRight
+
+_EDITOR_TYPES = (QLineEdit, QTextEdit, QPlainTextEdit, QAbstractSpinBox, QComboBox)
+
 
 class _GlobalEscapeFilter(QObject):
     """Route unmodified Escape through one window-level command path."""
@@ -37,8 +43,27 @@ class _GlobalEscapeFilter(QObject):
             return False
         if event.key() != Qt.Key.Key_Escape or event.modifiers() != Qt.KeyboardModifier.NoModifier:
             return False
-        editor_types = (QLineEdit, QTextEdit, QPlainTextEdit, QAbstractSpinBox, QComboBox)
-        if isinstance(QApplication.focusWidget(), editor_types) or isinstance(watched, editor_types):
+        if isinstance(QApplication.focusWidget(), _EDITOR_TYPES) or isinstance(watched, _EDITOR_TYPES):
+            return False
+        self._callback()
+        event.accept()
+        return True
+
+
+class _GlobalDeleteFilter(QObject):
+    """Route unmodified Delete while preserving editor-local behavior."""
+
+    def __init__(self, callback: Callable[[], object], parent: QObject | None = None) -> None:
+        super().__init__(parent)
+        self._callback = callback
+
+    def eventFilter(self, watched: QObject, event: QEvent) -> bool:  # noqa: N802
+        """Handle Delete unless a focused editor owns the key event."""
+        if event.type() != QEvent.Type.KeyPress or not isinstance(event, QKeyEvent):
+            return False
+        if event.key() != Qt.Key.Key_Delete or event.modifiers() != Qt.KeyboardModifier.NoModifier:
+            return False
+        if isinstance(QApplication.focusWidget(), _EDITOR_TYPES) or isinstance(watched, _EDITOR_TYPES):
             return False
         self._callback()
         event.accept()
@@ -61,9 +86,12 @@ class MenuBar(Component):
         self._menus: list[QMenu] = []
         self._groups: list[QActionGroup] = []
         self._actions: list[QAction] = []
+        self._command_actions: dict[str, list[QAction]] = {}
         self._state_actions: dict[str, list[tuple[QAction, object]]] = {}
         self._escape_filter = _GlobalEscapeFilter(self._deselect_or_cancel, self.widget)
+        self._delete_filter = _GlobalDeleteFilter(self._delete_from_focus, self.widget)
         self.viewer.app.installEventFilter(self._escape_filter)
+        self.viewer.app.installEventFilter(self._delete_filter)
         self.viewer.state.changed.connect(self._on_state_changed)
         self.load_items()
 
@@ -73,6 +101,23 @@ class MenuBar(Component):
             return None
         command = self.viewer.commands["viewer.deselect_all"]
         return command.callback(self.viewer)
+
+    def _delete_from_focus(self) -> object:
+        """Invoke contextual deletion for the focused interaction domain."""
+        command = self.viewer.commands["viewer.delete_selected"]
+        return command.callback(self.viewer, source="context")
+
+    def bind_sidebar(self, sidebar: "SideBarRight") -> None:
+        """Bind contextual menu enablement after sidebar construction."""
+        self._sidebar = sidebar
+        sidebar.widget.currentChanged.connect(self._update_delete_action)
+        self._update_delete_action()
+
+    def _update_delete_action(self, _index: int | None = None) -> None:
+        """Disable menu deletion while System owns the active context."""
+        enabled = self._sidebar.current_tab != "System"
+        for action in self._command_actions.get("viewer.delete_selected", ()):
+            action.setEnabled(enabled)
 
     @property
     def items(self) -> list[UIItem]:
@@ -119,6 +164,8 @@ class MenuBar(Component):
                 a = self.add_action(text=cast(str, text), action=action, parent=target, args=args, kwargs=kwargs)
                 self._actions.append(a)
                 actions.append(a)
+                if command_id is not None:
+                    self._command_actions.setdefault(command_id, []).append(a)
 
                 if itemtype == "checkbox":
                     a.setCheckable(True)
@@ -133,7 +180,7 @@ class MenuBar(Component):
                     state = item.get("checked", False)
                     a.setChecked(state if not callable(state) else state(self.viewer))
 
-                if action.keybinding is not None and action.keybinding != "Escape":
+                if action.keybinding is not None and action.keybinding not in {"Escape", "Delete"}:
                     a.setShortcut(action.keybinding)
 
             else:
@@ -175,8 +222,11 @@ class MenuBar(Component):
         self._menus.clear()
         self._groups.clear()
         self._actions.clear()
+        self._command_actions.clear()
         self._state_actions.clear()
         self.load_items()
+        if hasattr(self, "_sidebar"):
+            self._update_delete_action()
 
     def _on_state_changed(self, path: str, value: object) -> None:
         """Synchronize actions bound to a changed viewer-state path."""

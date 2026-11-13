@@ -1,7 +1,7 @@
 # Distance Measurements
 
 Configure the informational unit and display precision, add geometry with
-visible vertices, and start a one-shot fixed-distance interaction.
+an otherwise visible Mesh, and start a one-shot fixed-distance interaction.
 The completed dimension becomes a selected entry in the flat annotation
 collection.
 
@@ -30,11 +30,18 @@ hovered object's rendered point footprint rather than relying on one pixel, so
 visible receding vertices remain reliable on steeply tilted meshes without
 making occluded vertices eligible.
 
-Only displayed discrete guides participate in measurement acquisition: Point
-objects, Mesh vertices, and Graph nodes. Lines, edges, faces, and surfaces are
-not snappable until they have explicit candidate overlays. Missing a point
-therefore creates no anchor instead of silently accepting nearby unmarked
-geometry.
+Mesh acquisition does not require ordinary vertex glyphs. While measurement is
+active, an otherwise visible face-only or edge-only Mesh receives an invisible
+measurement footprint for every vertex in the acquisition pass. This example
+sets `show_vertices=False` to exercise that path; the hollow guides still
+communicate eligibility, while the footprints never appear in ordinary
+rendering. A hidden Mesh or one with no visible face, edge, or vertex
+representation remains excluded.
+
+Only displayed discrete guidance participates in measurement acquisition:
+Point objects, Mesh vertices, and Graph nodes. Lines, edges, faces, and surfaces
+are not themselves candidates. Missing a point therefore creates no anchor
+instead of silently accepting nearby unmarked geometry.
 
 The same scene also supports the other modes:
 
@@ -52,6 +59,18 @@ serialization, or transform history. Fixed and associative modes create a
 precision are snapshots taken when the second anchor is accepted. The entry is
 selected through `viewer.state.annotation_selection`, independently from
 spatial object selection.
+
+With that single distance entry selected, use **Annotations → Measurement
+Format** to edit its durable **Coordinate Unit** or **Display Precision**.
+Coordinate Unit is trimmed and blank input stores no unit. Precision is a
+fixed-point decimal-place count from 0 through 15 inclusive. Values outside the
+range are rejected rather than clamped or truncated. These controls edit only
+the selected dimension: they do not convert its value, change its anchors, or
+alter the **Grid and Units** defaults. Conversely, changing Grid and Units
+affects transient labels and dimensions created afterward, not this existing
+entry. If a dimension has an explicit label, that text remains verbatim and
+hides any generated formatting change until the override is removed, but it
+does not relax precision validation.
 
 Fixed mode copies the selected point, vertex, or node coordinates. Associative
 mode links to those same displayed components using their stable serializable
@@ -73,6 +92,9 @@ depth testing or depth writes, so scene geometry cannot hide them.
 
 Use the **Annotations** tab to hide, select, or remove a dimension. When exactly
 one distance dimension is selected, the detail area provides an explicit Name
-field, its read-only Type, and controls for color, line width, text size, arrow
-size, and label offset. These style sizes and offsets use logical screen pixels
-and do not alter anchors, unit, precision, or label text.
+field, its read-only Type, Measurement Format controls, and controls for color,
+line width, text size, arrow size, and label offset. These style sizes and
+offsets use logical screen pixels and do not alter anchors, unit, precision, or
+label text. Measurement Format is hidden for unsupported selection states,
+including no selection, multiple selection, non-distance annotations, and
+unresolved annotation data bindings.

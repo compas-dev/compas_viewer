@@ -10,6 +10,7 @@ from compas.colors import Color
 from compas.geometry import Point
 
 from compas_viewer.commands import camera_settings
+from compas_viewer.commands import delete_selected
 from compas_viewer.commands import deselect_all
 from compas_viewer.commands import isolate_selected
 from compas_viewer.commands import invert_selection
@@ -58,6 +59,101 @@ def test_camera_settings_uses_system_sidebar_navigation():
     camera_settings(viewer)
 
     sidebar.focus_system_section.assert_called_once_with("Camera")
+
+
+def test_contextual_delete_removes_only_annotation_selection():
+    annotation = object()
+    spatial = object()
+    sidebar = SimpleNamespace(deletion_domain=Mock(return_value="annotations"))
+    scene = SimpleNamespace(remove_annotation=Mock(), objects=(spatial,))
+    viewer = SimpleNamespace(
+        ui=SimpleNamespace(sidebar=sidebar),
+        scene=scene,
+        state=SimpleNamespace(
+            selection=SimpleNamespace(objects=(spatial,)),
+            annotation_selection=SimpleNamespace(objects=(annotation,)),
+        ),
+        running=False,
+    )
+
+    delete_selected(viewer, source="context")
+
+    sidebar.deletion_domain.assert_called_once_with(use_focus=True)
+    scene.remove_annotation.assert_called_once_with(annotation)
+    assert viewer.state.selection.objects == (spatial,)
+
+
+def test_menu_delete_removes_only_spatial_selection():
+    annotation = object()
+    spatial = object()
+    sidebar = SimpleNamespace(deletion_domain=Mock(return_value="spatial"))
+    scene = SimpleNamespace(remove_annotation=Mock(), objects=(spatial,), _remove=Mock())
+    selection = SimpleNamespace(objects=(spatial,), clear=Mock())
+    viewer = SimpleNamespace(
+        ui=SimpleNamespace(sidebar=sidebar),
+        scene=scene,
+        state=SimpleNamespace(selection=selection, annotation_selection=SimpleNamespace(objects=(annotation,))),
+        running=False,
+    )
+
+    delete_selected(viewer, source="menu")
+
+    sidebar.deletion_domain.assert_called_once_with(use_focus=False)
+    scene._remove.assert_called_once_with(spatial, rebuild_buffers=False, cleanup_selection=False, context_is_current=False)
+    selection.clear.assert_called_once_with()
+    scene.remove_annotation.assert_not_called()
+    assert viewer.state.annotation_selection.objects == (annotation,)
+
+
+def test_running_spatial_delete_refreshes_data_once_after_the_batch_without_extra_redraw():
+    first = object()
+    second = object()
+    renderer = Mock()
+    scene = SimpleNamespace(
+        remove_annotation=Mock(),
+        objects=(first, second),
+        _remove=Mock(),
+        _refresh_data_domain=Mock(),
+    )
+    selection = SimpleNamespace(objects=(first, second), clear=Mock(side_effect=renderer.update))
+    viewer = SimpleNamespace(
+        ui=SimpleNamespace(sidebar=SimpleNamespace(deletion_domain=Mock(return_value="spatial"))),
+        scene=scene,
+        state=SimpleNamespace(selection=selection, annotation_selection=SimpleNamespace(objects=())),
+        renderer=renderer,
+        running=True,
+    )
+
+    delete_selected(viewer, source="menu")
+
+    assert scene._remove.call_count == 2
+    scene._remove.assert_any_call(first, rebuild_buffers=False, cleanup_selection=False, context_is_current=True)
+    scene._remove.assert_any_call(second, rebuild_buffers=False, cleanup_selection=False, context_is_current=True)
+    renderer.makeCurrent.assert_called_once_with()
+    renderer.doneCurrent.assert_called_once_with()
+    renderer.rebuild_buffers.assert_called_once_with()
+    scene._refresh_data_domain.assert_called_once_with()
+    selection.clear.assert_called_once_with()
+    renderer.update.assert_called_once_with()
+
+
+def test_contextual_delete_is_noop_in_system_domain():
+    sidebar = SimpleNamespace(deletion_domain=Mock(return_value=None))
+    scene = SimpleNamespace(remove_annotation=Mock(), _remove=Mock(), objects=(object(),))
+    selection = SimpleNamespace(objects=scene.objects, clear=Mock())
+    annotation_selection = SimpleNamespace(objects=(object(),))
+    viewer = SimpleNamespace(
+        ui=SimpleNamespace(sidebar=sidebar),
+        scene=scene,
+        state=SimpleNamespace(selection=selection, annotation_selection=annotation_selection),
+        running=False,
+    )
+
+    delete_selected(viewer)
+
+    scene._remove.assert_not_called()
+    scene.remove_annotation.assert_not_called()
+    selection.clear.assert_not_called()
 
 
 class PointItem:

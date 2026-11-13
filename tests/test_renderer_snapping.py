@@ -232,7 +232,8 @@ def test_acquisition_uses_one_scissored_pass_and_restores_state(monkeypatch, ena
     assert state_snapshot(state) == initial
 
 
-def test_instance_render_uses_sentinel_background_and_coplanar_component_priority(monkeypatch):
+@pytest.mark.parametrize("measurement_active", [False, True])
+def test_instance_render_uses_sentinel_background_and_coplanar_component_priority(monkeypatch, measurement_active):
     renderer = projection_renderer(width=100, height=50)
     renderer.INSTANCE_BACKGROUND = Renderer.INSTANCE_BACKGROUND
     renderer._capture_instance_gl_state = Renderer._capture_instance_gl_state
@@ -240,20 +241,24 @@ def test_instance_render_uses_sentinel_background_and_coplanar_component_priorit
     renderer.paintGL = Mock()
     renderer.clear = Mock()
     collision_color = (0.2, 0.4, 0.6, 1.0)
-    renderer.viewer = SimpleNamespace(config=SimpleNamespace(renderer=SimpleNamespace(backgroundcolor=SimpleNamespace(rgba=collision_color))))
+    renderer.viewer = SimpleNamespace(
+        config=SimpleNamespace(renderer=SimpleNamespace(backgroundcolor=SimpleNamespace(rgba=collision_color))),
+        state=SimpleNamespace(measurement=SimpleNamespace(active=measurement_active)),
+    )
     state = install_gl_state(monkeypatch, enabled=False)
     initial = state_snapshot(state)
-    depth_during_paint = []
-    renderer.paint = Mock(side_effect=lambda **_kwargs: depth_during_paint.append(state["depth_func"]))
+    state_during_paint = []
+    renderer.paint = Mock(side_effect=lambda **_kwargs: state_during_paint.append((state["depth_func"], renderer._measurement_acquisition)))
 
     Renderer._render_instance_map(renderer)
 
     renderer.paint.assert_called_once_with(is_instance=True)
+    assert renderer._measurement_acquisition is False
     renderer.paintGL.assert_not_called()
     renderer.clear.assert_not_called()
     assert Renderer.INSTANCE_BACKGROUND in state["clear_colors"]
     assert collision_color not in state["clear_colors"]
-    assert depth_during_paint == [renderer_module.GL.GL_LEQUAL]
+    assert state_during_paint == [(renderer_module.GL.GL_LEQUAL, measurement_active)]
     assert state_snapshot(state) == initial
 
     manager = BufferManager()
@@ -263,9 +268,54 @@ def test_instance_render_uses_sentinel_background_and_coplanar_component_priorit
     manager._draw_faces = Mock(side_effect=lambda *_args: order.append("faces"))
     manager._draw_points = Mock(side_effect=lambda *_args: order.append("points"))
     manager._draw_lines = Mock(side_effect=lambda *_args: order.append("lines"))
+    manager._draw_measurement_points = Mock(side_effect=lambda *_args: order.append("measurement"))
     manager.draw(Mock(), Mock(), "shaded", is_instance=True)
 
     assert order == ["faces", "points", "lines"]
+
+
+def test_paint_adds_measurement_footprints_only_to_active_instance_acquisition(monkeypatch):
+    monkeypatch.setattr(renderer_module.GL, "glBindVertexArray", Mock())
+    renderer: Any = SimpleNamespace(
+        _vao=1,
+        camera=SimpleNamespace(viewworld=Mock(return_value=np.identity(4))),
+        update_projection=Mock(),
+        buffer_manager=SimpleNamespace(
+            update_settings=Mock(),
+            transform_texture=1,
+            settings_texture=2,
+            draw=Mock(),
+            _draw_measurement_points=Mock(),
+        ),
+        shader_model=Mock(),
+        shader_lines=Mock(),
+        opacity=1.0,
+        width=Mock(return_value=100),
+        height=Mock(return_value=50),
+        viewer=SimpleNamespace(
+            config=SimpleNamespace(renderer=SimpleNamespace(show_grid=False)),
+            mouse=SimpleNamespace(is_tracing_a_window=False),
+        ),
+        rendermode="shaded",
+        _measurement_acquisition=True,
+        _draw_world_annotations=Mock(),
+    )
+
+    Renderer.paint(renderer, is_instance=True)
+
+    renderer.buffer_manager._draw_measurement_points.assert_called_once_with(renderer.shader_model, faces_visible=True)
+
+    renderer.buffer_manager._draw_measurement_points.reset_mock()
+    renderer.rendermode = "wireframe"
+    Renderer.paint(renderer, is_instance=True)
+    renderer.buffer_manager._draw_measurement_points.assert_called_once_with(renderer.shader_model, faces_visible=False)
+
+    renderer.buffer_manager._draw_measurement_points.reset_mock()
+    renderer._measurement_acquisition = False
+    Renderer.paint(renderer, is_instance=True)
+    Renderer.paint(renderer, is_instance=False)
+
+    renderer.buffer_manager._draw_measurement_points.assert_not_called()
 
 
 @pytest.mark.parametrize("enabled", [False, True])

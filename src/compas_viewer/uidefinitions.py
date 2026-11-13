@@ -20,6 +20,7 @@ class UIItem(TypedDict, total=False):
     columns: list[dict[str, Any]]
     tooltip: str
     icon: str
+    icon_only: bool
 
 
 def default_toolbar_items() -> list[UIItem]:
@@ -28,24 +29,64 @@ def default_toolbar_items() -> list[UIItem]:
     Returns
     -------
     list[UIItem]
-        State-bound render-mode and current-view selectors.
+        Command-backed view utilities and measurement menu.
 
     """
     return [
+        {"title": "Zoom Selected", "type": "button", "command": "viewer.zoom_selected", "icon": "zoom_selected.svg", "icon_only": True},
+        {"title": "Zoom Extents", "type": "button", "command": "viewer.zoom_extents", "icon": "zoom_extents.svg", "icon_only": True},
+        {"title": "Capture View", "type": "button", "command": "viewer.capture_view", "icon": "capture_view.svg", "icon_only": True},
         {
-            "title": "Render Mode",
-            "type": "select",
-            "state": "renderer.rendermode",
+            "title": "Measurement",
+            "type": "menu_button",
+            "icon": "measurement.svg",
+            "icon_only": True,
             "items": [
-                {"title": mode.title(), "command": "viewer.change_rendermode", "value": mode, "kwargs": {"mode": mode}} for mode in ("shaded", "ghosted", "lighted", "wireframe")
+                {"title": "Inspect Distance", "command": "viewer.inspect_distance"},
+                {"title": "Add Fixed Distance Dimension", "command": "viewer.add_fixed_distance_dimension"},
+                {"title": "Add Associative Distance Dimension", "command": "viewer.add_associative_distance_dimension"},
+                {"title": "Cancel Measurement", "command": "viewer.cancel_measurement"},
+            ],
+        },
+    ]
+
+
+def _geometry_add_items() -> list[UIItem]:
+    """Return the fixed geometry hierarchy owned by the Scene menu."""
+    return [
+        {
+            "title": "Primitives",
+            "items": [
+                {"title": title, "command": "viewer.add_geometry", "kwargs": {"kind": kind}}
+                for title, kind in (("Point", "point"), ("Line", "line"), ("Frame", "frame"), ("Plane", "plane"))
             ],
         },
         {
-            "title": "View",
-            "type": "select",
-            "state": "renderer.view",
+            "title": "Curves",
             "items": [
-                {"title": view.title(), "command": "viewer.change_view", "value": view, "kwargs": {"mode": view}} for view in ("perspective", "top", "front", "right", "ortho")
+                {"title": title, "command": "viewer.add_geometry", "kwargs": {"kind": kind}}
+                for title, kind in (("Polyline", "polyline"), ("Polygon", "polygon"), ("Circle", "circle"), ("Ellipse", "ellipse"))
+            ],
+        },
+        {
+            "title": "Surfaces",
+            "items": [
+                {"title": "Quad Surface", "command": "viewer.add_geometry", "kwargs": {"kind": "quad_surface"}},
+                {"title": "Saddle Surface", "command": "viewer.add_geometry", "kwargs": {"kind": "saddle_surface"}},
+            ],
+        },
+        {
+            "title": "Shapes",
+            "items": [
+                {"title": title, "command": "viewer.add_geometry", "kwargs": {"kind": kind}}
+                for title, kind in (
+                    ("Box", "box"),
+                    ("Sphere", "sphere"),
+                    ("Cylinder", "cylinder"),
+                    ("Cone", "cone"),
+                    ("Capsule", "capsule"),
+                    ("Torus", "torus"),
+                )
             ],
         },
     ]
@@ -61,46 +102,6 @@ def default_menu_items() -> list[UIItem]:
 
     """
     return [
-        {
-            "title": "Add",
-            "items": [
-                {
-                    "title": "Primitives",
-                    "items": [
-                        {"title": title, "command": "viewer.add_geometry", "kwargs": {"kind": kind}}
-                        for title, kind in (("Point", "point"), ("Line", "line"), ("Frame", "frame"), ("Plane", "plane"))
-                    ],
-                },
-                {
-                    "title": "Curves",
-                    "items": [
-                        {"title": title, "command": "viewer.add_geometry", "kwargs": {"kind": kind}}
-                        for title, kind in (("Polyline", "polyline"), ("Polygon", "polygon"), ("Circle", "circle"), ("Ellipse", "ellipse"))
-                    ],
-                },
-                {
-                    "title": "Surfaces",
-                    "items": [
-                        {"title": "Quad Surface", "command": "viewer.add_geometry", "kwargs": {"kind": "quad_surface"}},
-                        {"title": "Saddle Surface", "command": "viewer.add_geometry", "kwargs": {"kind": "saddle_surface"}},
-                    ],
-                },
-                {
-                    "title": "Shapes",
-                    "items": [
-                        {"title": title, "command": "viewer.add_geometry", "kwargs": {"kind": kind}}
-                        for title, kind in (
-                            ("Box", "box"),
-                            ("Sphere", "sphere"),
-                            ("Cylinder", "cylinder"),
-                            ("Cone", "cone"),
-                            ("Capsule", "capsule"),
-                            ("Torus", "torus"),
-                        )
-                    ],
-                },
-            ],
-        },
         {
             "title": "View",
             "items": [
@@ -153,7 +154,7 @@ def default_menu_items() -> list[UIItem]:
                 {"type": "separator"},
                 {"title": "Modify Parameters...", "command": "viewer.modify_selected"},
                 {"type": "separator"},
-                {"title": "Delete Selected", "command": "viewer.delete_selected"},
+                {"title": "Delete Selected", "command": "viewer.delete_selected", "kwargs": {"source": "menu"}},
             ],
         },
         {
@@ -192,6 +193,8 @@ def default_menu_items() -> list[UIItem]:
                 {"type": "separator"},
                 {"title": "Load Scene", "command": "viewer.load_scene"},
                 {"title": "Save Scene", "command": "viewer.save_scene"},
+                {"type": "separator"},
+                {"title": "Add", "items": _geometry_add_items()},
             ],
         },
         {
@@ -226,6 +229,7 @@ def default_sidebar_items() -> list[UIItem]:
                 {"title": "Show", "type": "checkbox", "checked": lambda obj: obj.show, "action": lambda obj, checked: setattr(obj, "show", checked)},
             ],
         },
+        {"type": "DataPanel"},
         {"type": "AnnotationPanel"},
         {"type": "ObjectSetting"},
         {"type": "CameraSetting"},

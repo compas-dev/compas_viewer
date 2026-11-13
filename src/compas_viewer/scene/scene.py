@@ -1,4 +1,5 @@
 from collections.abc import Generator
+from collections.abc import Iterable
 from random import randint
 from random import seed
 from typing import TYPE_CHECKING
@@ -18,6 +19,7 @@ if TYPE_CHECKING:
     from compas.scene import ArrowAnnotation
     from compas.scene import DimensionStyle
     from compas.scene import DistanceDimension
+    from compas.scene import DistanceDimensionLayout
     from compas.scene import TextAnnotation
     from compas_viewer import Viewer
 
@@ -93,6 +95,7 @@ class ViewerScene(Scene):
         self.instance_colors: dict[tuple[int, int, int], SceneObject] = {}
         self._instance_colors_generator = instance_colors_generator()
         self._viewer: Viewer | None = None
+        self._defer_data_refresh = 0
 
     @property
     def viewer(self) -> "Viewer":
@@ -103,6 +106,45 @@ class ViewerScene(Scene):
     def attach(self, viewer: "Viewer") -> None:
         """Attach the explicit Viewer that owns this runtime scene."""
         self._viewer = viewer
+
+    def bind(self, item: Data) -> None:
+        """Bind one referenced item and refresh the read-only Data domain."""
+        super().bind(item)
+        self._refresh_data_domain()
+
+    def bind_many(self, items: Iterable[Data]) -> None:
+        """Bind referenced items atomically and refresh the Data domain."""
+        super().bind_many(items)
+        self._refresh_data_domain()
+
+    def _refresh_data_domain(self) -> None:
+        if self._defer_data_refresh or self._viewer is None or not self._viewer.running:
+            return
+        sidebar = self._viewer.ui.sidebar
+        if hasattr(sidebar, "data_panel"):
+            sidebar.data_panel.update()
+
+    def add_object(self, sceneobject: SceneObject, parent: SceneObject | SceneNode | None = None) -> SceneObject:
+        """Attach a stable object and refresh the referenced-data projection."""
+        self._defer_data_refresh += 1
+        try:
+            added = super().add_object(sceneobject, parent=parent)
+        finally:
+            self._defer_data_refresh -= 1
+        self._refresh_data_domain()
+        return added
+
+    def add_reference(
+        self,
+        item_guid: UUID,
+        *,
+        name: str,
+        parent: SceneObject | SceneNode | None = None,
+        object_type: type[SceneObject] = SceneObject,
+        **kwargs: Any,
+    ) -> SceneObject:
+        """Attach an unresolved object and refresh the referenced-data projection."""
+        return super().add_reference(item_guid, name=name, parent=parent, object_type=object_type, **kwargs)
 
     def _reset_instance_colors(self) -> None:
         """Reset transient picking colors and release cached adapter references."""
@@ -226,6 +268,7 @@ class ViewerScene(Scene):
         """
         from compas.datastructures import Graph
         from compas.datastructures import Mesh
+        from compas.datastructures import VolMesh
         from compas.geometry import Point
         from compas.geometry import Pointcloud
 
@@ -268,6 +311,12 @@ class ViewerScene(Scene):
             return group
 
         edgecolor = kwargs.pop("edgecolor", linecolor)
+        base_color = kwargs.get("color")
+        content_color: Any = getattr(self._viewer, "_content_color", None)
+        use_viewer_defaults = callable(content_color) and base_color is None and not isinstance(item, SceneObject)
+        default_point = content_color("point") if use_viewer_defaults else None
+        default_line = content_color("line") if use_viewer_defaults else None
+        default_surface = content_color("surface") if use_viewer_defaults else None
         if isinstance(item, (Point, Pointcloud)) and show_points is None:
             show_points = True
         if isinstance(item, BufferGeometry):
@@ -285,9 +334,9 @@ class ViewerScene(Scene):
                         "show_vertices": show_points,
                         "show_edges": show_lines,
                         "show_faces": show_faces,
-                        "vertexcolor": vertexcolor or pointcolor,
-                        "edgecolor": edgecolor,
-                        "facecolor": facecolor,
+                        "vertexcolor": vertexcolor if vertexcolor is not None else pointcolor if pointcolor is not None else default_point,
+                        "edgecolor": edgecolor if edgecolor is not None else default_line,
+                        "facecolor": facecolor if facecolor is not None else default_surface,
                         "vertexsize": pointsize,
                         "edgewidth": linewidth,
                         "hide_coplanaredges": hide_coplanaredges,
@@ -303,9 +352,27 @@ class ViewerScene(Scene):
                     for key, value in {
                         "show_nodes": show_points,
                         "show_edges": show_lines,
-                        "nodecolor": pointcolor,
-                        "edgecolor": linecolor,
+                        "nodecolor": pointcolor if pointcolor is not None else default_point,
+                        "edgecolor": linecolor if linecolor is not None else default_line,
                         "nodesize": pointsize,
+                        "edgewidth": linewidth,
+                    }.items()
+                    if value is not None
+                }
+            )
+        elif isinstance(item, VolMesh):
+            options.update(
+                {
+                    key: value
+                    for key, value in {
+                        "show_vertices": show_points,
+                        "show_edges": show_lines,
+                        "show_faces": show_faces,
+                        "vertexcolor": vertexcolor if vertexcolor is not None else pointcolor if pointcolor is not None else default_point,
+                        "edgecolor": edgecolor if edgecolor is not None else default_line,
+                        "facecolor": facecolor if facecolor is not None else default_surface,
+                        "cellcolor": kwargs.get("cellcolor", default_surface),
+                        "vertexsize": pointsize,
                         "edgewidth": linewidth,
                     }.items()
                     if value is not None
@@ -319,9 +386,9 @@ class ViewerScene(Scene):
                         "show_points": show_points,
                         "show_lines": show_lines,
                         "show_surfaces": show_faces,
-                        "pointcolor": pointcolor,
-                        "linecolor": linecolor,
-                        "surfacecolor": surfacecolor or facecolor,
+                        "pointcolor": pointcolor if pointcolor is not None else default_point,
+                        "linecolor": linecolor if linecolor is not None else default_line,
+                        "surfacecolor": surfacecolor if surfacecolor is not None else facecolor if facecolor is not None else default_surface,
                         "linewidth": linewidth,
                         "pointsize": pointsize,
                         "u": u,
@@ -331,7 +398,11 @@ class ViewerScene(Scene):
                 }
             )
 
-        sceneobject = super().add(item=item, parent=parent, **options)
+        self._defer_data_refresh += 1
+        try:
+            sceneobject = super().add(item=item, parent=parent, **options)
+        finally:
+            self._defer_data_refresh -= 1
 
         if self._viewer is not None and self._viewer.running:
             self._viewer.renderer.rebuild_buffers()
@@ -347,6 +418,9 @@ class ViewerScene(Scene):
         name: str | None = None,
         show: bool = True,
         style: "DimensionStyle | None" = None,
+        layout: "DistanceDimensionLayout | None" = None,
+        label_background: Color | None = None,
+        label_background_padding: float = 2.0,
     ) -> SceneAnnotation:
         """Add a durable annotation outside the spatial hierarchy.
 
@@ -360,6 +434,12 @@ class ViewerScene(Scene):
             Whether the annotation is visible.
         style
             Distance-dimension presentation style.
+        layout
+            Distance-dimension world-space layout.
+        label_background
+            Optional background color for text-bearing labels.
+        label_background_padding
+            Nonnegative logical-pixel padding around label glyph bounds.
 
         Returns
         -------
@@ -367,7 +447,15 @@ class ViewerScene(Scene):
             Added scene annotation entry.
 
         """
-        return super().add_annotation(item, name=name, show=show, style=style)
+        return super().add_annotation(
+            item,
+            name=name,
+            show=show,
+            style=style,
+            layout=layout,
+            label_background=label_background,
+            label_background_padding=label_background_padding,
+        )
 
     def add_annotation_entry(self, entry: SceneAnnotation) -> SceneAnnotation:
         """Attach an annotation entry and refresh only the annotation layer.
@@ -409,6 +497,8 @@ class ViewerScene(Scene):
         selection_changed = False
         if self._viewer is not None:
             selection_changed = self._viewer.state.annotation_selection.remove(annotation)
+        if selection_changed:
+            self._refresh_data_domain()
         self._refresh_after_annotation_change(selection_changed=selection_changed)
 
     def _refresh_after_annotation_change(self, *, selection_changed: bool = False) -> None:
@@ -477,6 +567,8 @@ class ViewerScene(Scene):
             if cleanup_selection:
                 selection_changed = self._viewer.state.selection.remove(*removed_objects)
 
+        if selection_changed:
+            self._refresh_data_domain()
         if self._viewer is not None and self._viewer.running and rebuild_buffers and not selection_changed:
             self._viewer.renderer.update()
             self._viewer.ui.sidebar.update()
@@ -518,6 +610,8 @@ class ViewerScene(Scene):
             if self._viewer.running:
                 self._viewer.renderer.rebuild_buffers()
             selection_changed = self._viewer.state.selection.clear()
+            if selection_changed or annotation_selection_changed:
+                self._refresh_data_domain()
             if not selection_changed and not annotation_selection_changed:
                 self._viewer.ui.sidebar.update()
                 self._viewer.renderer.update()

@@ -217,6 +217,10 @@ class ScreenTextOverlay:
         Vertical alignment relative to the position.
     color
         Text color.
+    label_background
+        Optional background color. The color alpha controls opacity.
+    label_background_padding
+        Nonnegative logical-pixel padding around the glyph bounds.
 
     """
 
@@ -225,6 +229,8 @@ class ScreenTextOverlay:
     horizontal_alignment: Literal["left", "center", "right"] = "left"
     vertical_alignment: Literal["top", "center", "bottom"] = "top"
     color: Color = field(default_factory=Color.white)
+    label_background: Color | None = None
+    label_background_padding: float = 2.0
 
     def __post_init__(self) -> None:
         if not isinstance(self.text, str):
@@ -244,6 +250,14 @@ class ScreenTextOverlay:
             raise ValueError("Screen-text vertical alignment should be top, center, or bottom.")
         if not isinstance(self.color, Color):
             raise TypeError("Screen-text color should be a COMPAS Color.")
+        if self.label_background is not None and not isinstance(self.label_background, Color):
+            raise TypeError("Screen-text label background should be a COMPAS Color or None.")
+        if isinstance(self.label_background_padding, bool) or not isinstance(self.label_background_padding, Real):
+            raise TypeError("Screen-text label background padding should be a non-boolean number.")
+        if not isfinite(self.label_background_padding):
+            raise ValueError("Screen-text label background padding should be finite.")
+        if self.label_background_padding < 0:
+            raise ValueError("Screen-text label background padding cannot be negative.")
 
 
 def _screen_text_origin(
@@ -360,6 +374,7 @@ class _OverlayLayer:
 
         """
         from PySide6.QtCore import QRectF
+        from PySide6.QtCore import Qt
         from PySide6.QtGui import QBrush
         from PySide6.QtGui import QColor
         from PySide6.QtGui import QPainter
@@ -391,7 +406,21 @@ class _OverlayLayer:
                     (float(bounds.left()), float(bounds.top()), float(bounds.width()), float(bounds.height())),
                 )
 
+                if overlay.label_background is not None:
+                    padding = float(overlay.label_background_padding)
+                    background = QColor.fromRgbF(*overlay.label_background.rgba)
+                    painter.setPen(Qt.PenStyle.NoPen)
+                    painter.setBrush(QBrush(background))
+                    painter.drawRect(
+                        QRectF(
+                            x + bounds.left() - padding,
+                            y + bounds.top() - padding,
+                            bounds.width() + 2.0 * padding,
+                            bounds.height() + 2.0 * padding,
+                        )
+                    )
                 color = QColor.fromRgbF(*overlay.color.rgba)
+                painter.setBrush(Qt.BrushStyle.NoBrush)
                 painter.setPen(QPen(color))
                 painter.drawText(round(x), round(y), overlay.text)
                 continue

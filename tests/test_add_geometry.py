@@ -76,8 +76,30 @@ def test_add_geometry_selects_only_the_new_object():
     assert scene.kwargs == {"name": "Sphere"}
 
 
-def test_add_menu_contains_geometry_categories():
-    add_menu = default_menu_items()[0]
+def test_scene_menu_owns_the_existing_geometry_categories():
+    menus = default_menu_items()
+    scene_menu = next(item for item in menus if item["title"] == "Scene")
+    add_menu = next(item for item in scene_menu["items"] if item.get("title") == "Add")
 
-    assert add_menu["title"] == "Add"
+    assert all(item["title"] != "Add" for item in menus)
     assert [item["title"] for item in add_menu["items"]] == ["Primitives", "Curves", "Surfaces", "Shapes"]
+    commands = [entry for category in add_menu["items"] for entry in category["items"]]
+    assert all(entry["command"] == "viewer.add_geometry" for entry in commands)
+    assert [entry["kwargs"]["kind"] for entry in commands] == [
+        "point",
+        "line",
+        "frame",
+        "plane",
+        "polyline",
+        "polygon",
+        "circle",
+        "ellipse",
+        "quad_surface",
+        "saddle_surface",
+        "box",
+        "sphere",
+        "cylinder",
+        "cone",
+        "capsule",
+        "torus",
+    ]

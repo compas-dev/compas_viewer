@@ -19,6 +19,7 @@ class UI(Base):
         self.statusbar = StatusBar(self.window)
         self.sidedock = SideDock(self.window)
         self.viewport = ViewPort(self.window)
+        self.menubar.bind_sidebar(self.sidebar)
 
         self.menubar.show = self.viewer.config.ui.menubar.show
         self.toolbar.show = self.viewer.config.ui.toolbar.show

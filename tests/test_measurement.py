@@ -57,11 +57,12 @@ def connected_viewer(*, results=()):
         renderer.query_snap_context_at.side_effect = [query(result) for result in results]
     viewer = object.__new__(Viewer)
     viewer._config = Config()
+    viewer._config.ui.appearance = "light"
     viewer._scene = scene
     viewer._undo_transforms = []
     viewer._redo_transforms = []
     viewer.running = False
-    viewer.ui = SimpleNamespace(viewport=SimpleNamespace(renderer=renderer), sidebar=Mock())  # type: ignore[assignment]
+    viewer.ui = SimpleNamespace(viewport=SimpleNamespace(renderer=renderer, update_overlays=Mock()), sidebar=Mock())  # type: ignore[assignment]
     viewer.state = ViewerState(viewer.config, scene.object, scene.annotation)
     viewer.state.changed.connect(viewer._on_state_changed)
     scene.attach(viewer)
@@ -334,6 +335,66 @@ def test_persistent_completion_adds_one_annotation_and_selects_it(mode):
     assert viewer.state.annotation_selection.objects == (created,)
     assert not viewer.state.measurement.active
     assert renderer.query_snap_context_at.call_count == 2
+
+
+@pytest.mark.parametrize(
+    ("appearance", "expected_background"),
+    [
+        ("light", (250 / 255, 250 / 255, 250 / 255, 230 / 255)),
+        ("dark", (16 / 255, 22 / 255, 27 / 255, 230 / 255)),
+    ],
+)
+def test_persistent_completion_uses_scheme_label_background(appearance, expected_background):
+    viewer, scene, _renderer = connected_viewer(results=(snap([0, 0, 0]), snap([1, 0, 0])))
+    viewer.config.ui.appearance = appearance
+    viewer.start_distance_dimension("fixed")
+
+    viewer._accept_measurement_at((10, 20))
+    viewer._accept_measurement_at((30, 40))
+
+    created = scene.annotations[0]
+    assert created.label_background is not None
+    assert created.label_background.rgba == pytest.approx(expected_background)
+    assert created.label_background_padding == 2.0
+
+
+def test_programmatic_distance_dimension_keeps_transparent_background_default():
+    _viewer, scene, _renderer = connected_viewer()
+    dimension = DistanceDimension(PointAnchor([0, 0, 0]), PointAnchor([1, 0, 0]))
+
+    created = scene.add_annotation(dimension)
+
+    assert created.label_background is None
+    assert created.label_background_padding == 2.0
+
+
+def test_measurement_default_changes_affect_only_subsequently_created_dimensions():
+    viewer, scene, _renderer = connected_viewer(
+        results=(
+            snap([0, 0, 0]),
+            snap([1, 0, 0]),
+            snap([0, 0, 0]),
+            snap([2, 0, 0]),
+        )
+    )
+    viewer.state.set_measurement_unit("m")
+    viewer.state.set_measurement_precision(2)
+    viewer.start_distance_dimension("fixed")
+    viewer._accept_measurement_at((10, 20))
+    viewer._accept_measurement_at((30, 40))
+    existing = scene.annotations[0].item
+
+    viewer.state.set_measurement_unit("cm")
+    viewer.state.set_measurement_precision(4)
+    viewer.start_distance_dimension("fixed")
+    viewer._accept_measurement_at((50, 60))
+    viewer._accept_measurement_at((70, 80))
+    created = scene.annotations[1].item
+
+    assert isinstance(existing, DistanceDimension)
+    assert (existing.unit, existing.precision) == ("m", 2)
+    assert isinstance(created, DistanceDimension)
+    assert (created.unit, created.precision) == ("cm", 4)
 
 
 def test_new_measurement_scene_replacement_and_scene_clear_cancel_transient_state():

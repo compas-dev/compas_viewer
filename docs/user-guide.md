@@ -35,12 +35,16 @@ The main window consists of:
 - A 3D viewport for navigation and selection.
 - A **Scene** sidebar tab with the spatial hierarchy and details for the
   selected spatial object.
+- A **Data** sidebar tab with one row per distinct data item referenced by the
+  scene or its annotations.
 - An **Annotations** sidebar tab with the ordered annotation list and details
   for the selected annotation.
 - A **System** sidebar tab with Camera, Display, and Grid and Units
   sections.
-- A visible toolbar with Render Mode and View selectors.
-- Menus for creating geometry, selecting objects, changing the view, and loading or saving scenes.
+- A visible toolbar with zoom, capture, and measurement controls.
+- A grouped **View** control over the top-right of the viewport for standard
+  views and render modes.
+- Menus for creating Scene geometry, selecting objects, changing the view, and loading or saving scenes.
 
 The sidebar and toolbar are visible by default. Use **View → Sidebar** or
 **View → Toolbar** to hide or restore them.
@@ -52,11 +56,17 @@ The sidebar and toolbar are visible by default. Use **View → Sidebar** or
 | Rotate | Right-drag |
 | Pan | Shift + right-drag |
 | Zoom | Mouse wheel |
-| Zoom extents | `H` or **View → Zoom Extents** |
-| Zoom selected | `F` or **View → Zoom Selected** |
-| Set a standard view | Toolbar **View** selector or **View → Set Current View** |
+| Zoom extents | Toolbar **Zoom Extents**, `H`, or **View → Zoom Extents** |
+| Zoom selected | Toolbar **Zoom Selected**, `F`, or **View → Zoom Selected** |
+| Set a standard view | The viewport **View** menu's View group; or **View → Set Current View** |
+| Set the render mode | The viewport **View** menu's View Mode group; or **View → Set Render Mode** |
 
 Zoom extents frames all visible objects. Zoom selected frames only the current selection.
+The grouped viewport menu keeps Perspective, Top, Front, Right, and Ortho
+under **View**, and Shaded, Lighted, Ghosted, and Wireframe under **View
+Mode**. Each group shows its current checked choice. Closing the menu returns
+focus to the viewport, so orbit, pan, zoom, and renderer shortcuts remain
+immediately available.
 
 ## Select objects
 
@@ -65,7 +75,7 @@ Zoom extents frames all visible objects. Zoom selected frames only the current s
 | Replace the selection | Left-click an object |
 | Add an object to the selection | Ctrl + left-click |
 | Clear spatial and annotation selection | Click empty viewport background or press `Escape` |
-| Delete selected objects | `Delete` or **Edit → Delete Selected** |
+| Delete the active domain's selection | `Delete` or **Edit → Delete Selected** |
 | Rectangular selection | Shift + left-drag |
 
 When no measurement tool is active, an unmodified click on empty viewport
@@ -103,6 +113,20 @@ Changing sidebar tabs preserves both selections. Picking in the viewport or
 Scene tree changes only spatial selection; selecting an entry in Annotations
 changes only annotation selection.
 
+The **Data** tab is a flat, read-only view of the current scene's referenced
+items. Shared items appear once with their number of references; unresolved
+references remain visible without being loaded. Select a row and use
+**Details** to inspect its GUID, binding status, referrers, and public
+parameters. Mesh and Graph details expose their declared element-attribute
+tables lazily and read-only. Data-row selection is temporary and independent
+from Scene and Annotations selection.
+
+Delete follows the active interaction domain and never removes both selections.
+Focus in the Scene tree or viewport removes spatial objects; focus in the
+annotation list or details removes annotations. Menu activation follows the
+active sidebar tab. The action is disabled in System, and text or numeric
+editors retain their local Delete behavior.
+
 Deleting a selected group removes its complete scene subtree but does not
 delete the independently owned geometry or data. Deletion is not part of the
 transform-only undo history and clears that history. Associative dimensions
@@ -113,6 +137,21 @@ they are not silently converted or deleted.
 
 The scene tree in the **Scene** tab mirrors parent-child relationships in the
 scene. The detail area below it shows controls for the selected spatial object.
+Drag the Scene splitter to resize the hierarchy and detail areas; this does not
+resize the independent Annotations splitter. The details area no longer keeps
+a large inline description open. Select one or more objects and choose
+**Details** for a read-only modal snapshot of names, types, visibility, and
+available represented-object parameters. Editable controls remain in the
+sidebar, and Details is disabled when nothing is selected. Parametric
+representations expose **U Resolution** and, where used, **V Resolution** in
+this area: cones and cylinders use U; spheres, tori, and capsules use U and V;
+parametric surfaces use both; boxes and unrecognized shapes expose neither.
+Shape resolution is at least 3, surface resolution is at least 1, and capsule
+V resolution is at least 4 and even. Rejected edits restore the previous value.
+For shapes and surfaces, the line controls are labelled **Show wireframe**,
+**Wireframe color**, and **Wireframe width**; meshes and graphs continue to use
+edge terminology. Toggling these display settings does not regenerate the
+parametric representation, including at high resolution.
 Create explicit groups when related objects should appear under a shared node:
 
 ```python
@@ -245,7 +284,7 @@ refresh the Viewer.
 
 ## Add geometry from the UI
 
-The **Add** menu creates commonly used defaults:
+**Scene → Add** creates commonly used defaults:
 
 - Primitives: Point, Line, Frame, and Plane.
 - Curves: Polyline, Polygon, Circle, and Ellipse.
@@ -270,8 +309,10 @@ object's discrete point snaps: the Point itself, Mesh vertices, or Graph nodes.
 The available points are bright hollow square guidance markers. Only the
 distinct filled winner inside the snapping radius and accepted by the depth
 test can be selected. The guidance markers are not independently tested for
-occlusion. Winner visibility searches the hovered object's rendered point
-footprint, which avoids unreliable single-pixel depth comparisons at receding
+occlusion. During measurement, Mesh vertices use a measurement-only point
+footprint in the acquisition pass, including when ordinary vertex glyphs are
+hidden. This footprint never appears in normal rendering. Winner visibility
+therefore avoids unreliable single-pixel depth comparisons at receding
 vertices without admitting background pixels or other objects.
 
 After the first anchor is selected, its marker remains visible while the
@@ -281,10 +322,13 @@ when a second valid winner is available. The 18-logical-pixel acquisition
 radius provides a pronounced but deterministic lock to the nearest eligible
 point.
 
-Only the displayed discrete guides are snappable: Point objects, Mesh
-vertices, and Graph nodes. Lines, edges, faces, and surfaces are disabled until
-they have explicit candidate overlays. A miss creates no anchor rather than
-silently accepting unmarked geometry.
+Only displayed discrete guidance is snappable: Point objects, Mesh vertices,
+and Graph nodes. A Mesh may expose all vertices as measurement guides while its
+ordinary vertex glyphs are off, provided a face or edge representation keeps
+the Mesh visibly represented. Hidden objects and Meshes with no visible
+representation remain excluded. Lines, edges, faces, and surfaces are not
+themselves candidates. A miss creates no anchor rather than silently accepting
+unmarked geometry.
 
 While a measurement is active, left-clicks belong to the measurement rather
 than ordinary selection. Clicking the background does not create an anchor or
@@ -366,9 +410,28 @@ display precision and append the declared coordinate unit as `unit²` or
 
 Use **View → Appearance** to select:
 
-- **System** to follow the operating-system appearance, including changes while the viewer is open.
-- **Light** to force a light application palette.
-- **Dark** to force a dark application palette.
+- **System** to follow the operating-system color scheme, including changes while the viewer is open.
+- **Light** to force the light COMPAS Viewer palette.
+- **Dark** to force the dark COMPAS Viewer palette.
+
+These choices style the Viewer application chrome and select the automatic
+Viewer content palette. An automatic viewport follows the effective light or
+dark scheme. New Viewer scene objects resolve omitted presentation colors from
+that scheme when they are created; the resulting concrete colors do not change
+if the appearance changes later. Explicit and deserialized colors remain
+authoritative and are never recolored.
+
+| Content role | Light | Dark |
+| --- | --- | --- |
+| Viewport | `#FAFAFA` | `#10161B` |
+| Surface and face | `#D8DEE4` | `#3A4650` |
+| Line and edge | `#4B5563` | `#B8C2CC` |
+| Point and vertex | `#111827` | `#F2F6F8` |
+
+`config.renderer.backgroundcolor = None` selects the automatic viewport.
+Assigning a `Color` makes the background explicit, so later appearance changes
+do not alter it. Grid, selection, explicit scene-object appearance, existing
+annotations, legends, and overlays retain their existing ownership.
 
 The **Display** section of the **System** tab controls:
 
@@ -376,8 +439,11 @@ The **Display** section of the **System** tab controls:
 - Perspective, orthographic, and standard views.
 - Viewport background and selection colors.
 
-The visible toolbar provides synchronized **Render Mode** and **View**
-selectors for the same settings. Changes through the toolbar, View menu,
+The visible toolbar provides **Zoom Selected**, **Zoom Extents**, **Capture
+View**, and one **Measurement** menu. The measurement menu starts distance
+inspection, creates fixed or associative distance dimensions, or cancels the
+active measurement. The grouped viewport menu owns the standard-view and
+render-mode choices. Changes through that menu, the application View menu,
 Display section, or Python API update every other surface. Set
 `config.ui.toolbar.show = False` before constructing the Viewer to start with
 the toolbar hidden.
@@ -387,7 +453,7 @@ The **Grid and Units** section of the **System** tab controls:
 - Grid visibility, axes, mode, color, extents, and divisions.
 - **Coordinate Unit** declares the unit suffix shown with measurement labels.
   Leaving it blank keeps the unit unspecified.
-- **Display Precision** sets the number of decimal places shown.
+- **Display Precision** sets 0–15 decimal places for displayed measurements.
 
 The unit declaration does not convert coordinates, and display precision is
 not a geometry tolerance. These presentation settings do not control snapping
@@ -395,10 +461,15 @@ or component association, and the unit does not change grid spacing. Global
 `compas.tolerance.TOL` remains available to computational code but is not a
 Viewer control or System-sidebar field. A persistent dimension snapshots the
 unit and precision when it is completed. A transient inspection uses the
-current settings whenever it is drawn.
+current settings whenever it is drawn. Later Grid and Units changes affect
+only transient measurements and dimensions created afterward; they do not
+rewrite existing dimensions.
 
 Camera, Display, and Grid and Units use the same two-column field layout:
 labels are left-aligned and editors share one right-hand column.
+
+The Camera section is fully populated when the System panel first appears; it
+does not require a later refresh or resize to reveal its controls.
 
 ## Configure the viewer in Python
 
@@ -438,12 +509,14 @@ config.to_json("viewer-config.json")
 restored = Config.from_json("viewer-config.json")
 ```
 
-Configuration files contain persistent values only. Schema version 3 accepts
-only declared fields. Loading schema-version-0, schema-version-1, and
-schema-version-2 files retains supported values, discards the known retired
-fields of the older schemas, and adds default measurement presentation.
-Unknown fields are rejected. Commands and menu callbacks are runtime
-extensions and are deliberately not serialized.
+Configuration files contain persistent values only. Schema version 4 accepts
+only declared fields and uses `renderer.backgroundcolor=None` as the automatic
+viewport marker. Loading schema-version-0 through schema-version-3 files
+retains supported values and discards only known retired fields. A schema-3
+background remains explicit; if it was omitted, migration records the former
+`#D8DDE2` default explicitly rather than guessing that it should become
+automatic. Unknown fields are rejected. Commands and menu callbacks are
+runtime extensions and are deliberately not serialized.
 
 ## Load, save, and capture
 
@@ -519,6 +592,8 @@ viewer.scene.add_annotation(
         horizontal_alignment="center",
     ),
     name="Force label",
+    label_background=Color(0.05, 0.05, 0.05, 0.75),
+    label_background_padding=3.0,
 )
 viewer.scene.add_annotation(
     DistanceDimension(
@@ -531,26 +606,80 @@ viewer.scene.add_annotation(
     style=DimensionStyle(
         color=Color.red(),
         line_width=4.0,
+        extension_line_width=1.0,
         text_size=14.0,
         arrow_size=12.0,
         label_offset=8.0,
     ),
+    label_background=Color.white(),
+    label_background_padding=2.0,
 )
 viewer.show()
 ```
 
 Annotations live in `viewer.scene.annotations`, not in the spatial scene tree.
 They have no parent, children, or inherited transformation. The
-**Annotations** tab lists them in collection order. Select exactly one entry to
+**Annotations** tab lists them in collection order. Drag its splitter to resize
+the annotation list and dimension-details areas independently of the Scene
+tab. When the details area is shorter than its controls, scroll vertically;
+the controls retain their natural size and spacing. Select exactly one entry to
 show an explicit Name field, its read-only Type, and, for a distance dimension,
-its color, line width, text size, arrow size, and label offset. Multiple
-selection shows a summary and removal controls instead of a single-entry form.
-Style sizes and offsets use logical screen pixels.
+separate **Measurement Format** and **Dimension Style** groups. Measurement
+Format edits the dimension's **Coordinate Unit** and **Display Precision**;
+Dimension Style edits color, dimension-line width, extension-line width, text
+size, arrow size, and label offset. A **Spatial Layout** group edits a signed world-space offset and an
+optional world-space plane normal. Leave all three normal components blank for
+no normal, or provide three finite values. The read-only status explains
+whether the durable layout resolves. Keyboard traversal retains the complete
+draft until **Apply Layout** validates and replaces it atomically; **Reset
+Layout** restores zero offset and no normal. Valid application refreshes only
+the selected annotation. A **Label
+Background** group for a selected text or distance annotation
+provides **Enable Background**, an alpha-aware color editor, and nonnegative
+logical-pixel padding. Disabling it stores `None`. Multiple selection shows a
+summary and removal controls instead of a single-entry form. Style sizes,
+offsets, and label padding use logical screen pixels.
 
-Pressing `Delete` while the annotation list has focus removes the selected
-annotations only. **Edit → Delete Selected** and the viewport's Delete binding
-operate on spatial selection; neither operation crosses into the other
-collection.
+Coordinate Unit input is trimmed; leaving it blank stores no unit. Display
+Precision is an integer from 0 through 15 inclusive. Values outside that range
+are rejected rather than clamped or truncated. These edits refresh only the
+selected annotation and never convert coordinates, rescale anchors, or change
+the measured distance. An explicit dimension label remains verbatim and takes
+precedence, so format edits may not change visible text until that explicit
+label is removed; the override does not relax validation. The controls remain
+available when an associative dimension's geometric anchors are unresolved,
+but they are hidden for no selection, multiple selection, text or arrow
+annotations, and unresolved annotation data bindings.
+
+A nonzero spatial offset displaces the dimension line along the normalized
+cross product of the stored plane normal and the measured segment. Extension
+lines connect the measured anchors to the displaced endpoints. Missing, zero,
+or parallel normals leave the ordinary zero-offset line visible when both
+anchors resolve; Viewer never substitutes a camera-facing direction. If an
+associative anchor is unresolved, no cached or synthesized dimension line is
+drawn. Interactive dragging and reusable construction planes are not part of
+this initial editing workflow.
+
+New persistent distance dimensions acquired through Viewer enable a label
+background by default: `#FAFAFAE6` in the light scheme and `#10161BE6` in the
+dark scheme, with two logical pixels of padding. The color is resolved when
+the dimension is created and does not change later. Existing dimensions,
+programmatic annotation insertion, and explicitly supplied values remain
+unchanged.
+
+Text and distance entries may define `label_background` and a nonnegative
+`label_background_padding` in logical pixels. `None` keeps the default
+transparent result, and the color alpha controls opacity. Viewer draws the
+background behind the glyphs and, for dimensions, in front of the dimension
+line. The Annotations details controls edit these same durable fields and
+refresh only the affected annotation. Arrow annotations have no label and
+therefore accept only the default background values and do not show the group.
+
+Pressing `Delete` while the annotation list or annotation details has focus
+removes selected annotations only. The same command removes spatial objects
+when focus is in the Scene tree or viewport. **Edit → Delete Selected** follows
+the active Scene or Annotations tab and is disabled in System. Neither path
+crosses into the other collection.
 
 Scripts use `viewer.state.annotation_selection` for annotations and
 `viewer.state.selection` for spatial objects. Removing a spatial object does

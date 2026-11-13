@@ -38,7 +38,7 @@ class DisplaySetting(Container):
 
         add_state_control("renderer.rendermode", ChoiceEdit(self.renderer, "rendermode", ["shaded", "lighted", "ghosted", "wireframe"], title="Render Mode"))
         add_state_control("renderer.view", ChoiceEdit(self.renderer, "view", ["perspective", "top", "front", "right", "ortho"], title="View"))
-        add_state_control("renderer.backgroundcolor", ColorPicker(renderer_config, "backgroundcolor", title="Background", action=notify("renderer.backgroundcolor")))
+        add_state_control("renderer.backgroundcolor", ColorPicker(self.renderer, "backgroundcolor", title="Background", action=notify("renderer.backgroundcolor")))
         add_state_control("renderer.selectioncolor", ColorPicker(renderer_config, "selectioncolor", title="Selection", action=notify("renderer.selectioncolor")))
 
     def _on_state_changed(self, path: str, value: object) -> None:

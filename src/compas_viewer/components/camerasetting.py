@@ -1,34 +1,37 @@
+from typing import TYPE_CHECKING
+
 from .button import Button
 from .container import Container
 from .numberedit import NumberEdit
+
+if TYPE_CHECKING:
+    from .viewport import ViewPort
 
 
 class CameraSetting(Container):
     """Display and update camera settings with bound numeric controls.
 
-    Examples
-    --------
-    >>> camera_setting = CameraSetting()
-    >>> camera_setting.update()
+    Parameters
+    ----------
+    viewport
+        Viewport whose renderer camera is edited.
 
     """
 
-    def __init__(self) -> None:
+    def __init__(self, viewport: "ViewPort") -> None:
         super().__init__(container_type="scrollable", compact=True)
+        self.viewport = viewport
+        self.renderer = viewport.renderer
         self.populate()
 
     def populate(self) -> None:
         """Populate the form with camera setting components."""
         self.reset()
 
-        if not hasattr(self.viewer, "ui"):
-            # If the ui is not initialized, don't populate the form
-            return
-
         def _update_camera(*args: object) -> None:
-            self.viewer.renderer.update()
+            self.renderer.update()
 
-        camera = self.viewer.renderer.camera
+        camera = self.renderer.camera
 
         # Create NumberEdit components for target (bind directly to camera.target)
         self.target_x = NumberEdit(camera.target, "x", title="Target X", action=_update_camera)
@@ -67,7 +70,7 @@ class CameraSetting(Container):
         # Add reset button
         def _reset_camera() -> None:
             """Reset camera to default settings."""
-            camera = self.viewer.renderer.camera
+            camera = self.renderer.camera
             config = self.viewer.config.camera
 
             # Reset all camera properties to config defaults
@@ -81,7 +84,7 @@ class CameraSetting(Container):
             camera.rotationdelta = config.rotationdelta
             camera.pandelta = config.pandelta
 
-            self.viewer.renderer.update()
+            self.renderer.update()
             # Update the form values
             self.update()
 
@@ -90,9 +93,7 @@ class CameraSetting(Container):
 
     def update(self) -> None:
         """Update the form with current camera settings."""
-        self.populate()
-
-        camera = self.viewer.renderer.camera
+        camera = self.renderer.camera
 
         # Update the NumberEdit components
         if hasattr(self, "target_x"):

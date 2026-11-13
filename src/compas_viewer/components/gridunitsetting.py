@@ -5,7 +5,6 @@ from typing import Any
 from PySide6.QtWidgets import QHBoxLayout
 from PySide6.QtWidgets import QLabel
 from PySide6.QtWidgets import QLineEdit
-from PySide6.QtWidgets import QSpinBox
 from PySide6.QtWidgets import QWidget
 
 from .booleantoggle import BooleanToggle
@@ -75,12 +74,11 @@ class GridUnitSetting(Container):
         self.unit_edit.editingFinished.connect(self._set_unit)
         self.add(_FieldRow("Coordinate Unit", self.unit_edit))
 
-        self.precision_edit = QSpinBox()
+        self.precision_edit = QLineEdit()
         self.precision_edit.setObjectName("measurement_precision")
-        self.precision_edit.setRange(0, 2_147_483_647)
-        self.precision_edit.setToolTip("Decimal places used to display measurements; this is not a geometry tolerance.")
-        self.precision_edit.setValue(self.viewer.config.measurement.precision)
-        self.precision_edit.valueChanged.connect(self._set_precision)
+        self.precision_edit.setToolTip("Decimal places from 0 to 15 used to display measurements; this is not a geometry tolerance.")
+        self.precision_edit.setText(str(self.viewer.config.measurement.precision))
+        self.precision_edit.editingFinished.connect(self._set_precision)
         self.add(_FieldRow("Display Precision", self.precision_edit))
 
         self.viewer.state.changed.connect(self._on_state_changed)
@@ -90,8 +88,15 @@ class GridUnitSetting(Container):
         self.viewer.state.set_measurement_unit(unit)
         self._sync_unit(unit)
 
-    def _set_precision(self, precision: int) -> None:
-        self.viewer.state.set_measurement_precision(precision)
+    def _set_precision(self) -> None:
+        try:
+            precision = int(self.precision_edit.text().strip())
+            self.viewer.state.set_measurement_precision(precision)
+        except (TypeError, ValueError):
+            self._sync_precision(self.viewer.config.measurement.precision)
+            self.precision_edit.clearFocus()
+            return
+        self._sync_precision(self.viewer.config.measurement.precision)
 
     def _on_state_changed(self, path: str, value: object) -> None:
         if path == "renderer.gridsize":
@@ -105,14 +110,17 @@ class GridUnitSetting(Container):
         elif path == "measurement.unit":
             self._sync_unit(value if isinstance(value, str) else None)
         elif path == "measurement.precision" and isinstance(value, int):
-            self.precision_edit.blockSignals(True)
-            self.precision_edit.setValue(value)
-            self.precision_edit.blockSignals(False)
+            self._sync_precision(value)
 
     def _sync_unit(self, unit: str | None) -> None:
         self.unit_edit.blockSignals(True)
         self.unit_edit.setText(unit or "")
         self.unit_edit.blockSignals(False)
+
+    def _sync_precision(self, precision: int) -> None:
+        blocked = self.precision_edit.blockSignals(True)
+        self.precision_edit.setText(str(precision))
+        self.precision_edit.blockSignals(blocked)
 
 
 __all__ = ["GridUnitSetting"]

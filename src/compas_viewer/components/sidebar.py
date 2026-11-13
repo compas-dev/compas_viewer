@@ -2,14 +2,23 @@ from typing import TYPE_CHECKING
 from typing import Literal
 from typing import cast
 
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QAbstractSpinBox
+from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QComboBox
 from PySide6.QtWidgets import QLabel
+from PySide6.QtWidgets import QLineEdit
+from PySide6.QtWidgets import QPlainTextEdit
+from PySide6.QtWidgets import QSplitter
 from PySide6.QtWidgets import QTabWidget
+from PySide6.QtWidgets import QTextEdit
 from PySide6.QtWidgets import QVBoxLayout
 from PySide6.QtWidgets import QWidget
 
 from compas_viewer.components.annotationpanel import AnnotationPanel
 from compas_viewer.components.camerasetting import CameraSetting
 from compas_viewer.components.component import Component
+from compas_viewer.components.datapanel import DataPanel
 from compas_viewer.components.datastructureattributes import DatastructureAttributes
 from compas_viewer.components.displaysetting import DisplaySetting
 from compas_viewer.components.gridunitsetting import GridUnitSetting
@@ -23,13 +32,14 @@ from compas_viewer.uidefinitions import UIItem
 if TYPE_CHECKING:
     from .viewport import ViewPort
 
-SidebarTab = Literal["Scene", "Annotations", "System"]
+SidebarTab = Literal["Scene", "Annotations", "Data", "System"]
+DeletionDomain = Literal["spatial", "annotations"]
 
 
 class SideBarRight(Component):
-    """Display Scene, Annotations, and System in stable sidebar domains."""
+    """Display Scene, Annotations, Data, and System sidebar domains."""
 
-    TABS: tuple[SidebarTab, ...] = ("Scene", "Annotations", "System")
+    TABS: tuple[SidebarTab, ...] = ("Scene", "Data", "Annotations", "System")
 
     def __init__(self, viewport: "ViewPort") -> None:
         super().__init__()
@@ -46,6 +56,7 @@ class SideBarRight(Component):
             self._page_layouts[name] = layout
             self.widget.addTab(page, name)
         self.load_items()
+        self.widget.currentChanged.connect(self._on_tab_changed)
         self.set_current_tab("Scene")
 
     @property
@@ -64,12 +75,14 @@ class SideBarRight(Component):
                 self.sceneform = SceneTree(columns=cast(list[SceneColumn], columns))
             elif itemtype == "AnnotationPanel":
                 self.annotation_panel = AnnotationPanel()
+            elif itemtype == "DataPanel":
+                self.data_panel = DataPanel()
             elif itemtype == "ObjectSetting":
                 self.object_setting = ObjectSetting()
             elif itemtype == "DatastructureAttributes":
                 self.datastructure_attributes = DatastructureAttributes()
             elif itemtype == "CameraSetting":
-                self.camera_setting = CameraSetting()
+                self.camera_setting = CameraSetting(self.viewport)
             elif itemtype == "DisplaySetting":
                 self.display_setting = DisplaySetting(self.viewport)
             elif itemtype == "GridUnitSetting":
@@ -79,6 +92,7 @@ class SideBarRight(Component):
 
         self._compose_scene_page()
         self._compose_annotations_page()
+        self._compose_data_page()
         self._compose_system_page()
 
     def set_current_tab(self, tab: SidebarTab) -> None:
@@ -87,7 +101,7 @@ class SideBarRight(Component):
         Parameters
         ----------
         tab
-            One of `"Scene"`, `"Annotations"`, or `"System"`.
+            One of `"Scene"`, `"Annotations"`, `"Data"`, or `"System"`.
 
         Raises
         ------
@@ -98,6 +112,47 @@ class SideBarRight(Component):
         if tab not in self.TABS:
             raise ValueError(f"Unsupported sidebar tab: {tab!r}.")
         self.widget.setCurrentIndex(self.TABS.index(tab))
+
+    @property
+    def current_tab(self) -> SidebarTab:
+        """SidebarTab: Active interaction domain."""
+        return self.TABS[self.widget.currentIndex()]
+
+    def deletion_domain(self, *, use_focus: bool) -> DeletionDomain | None:
+        """Return the selection domain owned by the current interaction context.
+
+        Parameters
+        ----------
+        use_focus
+            Resolve focused Scene, Annotations, viewport, and editor widgets
+            before falling back to the active sidebar tab.
+
+        Returns
+        -------
+        DeletionDomain | None
+            Selection domain to remove, or `None` for editor-local and System
+            contexts.
+
+        """
+        if use_focus:
+            focused = QApplication.focusWidget()
+            editor_types = (QLineEdit, QTextEdit, QPlainTextEdit, QAbstractSpinBox, QComboBox)
+            if isinstance(focused, editor_types):
+                return None
+            if focused is not None:
+                annotations = self.pages["Annotations"]
+                if focused is annotations or annotations.isAncestorOf(focused):
+                    return "annotations"
+                scene = self.pages["Scene"]
+                renderer = self.viewport.renderer
+                if focused is scene or scene.isAncestorOf(focused) or focused is renderer or renderer.isAncestorOf(focused):
+                    return "spatial"
+
+        if self.current_tab == "Annotations":
+            return "annotations"
+        if self.current_tab == "Scene":
+            return "spatial"
+        return None
 
     def focus_system_section(self, section: SystemSection) -> None:
         """Activate System and reveal one configured settings section.
@@ -136,27 +191,46 @@ class SideBarRight(Component):
         """Update every configured sidebar domain."""
         self.update_spatial_selection()
         self.update_annotation_selection()
+        if hasattr(self, "data_panel"):
+            self.data_panel.update()
         self.system_panel.update()
         self.widget.update()
 
     def _compose_scene_page(self) -> None:
         layout = self._page_layouts["Scene"]
-        if hasattr(self, "sceneform"):
-            layout.addWidget(self.sceneform.widget, 3)
-
         details: list[tuple[str, Component]] = []
         if hasattr(self, "object_setting"):
             details.append(("Object", self.object_setting))
         if hasattr(self, "datastructure_attributes"):
             details.append(("Attributes", self.datastructure_attributes))
 
+        detail_widget: QWidget | None = None
         if len(details) == 1:
-            layout.addWidget(details[0][1].widget, 2)
+            detail_widget = details[0][1].widget
         elif len(details) > 1:
             self.scene_details = QTabWidget()
             for name, component in details:
                 self.scene_details.addTab(component.widget, name)
-            layout.addWidget(self.scene_details, 2)
+            detail_widget = self.scene_details
+
+        if hasattr(self, "sceneform") and detail_widget is not None:
+            self.scene_splitter = QSplitter(Qt.Orientation.Vertical)
+            self.scene_splitter.setObjectName("sceneInspectorSplitter")
+            self.scene_splitter.setChildrenCollapsible(False)
+            self.scene_splitter.addWidget(self.sceneform.widget)
+            self.scene_splitter.addWidget(detail_widget)
+            self.scene_splitter.setCollapsible(0, False)
+            self.scene_splitter.setCollapsible(1, False)
+            self.scene_splitter.setStretchFactor(0, 3)
+            self.scene_splitter.setStretchFactor(1, 2)
+            self.sceneform.widget.setMinimumHeight(80)
+            detail_widget.setMinimumHeight(80)
+            self.scene_splitter.setSizes([300, 200])
+            layout.addWidget(self.scene_splitter)
+        elif hasattr(self, "sceneform"):
+            layout.addWidget(self.sceneform.widget)
+        elif detail_widget is not None:
+            layout.addWidget(detail_widget)
         elif not hasattr(self, "sceneform"):
             layout.addWidget(QLabel("No Scene controls configured"))
 
@@ -166,6 +240,17 @@ class SideBarRight(Component):
             layout.addWidget(self.annotation_panel.widget)
         else:
             layout.addWidget(QLabel("No Annotation controls configured"))
+
+    def _compose_data_page(self) -> None:
+        layout = self._page_layouts["Data"]
+        if hasattr(self, "data_panel"):
+            layout.addWidget(self.data_panel.widget)
+        else:
+            layout.addWidget(QLabel("No Data controls configured"))
+
+    def _on_tab_changed(self, index: int) -> None:
+        if self.TABS[index] == "Data" and hasattr(self, "data_panel"):
+            self.data_panel.update()
 
     def _compose_system_page(self) -> None:
         layout = self._page_layouts["System"]
@@ -179,4 +264,4 @@ class SideBarRight(Component):
         layout.addWidget(self.system_panel.widget)
 
 
-__all__ = ["SideBarRight", "SidebarTab"]
+__all__ = ["DeletionDomain", "SideBarRight", "SidebarTab"]

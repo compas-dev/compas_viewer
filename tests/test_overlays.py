@@ -67,6 +67,11 @@ def test_overlay_layer_rejects_duplicates_and_unapproved_types():
         ({"horizontal_alignment": cast(Literal["left", "center", "right"], "middle")}, ValueError, "horizontal alignment"),
         ({"vertical_alignment": cast(Literal["top", "center", "bottom"], "middle")}, ValueError, "vertical alignment"),
         ({"color": cast(Color, object())}, TypeError, "COMPAS Color"),
+        ({"label_background": cast(Color, object())}, TypeError, "label background.*Color or None"),
+        ({"label_background_padding": True}, TypeError, "padding.*non-boolean number"),
+        ({"label_background_padding": float("nan")}, ValueError, "padding.*finite"),
+        ({"label_background_padding": float("inf")}, ValueError, "padding.*finite"),
+        ({"label_background_padding": -1}, ValueError, "padding.*negative"),
     ],
 )
 def test_screen_text_rejects_invalid_presentation(kwargs, error, message):
@@ -237,6 +242,38 @@ def test_screen_text_origin_tracks_viewport_size_and_not_camera():
     assert _screen_text_origin(overlay, near, bounds) == (42.0, 53.0)
     assert _screen_text_origin(overlay, far, bounds) == (42.0, 53.0)
     assert _screen_text_origin(overlay, large, bounds) == (92.0, 103.0)
+
+
+def test_screen_text_background_is_drawn_before_text_with_padded_bounds():
+    from PySide6.QtCore import QRect
+
+    bounds = QRect(-2, -8, 20, 10)
+    metrics = Mock()
+    metrics.boundingRect.return_value = bounds
+    painter = Mock()
+    painter.fontMetrics.return_value = metrics
+    layer = _OverlayLayer()
+    background = Color(0.1, 0.2, 0.3, 0.4)
+    layer.add(
+        ScreenTextOverlay(
+            "Viewport",
+            (0.25, 0.5),
+            color=Color.white(),
+            label_background=background,
+            label_background_padding=3.0,
+        )
+    )
+
+    layer.draw(
+        painter,
+        _OverlayContext(width=200, height=100, camera_distance=10, field_of_view=45, perspective=True),
+    )
+
+    draw_rect_index = next(index for index, call_value in enumerate(painter.method_calls) if call_value[0] == "drawRect")
+    draw_text_index = next(index for index, call_value in enumerate(painter.method_calls) if call_value[0] == "drawText")
+    assert draw_rect_index < draw_text_index
+    rectangle = painter.drawRect.call_args.args[0]
+    assert rectangle.getRect() == pytest.approx((47.0, 47.0, 26.0, 16.0))
 
 
 def test_viewer_overlay_facade_does_not_change_scene_serialization():
@@ -450,6 +487,58 @@ def test_viewport_stacks_overlay_above_renderer_and_repaints_after_frame(monkeyp
     assert not viewport._overlay_canvas.isHidden()
     update.assert_called_once_with()
     assert app is not None
+
+
+def test_viewport_sidebar_cannot_collapse_below_configured_minimum(monkeypatch):
+    monkeypatch.setenv("QT_QPA_PLATFORM", "offscreen")
+    from PySide6.QtWidgets import QApplication
+    from PySide6.QtWidgets import QMainWindow
+    from PySide6.QtWidgets import QWidget
+
+    import compas_viewer.components.viewport as viewport_module
+
+    class Signal:
+        def connect(self, _callback):
+            pass
+
+    class FakeRenderer(QWidget):
+        def __init__(self):
+            super().__init__()
+            self.frameSwapped = Signal()
+
+    minimum_width = 240
+
+    class FakeSidebar:
+        def __init__(self, _viewport):
+            self.widget = QWidget()
+            self.widget.setMinimumWidth(minimum_width)
+
+    app = QApplication.instance() or QApplication([])
+    viewer = SimpleNamespace(
+        config=SimpleNamespace(
+            ui=SimpleNamespace(sidebar=SimpleNamespace(width=320, minimum_width=minimum_width)),
+            window=SimpleNamespace(width=800),
+        ),
+        _has_overlay_content=lambda: False,
+    )
+    monkeypatch.setattr(viewport_module, "Renderer", FakeRenderer)
+    monkeypatch.setattr(viewport_module, "SideBarRight", FakeSidebar)
+    monkeypatch.setattr(viewport_module.ViewPort, "viewer", property(lambda _self: viewer), raising=False)
+    monkeypatch.setattr(viewport_module._OverlayCanvas, "viewer", property(lambda _self: viewer), raising=False)
+    window = SimpleNamespace(widget=QMainWindow())
+    window.widget.resize(800, 600)
+    viewport = viewport_module.ViewPort(window)
+    window.widget.show()
+    app.processEvents()
+
+    assert viewport.widget.isCollapsible(0)
+    assert not viewport.widget.isCollapsible(1)
+
+    viewport.widget.setSizes([800, 0])
+    app.processEvents()
+
+    assert viewport.widget.sizes()[1] >= minimum_width
+    window.widget.close()
 
 
 def test_public_overlay_imports_remain_graphics_free(tmp_path):

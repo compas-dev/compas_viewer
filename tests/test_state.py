@@ -99,11 +99,18 @@ def test_state_updates_measurement_presentation_through_explicit_methods():
 
     assert state.set_measurement_unit("mm")
     assert state.set_measurement_precision(4)
-    assert not state.set_measurement_precision(4)
+    assert state.set_measurement_precision(15)
+    assert state.set_measurement_precision(0)
+    assert not state.set_measurement_precision(0)
 
     assert config.measurement.unit == "mm"
-    assert config.measurement.precision == 4
-    assert changes == [("measurement.unit", "mm"), ("measurement.precision", 4)]
+    assert config.measurement.precision == 0
+    assert changes == [
+        ("measurement.unit", "mm"),
+        ("measurement.precision", 4),
+        ("measurement.precision", 15),
+        ("measurement.precision", 0),
+    ]
 
 
 @pytest.mark.parametrize(
@@ -112,18 +119,22 @@ def test_state_updates_measurement_presentation_through_explicit_methods():
         ("set_measurement_unit", " ", ValueError),
         ("set_measurement_unit", 1, TypeError),
         ("set_measurement_precision", -1, ValueError),
+        ("set_measurement_precision", 16, ValueError),
         ("set_measurement_precision", 1.5, TypeError),
     ],
 )
 def test_state_rejects_invalid_measurement_presentation(method, value, error):
     config = Config()
     state = ViewerState(config)
+    changes = []
+    state.changed.connect(lambda path, stored: changes.append((path, stored)))
 
     with pytest.raises(error, match="measurement"):
         getattr(state, method)(value)
 
     assert config.measurement.unit is None
     assert config.measurement.precision == 3
+    assert changes == []
 
 
 def test_menu_actions_reflect_published_state():

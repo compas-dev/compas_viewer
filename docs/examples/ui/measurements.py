@@ -20,7 +20,7 @@ mesh = Mesh.from_vertices_and_faces(
 viewer.scene.add(
     mesh,
     name="Measurement target",
-    show_vertices=True,
+    show_vertices=False,
     show_edges=True,
     vertexsize=10,
     edgewidth=2,

@@ -9,6 +9,8 @@ from .colorpicker import ColorPicker
 from .choiceedit import ChoiceEdit
 from .component import Component
 from .container import Container
+from .datapanel import DataDetailsDialog
+from .datapanel import DataPanel
 from .datastructureattributes import DatastructureAttributes
 from .displaysetting import DisplaySetting
 from .gridunitsetting import GridUnitSetting
@@ -39,6 +41,8 @@ __all__ = [
     "ChoiceEdit",
     "Component",
     "Container",
+    "DataDetailsDialog",
+    "DataPanel",
     "DatastructureAttributes",
     "DisplaySetting",
     "GridUnitSetting",

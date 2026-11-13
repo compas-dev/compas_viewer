@@ -29,6 +29,7 @@ class SystemPanel(Component):
         self.layout = QVBoxLayout(self.content)
         self.layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.layout.setContentsMargins(0, 0, 0, 0)
+        self.layout.setSpacing(14)
         self.widget.setWidget(self.content)
         self.sections: dict[SystemSection, tuple[QGroupBox, Component]] = {}
 
@@ -46,8 +47,9 @@ class SystemPanel(Component):
         if name in self.sections:
             raise ValueError(f"System section {name!r} already exists.")
         group = QGroupBox(name)
+        group.setObjectName("systemSection")
         layout = QVBoxLayout(group)
-        layout.setContentsMargins(6, 6, 6, 6)
+        layout.setContentsMargins(6, 12, 6, 12)
         layout.addWidget(component.widget)
         self._fit_component(component)
         self.layout.addWidget(group)

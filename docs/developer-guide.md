@@ -84,9 +84,44 @@ The root configuration currently contains:
 - `measurement`: coordinate-unit declaration and decimal display precision.
 - `vectorsize`: the viewer-wide vector-arrow preference.
 
-`schema_version` protects persisted data. Schema version 3 is closed: unknown
-and retired fields are rejected. `Config.from_dict` migrates versions 0, 1,
-and 2 by retaining declared values and adding the default `measurement` group.
+`ui.appearance` retains the closed `system`, `light`, and `dark` values. These
+select the effective light or dark variant of one built-in COMPAS Viewer theme;
+they are not a general theme-extension interface. A private semantic token
+module constructs the application-wide Qt palette and the narrow stylesheet
+used for focus, interaction, links, and System-section hierarchy. Viewer keeps
+the platform UI font, packaged or configured application icon, and existing
+monochrome UI icons. Button icons are tinted privately from the active Qt
+button-text palette and retint when the application palette changes; this does
+not affect the packaged or configured application icon.
+
+Theme ownership includes Qt application chrome and a narrow Viewer content
+palette. `renderer.backgroundcolor=None` is the sole automatic marker; the
+effective light or dark scheme resolves it to `#FAFAFA` or `#10161B` at draw
+time. An explicit renderer background is never replaced. New Viewer scene
+objects resolve omitted channels at creation to surface `#D8DEE4`/`#3A4650`,
+line `#4B5563`/`#B8C2CC`, and point `#111827`/`#F2F6F8` for light/dark. The
+resolved values remain concrete and do not change on a later appearance
+switch. Explicit, deserialized, and existing content remains authoritative;
+grid, selection, legends, and overlays retain their own ownership. This is a
+Viewer-specific palette, not an organization-wide COMPAS brand standard, and
+Core keeps its existing white defaults.
+
+Viewer applies creation defaults to supported Geometry, Mesh, Graph, and
+VolMesh objects only when both the base color and the relevant specialized
+channel are omitted. An explicit point/vertex, line/edge, or surface/face
+channel always wins. When the base `color` is explicit and a specialized
+channel is omitted, the existing Core derivation from that base color remains
+authoritative. Collections and buffer-backed objects keep their established
+explicit and per-element color semantics; Viewer does not invent unsupported
+semantic roles for them.
+
+`schema_version` protects persisted data. Schema version 4 is closed: unknown
+and retired fields are rejected. `Config.from_dict` migrates versions 0
+through 3. Versions 0--2 retain supported values and add the default
+`measurement` group. Schema 3 always becomes an explicit background: a stored
+color remains unchanged, while an omitted field receives the former
+`#D8DDE2` default. Migration never guesses that an old concrete value was
+automatic.
 Versions 0 and 1 also drop only these known retired fields:
 
 - Root `commands`, `display`, and `unit` fields.
@@ -106,12 +141,32 @@ grid spacing, configure snapping, or define geometry tolerance. Process-wide
 Viewer setting. Camera, Display, and Grid and Units use one private aligned
 two-column layout; this is not a generic component-extension API.
 
-The default toolbar contains state-bound Render Mode and View selectors and is
-visible unless `ui.toolbar.show` is explicitly false. The selectors reuse the
-same commands and `renderer.rendermode` or `renderer.view` state paths as the
-View menu and Display form. State-driven synchronization blocks selector
-signals so it does not invoke commands recursively. Custom
-`viewer.toolbar_items` remains the runtime composition boundary.
+Measurement precision has one shared Core and Viewer domain: integer values
+from 0 through 15 inclusive. Configuration validation and both precision
+editors reject values outside that domain; Core assignment and configuration
+validation raise `ValueError`, and no path clamps or truncates. Existing
+configuration above 15 is rejected without migration or a
+configuration-schema change.
+
+The default toolbar contains command-backed Zoom Selected, Zoom Extents, and
+Capture View buttons followed by one `menu_button` for Measurement. Its fixed
+items reuse `viewer.inspect_distance`, `viewer.add_fixed_distance_dimension`,
+`viewer.add_associative_distance_dimension`, and
+`viewer.cancel_measurement`. The toolbar is visible unless
+`ui.toolbar.show` is explicitly false. Existing custom text-only,
+text-plus-icon, unbound, and state-bound buttons remain supported;
+`viewer.toolbar_items` remains the runtime composition boundary. The narrow
+menu-button definition contains command items only and does not establish a
+general toolbar-widget registry.
+
+Perspective, Top, Front, Right, and Ortho and the four render modes live in one
+private grouped `QToolButton`/`QMenu` over the top-right of the viewport. The
+two titled, exclusive groups observe `renderer.view` and
+`renderer.rendermode`, reuse the existing commands, and synchronize with the
+application View menu, Display form, and public state. Menu closure restores
+renderer focus. The control is private Viewer chrome: it does not enter the
+public mouse-transparent overlay layer and does not establish a general
+viewport-widget registry.
 
 Applications may subclass `Config` and add typed nested `ConfigBase`
 dataclasses. Declared fields round-trip through dictionaries and JSON; dynamic
@@ -211,21 +266,76 @@ Annotations use a separate runtime selection and never enter spatial transform
 commands:
 
 ```python
+from compas.colors import Color
 from compas.scene import TextAnnotation
 
 entry = viewer.scene.add_annotation(
     TextAnnotation("Result", (0, 0, 0)),
     name="Result label",
+    label_background=Color(0.0, 0.0, 0.0, 0.75),
+    label_background_padding=3.0,
 )
 viewer.state.annotation_selection.replace((entry,))
 viewer.refresh_annotations((entry,))
 ```
 
+`SceneAnnotation.label_background` and
+`SceneAnnotation.label_background_padding` are durable presentation. They
+apply to text and distance labels; padding is nonnegative and measured in
+logical pixels. Arrow entries accept only the transparent default because they
+have no label. A background change uses the annotation-only refresh path and
+does not alter semantic text, anchors, units, values, or precision.
+
+Interactive Viewer completion of a new persistent distance dimension resolves
+an enabled background from the effective scheme: `#FAFAFAE6` for light or
+`#10161BE6` for dark, with two logical pixels of padding. This is a narrow
+acquisition default. Core construction, programmatic `add_annotation`, existing
+serialized dimensions, and explicit values retain their previous behavior.
+The resolved background is concrete and does not change after a later scheme
+switch.
+
 `viewer.scene.annotations` preserves durable collection order independently of
 the scene hierarchy. `viewer.state.annotation_selection` is transient and
 unserialized. The **Annotations** tab owns annotation naming, visibility,
-removal, and distance-style editing; the **Scene** tab and spatial selection
-remain unchanged.
+removal, distance-style editing, and optional label-background controls for
+text-bearing annotations; the **Scene** tab and spatial selection remain
+unchanged. The Label Background group maps a disabled checkbox to
+`label_background=None`, edits alpha-aware color and nonnegative logical-pixel
+padding when enabled, blocks editor signals during synchronization, and
+refreshes only the affected annotation. Arrow, unresolved-data, no-selection,
+and multiple-selection states hide the group.
+
+For exactly one selected entry bound to a `DistanceDimension`, Annotations also
+owns a separate **Measurement Format** group. It trims Coordinate Unit input,
+maps blank input to `None`, and assigns Display Precision through Core's
+validated 0–15 property. A changed value refreshes only that annotation with
+`viewer.refresh_annotations((entry,))`; synchronization blocks editor signals,
+and Escape in the unit editor restores the durable value without invoking
+global deselection. No selection, multiple selection, non-distance items, and
+unresolved data bindings hide the group. An associative dimension with
+geometrically unresolved anchors remains editable when its semantic data item
+is still bound.
+
+These durable per-dimension values do not update
+`viewer.config.measurement`. **Grid and Units** continues to supply transient
+formatting and snapshots for dimensions created afterward. No unit conversion,
+bulk editing, spatial-buffer rebuild, or generic property-editor path is
+involved. An explicit semantic label remains a verbatim override of generated
+value, precision, and unit text, but it does not bypass format validation.
+
+The same single-dimension details surface owns **Spatial Layout**. It replaces
+the complete immutable-value-style `DistanceDimensionLayout` atomically from a
+finite signed offset and either three finite world-normal components or three
+blank fields. Field traversal retains partial drafts; **Apply Layout** is the
+only commit boundary. Partial normals, non-finite values, and invalid
+application restore the durable layout without refresh. Successful application
+calls `viewer.refresh_annotations((entry,))` once and never rebuild spatial
+buffers.
+The derived status follows the accepted order: zero displacement, unresolved
+anchor, coincident anchors, missing normal, zero normal, parallel normal, then
+resolved. Rendering includes measured anchors and displaced endpoints in
+annotation bounds, keeps the measured value tied to the original anchors, and
+uses no camera-dependent fallback.
 
 Spatial and annotation selections may coexist. Sidebar tab changes preserve
 both, object picking changes only spatial selection, and annotation-list
@@ -234,17 +344,61 @@ an unmodified empty viewport click clears both selections and Ctrl-clicking
 empty background changes neither. Escape cancels an active measurement first
 and otherwise clears both selections.
 
-Delete remains focus-owned: the annotation list removes selected annotations,
-whereas the spatial Delete command removes selected scene objects. Neither
-operation crosses the collection boundary.
+Delete remains focus-owned. Annotation-list and annotation-detail focus remove
+selected annotations, while Scene-tree and renderer focus remove selected
+scene objects. Menu invocation follows the active Scene or Annotations tab and
+is disabled in System. Text and numeric editors retain local Delete behavior.
+Neither operation crosses the collection boundary when both selections exist.
 
 Default menu and sidebar structures live in `compas_viewer.uidefinitions`.
 They refer to command IDs rather than importing callbacks, keeping UI
-composition separate from serialization. The built-in right sidebar has three
+composition separate from serialization. The fixed geometry hierarchy belongs
+to **Scene → Add**; Measure continues to own interactive acquisition. The
+built-in right sidebar has four
 stable domains: **Scene** for the spatial hierarchy and object details,
-**Annotations** for the ordered annotation list and annotation details, and
-**System** for Camera, Display, and Grid and Units. Dynamic detail
+**Data** for the flat referenced-item projection, **Annotations** for the
+ordered annotation list and annotation details, and **System** for Camera,
+Display, and Grid and Units. Dynamic detail
 updates do not resize or rebuild unrelated domains.
+
+Data is a read-only Viewer projection, not a store. It walks spatial objects
+in hierarchy order followed by annotations in collection order, deduplicates
+their item GUIDs, and resolves bound instances only through
+`scene.item_store`. Unresolved GUIDs remain rows and no resolver is invoked.
+Its local selection is not part of `ViewerState`. The modal Data Details
+dialog reads generic public constructor attributes without traversing
+`__data__`; Mesh and Graph reuse lazy declared-domain tables with editing
+disabled. Refreshing this projection does not rebuild renderer buffers.
+Scene owns a noncollapsible vertical splitter between its hierarchy and
+editable details. Annotations owns a separate noncollapsible splitter between
+its list and a vertically scrollable dimension-details area. Detail controls
+retain their natural size and spacing when the splitter is reduced, and the two
+splitter sizes remain independent. The Scene details
+area replaces the old inline information textbox with a fixed **Details**
+button. That button opens a main-window-owned, read-only modal snapshot for one
+or multiple selected objects; it is disabled for no selection. Editable
+attributes remain in the sidebar.
+The Viewer derives resolution controls from the normalized Core editable-field
+mapping and filters them by the represented producer. It does not define a
+second resolution field or alias: cones and cylinders expose U; spheres, tori,
+and capsules expose U and V; surfaces expose both; boxes and unknown shapes
+expose neither. Core callbacks validate integer minima and the capsule's even V
+constraint transactionally. A valid edit regenerates only the affected render
+helper's representation and bounds before topology buffers and the Scene tree
+are refreshed; the active editor is retained until its Qt signal callback has
+returned. U/V spin boxes commit typed text once rather than rebuilding for each
+keystroke. An invalid edit rolls back without a render or UI refresh. The
+analytic geometry remains unchanged, while the scene-owned U/V values survive
+scene serialization.
+Shape and surface controls present their existing `show_lines`, `linecolor`,
+and `linewidth` fields as wireframe settings; the durable field names are not
+changed. Visibility flags, opacity, point or vertex size, and line or edge
+width update only the affected settings-texture record with a current OpenGL
+context and request one redraw. They do not refresh object data, tessellate a
+parametric producer, or rebuild combined buffers. Color controls continue to
+use the appearance-data refresh path.
+The enclosing viewport splitter keeps the right sidebar non-collapsible, so
+its configured minimum width remains authoritative.
 
 `GridUnitSetting` is the only built-in component for grid, unit, and precision
 controls. The retired `MeasurementSetting` item type and `"Units and
@@ -254,8 +408,10 @@ Measurement"` section identifier have no compatibility alias.
 
 Viewer-owned screen overlays remain outside Scene, picking, and serialization.
 `ScreenTextOverlay` stores text, a normalized viewport position, horizontal and
-vertical alignment, and color. `(0, 0)` is the top-left corner and `(1, 1)` is
-the bottom-right. Add and remove instances through `viewer.add_overlay` and
+vertical alignment, color, and optional label background with nonnegative
+logical-pixel padding. `(0, 0)` is the top-left corner and `(1, 1)` is the
+bottom-right. The background alpha controls opacity and `None` remains
+transparent. Add and remove instances through `viewer.add_overlay` and
 `viewer.remove_overlay`; the initial contract has no interactive placement,
 management UI, or persistence.
 
@@ -448,7 +604,8 @@ viewer.ui.sidebar.set_current_tab("System")
 viewer.ui.sidebar.focus_system_section("Camera")
 ```
 
-`set_current_tab` accepts only `"Scene"`, `"Annotations"`, or `"System"`.
+`set_current_tab` accepts only `"Scene"`, `"Data"`, `"Annotations"`, or
+`"System"`.
 `focus_system_section` accepts only `"Camera"`, `"Display"`, or
 `"Grid and Units"`, activates System, and focuses that section. Both
 methods raise `ValueError` for unsupported identifiers. Components should use

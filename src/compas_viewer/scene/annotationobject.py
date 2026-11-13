@@ -21,6 +21,7 @@ from compas.scene import DistanceDimension
 from compas.scene import SceneAnnotation
 from compas.scene import TextAnnotation
 from compas_viewer import HERE
+from compas_viewer.dimensionlayout import resolve_dimension_layout
 from compas_viewer.gl import make_index_buffer
 from compas_viewer.gl import make_vertex_buffer
 
@@ -162,6 +163,7 @@ class TextAnnotationRenderObject(WorldAnnotationRenderObject):
         shader = renderer.shader_world_text
         shader.bind()
         shader.uniform4x4("viewworld", viewworld)
+        background = self.annotation_entry.label_background
         _draw_text(
             shader,
             self._text_buffer,
@@ -177,6 +179,9 @@ class TextAnnotationRenderObject(WorldAnnotationRenderObject):
             horizontal_align=self.HORIZONTAL_ALIGN[self.annotation.horizontal_alignment],
             is_selected=self.is_selected,
             text_offset=(0.0, 0.0),
+            background_color=background.rgb if background is not None else (0.0, 0.0, 0.0),
+            background_alpha=background.a if background is not None else 0.0,
+            background_padding=self.annotation_entry.label_background_padding if background is not None else 0.0,
         )
         shader.release()
 
@@ -270,6 +275,16 @@ class DistanceDimensionRenderObject(WorldAnnotationRenderObject):
         return self.dimension.resolve(self.runtime_scene)
 
     @property
+    def layout_resolution(self):
+        """Return the current durable spatial-layout resolution."""
+        return resolve_dimension_layout(self.annotation_entry, self.runtime_scene)
+
+    @property
+    def display_points(self) -> tuple[Point, Point] | None:
+        """Return the displaced line endpoints, or the valid fallback line."""
+        return self.layout_resolution.line_points
+
+    @property
     def display_label(self) -> str:
         """Return the resolved label or an explicit unresolved-state label."""
         label = self.dimension.formatted_label(self.runtime_scene)
@@ -282,7 +297,7 @@ class DistanceDimensionRenderObject(WorldAnnotationRenderObject):
     @property
     def label_position(self) -> Point:
         """Return the world-coordinate position of the current label."""
-        points = self.resolved_points
+        points = self.display_points
         if points is not None:
             return Point(
                 0.5 * (points[0].x + points[1].x),
@@ -313,7 +328,8 @@ class DistanceDimensionRenderObject(WorldAnnotationRenderObject):
         if not self.show:
             return
         self._refresh_label()
-        points = self.resolved_points
+        resolution = self.layout_resolution
+        points = resolution.line_points
         if points is not None:
             shader = renderer.shader_world_arrow
             shader.bind()
@@ -331,11 +347,27 @@ class DistanceDimensionRenderObject(WorldAnnotationRenderObject):
                 line_width=self.style.line_width,
                 arrow_size=self.style.arrow_size,
             )
+            if resolution.displaced and resolution.anchors is not None:
+                for anchor, endpoint in zip(resolution.anchors, points, strict=True):
+                    _draw_arrow(
+                        shader,
+                        self._arrow_buffer,
+                        start=anchor,
+                        end=endpoint,
+                        transform=identity(4, dtype=float32),
+                        color=self.style.color.rgb,
+                        opacity=1.0,
+                        screen_size=(renderer.width(), renderer.height()),
+                        is_selected=self.is_selected,
+                        line_width=self.style.extension_line_width,
+                        arrow_size=0.0,
+                    )
             shader.release()
 
         shader = renderer.shader_world_text
         shader.bind()
         shader.uniform4x4("viewworld", viewworld)
+        background = self.annotation_entry.label_background
         _draw_text(
             shader,
             self._text_buffer,
@@ -351,6 +383,9 @@ class DistanceDimensionRenderObject(WorldAnnotationRenderObject):
             horizontal_align=0,
             is_selected=self.is_selected,
             text_offset=self._label_offset(renderer, points),
+            background_color=background.rgb if background is not None else (0.0, 0.0, 0.0),
+            background_alpha=background.a if background is not None else 0.0,
+            background_padding=self.annotation_entry.label_background_padding if background is not None else 0.0,
         )
         shader.release()
 
@@ -383,15 +418,15 @@ class DistanceDimensionRenderObject(WorldAnnotationRenderObject):
 
     def refresh_annotation_bounds(self) -> None:
         """Recompute the dimension's resolved world-space bounds."""
-        points = self.resolved_points
-        if points is None:
+        resolution = self.layout_resolution
+        if resolution.anchors is None:
             self._bounding_box = None
             self._bounding_box_center = None
             return
-        self._bounding_box = [
-            [min(a, b) for a, b in zip(points[0], points[1], strict=True)],
-            [max(a, b) for a, b in zip(points[0], points[1], strict=True)],
-        ]
+        points = list(resolution.anchors)
+        if resolution.line_points is not None:
+            points.extend(resolution.line_points)
+        self._set_bounds(points)
         self._bounding_box_center = self.label_position
 
 
@@ -520,6 +555,9 @@ def _draw_text(
     horizontal_align: int,
     is_selected: bool,
     text_offset: tuple[float, float],
+    background_color: tuple[float, float, float],
+    background_alpha: float,
+    background_padding: float,
 ) -> None:
     shader.enable_attribute("position")
     shader.uniform4x4("transform", transform)
@@ -532,8 +570,9 @@ def _draw_text(
     shader.uniform1f("text_height", text_height)
     shader.uniform3f("text_position", position)
     shader.uniform3f("text_color", color)
-    shader.uniform3f("background_color", (0, 0, 0))
-    shader.uniform1f("background_alpha", 0)
+    shader.uniform3f("background_color", background_color)
+    shader.uniform1f("background_alpha", background_alpha)
+    shader.uniform1f("background_padding", background_padding)
     shader.uniform1i("vertical_align", vertical_align)
     shader.uniform1i("horizontal_align", horizontal_align)
     shader.uniformText("text_texture", buffer["text_texture"])

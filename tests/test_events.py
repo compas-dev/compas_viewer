@@ -5,12 +5,15 @@ from PySide6.QtCore import QEvent
 from PySide6.QtCore import QPoint
 from PySide6.QtCore import QPointF
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QAction
 from PySide6.QtGui import QKeyEvent
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication
 from PySide6.QtWidgets import QLineEdit
+from PySide6.QtWidgets import QTabWidget
 from PySide6.QtWidgets import QWidget
 
+from compas_viewer.components.menubar import _GlobalDeleteFilter
 from compas_viewer.components.menubar import _GlobalEscapeFilter
 from compas_viewer.components.menubar import MenuBar
 from compas_viewer.events import EventManager
@@ -117,6 +120,40 @@ def test_global_escape_filter_leaves_propagated_escape_to_focused_editor(monkeyp
     editor.hide()
 
 
+def test_global_delete_filter_routes_non_editor_delete_once(monkeypatch):
+    monkeypatch.setenv("QT_QPA_PLATFORM", "offscreen")
+    app = QApplication.instance() or QApplication([])
+    callback = Mock()
+    event_filter = _GlobalDeleteFilter(callback)
+    event = QKeyEvent(QEvent.Type.KeyPress, Qt.Key.Key_Delete, Qt.KeyboardModifier.NoModifier)
+
+    assert event_filter.eventFilter(QWidget(), event)
+    callback.assert_called_once_with()
+    assert event.isAccepted()
+    assert app is not None
+
+
+def test_global_delete_filter_preserves_editor_local_delete(monkeypatch):
+    monkeypatch.setenv("QT_QPA_PLATFORM", "offscreen")
+    app = QApplication.instance() or QApplication([])
+    callback = Mock()
+    event_filter = _GlobalDeleteFilter(callback)
+    editor = QLineEdit("abc")
+    editor.selectAll()
+    editor.show()
+    editor.setFocus()
+    app.processEvents()
+    app.installEventFilter(event_filter)
+
+    QTest.keyClick(editor, Qt.Key.Key_Delete)
+    app.processEvents()
+
+    callback.assert_not_called()
+    assert editor.text() == ""
+    app.removeEventFilter(event_filter)
+    editor.hide()
+
+
 def test_global_escape_cancels_measurement_before_deselecting(monkeypatch):
     command = SimpleNamespace(callback=Mock())
     viewer = SimpleNamespace(
@@ -135,6 +172,40 @@ def test_global_escape_cancels_measurement_before_deselecting(monkeypatch):
     menu._deselect_or_cancel()
 
     command.callback.assert_called_once_with(viewer)
+
+
+def test_menu_delete_uses_active_tab_and_is_disabled_for_system(monkeypatch):
+    app = QApplication.instance() or QApplication([])
+    delete = SimpleNamespace(callback=Mock())
+    viewer = SimpleNamespace(commands={"viewer.delete_selected": delete})
+    monkeypatch.setattr(MenuBar, "viewer", property(lambda _self: viewer), raising=False)
+    menu = object.__new__(MenuBar)
+    action = QAction("Delete Selected")
+    menu._command_actions = {"viewer.delete_selected": [action]}
+
+    class Sidebar:
+        TABS = ("Scene", "Annotations", "System")
+
+        def __init__(self):
+            self.widget = QTabWidget()
+            for name in self.TABS:
+                self.widget.addTab(QWidget(), name)
+
+        @property
+        def current_tab(self):
+            return self.TABS[self.widget.currentIndex()]
+
+    sidebar = Sidebar()
+    menu.bind_sidebar(sidebar)
+    assert action.isEnabled()
+    sidebar.widget.setCurrentIndex(2)
+    assert not action.isEnabled()
+    sidebar.widget.setCurrentIndex(1)
+    assert action.isEnabled()
+
+    menu._delete_from_focus()
+    delete.callback.assert_called_once_with(viewer, source="context")
+    assert app is not None
 
 
 def test_active_measurement_consumes_left_press_before_selection(monkeypatch):

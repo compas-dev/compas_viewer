@@ -1,0 +1,5 @@
+<!-- Project-authored for COMPAS Viewer; licensed under the repository MIT License. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <path fill="#000" opacity=".28" d="M12 2 21 7v10l-9 5-9-5V7z"/>
+  <path fill="#000" d="M12 2 3 7v10l9 5 9-5V7zm0 2.3L18.6 8 12 11.7 5.4 8zM5 9.7l6 3.3v6.1l-6-3.3zm8 9.4V13l6-3.3v6.1z" opacity=".65"/>
+</svg>

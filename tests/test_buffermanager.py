@@ -1,4 +1,5 @@
 import numpy as np
+from unittest.mock import Mock
 
 from compas.colors import Color
 from compas.datastructures import Graph
@@ -133,3 +134,63 @@ def test_mesh_and_graph_helpers_satisfy_generic_buffer_contract():
     np.testing.assert_allclose(manager.colors["_points_data"][-4:], Color.yellow().rgba)
     np.testing.assert_allclose(manager.colors["_lines_data"][:4], Color.green().rgba)
     np.testing.assert_allclose(manager.colors["_lines_data"][-4:], Color.cyan().rgba)
+
+
+def test_measurement_footprints_include_all_mesh_vertices_and_no_graph_nodes():
+    scene = ViewerScene()
+    mesh = Mesh.from_vertices_and_faces(
+        [[0, 0, 0], [1, 0, 0], [1, 1, 0], [0, 1, 0]],
+        [[0, 1, 2, 3]],
+    )
+    graph = Graph()
+    graph.add_node(0, x=0, y=0, z=1)
+    graph.add_node(1, x=1, y=0, z=1)
+    graph.add_edge(0, 1)
+    mesh_object = scene.add(mesh, show_points=False, show_lines=True, show_faces=False)
+    mesh_object.show_vertices = [0]
+    graph_object = scene.add(graph, show_points=True, show_lines=True)
+    mesh_render = scene.render_object(mesh_object)
+    graph_render = scene.render_object(graph_object)
+    mesh_render.refresh_data()
+    graph_render.refresh_data()
+    manager = BufferManager()
+
+    manager.add_object(mesh_render)
+    manager.add_object(graph_render)
+
+    np.testing.assert_array_equal(manager.measurement_point_elements, [0, 1, 2, 3])
+    assert manager.settings[0][0] == [True, True, True, False]
+    assert manager.settings[1][0] == [True, True, True, False]
+
+
+def test_measurement_footprints_do_not_make_a_mesh_without_visible_primitives_discoverable():
+    scene = ViewerScene()
+    mesh = Mesh.from_vertices_and_faces([[0, 0, 0]], [])
+    mesh_object = scene.add(mesh, show_points=False, show_lines=False, show_faces=True)
+    mesh_render = scene.render_object(mesh_object)
+    mesh_render.refresh_data()
+    manager = BufferManager()
+
+    manager.add_object(mesh_render)
+
+    np.testing.assert_array_equal(manager.measurement_point_elements, [0])
+    assert manager.settings[0][0] == [True, False, False, False]
+
+
+def test_measurement_footprints_use_the_mesh_only_index_buffer():
+    manager = BufferManager()
+    manager.measurement_point_elements = np.array([1, 3], dtype=np.int32)
+    manager.buffer_ids["_points_data"] = {
+        "positions": 10,
+        "colors": 11,
+        "object_indices": 12,
+        "elements": 13,
+        "measurement_elements": 14,
+    }
+    shader = Mock()
+
+    manager._draw_measurement_points(shader, faces_visible=False)
+
+    shader.uniform1i.assert_any_call("element_type", 3)
+    shader.uniform1i.assert_any_call("measurement_faces_visible", False)
+    shader.draw_points.assert_called_once_with(elements=14, n=2)

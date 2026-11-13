@@ -57,7 +57,7 @@ def test_edit_menu_exposes_history_editing_and_deletion_commands_once():
         {"type": "separator"},
         {"title": "Modify Parameters...", "command": "viewer.modify_selected"},
         {"type": "separator"},
-        {"title": "Delete Selected", "command": "viewer.delete_selected"},
+        {"title": "Delete Selected", "command": "viewer.delete_selected", "kwargs": {"source": "menu"}},
     ]
     assert [item.get("command") for item in edit_menu["items"]].count("viewer.delete_selected") == 1
     assert builtin_commands()["viewer.delete_selected"].keybinding == "Delete"

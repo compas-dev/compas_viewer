@@ -14,7 +14,6 @@ from PySide6.QtCore import QByteArray
 from PySide6.QtCore import QIODevice
 from PySide6.QtCore import Qt
 from PySide6.QtCore import QTimer
-from PySide6.QtGui import QColor
 from PySide6.QtGui import QIcon
 from PySide6.QtGui import QPalette
 from PySide6.QtWidgets import QApplication
@@ -31,6 +30,8 @@ from compas_viewer._history import copy_transformation
 from compas_viewer._scalar_measurement import ScalarMeasurementError
 from compas_viewer._scalar_measurement import ScalarMeasurementKind
 from compas_viewer._scalar_measurement import measure_sceneobject_scalar
+from compas_viewer._theme import application_palette
+from compas_viewer._theme import application_stylesheet
 from compas_viewer.animation import ANIMATION_PRESETS
 from compas_viewer.animation import AnimationPreset
 from compas_viewer.commandregistry import CommandRegistry
@@ -60,6 +61,22 @@ from compas_viewer.uidefinitions import default_toolbar_items
 
 if TYPE_CHECKING:
     from PySide6.QtGui import QPainter
+
+
+_CONTENT_PALETTE = {
+    "light": {
+        "viewport": "#FAFAFA",
+        "surface": "#D8DEE4",
+        "line": "#4B5563",
+        "point": "#111827",
+    },
+    "dark": {
+        "viewport": "#10161B",
+        "surface": "#3A4650",
+        "line": "#B8C2CC",
+        "point": "#F2F6F8",
+    },
+}
 
 
 class Viewer(Singleton):
@@ -150,6 +167,8 @@ class Viewer(Singleton):
                     annotation.init()
             finally:
                 self.renderer.doneCurrent()
+            if hasattr(self.ui.sidebar, "data_panel"):
+                self.ui.sidebar.data_panel.update()
 
     @property
     def overlays(self) -> tuple[Overlay, ...]:
@@ -313,7 +332,11 @@ class Viewer(Singleton):
             return
         if not isinstance(result, DistanceDimension):
             raise RuntimeError("Unexpected distance measurement result.")
-        annotation = self.scene.add_annotation(result)
+        if self._effective_appearance() == "light":
+            label_background = Color(250 / 255, 250 / 255, 250 / 255, 230 / 255)
+        else:
+            label_background = Color(16 / 255, 22 / 255, 27 / 255, 230 / 255)
+        annotation = self.scene.add_annotation(result, label_background=label_background, label_background_padding=2.0)
         self.state.annotation_selection.replace((annotation,))
 
     def _has_overlay_content(self) -> bool:
@@ -741,11 +764,25 @@ class Viewer(Singleton):
 
     def _apply_appearance(self, appearance: Appearance) -> None:
         """Apply an appearance without changing the selected state value."""
-        effective = self._system_appearance() if appearance == "system" else appearance
-        self.app.setPalette(self._appearance_palette(effective))
-        self.state.set("renderer.backgroundcolor", Color.from_hex("#1e1e1e") if effective == "dark" else Color.white())
+        effective = self._effective_appearance(appearance)
+        self.app.setPalette(application_palette(effective))
+        self.app.setStyleSheet(application_stylesheet(effective))
         if hasattr(self, "ui"):
             self.renderer.update()
+
+    def _effective_appearance(self, appearance: Appearance | None = None) -> Literal["light", "dark"]:
+        """Return the effective light or dark scheme for Viewer-owned defaults."""
+        selected = self.config.ui.appearance if appearance is None else appearance
+        return self._system_appearance() if selected == "system" else selected
+
+    def _content_color(self, role: Literal["viewport", "surface", "line", "point"]) -> Color:
+        """Return one Viewer-owned content default for the effective scheme."""
+        return Color.from_hex(_CONTENT_PALETTE[self._effective_appearance()][role])
+
+    @property
+    def backgroundcolor(self) -> Color:
+        """Return the explicit or automatic effective viewport background."""
+        return self.config.renderer.backgroundcolor or self._content_color("viewport")
 
     def _on_state_changed(self, path: str, value: object) -> None:
         """Apply viewer-owned effects for a changed state value."""
@@ -767,66 +804,15 @@ class Viewer(Singleton):
 
     def _system_appearance(self) -> Literal["light", "dark"]:
         """Return the effective appearance reported by the platform."""
-        scheme = self.app.styleHints().colorScheme()
+        app = getattr(self, "app", None) or QApplication.instance()
+        if app is None:
+            return "light"
+        scheme = app.styleHints().colorScheme()
         if scheme == Qt.ColorScheme.Dark:
             return "dark"
         if scheme == Qt.ColorScheme.Light:
             return "light"
-        return "dark" if self.app.palette().color(QPalette.ColorRole.Window).lightness() < 128 else "light"
-
-    @staticmethod
-    def _appearance_palette(appearance: Literal["light", "dark"]) -> QPalette:
-        """Create a complete Qt palette for an effective appearance.
-
-        Parameters
-        ----------
-        appearance
-            Effective light or dark appearance.
-
-        Returns
-        -------
-        QPalette
-            Application palette for the requested appearance.
-
-        """
-        palette = QPalette()
-        if appearance == "dark":
-            colors = {
-                QPalette.ColorRole.Window: "#2b2b2b",
-                QPalette.ColorRole.WindowText: "#f0f0f0",
-                QPalette.ColorRole.Base: "#1e1e1e",
-                QPalette.ColorRole.AlternateBase: "#353535",
-                QPalette.ColorRole.ToolTipBase: "#f0f0f0",
-                QPalette.ColorRole.ToolTipText: "#202020",
-                QPalette.ColorRole.Text: "#f0f0f0",
-                QPalette.ColorRole.Button: "#353535",
-                QPalette.ColorRole.ButtonText: "#f0f0f0",
-                QPalette.ColorRole.BrightText: "#ff5c5c",
-                QPalette.ColorRole.Link: "#6cb6ff",
-                QPalette.ColorRole.Highlight: "#3d7eff",
-                QPalette.ColorRole.HighlightedText: "#ffffff",
-                QPalette.ColorRole.PlaceholderText: "#a0a0a0",
-            }
-        else:
-            colors = {
-                QPalette.ColorRole.Window: "#f0f0f0",
-                QPalette.ColorRole.WindowText: "#202020",
-                QPalette.ColorRole.Base: "#ffffff",
-                QPalette.ColorRole.AlternateBase: "#e8e8e8",
-                QPalette.ColorRole.ToolTipBase: "#ffffdc",
-                QPalette.ColorRole.ToolTipText: "#202020",
-                QPalette.ColorRole.Text: "#202020",
-                QPalette.ColorRole.Button: "#f0f0f0",
-                QPalette.ColorRole.ButtonText: "#202020",
-                QPalette.ColorRole.BrightText: "#ffffff",
-                QPalette.ColorRole.Link: "#0057ae",
-                QPalette.ColorRole.Highlight: "#308cc6",
-                QPalette.ColorRole.HighlightedText: "#ffffff",
-                QPalette.ColorRole.PlaceholderText: "#707070",
-            }
-        for role, color in colors.items():
-            palette.setColor(role, QColor(color))
-        return palette
+        return "dark" if app.palette().color(QPalette.ColorRole.Window).lightness() < 128 else "light"
 
     def show(self) -> None:
         """Initialize the interface and enter the Qt event loop."""

@@ -117,6 +117,7 @@ class _ElementAttributesModel(QAbstractTableModel):
         *,
         changed: Callable[[], None],
         failed: Callable[[Exception], None],
+        editable: bool = True,
     ) -> None:
         super().__init__()
         self.domain = domain
@@ -124,6 +125,7 @@ class _ElementAttributesModel(QAbstractTableModel):
         self.attributes = tuple(domain.defaults)
         self._changed = changed
         self._failed = failed
+        self._editable = editable
 
     def rowCount(self, parent: QModelIndex | QPersistentModelIndex = QModelIndex()) -> int:
         """Return the number of snapshotted element keys."""
@@ -166,7 +168,7 @@ class _ElementAttributesModel(QAbstractTableModel):
         if not index.isValid():
             return Qt.ItemFlag.NoItemFlags
         flags = Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable
-        if index.column() == 0:
+        if index.column() == 0 or not self._editable:
             return flags
         default = self.domain.defaults[self.attributes[index.column() - 1]]
         value_type = _editable_type(default)
@@ -179,7 +181,7 @@ class _ElementAttributesModel(QAbstractTableModel):
 
     def setData(self, index: QModelIndex | QPersistentModelIndex, value: object, role: int = Qt.ItemDataRole.EditRole) -> bool:
         """Commit one scalar cell through the singular datastructure setter."""
-        if not index.isValid() or index.column() == 0:
+        if not self._editable or not index.isValid() or index.column() == 0:
             return False
         if role not in {Qt.ItemDataRole.EditRole, Qt.ItemDataRole.CheckStateRole}:
             return False
@@ -202,7 +204,7 @@ class _ElementAttributesModel(QAbstractTableModel):
 
     def reset_to_default(self, index: QModelIndex, *, refresh: bool = True) -> bool:
         """Remove one editable cell override through the singular unsetter."""
-        if not index.isValid() or index.column() == 0:
+        if not self._editable or not index.isValid() or index.column() == 0:
             return False
         name = self.attributes[index.column() - 1]
         if _editable_type(self.domain.defaults[name]) is None:

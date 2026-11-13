@@ -1,0 +1,4 @@
+<!-- Project-authored for COMPAS Viewer; licensed under the repository MIT License. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <path fill="none" stroke="#000" stroke-width="1.8" stroke-linejoin="round" d="m12 2 9 5v10l-9 5-9-5V7zm0 10v10m0-10 9-5m-9 5L3 7m0 10 9-5 9 5"/>
+</svg>

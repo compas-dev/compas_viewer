@@ -16,8 +16,9 @@ from compas.colors import Color
 type Appearance = Literal["system", "light", "dark"]
 
 
-def _default_backgroundcolor() -> Color:
-    return Color.white()
+def _legacy_backgroundcolor() -> Color:
+    """Return the fixed background used by configuration schemas 0--3."""
+    return Color.from_hex("#D8DDE2")
 
 
 def _serialize_config_value(value: Any) -> Any:
@@ -403,7 +404,7 @@ class RendererConfig(ConfigBase):
     ghostopacity: float = 0.7
     rendermode: Literal["ghosted", "shaded", "lighted", "wireframe"] = "shaded"
     view: Literal["perspective", "front", "right", "top", "ortho"] = "perspective"
-    backgroundcolor: Color = field(default_factory=_default_backgroundcolor)
+    backgroundcolor: Color | None = None
     selectioncolor: Color = field(default_factory=lambda: Color(1.0, 1.0, 0.0, 1.0))
     debug_instance: bool = False
 
@@ -424,7 +425,8 @@ class RendererConfig(ConfigBase):
         _require_number(f"{path}.ghostopacity", self.ghostopacity, minimum=0.0, maximum=1.0)
         _require_choice(f"{path}.rendermode", self.rendermode, {"ghosted", "lighted", "shaded", "wireframe"})
         _require_choice(f"{path}.view", self.view, {"front", "ortho", "perspective", "right", "top"})
-        _require_color(f"{path}.backgroundcolor", self.backgroundcolor)
+        if self.backgroundcolor is not None:
+            _require_color(f"{path}.backgroundcolor", self.backgroundcolor)
         _require_color(f"{path}.selectioncolor", self.selectioncolor)
         _require_bool(f"{path}.debug_instance", self.debug_instance)
 
@@ -477,7 +479,7 @@ class MeasurementConfig(ConfigBase):
         leaves the unit unspecified. This declaration does not convert
         coordinates.
     precision
-        Number of decimal places used to display measurements.
+        Number of decimal places used to display measurements, from 0 to 15.
 
     Notes
     -----
@@ -496,8 +498,8 @@ class MeasurementConfig(ConfigBase):
             if not self.unit.strip():
                 raise ValueError(f"{path}.unit should be a non-empty string or None.")
         _require_int(f"{path}.precision", self.precision)
-        if self.precision < 0:
-            raise ValueError(f"{path}.precision should be non-negative.")
+        if not 0 <= self.precision <= 15:
+            raise ValueError(f"{path}.precision should be between 0 and 15 inclusive.")
 
 
 # =============================================================================
@@ -557,13 +559,13 @@ class Config(ConfigBase):
     """Collect validated, serializable Viewer startup preferences.
 
     Nested values may be assigned directly while preparing a Viewer. They do
-    not provide a general reactive runtime interface. Schema version 3 accepts
-    only declared fields. `Config.from_dict` also migrates supported version-0,
-    version-1, and version-2 data.
+    not provide a general reactive runtime interface. Schema version 4 accepts
+    only declared fields. `Config.from_dict` also migrates supported version-0
+    through version-3 data.
 
     """
 
-    schema_version: int = 3
+    schema_version: int = 4
     vectorsize: float = 0.1
     ui: UIConfig = field(default_factory=UIConfig)
     window: WindowConfig = field(default_factory=WindowConfig)
@@ -581,8 +583,8 @@ class Config(ConfigBase):
 
         """
         _require_int(_path(path, "schema_version"), self.schema_version)
-        if self.schema_version != 3:
-            raise ValueError(f"{_path(path, 'schema_version')} should be 3.")
+        if self.schema_version != 4:
+            raise ValueError(f"{_path(path, 'schema_version')} should be 4.")
         _require_number(_path(path, "vectorsize"), self.vectorsize, positive=True)
 
         sections = {
@@ -639,7 +641,7 @@ class Config(ConfigBase):
 
         migrated = dict(data)
         version = migrated.get("schema_version", 0)
-        if isinstance(version, bool) or not isinstance(version, int) or version not in {0, 1, 2, 3}:
+        if isinstance(version, bool) or not isinstance(version, int) or version not in {0, 1, 2, 3, 4}:
             raise ValueError(f"Unsupported configuration schema version: {version!r}.")
 
         if version < 3 and "measurement" in migrated:
@@ -682,5 +684,12 @@ class Config(ConfigBase):
         if version < 3:
             migrated["measurement"] = MeasurementConfig().to_dict()
             migrated["schema_version"] = 3
+
+        if version < 4:
+            renderer = migrated.get("renderer")
+            renderer = dict(renderer) if isinstance(renderer, dict) else {}
+            renderer.setdefault("backgroundcolor", _serialize_config_value(_legacy_backgroundcolor()))
+            migrated["renderer"] = renderer
+            migrated["schema_version"] = 4
 
         return cls._from_dict(migrated, "")

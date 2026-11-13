@@ -14,6 +14,11 @@ size, and label offset. Sizes and offsets use logical screen pixels. A positive
 label offset moves the label toward the left side of the projected start-to-end
 segment.
 
+Omitting the style color uses magenta for a newly constructed default. An
+explicit color remains authoritative, and a serialized style reloads its stored
+color. Magenta is a visible starting point rather than a guarantee of contrast
+against every viewport background.
+
 ```python
 --8<-- "docs/examples/object/text_annotations.py"
 ```

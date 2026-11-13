@@ -158,7 +158,7 @@ class ViewerState(QObject):
         Parameters
         ----------
         precision
-            Non-negative number of decimal places.
+            Number of decimal places from 0 to 15 inclusive.
 
         Returns
         -------

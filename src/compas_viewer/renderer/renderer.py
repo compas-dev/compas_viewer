@@ -27,6 +27,7 @@ from PySide6.QtOpenGLWidgets import QOpenGLWidget
 from PySide6.QtWidgets import QGesture
 from PySide6.QtWidgets import QGestureEvent
 
+from compas.colors import Color
 from compas.geometry import Frame
 from compas.geometry import Point
 from compas.geometry import transform_points_numpy
@@ -149,6 +150,7 @@ class Renderer(QOpenGLWidget, Base):
         self.setAcceptDrops(True)
 
         self.buffer_manager = BufferManager()
+        self._measurement_acquisition = False
         self.viewer.state.changed.connect(self._on_state_changed)
 
         self.set_idle_refresh()
@@ -217,6 +219,16 @@ class Renderer(QOpenGLWidget, Base):
         return self._opacity
 
     @property
+    def backgroundcolor(self) -> Color:
+        """Return the effective viewport background color."""
+        return self.viewer.backgroundcolor
+
+    @backgroundcolor.setter
+    def backgroundcolor(self, color: Color) -> None:
+        """Store an explicit viewport background color."""
+        self.viewer.config.renderer.backgroundcolor = color
+
+    @property
     def shader_world_text(self) -> Shader:
         """Return the lazily initialized world-text shader.
 
@@ -267,7 +279,7 @@ class Renderer(QOpenGLWidget, Base):
 
     def clear(self) -> None:
         """Clear the color and depth buffers."""
-        GL.glClearColor(*self.viewer.config.renderer.backgroundcolor.rgba)
+        GL.glClearColor(*self.backgroundcolor.rgba)
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)  # type: ignore
 
     def _clear_opengl_errors(self):
@@ -295,7 +307,7 @@ class Renderer(QOpenGLWidget, Base):
         # any stale errors caused e.g. by the windowing framework and were not cleared may trigger a crash as soon as we start issuing GL calls.
         self._clear_opengl_errors()
 
-        GL.glClearColor(*self.viewer.config.renderer.backgroundcolor.rgba)
+        GL.glClearColor(*self.backgroundcolor.rgba)
         GL.glPolygonOffset(1.0, 1.0)
         GL.glEnable(GL.GL_CULL_FACE)
         GL.glCullFace(GL.GL_BACK)
@@ -389,7 +401,7 @@ class Renderer(QOpenGLWidget, Base):
             The Qt event.
 
         """
-        if self.isActiveWindow() and self.underMouse():
+        if self.underMouse():
             self.viewer.eventmanager.delegate_mousemove(event)
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
@@ -402,7 +414,7 @@ class Renderer(QOpenGLWidget, Base):
             The Qt event.
 
         """
-        if self.isActiveWindow() and self.underMouse():
+        if self.underMouse():
             self.viewer.eventmanager.delegate_mousepress(event)
 
     def mouseReleaseEvent(self, event: QMouseEvent) -> None:
@@ -415,7 +427,7 @@ class Renderer(QOpenGLWidget, Base):
             The Qt event.
 
         """
-        if self.isActiveWindow() and self.underMouse():
+        if self.underMouse():
             self.viewer.eventmanager.delegate_mouserelease(event)
 
     def gestureEvent(self, event: QGestureEvent) -> bool:
@@ -453,7 +465,7 @@ class Renderer(QOpenGLWidget, Base):
         * https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QWidget.html#PySide6.QtWidgets.PySide6.QtWidgets.QWidget.wheelEvent
 
         """
-        if self.isActiveWindow() and self.underMouse():
+        if self.underMouse():
             self.viewer.eventmanager.delegate_wheel(event)
 
     def keyPressEvent(self, event: QKeyEvent) -> None:
@@ -784,6 +796,8 @@ class Renderer(QOpenGLWidget, Base):
             self.rendermode,
             is_instance=is_instance,
         )
+        if is_instance and self._measurement_acquisition:
+            self.buffer_manager._draw_measurement_points(self.shader_model, faces_visible=self.rendermode != "wireframe")
 
         if not is_instance:
             self._draw_world_annotations(viewworld)
@@ -1194,6 +1208,7 @@ class Renderer(QOpenGLWidget, Base):
     def _render_instance_map(self) -> None:
         """Render the scene in instance color mode."""
         state = self._capture_instance_gl_state()
+        previous_measurement_acquisition = getattr(self, "_measurement_acquisition", False)
         try:
             GL.glEnable(GL.GL_DEPTH_TEST)
             GL.glDepthFunc(GL.GL_LEQUAL)
@@ -1202,10 +1217,13 @@ class Renderer(QOpenGLWidget, Base):
             GL.glDisable(GL.GL_BLEND)
             GL.glClear(cast(int, GL.GL_COLOR_BUFFER_BIT) | cast(int, GL.GL_DEPTH_BUFFER_BIT))
             GL.glViewport(0, 0, self.width(), self.height())
+            measurement = getattr(getattr(getattr(self, "viewer", None), "state", None), "measurement", None)
+            self._measurement_acquisition = bool(getattr(measurement, "active", False))
             self.paint(is_instance=True)
             GL.glFlush()
             GL.glFinish()
         finally:
+            self._measurement_acquisition = previous_measurement_acquisition
             self._restore_instance_gl_state(state)
 
     def _read_pixels(self, x: int, y: int, width: int, height: int) -> NDArray[uint8]:

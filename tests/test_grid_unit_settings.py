@@ -21,7 +21,8 @@ def test_grid_unit_panel_updates_grid_and_measurement_presentation(monkeypatch):
     panel = GridUnitSetting()
     panel.unit_edit.setText(" mm ")
     panel.unit_edit.editingFinished.emit()
-    panel.precision_edit.setValue(5)
+    panel.precision_edit.setText("5")
+    panel.precision_edit.editingFinished.emit()
     state.set("renderer.show_grid", False)
     state.set("renderer.gridsize", (20.0, 8, 30.0, 12))
 
@@ -47,7 +48,36 @@ def test_grid_unit_panel_synchronizes_explicit_external_measurement_changes(monk
     state.set_measurement_precision(2)
 
     assert panel.unit_edit.text() == "cm"
-    assert panel.precision_edit.value() == 2
+    assert panel.precision_edit.text() == "2"
+    assert app is not None
+
+
+def test_grid_unit_precision_accepts_boundaries_and_restores_rejected_input(monkeypatch):
+    app = QApplication.instance() or QApplication([])
+    config = Config()
+    state = ViewerState(config)
+    changes = []
+    state.changed.connect(lambda path, value: changes.append((path, value)))
+    viewer = SimpleNamespace(config=config, state=state)
+    monkeypatch.setattr(GridUnitSetting, "viewer", property(lambda _self: viewer), raising=False)
+    panel = GridUnitSetting()
+
+    panel.precision_edit.setText("15")
+    panel.precision_edit.editingFinished.emit()
+    assert config.measurement.precision == 15
+    assert panel.precision_edit.text() == "15"
+
+    for rejected in ("16", "-1", "", "not-an-integer"):
+        panel.precision_edit.setText(rejected)
+        panel.precision_edit.editingFinished.emit()
+        assert config.measurement.precision == 15
+        assert panel.precision_edit.text() == "15"
+
+    panel.precision_edit.setText("0")
+    panel.precision_edit.editingFinished.emit()
+    assert config.measurement.precision == 0
+    assert panel.precision_edit.text() == "0"
+    assert changes == [("measurement.precision", 15), ("measurement.precision", 0)]
     assert app is not None
 
 

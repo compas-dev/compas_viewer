@@ -14,9 +14,12 @@ out vec4 fragColor;
 
 void main()
 {
-    vec2 xy = texcoord;
-    xy.y = 1.0 - xy.y;
-    float a = texture(tex, xy).r;
+    float a = 0.0;
+    if (all(greaterThanEqual(texcoord, vec2(0.0))) && all(lessThanEqual(texcoord, vec2(1.0)))) {
+        vec2 xy = texcoord;
+        xy.y = 1.0 - xy.y;
+        a = texture(tex, xy).r;
+    }
     vec3 foreground = is_selected ? selection_color : text_color;
     float alpha = a + background_alpha * (1.0 - a);
     vec3 color = alpha > 0.0

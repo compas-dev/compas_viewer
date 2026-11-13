@@ -1045,15 +1045,31 @@ redo_cmd = Command(title="Redo", callback=redo)
 # =============================================================================
 
 
-def delete_selected(viewer: "Viewer") -> None:
-    """Remove all selected objects from the scene.
+def delete_selected(viewer: "Viewer", *, source: Literal["direct", "context", "menu"] = "direct") -> None:
+    """Remove the selection owned by the current interaction context.
 
     Parameters
     ----------
     viewer
-        Viewer containing the objects to remove.
+        Viewer containing the spatial and annotation selections.
+    source
+        Use focused-widget ownership for `"context"`. Direct and menu
+        invocations use the active sidebar tab.
 
     """
+    sidebar = getattr(getattr(viewer, "ui", None), "sidebar", None)
+    if sidebar is None or not hasattr(sidebar, "deletion_domain"):
+        domain = "spatial"
+    else:
+        domain = sidebar.deletion_domain(use_focus=source == "context")
+
+    if domain == "annotations":
+        for annotation in tuple(viewer.state.annotation_selection.objects):
+            viewer.scene.remove_annotation(annotation)
+        return
+    if domain != "spatial":
+        return
+
     selected = viewer.state.selection.objects
     if not selected:
         return
@@ -1069,6 +1085,7 @@ def delete_selected(viewer: "Viewer") -> None:
             renderer.doneCurrent()
     if viewer.running:
         viewer.renderer.rebuild_buffers()
+        viewer.scene._refresh_data_domain()
     viewer.state.selection.clear()
 
 

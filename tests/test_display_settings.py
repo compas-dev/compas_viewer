@@ -27,7 +27,11 @@ def test_display_settings_exclude_grid_controls(monkeypatch):
     app = QApplication.instance() or QApplication([])
     config = Config()
     state = ViewerState(config)
-    renderer = SimpleNamespace(rendermode=config.renderer.rendermode, view=config.renderer.view)
+    renderer = SimpleNamespace(
+        rendermode=config.renderer.rendermode,
+        view=config.renderer.view,
+        backgroundcolor=Color.from_hex("#FAFAFA"),
+    )
     viewer = SimpleNamespace(config=config, state=state)
     monkeypatch.setattr(DisplaySetting, "viewer", property(lambda _self: viewer), raising=False)
 
