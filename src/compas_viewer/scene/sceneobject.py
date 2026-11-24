@@ -7,7 +7,6 @@ from numpy import average
 from numpy.typing import NDArray
 
 from compas.colors import Color
-from compas.data import Data
 from compas.geometry import Point
 from compas.geometry import transform_points_numpy
 from compas.scene import SceneObject
@@ -21,27 +20,25 @@ type BufferValues = Sequence[Any] | NDArray[Any]
 type ShaderDataType = tuple[BufferValues, BufferValues | None, BufferValues]
 
 
-class ViewerSceneObject(SceneObject):
-    """Base class for viewer scene objects with render-buffer support.
+class ViewerSceneObject:
+    """Transient Viewer render state for a stable COMPAS scene object.
 
     Parameters
     ----------
-    is_selected
-        Whether the object is selected. Default is False.
     show
         Whether to show object. Default is True.
     show_points
-        Whether to show points/vertices of the object. Default is the value of `show_points` in `viewer.config`.
+        Whether to show points or vertices of the object.
     show_lines
-        Whether to show lines/edges of the object. Default is the value of `show_lines` in `viewer.config`.
+        Whether to show lines or edges of the object.
     show_faces
-        Whether to show faces of the object. Default is the value of `show_faces` in `viewer.config`.
+        Whether to show faces of the object.
     linewidth
-        The line width to be drawn on screen. Default is the value of `linewidth` in `viewer.config`.
+        The line width to draw on screen.
     pointsize
-        The point size to be drawn on screen. Default is the value of `pointsize` in `viewer.config`.
+        The point size to draw on screen.
     opacity
-        The opacity of the object. Default is the value of `opacity` in `viewer.config`.
+        The opacity of the object.
     use_rgba
         Whether buffer colors contain alpha values.
     **kwargs
@@ -51,34 +48,14 @@ class ViewerSceneObject(SceneObject):
 
     def __init__(
         self,
-        is_selected: bool = False,
-        show: bool = True,
-        show_points: bool | None = None,
-        show_lines: bool | None = None,
-        show_faces: bool | None = None,
-        linewidth: float | None = None,
-        pointsize: float | None = None,
-        opacity: float | None = None,
-        use_rgba: bool = False,
+        sceneobject: SceneObject,
+        runtime: Any,
         **kwargs: Any,
     ) -> None:
-        #  Basic
-        super().__init__(**kwargs)
-        self.show = show
-        self.show_points = show_points if show_points is not None else False
-        self.show_lines = show_lines if show_lines is not None else True
-        self.show_faces = show_faces if show_faces is not None else True
-        self.linewidth = linewidth if linewidth is not None else self.viewer.config.display.linewidth
-        self.pointsize = pointsize if pointsize is not None else self.viewer.config.display.pointsize
-        self.opacity = opacity if opacity is not None else self.viewer.config.display.opacity
-
-        #  Selection
-        self.is_selected = is_selected
+        object.__setattr__(self, "sceneobject", sceneobject)
+        object.__setattr__(self, "runtime", runtime)
 
         #  Visual
-        self.background: bool = False
-        self.use_rgba = use_rgba
-
         #  Geometric
         self._bounding_box: list[list[float]] | None = None
         self._bounding_box_center: Point | None = None
@@ -90,14 +67,58 @@ class ViewerSceneObject(SceneObject):
         self._backfaces_data: ShaderDataType | None = None
 
         self._inited = False
-        self.context = "Viewer"
+        self._inited = False
+
+    def __getattr__(self, name: str) -> Any:
+        """Delegate durable presentation and item access to the stable object."""
+        return getattr(self.sceneobject, name)
+
+    def __setattr__(self, name: str, value: Any) -> None:
+        """Store durable fields on the stable object and runtime fields locally."""
+        sceneobject = self.__dict__.get("sceneobject")
+        if sceneobject is not None and hasattr(sceneobject, name):
+            setattr(sceneobject, name, value)
+        else:
+            object.__setattr__(self, name, value)
 
     @property
     def viewer(self) -> Any:
-        """Viewer: The shared viewer instance."""
-        from compas_viewer.viewer import Viewer
+        """The Viewer instance that owns this transient render state."""
+        from .scene import ViewerScene
 
-        return Viewer()
+        if isinstance(self.runtime, ViewerScene):
+            return self.runtime.viewer
+        if getattr(self.runtime, "scene", None) is self.runtime_scene:
+            return self.runtime
+        raise RuntimeError("This render helper is not attached to a Viewer runtime.")
+
+    @property
+    def runtime_scene(self) -> Any:
+        """The ViewerScene that owns this transient render state."""
+        return getattr(self.runtime, "scene", self.runtime)
+
+    @property
+    def is_selected(self) -> bool:
+        """bool: Whether the stable object is selected in the current Viewer."""
+        try:
+            return self.sceneobject in self.viewer.state.selection
+        except RuntimeError:
+            return False
+
+    @property
+    def show_faces(self) -> bool:
+        """Whether to display surface geometry as faces."""
+        return self.show_surfaces
+
+    @show_faces.setter
+    def show_faces(self, show: bool) -> None:
+        self.show_surfaces = show
+
+    @property
+    def parent(self) -> "ViewerSceneObject | None":
+        """Transient render state of the stable parent, when rendered."""
+        parent = self.sceneobject.parent
+        return self.runtime_scene.render_objects.get(parent.guid) if parent is not None else None
 
     @property
     def bounding_box(self) -> list[list[float]] | None:
@@ -110,8 +131,8 @@ class ViewerSceneObject(SceneObject):
         return self._bounding_box_center
 
     @property
-    def data(self) -> Data | None:
-        """Data | None: Underlying COMPAS data or geometry object."""
+    def data(self) -> Any:
+        """Underlying COMPAS data or geometry object."""
         return self.item
 
     @property
@@ -151,8 +172,12 @@ class ViewerSceneObject(SceneObject):
     def init(self) -> None:
         """Initialize render data, bounds, and instance-selection color."""
         self.refresh_data()
-        self.instance_color = Color.from_rgb255(*next(self.viewer.scene._instance_colors_generator))
-        self.viewer.scene.instance_colors[self.instance_color.rgb255] = self
+        previous = getattr(self, "instance_color", None)
+        if previous is not None and self.runtime_scene.instance_colors.get(previous.rgb255) is self.sceneobject:
+            self.runtime_scene.instance_colors.pop(previous.rgb255)
+        self.instance_color = Color.from_rgb255(*next(self.runtime_scene._instance_colors_generator))
+        self.runtime_scene.instance_colors[self.instance_color.rgb255] = self.sceneobject
+        self._inited = True
 
     def refresh_data(self) -> None:
         """Regenerate render data and bounds from the underlying object."""
@@ -195,33 +220,6 @@ class ViewerSceneObject(SceneObject):
         self._bounding_box = list(transform_points_numpy(array([_positions.min(axis=0), _positions.max(axis=0)]), self.worldtransformation.matrix))
         center = average(a=array(self.bounding_box), axis=0)
         self._bounding_box_center = Point(center[0], center[1], center[2])
-
-    @property
-    def settings(self) -> dict[str, Any]:
-        """dict[str, Any]: Current display settings for the scene object."""
-        settings = {
-            "name": self.name,
-            "is_selected": self.is_selected,
-            "show": self.show,
-            "show_points": self.show_points,
-            "show_lines": self.show_lines,
-            "show_faces": self.show_faces,
-            "linewidth": self.linewidth,
-            "pointsize": self.pointsize,
-            "opacity": self.opacity,
-            "background": self.background,
-        }
-
-        if hasattr(self, "pointcolor"):
-            settings["pointcolor"] = getattr(self, "pointcolor")
-
-        if hasattr(self, "linecolor"):
-            settings["linecolor"] = getattr(self, "linecolor")
-
-        if hasattr(self, "facecolor"):
-            settings["facecolor"] = getattr(self, "facecolor")
-
-        return settings
 
     @property
     def buffer_manager(self) -> Any:

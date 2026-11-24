@@ -10,10 +10,6 @@ from .geometryobject import GeometryObject
 class EllipseObject(GeometryObject):
     """Viewer scene object for displaying COMPAS Ellipse geometry."""
 
-    def __init__(self, **kwargs) -> None:
-        super().__init__(**kwargs)
-        self.show_lines = True
-
     @property
     def points(self) -> list[Point]:
         return [cast(Ellipse, self.geometry).plane.point]

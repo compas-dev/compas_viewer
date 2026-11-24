@@ -1,9 +1,3 @@
-from compas.scene import Group as BaseGroup
+from compas.scene import Group
 
-from .sceneobject import ViewerSceneObject
-
-
-class Group(ViewerSceneObject, BaseGroup):
-    """A group of scene objects."""
-
-    pass
+__all__ = ["Group"]

@@ -187,7 +187,7 @@ class Container(Component):
         self.reset()
         label = QLabel(text)
         label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        label.setStyleSheet("color: gray; font-style: italic; padding: 10px;")
+        label.setProperty("mutedText", True)
         if self.container_type == "splitter":
             cast(QSplitter, self.widget).addWidget(label)
         else:

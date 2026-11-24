@@ -1,15 +1,21 @@
 from collections.abc import Callable
 
+from PySide6.QtCore import QTimer
+
 from compas.colors import Color
 from compas.geometry import Box
 from compas.geometry import Frame
 from compas_viewer import Viewer
 from compas_viewer.components import Component
 from compas_viewer.components import Slider
+from compas_viewer.config import Config
 
-viewer = Viewer()
-viewer.renderer.camera.target = [2, 2, 0]
-viewer.renderer.camera.position = [2, 10, 5]
+config = Config()
+config.camera.target = [2, 2, 0]
+config.camera.position = [2, 10, 5]
+config.ui.sidedock.show = True
+
+viewer = Viewer(config=config)
 
 for x in range(5):
     for y in range(5):
@@ -27,7 +33,6 @@ def camera_control(target: object, attribute: str) -> Callable[[Component, float
     return update
 
 
-viewer.ui.sidedock.show = True
 for title, vector in (("Position", viewer.renderer.camera.position), ("Target", viewer.renderer.camera.target)):
     for axis in ("x", "y", "z"):
         viewer.ui.sidedock.add(
@@ -40,4 +45,11 @@ for title, vector in (("Position", viewer.renderer.camera.position), ("Target", 
             )
         )
 
+
+def open_camera_settings() -> None:
+    """Open the built-in Camera controls for the same live camera."""
+    viewer.ui.settings.show("Camera")
+
+
+QTimer.singleShot(0, open_camera_settings)
 viewer.show()

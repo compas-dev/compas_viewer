@@ -1,3 +1,4 @@
+from typing import TYPE_CHECKING
 from typing import Any
 
 import numpy as np
@@ -10,7 +11,11 @@ from compas_viewer.gl import make_texture_buffer
 from compas_viewer.gl import make_vertex_buffer
 from compas_viewer.gl import update_texture_buffer
 from compas_viewer.gl import update_vertex_buffer
-from compas_viewer.renderer.shaders import Shader
+
+from .meshobject import MeshObject
+
+if TYPE_CHECKING:
+    from compas_viewer.renderer.shaders import Shader
 
 type FloatArray = NDArray[np.float32]
 type IntArray = NDArray[np.int32]
@@ -28,6 +33,7 @@ class BufferManager:
         self.elements: dict[str, IntArray] = {}
         self.object_indices: dict[str, FloatArray] = {}
         self.objects: dict[Any, int] = {}
+        self.measurement_point_elements: IntArray = np.array([], dtype=np.int32)
 
         # OpenGL buffer IDs
         self.buffer_ids: dict[str, dict[str, int]] = {}
@@ -63,7 +69,14 @@ class BufferManager:
         # Process geometry data
         for data_type in ["_points_data", "_lines_data", "_frontfaces_data", "_backfaces_data"]:
             if hasattr(obj, data_type) and getattr(obj, data_type):
+                point_start = len(self.positions[data_type]) // 3
                 self._add_buffer_data(obj, data_type)
+                if data_type == "_points_data" and isinstance(obj, MeshObject):
+                    point_count = len(self.positions[data_type]) // 3 - point_start
+                    self.measurement_point_elements = np.append(
+                        self.measurement_point_elements,
+                        np.arange(point_start, point_start + point_count, dtype=np.int32),
+                    )
 
         if obj.transformation is not None:
             matrix = np.array(obj.transformation.matrix, dtype=np.float32).flatten()
@@ -82,44 +95,54 @@ class BufferManager:
             parent_index = float(self.objects[obj.parent])
 
         obj_settings = [
-            [obj.show, obj.show_points, obj.show_lines, obj.show_faces],  # Row 1
+            [
+                obj.show,
+                bool(obj.show_points) and self._has_elements(obj, "_points_data"),
+                bool(obj.show_lines) and self._has_elements(obj, "_lines_data"),
+                bool(obj.show_faces) and (self._has_elements(obj, "_frontfaces_data") or self._has_elements(obj, "_backfaces_data")),
+            ],  # Row 1
             [*instance_color, obj.is_selected],  # Row 2
             [parent_index, obj.opacity, obj.pointsize, getattr(obj, "linewidth", 1.0)],  # Row 3
         ]
         self.settings.append(obj_settings)
 
+    @staticmethod
+    def _has_elements(obj: Any, data_type: str) -> bool:
+        data = getattr(obj, data_type, None)
+        return data is not None and len(data[2]) > 0
+
     def _add_buffer_data(self, obj: Any, buffer_type: str) -> None:
         """Add buffer data for a specific geometry type."""
         positions, colors, elements = getattr(obj, buffer_type)
+        pos_array = np.asarray(positions, dtype=np.float32).reshape(-1)
+        if pos_array.size % 3:
+            raise ValueError(f"Buffer positions should contain complete xyz coordinates, got {pos_array.size} values.")
+        vertex_count = pos_array.size // 3
+        colors = list(colors)
 
-        if len(colors) > len(positions):
-            print(
-                f"WARNING: Buffer type: {buffer_type} colors length: {len(colors)} greater than positions length: {len(positions)} for {obj},the remaining colors will be ignored"
-            )
-            colors = colors[: len(positions)]
-        elif len(colors) < len(positions):
-            print(f"WARNING: Buffer type: {buffer_type} colors length: {len(colors)} less than positions length: {len(positions)} for {obj}, last color will be repeated")
-            colors = colors + [colors[-1]] * (len(positions) - len(colors))
+        if len(colors) > vertex_count:
+            print(f"WARNING: Buffer type: {buffer_type} colors length: {len(colors)} greater than vertex count: {vertex_count} for {obj},the remaining colors will be ignored")
+            colors = colors[:vertex_count]
+        elif len(colors) < vertex_count:
+            print(f"WARNING: Buffer type: {buffer_type} colors length: {len(colors)} less than vertex count: {vertex_count} for {obj}, last color will be repeated")
+            colors = colors + [colors[-1]] * (vertex_count - len(colors))
 
         # Convert to numpy arrays
-        pos_array = np.array(positions, dtype=np.float32).flatten()
         col_array = np.array([c.rgba for c in colors] if len(colors) > 0 and isinstance(colors[0], Color) else colors, dtype=np.float32).flatten()
         elem_array = np.array(elements, dtype=np.int32).flatten()
 
         opaque_element_indices: list[int] = []
         transparent_element_indices: list[int] = []
         if buffer_type == "_frontfaces_data" or buffer_type == "_backfaces_data":
-            for e in elem_array:
-                if e >= len(colors):
+            if elem_array.size % 3:
+                raise ValueError(f"Face elements should contain complete triangle triplets, got {elem_array.size} indices.")
+            for triangle in elem_array.reshape((-1, 3)):
+                if any(e < 0 or e >= len(colors) for e in triangle):
                     # print("WARNING: Element index out of range", obj) # TODO: Fix BREP from IFC
                     continue
-
-                color = colors[e]
-                alpha = color.a if isinstance(color, Color) else color[3]
-                if alpha < 1.0 or obj.opacity < 1.0:
-                    transparent_element_indices.append(int(e))
-                else:
-                    opaque_element_indices.append(int(e))
+                alphas = [color.a if isinstance(color := colors[e], Color) else color[3] for e in triangle]
+                target = transparent_element_indices if obj.opacity < 1.0 or any(alpha < 1.0 for alpha in alphas) else opaque_element_indices
+                target.extend(int(e) for e in triangle)
 
         # Update elements to account for offset
         start_idx = len(self.positions[buffer_type]) // 3
@@ -127,7 +150,7 @@ class BufferManager:
 
         # Create vertex indices
         object_index = len(self.transforms)
-        obj_indices = np.full(len(positions), object_index, dtype=np.float32)
+        obj_indices = np.full(vertex_count, object_index, dtype=np.float32)
 
         # Append to existing buffers
         self.positions[buffer_type] = np.append(self.positions[buffer_type], pos_array)
@@ -174,8 +197,10 @@ class BufferManager:
                     self.buffer_ids[buffer_type]["elements_transparent"] = make_index_buffer(self.elements[buffer_type + "_transparent"])
                 else:
                     self.buffer_ids[buffer_type]["elements"] = make_index_buffer(self.elements[buffer_type])
+        if self.measurement_point_elements.size:
+            self.buffer_ids["_points_data"]["measurement_elements"] = make_index_buffer(self.measurement_point_elements)
 
-    def _draw_faces(self, shader: Shader, is_instance: bool, is_lighted: bool, is_ghosted: bool, is_wireframe: bool) -> None:
+    def _draw_faces(self, shader: "Shader", is_instance: bool, is_lighted: bool, is_ghosted: bool, is_wireframe: bool) -> None:
         GL.glEnable(GL.GL_POLYGON_OFFSET_FILL)
         if not is_wireframe and (not is_ghosted or is_instance):
             shader.uniform1i("is_lighted", is_lighted)
@@ -190,7 +215,7 @@ class BufferManager:
                         shader.draw_triangles(elements=self.buffer_ids[face_type]["elements_transparent"], n=len(self.elements[face_type + "_transparent"]))
         GL.glDisable(GL.GL_POLYGON_OFFSET_FILL)
 
-    def _draw_points(self, shader: Shader) -> None:
+    def _draw_points(self, shader: "Shader") -> None:
         shader.uniform1i("element_type", 0)
         if self.buffer_ids["_points_data"]:
             shader.bind_attribute("position", self.buffer_ids["_points_data"]["positions"])
@@ -198,7 +223,20 @@ class BufferManager:
             shader.bind_attribute("object_index", self.buffer_ids["_points_data"]["object_indices"], step=1)
             shader.draw_points(elements=self.buffer_ids["_points_data"]["elements"], n=len(self.elements["_points_data"]))
 
-    def _draw_lines(self, line_shader: Shader) -> None:
+    def _draw_measurement_points(self, shader: "Shader", *, faces_visible: bool) -> None:
+        points = self.buffer_ids["_points_data"]
+        if "measurement_elements" not in points:
+            return
+        shader.bind()
+        shader.uniform1i("element_type", 3)
+        shader.uniform1i("measurement_faces_visible", faces_visible)
+        shader.bind_attribute("position", points["positions"])
+        shader.bind_attribute("color", points["colors"], step=4)
+        shader.bind_attribute("object_index", points["object_indices"], step=1)
+        shader.draw_points(elements=points["measurement_elements"], n=len(self.measurement_point_elements))
+        shader.release()
+
+    def _draw_lines(self, line_shader: "Shader") -> None:
         GL.glDisable(GL.GL_CULL_FACE)
         line_shader.bind()
         line_shader.uniform1i("is_lighted", False)
@@ -214,7 +252,7 @@ class BufferManager:
         line_shader.release()
         GL.glEnable(GL.GL_CULL_FACE)
 
-    def _draw_transparent_faces(self, shader: Shader, is_lighted: bool, is_ghosted: bool) -> None:
+    def _draw_transparent_faces(self, shader: "Shader", is_lighted: bool, is_ghosted: bool) -> None:
         shader.bind()
         shader.uniform1i("is_lighted", is_lighted)
         shader.uniform1i("element_type", 2)
@@ -229,7 +267,7 @@ class BufferManager:
                     shader.draw_triangles(elements=self.buffer_ids[face_type]["elements"], n=len(self.elements[face_type]))
         GL.glDepthMask(GL.GL_TRUE)
 
-    def draw(self, shader: Shader, line_shader: Shader, rendermode: str, is_instance: bool = False) -> None:
+    def draw(self, shader: "Shader", line_shader: "Shader", rendermode: str, is_instance: bool = False) -> None:
         """Draw all objects using the combined buffers.
 
         Parameters
@@ -302,6 +340,7 @@ class BufferManager:
             self.buffer_ids[buffer_type] = {}
 
         self.objects = {}
+        self.measurement_point_elements = np.array([], dtype=np.int32)
         self.transforms = []
         self.settings = []
         self.object_settings_cache = {}
@@ -410,7 +449,12 @@ class BufferManager:
             parent_index = float(self.objects[obj.parent])
 
         obj_settings = [
-            [obj.show, obj.show_points, obj.show_lines, obj.show_faces],  # Row 1
+            [
+                obj.show,
+                bool(obj.show_points) and self._has_elements(obj, "_points_data"),
+                bool(obj.show_lines) and self._has_elements(obj, "_lines_data"),
+                bool(obj.show_faces) and (self._has_elements(obj, "_frontfaces_data") or self._has_elements(obj, "_backfaces_data")),
+            ],  # Row 1
             [*instance_color, obj.is_selected],  # Row 2
             [parent_index, obj.opacity, obj.pointsize, getattr(obj, "linewidth", 1.0)],  # Row 3: parent index and padding
         ]

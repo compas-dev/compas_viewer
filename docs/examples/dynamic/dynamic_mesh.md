@@ -1,5 +1,7 @@
 # Dynamic Mesh
 
+Update mesh coordinates through the mesh API, then call
+`viewer.refresh_geometry(...)` for the stable scene object.
 
 ![](../../assets/images/dynamic_mesh.gif)
 

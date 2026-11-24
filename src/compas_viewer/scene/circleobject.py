@@ -10,10 +10,6 @@ from .geometryobject import GeometryObject
 class CircleObject(GeometryObject):
     """Viewer scene object for displaying COMPAS Circle geometry."""
 
-    def __init__(self, **kwargs) -> None:
-        super().__init__(**kwargs)
-        self.show_lines = True
-
     @property
     def points(self) -> list[Point]:
         return [cast(Circle, self.geometry).center]

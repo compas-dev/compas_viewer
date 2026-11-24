@@ -5,7 +5,7 @@ from compas_viewer import DOCS
 from compas_viewer import HERE
 from compas_viewer import HOME
 from compas_viewer import TEMP
-from compas_viewer.scene import Tag
+from compas_viewer.scene.annotationobject import FONT
 
 
 def test_package_locations_are_paths():
@@ -18,9 +18,6 @@ def test_package_locations_are_paths():
     assert DOCS == HOME / "docs"
 
 
-def test_default_annotation_font_is_a_path():
-    annotation = Tag("Path", (0, 0, 0))
-
-    assert isinstance(annotation.font, Path)
-    assert annotation.font.is_file()
-    assert annotation.__data__["font"] == str(annotation.font)
+def test_default_annotation_font_is_packaged():
+    assert isinstance(FONT, Path)
+    assert FONT.is_file()

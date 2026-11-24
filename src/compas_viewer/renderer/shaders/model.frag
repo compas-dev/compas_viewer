@@ -18,6 +18,7 @@ uniform vec3 selection_color;
 uniform int element_type;
 uniform bool is_instance;
 uniform bool is_grid;
+uniform bool measurement_faces_visible;
 
 out vec4 fragColor;
 
@@ -27,6 +28,7 @@ void main() {
         (element_type == 0 && show_points == 0.0) ||
         (element_type == 1 && show_lines == 0.0) ||
         (element_type == 2 && show_faces == 0.0) ||
+        (element_type == 3 && show_points == 0.0 && show_lines == 0.0 && (show_faces == 0.0 || !measurement_faces_visible)) ||
         (is_instance && is_grid)) {
         discard;
     }
@@ -50,7 +52,7 @@ void main() {
     }
 
     // Draw circular points
-    if (element_type == 0) {
+    if (element_type == 0 || element_type == 3) {
         vec2 center = gl_PointCoord - vec2(0.5);
         if (length(center) > 0.5) {
             discard;

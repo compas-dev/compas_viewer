@@ -5,8 +5,6 @@ from typing import cast
 
 from compas.colors import Color
 from compas.itertools import flatten
-from compas.scene import GeometryObject as BaseGeometryObject
-from compas.scene.descriptors.color import ColorAttribute
 from compas.typing import RealInput
 from compas.typing import VerticesFaces
 
@@ -15,7 +13,7 @@ from .sceneobject import ShaderDataType
 from .sceneobject import ViewerSceneObject
 
 
-class GeometryObject(ViewerSceneObject, BaseGeometryObject):
+class GeometryObject(ViewerSceneObject):
     """Viewer scene object for displaying COMPAS Geometry.
 
     Parameters
@@ -27,44 +25,15 @@ class GeometryObject(ViewerSceneObject, BaseGeometryObject):
     v
         The number of cells in the v-direction of structured geometry.
     pointcolor
-        The color of the points. Default is the value of `pointcolor` in `viewer.config`.
+        The color of the points.
     linecolor
-        The color of the lines. Default is the value of `linecolor` in `viewer.config`.
+        The color of the lines.
     surfacecolor
-        The color of the surfaces. Default is the value of `surfacecolor` in `viewer.config`.
+        The color of the surfaces.
     **kwargs
         Additional scene-object options.
 
     """
-
-    pointcolor = ColorAttribute(default=Color(0.2, 0.2, 0.2))
-    linecolor = ColorAttribute(default=Color(0.2, 0.2, 0.2))
-    surfacecolor = ColorAttribute(default=Color(0.9, 0.9, 0.9))
-
-    def __init__(self, u: int | None = 16, v: int | None = 16, **kwargs: Any) -> None:
-        super().__init__(**kwargs)
-        self._u = 16 if u is None else u
-        self._v = 16 if v is None else v
-
-    @property
-    def u(self) -> int:
-        """The scene-owned cell count in the u-direction."""
-        return self._u
-
-    @u.setter
-    def u(self, value: int) -> None:
-        self._u = value
-        self._rebuild_resolution_buffers()
-
-    @property
-    def v(self) -> int:
-        """The scene-owned cell count in the v-direction."""
-        return self._v
-
-    @v.setter
-    def v(self, value: int) -> None:
-        self._v = value
-        self._rebuild_resolution_buffers()
 
     @property
     def facecolor(self) -> Color:
@@ -121,7 +90,14 @@ class GeometryObject(ViewerSceneObject, BaseGeometryObject):
 
     def _rebuild_resolution_buffers(self) -> None:
         """Refresh and rebuild active renderer buffers after resolution changes."""
-        if self.viewer.running and self in self.viewer.scene.objects:
+        if self.viewer.running and self.sceneobject in self.runtime_scene.objects:
             self.refresh_data()
             self.viewer.renderer.rebuild_buffers()
             self.viewer.renderer.update()
+
+    def __init__(self, u: int = 16, v: int = 16, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
+        if not hasattr(self.sceneobject, "u"):
+            object.__setattr__(self, "u", u)
+        if not hasattr(self.sceneobject, "v"):
+            object.__setattr__(self, "v", v)

@@ -1,6 +1,6 @@
 from compas.geometry import Point
 from compas.geometry import Sphere
-from compas_viewer.scene import ViewerSceneObject
+from compas_viewer.scene.sceneobject import ViewerSceneObject
 from compas_viewer.scene import inspect_object_parameters
 from compas_viewer.scene import modify_object_parameters
 from compas_viewer.scene import object_parameter_values

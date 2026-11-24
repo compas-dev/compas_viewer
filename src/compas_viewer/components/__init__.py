@@ -1,6 +1,7 @@
 """Reusable Qt interface components for COMPAS Viewer."""
 
 from .booleantoggle import BooleanToggle
+from .annotationpanel import AnnotationPanel
 from .boundcomponent import BoundComponent
 from .button import Button
 from .camerasetting import CameraSetting
@@ -8,7 +9,11 @@ from .colorpicker import ColorPicker
 from .choiceedit import ChoiceEdit
 from .component import Component
 from .container import Container
+from .datapanel import DataDetailsDialog
+from .datapanel import DataPanel
+from .datastructureattributes import DatastructureAttributes
 from .displaysetting import DisplaySetting
+from .gridunitsetting import GridUnitSetting
 from .mainwindow import MainWindow
 from .menubar import MenuBar
 from .numberedit import NumberEdit
@@ -25,8 +30,11 @@ from .textedit import TextEdit
 from .toolbar import ToolBar
 from .treeform import Treeform
 from .viewport import ViewPort
+from .viewersettings import SettingsSection
+from .viewersettings import ViewerSettings
 
 __all__ = [
+    "AnnotationPanel",
     "BooleanToggle",
     "BoundComponent",
     "Button",
@@ -35,7 +43,11 @@ __all__ = [
     "ChoiceEdit",
     "Component",
     "Container",
+    "DataDetailsDialog",
+    "DataPanel",
+    "DatastructureAttributes",
     "DisplaySetting",
+    "GridUnitSetting",
     "MainWindow",
     "MenuBar",
     "NumberEdit",
@@ -52,4 +64,6 @@ __all__ = [
     "ToolBar",
     "Treeform",
     "ViewPort",
+    "SettingsSection",
+    "ViewerSettings",
 ]

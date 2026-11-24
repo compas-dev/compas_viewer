@@ -76,9 +76,7 @@ class BooleanToggle(BoundComponent[bool]):
         """
         # Convert Qt checkbox state to boolean
         is_checked = state == 2  # Qt.Checked = 2
-        self.set_attr(is_checked)
-        if self.action:
-            self.action(self, is_checked)
+        self.on_value_changed(is_checked)
 
     def sync_from_bound_object(self, value: bool) -> None:
         """Synchronize the checkbox without publishing another change."""

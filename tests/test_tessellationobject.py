@@ -1,7 +1,7 @@
 from compas.colors import Color
 from compas.geometry import Tessellation
 
-from compas_viewer.scene import TessellationObject
+from compas_viewer.scene.tessellationobject import TessellationObject
 
 
 class ExampleTessellationObject(TessellationObject):

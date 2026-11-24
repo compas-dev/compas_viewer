@@ -7,7 +7,8 @@ from pathlib import Path
 
 from compas.data import json_load
 from compas.data import json_loadz
-from compas.scene.context import ITEM_SCENEOBJECT
+from compas.scene import SceneObjectNotRegisteredError
+from compas.scene import get_sceneobject_cls
 from compas_viewer import Viewer
 
 
@@ -26,7 +27,11 @@ def validate_object(object):
 
     """
 
-    return isinstance(object, tuple(ITEM_SCENEOBJECT["Viewer"].keys()))
+    try:
+        get_sceneobject_cls(object)
+    except (SceneObjectNotRegisteredError, TypeError):
+        return False
+    return True
 
 
 ap = argparse.ArgumentParser()

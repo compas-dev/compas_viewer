@@ -5,31 +5,29 @@ from compas_viewer import Viewer
 viewer = Viewer()
 
 boxes = [
-    Box.from_width_height_depth(1, 1, 1),
-    Box.from_width_height_depth(2, 2, 0.5),
-    Box.from_width_height_depth(3, 3, 0.2),
+    Box(1, 1, 1),
+    Box(2, 2, 0.5),
+    Box(3, 3, 0.2),
 ]
 
-obj1 = viewer.scene.add(boxes[0], facecolor=Color.blue())
+first_object = viewer.scene.add(boxes[0], surfacecolor=Color.blue())
 
-objects_to_remove = [obj1]
+objects_to_remove = [first_object]
 
 
 @viewer.on(interval=1000)
-def dynamic_update(frame):
-    """
-    This function is called every 1000ms for 6 frames.
-    """
+def dynamic_update(frame: int) -> None:
+    """Update the scene once per second for six frames."""
     print(f"Frame {frame}")
 
     if frame == 1:
         print("Adding second box...")
-        added_object = viewer.scene.add(boxes[1], facecolor=Color.red())
+        added_object = viewer.scene.add(boxes[1], surfacecolor=Color.red())
         objects_to_remove.append(added_object)
 
     if frame == 2:
         print("Adding third box...")
-        added_object = viewer.scene.add(boxes[2], facecolor=Color.green())
+        added_object = viewer.scene.add(boxes[2], surfacecolor=Color.green())
         objects_to_remove.append(added_object)
 
     if frame == 4:

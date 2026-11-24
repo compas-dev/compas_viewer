@@ -38,8 +38,8 @@ class ShapeObject(TessellationObject):
 
     """
 
-    def __init__(self, u: int | None = 16, v: int | None = 16, **kwargs: Any) -> None:
-        super().__init__(u=u, v=v, **kwargs)
+    def __init__(self, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
 
     @property
     def facecolor(self) -> Color:
