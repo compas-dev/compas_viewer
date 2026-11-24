@@ -4,7 +4,13 @@ from typing import TypedDict
 
 
 class UIItem(TypedDict, total=False):
-    """Describe a runtime menu, toolbar, or sidebar item."""
+    """Describe one setup-time menu, toolbar, sidebar, or settings item.
+
+    Viewer shallow-copies supplied sidebar and settings iterables before UI
+    construction. Individual definition mappings remain shared with the
+    caller and should not be mutated after construction.
+
+    """
 
     title: str
     type: str
@@ -21,6 +27,32 @@ class UIItem(TypedDict, total=False):
     tooltip: str
     icon: str
     icon_only: bool
+
+
+_SIDEBAR_ITEM_TYPES = {"SceneTree", "Sceneform", "AnnotationPanel", "DataPanel", "ObjectSetting", "DatastructureAttributes"}
+_SETTINGS_ITEM_TYPES = {"CameraSetting", "DisplaySetting", "GridUnitSetting"}
+
+
+def _validate_sidebar_items(items: list[UIItem]) -> None:
+    """Validate a materialized content-sidebar composition."""
+    for item in items:
+        itemtype = item.get("type")
+        if itemtype in {"SceneTree", "Sceneform"} and item.get("columns") is None:
+            raise ValueError("Please setup config for Sceneform")
+        if itemtype not in _SIDEBAR_ITEM_TYPES:
+            raise ValueError(f"Unsupported sidebar item type: {itemtype!r}.")
+
+
+def _validate_settings_items(items: list[UIItem]) -> None:
+    """Validate a materialized Viewer Settings composition."""
+    configured: set[str] = set()
+    for item in items:
+        itemtype = item.get("type")
+        if itemtype is None or itemtype not in _SETTINGS_ITEM_TYPES:
+            raise ValueError(f"Unsupported settings item type: {itemtype!r}.")
+        if itemtype in configured:
+            raise ValueError(f"Duplicate settings item type: {itemtype!r}.")
+        configured.add(itemtype)
 
 
 def default_toolbar_items() -> list[UIItem]:
@@ -144,6 +176,8 @@ def default_menu_items() -> list[UIItem]:
                 {"title": "Show All", "command": "viewer.show_all"},
                 {"type": "separator"},
                 {"title": "Capture View", "command": "viewer.capture_view"},
+                {"type": "separator"},
+                {"title": "Viewer Settings…", "command": "viewer.show_viewer_settings"},
             ],
         },
         {
@@ -217,7 +251,7 @@ def default_sidebar_items() -> list[UIItem]:
     Returns
     -------
     list[UIItem]
-        Runtime sidebar definitions.
+        Setup-time content-sidebar definitions.
 
     """
     return [
@@ -232,10 +266,23 @@ def default_sidebar_items() -> list[UIItem]:
         {"type": "DataPanel"},
         {"type": "AnnotationPanel"},
         {"type": "ObjectSetting"},
+    ]
+
+
+def default_settings_items() -> list[UIItem]:
+    """Return the built-in Viewer Settings composition.
+
+    Returns
+    -------
+    list[UIItem]
+        Setup-time settings definitions in presentation order.
+
+    """
+    return [
         {"type": "CameraSetting"},
         {"type": "DisplaySetting"},
         {"type": "GridUnitSetting"},
     ]
 
 
-__all__ = ["UIItem", "default_menu_items", "default_sidebar_items", "default_toolbar_items"]
+__all__ = ["UIItem", "default_menu_items", "default_settings_items", "default_sidebar_items", "default_toolbar_items"]

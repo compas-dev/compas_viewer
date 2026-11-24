@@ -174,7 +174,7 @@ def test_global_escape_cancels_measurement_before_deselecting(monkeypatch):
     command.callback.assert_called_once_with(viewer)
 
 
-def test_menu_delete_uses_active_tab_and_is_disabled_for_system(monkeypatch):
+def test_menu_delete_uses_active_tab_and_is_disabled_for_data(monkeypatch):
     app = QApplication.instance() or QApplication([])
     delete = SimpleNamespace(callback=Mock())
     viewer = SimpleNamespace(commands={"viewer.delete_selected": delete})
@@ -184,7 +184,7 @@ def test_menu_delete_uses_active_tab_and_is_disabled_for_system(monkeypatch):
     menu._command_actions = {"viewer.delete_selected": [action]}
 
     class Sidebar:
-        TABS = ("Scene", "Annotations", "System")
+        TABS = ("Scene", "Annotations", "Data")
 
         def __init__(self):
             self.widget = QTabWidget()

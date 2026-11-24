@@ -30,6 +30,8 @@ from .textedit import TextEdit
 from .toolbar import ToolBar
 from .treeform import Treeform
 from .viewport import ViewPort
+from .viewersettings import SettingsSection
+from .viewersettings import ViewerSettings
 
 __all__ = [
     "AnnotationPanel",
@@ -62,4 +64,6 @@ __all__ = [
     "ToolBar",
     "Treeform",
     "ViewPort",
+    "SettingsSection",
+    "ViewerSettings",
 ]

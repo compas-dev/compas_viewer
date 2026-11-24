@@ -138,13 +138,13 @@ QLabel[mutedText="true"] {{
     font-style: italic;
     padding: 10px;
 }}
-QGroupBox#systemSection {{
+QGroupBox#viewerSettingsSection {{
     color: {colors.text};
     font-size: 12pt;
     font-weight: bold;
     margin-top: 14px;
 }}
-QGroupBox#systemSection::title {{
+QGroupBox#viewerSettingsSection::title {{
     subcontrol-origin: margin;
     left: 6px;
     padding: 2px 4px;

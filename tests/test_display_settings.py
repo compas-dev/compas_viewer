@@ -7,7 +7,7 @@ from compas_viewer.components.displaysetting import DisplaySetting
 from compas_viewer.config import Config
 from compas_viewer.scene.gridobject import GridObject
 from compas_viewer.state import ViewerState
-from compas_viewer.uidefinitions import default_sidebar_items
+from compas_viewer.uidefinitions import default_settings_items
 
 
 def test_grid_supports_positive_odd_division_counts():
@@ -17,8 +17,8 @@ def test_grid_supports_positive_odd_division_counts():
     assert grid.ny == 3
 
 
-def test_default_sidebar_contains_display_settings():
-    item_types = [item["type"] for item in default_sidebar_items()]
+def test_default_settings_contains_display_settings():
+    item_types = [item["type"] for item in default_settings_items()]
 
     assert "DisplaySetting" in item_types
 

@@ -88,11 +88,11 @@ The root configuration currently contains:
 select the effective light or dark variant of one built-in COMPAS Viewer theme;
 they are not a general theme-extension interface. A private semantic token
 module constructs the application-wide Qt palette and the narrow stylesheet
-used for focus, interaction, links, and System-section hierarchy. Viewer keeps
-the platform UI font, packaged or configured application icon, and existing
-monochrome UI icons. Button icons are tinted privately from the active Qt
-button-text palette and retint when the application palette changes; this does
-not affect the packaged or configured application icon.
+used for focus, interaction, links, and Viewer Settings section hierarchy.
+Viewer keeps the platform UI font, packaged or configured application icon,
+and existing monochrome UI icons. Button icons are tinted privately from the
+active Qt button-text palette and retint when the application palette changes;
+this does not affect the packaged or configured application icon.
 
 Theme ownership includes Qt application chrome and a narrow Viewer content
 palette. `renderer.backgroundcolor=None` is the sole automatic marker; the
@@ -132,7 +132,7 @@ Versions 0 and 1 also drop only these known retired fields:
 Each nested configuration group validates its own values and reports complete
 paths such as `renderer.gridmode`.
 
-At runtime, the **Grid and Units** section of the **System** sidebar tab
+At runtime, the **Grid and Units** section of **Viewer Settings**
 updates these settings through `ViewerState.set_measurement_unit` and
 `ViewerState.set_measurement_precision`. It also owns the existing grid state
 paths. Unit and precision affect labels only: they do not convert coordinates,
@@ -347,28 +347,35 @@ and otherwise clears both selections.
 Delete remains focus-owned. Annotation-list and annotation-detail focus remove
 selected annotations, while Scene-tree and renderer focus remove selected
 scene objects. Menu invocation follows the active Scene or Annotations tab and
-is disabled in System. Text and numeric editors retain local Delete behavior.
+does not dispatch deletion from Data. Text and numeric editors retain local
+Delete behavior.
 Neither operation crosses the collection boundary when both selections exist.
 
 Default menu and sidebar structures live in `compas_viewer.uidefinitions`.
 They refer to command IDs rather than importing callbacks, keeping UI
 composition separate from serialization. The fixed geometry hierarchy belongs
 to **Scene → Add**; Measure continues to own interactive acquisition. The
-built-in right sidebar has four
-stable domains: **Scene** for the spatial hierarchy and object details,
-**Data** for the flat referenced-item projection, **Annotations** for the
-ordered annotation list and annotation details, and **System** for Camera,
-Display, and Grid and Units. Dynamic detail
-updates do not resize or rebuild unrelated domains.
+built-in right sidebar has three stable content domains: **Scene** for the
+spatial hierarchy and object details, **Data** for the flat referenced-item
+projection, and **Annotations** for the ordered annotation list and annotation
+details. Dynamic detail updates do not resize or rebuild unrelated domains.
+Camera, Display, and Grid and Units belong to one separate, Viewer-owned,
+modeless **Viewer Settings** window rather than a content domain.
 
 Data is a read-only Viewer projection, not a store. It walks spatial objects
 in hierarchy order followed by annotations in collection order, deduplicates
 their item GUIDs, and resolves bound instances only through
 `scene.item_store`. Unresolved GUIDs remain rows and no resolver is invoked.
 Its local selection is not part of `ViewerState`. The modal Data Details
-dialog reads generic public constructor attributes without traversing
-`__data__`; Mesh and Graph reuse lazy declared-domain tables with editing
-disabled. Refreshing this projection does not rebuild renderer buffers.
+dialog always starts with safe public constructor attributes without traversing
+`__data__`. A verified Core `Datastructure` adds its ordered public
+`attributes` mapping. Mesh and Graph then reuse lazy declared-domain tables
+with editing disabled in the established domain order. The tab contract is
+Parameters, General Attributes, then Vertices/Edges/Faces for Mesh or
+Nodes/Edges for Graph. Component columns remain limited to declared default
+mappings; sparse undeclared attributes are omitted. One failing value produces
+an unavailable marker without hiding the remaining entries. Refreshing this
+projection does not rebuild renderer buffers or change scene ownership.
 Scene owns a noncollapsible vertical splitter between its hierarchy and
 editable details. Annotations owns a separate noncollapsible splitter between
 its list and a vertically scrollable dimension-details area. Detail controls
@@ -376,8 +383,15 @@ retain their natural size and spacing when the splitter is reduced, and the two
 splitter sizes remain independent. The Scene details
 area replaces the old inline information textbox with a fixed **Details**
 button. That button opens a main-window-owned, read-only modal snapshot for one
-or multiple selected objects; it is disabled for no selection. Editable
-attributes remain in the sidebar.
+or multiple selected objects; it is disabled for no selection. One-object
+snapshots contain ordered Identity, General Scene State, Type-Specific Scene
+State, and Represented Item Parameters sections. The type-specific section
+reads only the concrete type's declared `scene_state_fields()` in declaration
+order and uses `namespace.field` labels; it does not traverse arbitrary
+properties or unknown extension payloads. Unresolved items omit only the
+parameter section. Multiple-object snapshots retain their count, represented
+types, and names. Editable attributes remain in the sidebar, and constructing
+or reading the dialog never calls a setter or renderer refresh.
 The Viewer derives resolution controls from the normalized Core editable-field
 mapping and filters them by the represented producer. It does not define a
 second resolution field or alias: cones and cylinders expose U; spheres, tori,
@@ -597,19 +611,52 @@ Components wrap Qt widgets and share access to the active viewer through `Base`.
 - `NumberEdit`
 - `TextEdit`
 
-Commands that navigate the built-in sidebar use its closed domain API:
+Commands that navigate the built-in sidebar use its closed content-domain API:
 
 ```python
-viewer.ui.sidebar.set_current_tab("System")
-viewer.ui.sidebar.focus_system_section("Camera")
+viewer.ui.sidebar.set_current_tab("Data")
 ```
 
-`set_current_tab` accepts only `"Scene"`, `"Data"`, `"Annotations"`, or
-`"System"`.
-`focus_system_section` accepts only `"Camera"`, `"Display"`, or
-`"Grid and Units"`, activates System, and focuses that section. Both
-methods raise `ValueError` for unsupported identifiers. Components should use
-this boundary instead of reaching into the sidebar's internal layouts.
+`set_current_tab` accepts only `"Scene"`, `"Data"`, or `"Annotations"` and
+raises `ValueError` for unsupported identifiers. Components should use this
+boundary instead of reaching into the sidebar's internal layouts.
+
+Viewer settings use one separate composition and navigation path:
+
+```python
+viewer.ui.settings.show()
+viewer.ui.settings.show("Camera")
+```
+
+`show` accepts `None`, `"Camera"`, `"Display"`, or `"Grid and Units"`. It
+refreshes all configured sections from current Viewer state, shows and raises
+the same modeless window, and optionally focuses one section. Unsupported
+identifiers raise `ValueError`. Closing hides the owned window; closing the
+main Viewer releases it. Window visibility, geometry, scroll position, and
+focused section remain transient. Settings-window Escape hides only that
+window, while editor-local Escape remains local and the main window retains
+its measurement-cancel and deselection behavior.
+
+Default sidebar and settings definitions are separate:
+
+```python
+from compas_viewer import Viewer
+from compas_viewer.uidefinitions import default_settings_items
+
+settings_items = default_settings_items()
+viewer = Viewer(settings_items=settings_items)
+```
+
+`viewer.sidebar_items` composes content only. `viewer.settings_items` composes
+Camera, Display, and Grid and Units in that fixed built-in order. The old
+System sidebar identifier and `focus_system_section` path are not aliases. Pass
+custom `sidebar_items` or `settings_items` during construction. Viewer
+shallow-copies the definitions and consumes them while building the UI; later
+list mutation does not recompose an existing Viewer, and there is no live
+reload operation. Composition must be supplied on the first `Viewer(...)`
+construction in a process. Subsequent calls return the existing singleton and
+ignore new composition inputs. Use a fresh process and application lifecycle
+for a different composition unless a future reset mechanism is approved.
 
 `Container(..., compact=True)` applies the shared compact sidebar policy: content margins, row margins, spacing, size policy, and maximum row height. Use this for inspector-style forms instead of repeating layout constants.
 
@@ -617,9 +664,9 @@ The scene-object parameter dialog intentionally edits only writable scalar const
 
 `DatastructureAttributes` is an opt-in Viewer-owned inspector for element data;
 it is not part of the default sidebar. Add `{"type":
-"DatastructureAttributes"}` to `viewer.sidebar_items` before showing a custom
-Viewer that requires it; the explicitly configured inspector appears in the
-**Scene** domain. The inspector discovers the established Mesh and
+"DatastructureAttributes"}` to a setup-time `sidebar_items` list passed to the
+first Viewer construction in the process; the explicitly configured inspector
+appears in the **Scene** domain. The inspector discovers the established Mesh and
 Graph element APIs and uses ordered `default_*_attributes` dictionaries as its
 column contract. Each tab uses a lazy `QAbstractTableModel`: it snapshots
 element keys for row lookup but fetches cell values through singular attribute

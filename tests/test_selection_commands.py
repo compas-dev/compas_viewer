@@ -1,5 +1,6 @@
 from types import SimpleNamespace
 from unittest.mock import Mock
+from unittest.mock import call
 from uuid import uuid4
 
 import numpy as np
@@ -10,6 +11,7 @@ from compas.colors import Color
 from compas.geometry import Point
 
 from compas_viewer.commands import camera_settings
+from compas_viewer.commands import show_viewer_settings
 from compas_viewer.commands import delete_selected
 from compas_viewer.commands import deselect_all
 from compas_viewer.commands import isolate_selected
@@ -52,13 +54,23 @@ def test_deselect_all_clears_both_selection_domains():
     viewer.state.annotation_selection.clear.assert_called_once_with()
 
 
-def test_camera_settings_uses_system_sidebar_navigation():
-    sidebar = SimpleNamespace(focus_system_section=Mock())
-    viewer = SimpleNamespace(ui=SimpleNamespace(sidebar=sidebar))
+def test_camera_settings_uses_viewer_settings_navigation():
+    settings = SimpleNamespace(show=Mock())
+    viewer = SimpleNamespace(ui=SimpleNamespace(settings=settings))
 
     camera_settings(viewer)
 
-    sidebar.focus_system_section.assert_called_once_with("Camera")
+    settings.show.assert_called_once_with("Camera")
+
+
+def test_show_viewer_settings_uses_optional_section():
+    settings = SimpleNamespace(show=Mock())
+    viewer = SimpleNamespace(ui=SimpleNamespace(settings=settings))
+
+    show_viewer_settings(viewer)
+    show_viewer_settings(viewer, "Display")
+
+    assert settings.show.call_args_list == [call(None), call("Display")]
 
 
 def test_contextual_delete_removes_only_annotation_selection():

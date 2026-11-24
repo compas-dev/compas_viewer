@@ -1,22 +1,30 @@
 from unittest.mock import Mock
+from uuid import uuid4
 
 import pytest
 from PySide6.QtWidgets import QPlainTextEdit
 
 from compas.colors import Color
 from compas.colors import ColorDict
+from compas.data import Data
+from compas.datastructures import Graph
 from compas.datastructures import Mesh
 from compas.geometry import Box
 from compas.geometry import Capsule
 from compas.geometry import Cone
 from compas.geometry import Cylinder
+from compas.geometry import Frame
 from compas.geometry import PlanarSurface
+from compas.geometry import Point
 from compas.geometry import Shape
 from compas.geometry import Sphere
 from compas.geometry import Torus
+from compas.scene import FrameObject
 from compas.scene import GeometryObject
+from compas.scene import GraphObject
 from compas.scene import MeshObject
 from compas.scene import SceneObject
+from compas.scene import SceneStateField
 from compas.scene import ShapeObject
 from compas.scene import SurfaceObject
 from compas_viewer import forms
@@ -167,11 +175,25 @@ def test_object_details_dialog_snapshots_single_and_multiple_selection(isolated_
     setting.update()
     setting.details_button.click()
 
-    assert "Name: First" in captured[0]
-    assert "Type: Sphere" in captured[0]
+    assert "Identity\n--------\nName: First" in captured[0]
+    assert "Scene Object Type: ShapeObject" in captured[0]
+    assert f"Scene Object GUID: {first.guid}" in captured[0]
+    assert "Represented Type: Sphere" in captured[0]
+    assert f"Item GUID: {first.item_guid}" in captured[0]
+    assert "Status: Bound" in captured[0]
+    assert "General Scene State" in captured[0]
     assert "Visible: False" in captured[0]
-    assert "Parameters:" in captured[0]
+    assert f"Base Color: {first.color!r}" in captured[0]
+    assert "Opacity: 1.0" in captured[0]
+    assert "Local Transformation: None" in captured[0]
+    assert "Type-Specific Scene State" in captured[0]
+    assert "compas.scene.GeometryObject.show_points: False" in captured[0]
+    assert "compas.scene.ShapeObject.u: 16" in captured[0]
+    assert "Represented Item Parameters" in captured[0]
     assert "radius: 1.0" in captured[0]
+    section_positions = [captured[0].index(title) for title in ("Identity", "General Scene State", "Type-Specific Scene State", "Represented Item Parameters")]
+    assert section_positions == sorted(section_positions)
+    assert viewer.renderer.mock_calls == []
 
     viewer.state.selection.objects = (first, second)
     setting.update()
@@ -179,6 +201,106 @@ def test_object_details_dialog_snapshots_single_and_multiple_selection(isolated_
 
     assert captured[1] == "2 objects selected\nTypes: Sphere, Unresolved\nNames:\n  First\n  Second"
     assert app is not None
+
+
+@pytest.mark.parametrize(
+    ("sceneobject", "expected_fields"),
+    [
+        (GeometryObject(item=Point(1, 2, 3)), ["compas.scene.GeometryObject.show_points"]),
+        (
+            MeshObject(item=Mesh.from_vertices_and_faces([[0, 0, 0], [1, 0, 0], [0, 1, 0]], [[0, 1, 2]])),
+            ["compas.scene.MeshObject.show_vertices", "compas.scene.MeshObject.hide_coplanaredges"],
+        ),
+        (GraphObject(item=Graph()), ["compas.scene.GraphObject.show_nodes"]),
+        (
+            ShapeObject(item=Sphere(1.0)),
+            ["compas.scene.GeometryObject.show_points", "compas.scene.ShapeObject.u"],
+        ),
+        (
+            SurfaceObject(item=PlanarSurface()),
+            ["compas.scene.GeometryObject.show_points", "compas.scene.SurfaceObject.u"],
+        ),
+        (
+            FrameObject(item=Frame.worldXY()),
+            ["compas.scene.GeometryObject.show_points", "compas.scene.FrameObject.size"],
+        ),
+    ],
+)
+def test_object_details_preserves_declared_scene_state_order(sceneobject, expected_fields):
+    setting = object.__new__(ObjectSetting)
+
+    details = setting._details_text([sceneobject])
+
+    declared_fields = [f"{namespace}.{field.name}" for namespace, fields in type(sceneobject).scene_state_fields().items() for field in fields]
+    assert set(expected_fields) <= set(declared_fields)
+    positions = [details.index(f"{field}:") for field in declared_fields]
+    assert positions == sorted(positions)
+
+
+def test_object_details_keeps_declared_state_for_unresolved_item():
+    sceneobject = MeshObject(item_guid=uuid4(), name="Deferred", show_faces=False)
+    sceneobject_guid = sceneobject.guid
+    item_guid = sceneobject.item_guid
+    setting = object.__new__(ObjectSetting)
+
+    details = setting._details_text([sceneobject])
+
+    assert f"Scene Object GUID: {sceneobject_guid}" in details
+    assert "Represented Type: Unresolved" in details
+    assert f"Item GUID: {item_guid}" in details
+    assert "Status: Unresolved" in details
+    assert "compas.scene.MeshObject.show_faces: False" in details
+    assert "Represented Item Parameters" not in details
+
+
+def test_object_details_isolates_declared_state_read_and_format_failures():
+    update = Mock()
+
+    class BadRepresentation:
+        def __repr__(self):
+            raise ValueError("cannot display")
+
+    class FailingStateObject(SceneObject):
+        __scene_state_namespace__ = "tests.FailingStateObject"
+        __scene_state_fields__ = (
+            SceneStateField("unreadable"),
+            SceneStateField("unformattable"),
+            SceneStateField("available", editable=True, update=update),
+        )
+
+        def __init__(self):
+            super().__init__()
+            self.unformattable = BadRepresentation()
+            self.available = "still visible"
+
+        @property
+        def unreadable(self):
+            raise RuntimeError("cannot read")
+
+    setting = object.__new__(ObjectSetting)
+
+    details = setting._details_text([FailingStateObject()])
+
+    assert "tests.FailingStateObject.unreadable: <unavailable: RuntimeError>" in details
+    assert "tests.FailingStateObject.unformattable: <unavailable: ValueError>" in details
+    assert "tests.FailingStateObject.available: 'still visible'" in details
+    update.assert_not_called()
+
+
+def test_object_details_preserves_unavailable_parameter_marker():
+    class PartiallyExposedData(Data):
+        def __init__(self, shown, hidden=2):
+            super().__init__()
+            self.shown = shown
+            self._hidden = hidden
+
+    sceneobject = SceneObject(item=PartiallyExposedData(1))
+    setting = object.__new__(ObjectSetting)
+
+    details = setting._details_text([sceneobject])
+
+    assert "shown: 1" in details
+    assert "hidden: <not exposed by object>" in details
 
 
 def test_object_details_button_is_disabled_without_selection(monkeypatch):

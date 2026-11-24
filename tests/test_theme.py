@@ -135,7 +135,7 @@ def test_stylesheet_uses_accessible_interaction_and_component_tokens(appearance)
     assert f"color: {colors['text_muted']}" in stylesheet
     assert 'QLabel[openExternalLinks="true"]' in stylesheet
     assert 'QLabel[mutedText="true"]' in stylesheet
-    assert "QGroupBox#systemSection" in stylesheet
+    assert "QGroupBox#viewerSettingsSection" in stylesheet
     assert "font-size: 12pt" in stylesheet
     assert "font-weight: bold" in stylesheet
 

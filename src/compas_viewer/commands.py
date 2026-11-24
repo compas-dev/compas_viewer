@@ -50,6 +50,7 @@ from compas_viewer._scalar_measurement import UnsupportedScalarMeasurementError
 
 if TYPE_CHECKING:
     from compas_viewer import Viewer
+    from compas_viewer.components.viewersettings import SettingsSection
     from compas_viewer.scene.sceneobject import ViewerSceneObject
 
 
@@ -335,16 +336,45 @@ def change_view(viewer: "Viewer", mode: Literal["perspective", "top", "front", "
 change_view_cmd = Command(title="Set View3D View", callback=change_view)
 
 
-def camera_settings(viewer: "Viewer") -> None:
-    """Open the camera section of the System sidebar tab.
+def show_viewer_settings(viewer: "Viewer", section: "SettingsSection | None" = None) -> None:
+    """Refresh and open the reusable Viewer Settings window.
 
     Parameters
     ----------
     viewer
-        Viewer whose camera settings should be focused.
+        Viewer whose settings should be shown.
+    section
+        `"Camera"`, `"Display"`, or `"Grid and Units"` to focus. `None`
+        opens the window without changing its current scroll position.
+
+    Raises
+    ------
+    ValueError
+        If `section` is unsupported or absent from the Viewer's setup-time
+        settings composition.
 
     """
-    viewer.ui.sidebar.focus_system_section("Camera")
+    viewer.ui.settings.show(section)
+
+
+show_viewer_settings_cmd = Command(title="Viewer Settings", callback=show_viewer_settings)
+
+
+def camera_settings(viewer: "Viewer") -> None:
+    """Refresh Viewer Settings and open it at the Camera section.
+
+    Parameters
+    ----------
+    viewer
+        Viewer whose Camera settings should be focused.
+
+    Raises
+    ------
+    ValueError
+        If the Viewer's setup-time settings composition omits Camera.
+
+    """
+    show_viewer_settings(viewer, "Camera")
 
 
 camera_settings_cmd = Command(title="Camera Settings", callback=camera_settings)
@@ -1357,6 +1387,7 @@ def builtin_commands() -> dict[str, Command]:
         "viewer.add_associative_distance_dimension": add_associative_distance_dimension_cmd,
         "viewer.add_fixed_distance_dimension": add_fixed_distance_dimension_cmd,
         "viewer.add_geometry": add_geometry_cmd,
+        "viewer.camera_settings": camera_settings_cmd,
         "viewer.cancel_measurement": cancel_measurement_cmd,
         "viewer.capture_view": capture_view_cmd,
         "viewer.change_appearance": change_appearance_cmd,
@@ -1385,6 +1416,7 @@ def builtin_commands() -> dict[str, Command]:
         "viewer.select_object": select_object_cmd,
         "viewer.select_window": select_window_cmd,
         "viewer.show_all": show_all_cmd,
+        "viewer.show_viewer_settings": show_viewer_settings_cmd,
         "viewer.toggle_grid": toggle_grid_cmd,
         "viewer.toggle_sidebar": toggle_sidebar_cmd,
         "viewer.toggle_sidedock": toggle_sidedock_cmd,

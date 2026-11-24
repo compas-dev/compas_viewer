@@ -17,7 +17,7 @@ from .numberedit import NumberEdit
 
 
 class _FieldRow(Component):
-    """Place one editor beside its System-section label."""
+    """Place one editor beside its Viewer Settings label."""
 
     def __init__(self, title: str, field: QWidget) -> None:
         super().__init__()

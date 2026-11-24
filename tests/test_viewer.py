@@ -371,6 +371,13 @@ def test_ui_applies_configured_statusbar_visibility_at_initialization(monkeypatc
 
     viewport = FakeComponent()
     viewport.sidebar = FakeComponent()
+    settings_args = []
+
+    class FakeSettings(FakeComponent):
+        def __init__(self, window, supplied_viewport):
+            settings_args.append((window, supplied_viewport))
+            super().__init__()
+
     configured = SimpleNamespace(
         config=Config(),
         state=SimpleNamespace(changed=SimpleNamespace(connect=lambda callback: None)),
@@ -384,11 +391,13 @@ def test_ui_applies_configured_statusbar_visibility_at_initialization(monkeypatc
     monkeypatch.setattr("compas_viewer.ui.StatusBar", FakeComponent)
     monkeypatch.setattr("compas_viewer.ui.SideDock", FakeComponent)
     monkeypatch.setattr("compas_viewer.ui.ViewPort", lambda *args: viewport)
+    monkeypatch.setattr("compas_viewer.ui.ViewerSettings", FakeSettings)
 
     ui = UI()
 
     assert ui.statusbar.show is False
     assert ui.menubar.sidebar is viewport.sidebar
+    assert settings_args == [(ui.window, viewport)]
 
 
 @pytest.mark.parametrize("fullscreen", [False, True])

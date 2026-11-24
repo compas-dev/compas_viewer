@@ -1,5 +1,7 @@
 from collections.abc import Callable
 
+from PySide6.QtCore import QTimer
+
 from compas.colors import Color
 from compas.geometry import Box
 from compas.geometry import Frame
@@ -43,4 +45,11 @@ for title, vector in (("Position", viewer.renderer.camera.position), ("Target", 
             )
         )
 
+
+def open_camera_settings() -> None:
+    """Open the built-in Camera controls for the same live camera."""
+    viewer.ui.settings.show("Camera")
+
+
+QTimer.singleShot(0, open_camera_settings)
 viewer.show()

@@ -103,11 +103,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   title, packaged or absolute custom icons, and fullscreen display.
 * Added versioned configuration serialization and migration of supported legacy
   configuration layouts.
-* Added MkDocs user and developer guides, a Hello World tutorial, documentation
-  build instructions, modernized examples, and a generated API reference.
+* Added MkDocs user and developer guides, Hello World and end-to-end Viewer
+  tutorials, documentation build instructions, verified settings and content
+  composition examples, modernized examples, and a generated API reference.
 
 ### Changed
 
+* Moved Camera, Display, and Grid and Units from the former System sidebar tab
+  into one reusable modeless **Viewer Settings** window opened from the View
+  menu. The built-in sidebar now contains only Scene, Data, and Annotations;
+  settings composition uses `viewer.settings_items` and
+  `default_settings_items()`, and navigation uses
+  `viewer.ui.settings.show(section)` without compatibility aliases for the old
+  System path. Typed `sidebar_items` and `settings_items` constructor inputs
+  provide setup-time composition on the first Viewer construction in a process;
+  Viewer shallow-copies and consumes them once without live recomposition.
+  Subsequent singleton calls ignore new composition inputs. Closing hides the
+  transient settings window, while window-level Escape hides only Viewer
+  Settings and preserves active measurements and content selection. Repeated
+  settings types are rejected before Qt setup, and Delete in the settings
+  window preserves Scene and annotation selections.
+* Expanded read-only **Data Details** with ordered constructor parameters,
+  general attributes for every Core datastructure, and the existing lazy
+  Mesh/Graph component tables. The dialog keeps shared-item inspection
+  non-owning and contains individual read or formatting failures without
+  enabling edits or renderer refreshes.
+* Expanded read-only **Object Details** with stable scene-object identity,
+  general scene state, declared type-specific state, and represented-item
+  parameters. **Object Settings** remains the sole scene-object editing
+  surface; unresolved items retain their scene state without synthesizing or
+  resolving represented data.
 * Renamed shape and surface line controls to **Show wireframe**, **Wireframe
   color**, and **Wireframe width**, while mesh and graph controls retain edge
   terminology. Display toggles, opacity, point or vertex size, and line or edge

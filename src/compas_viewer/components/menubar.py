@@ -18,6 +18,7 @@ from PySide6.QtWidgets import QMenu
 from PySide6.QtWidgets import QMenuBar
 from PySide6.QtWidgets import QPlainTextEdit
 from PySide6.QtWidgets import QTextEdit
+from PySide6.QtWidgets import QWidget
 
 from compas_viewer.components.component import Component
 from compas_viewer.uidefinitions import UIItem
@@ -51,9 +52,9 @@ class _GlobalEscapeFilter(QObject):
 
 
 class _GlobalDeleteFilter(QObject):
-    """Route unmodified Delete while preserving editor-local behavior."""
+    """Route unmodified Delete within the owning window."""
 
-    def __init__(self, callback: Callable[[], object], parent: QObject | None = None) -> None:
+    def __init__(self, callback: Callable[[], object], parent: QWidget | None = None) -> None:
         super().__init__(parent)
         self._callback = callback
 
@@ -62,6 +63,9 @@ class _GlobalDeleteFilter(QObject):
         if event.type() != QEvent.Type.KeyPress or not isinstance(event, QKeyEvent):
             return False
         if event.key() != Qt.Key.Key_Delete or event.modifiers() != Qt.KeyboardModifier.NoModifier:
+            return False
+        parent = self.parent()
+        if isinstance(parent, QWidget) and (not isinstance(watched, QWidget) or watched.window() is not parent.window()):
             return False
         if isinstance(QApplication.focusWidget(), _EDITOR_TYPES) or isinstance(watched, _EDITOR_TYPES):
             return False
@@ -114,8 +118,8 @@ class MenuBar(Component):
         self._update_delete_action()
 
     def _update_delete_action(self, _index: int | None = None) -> None:
-        """Disable menu deletion while System owns the active context."""
-        enabled = self._sidebar.current_tab != "System"
+        """Enable menu deletion only for content domains that own deletion."""
+        enabled = self._sidebar.current_tab in {"Scene", "Annotations"}
         for action in self._command_actions.get("viewer.delete_selected", ()):
             action.setEnabled(enabled)
 

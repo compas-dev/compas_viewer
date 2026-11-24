@@ -1,14 +1,11 @@
 from types import SimpleNamespace
 
-import pytest
 from PySide6.QtWidgets import QApplication
 
-from compas_viewer.base import Base
 from compas_viewer.components.gridunitsetting import GridUnitSetting
-from compas_viewer.components.sidebar import SideBarRight
 from compas_viewer.config import Config
 from compas_viewer.state import ViewerState
-from compas_viewer.uidefinitions import default_sidebar_items
+from compas_viewer.uidefinitions import default_settings_items
 
 
 def test_grid_unit_panel_updates_grid_and_measurement_presentation(monkeypatch):
@@ -81,29 +78,8 @@ def test_grid_unit_precision_accepts_boundaries_and_restores_rejected_input(monk
     assert app is not None
 
 
-def test_default_sidebar_contains_one_grid_and_units_panel():
-    item_types = [item["type"] for item in default_sidebar_items()]
+def test_default_settings_contains_one_grid_and_units_panel():
+    item_types = [item["type"] for item in default_settings_items()]
 
     assert item_types.count("GridUnitSetting") == 1
     assert "MeasurementSetting" not in item_types
-
-
-def test_sidebar_loads_grid_and_units_and_rejects_retired_component(monkeypatch):
-    app = QApplication.instance() or QApplication([])
-    config = Config()
-    viewer = SimpleNamespace(
-        config=config,
-        state=ViewerState(config),
-        sidebar_items=[{"type": "GridUnitSetting"}],
-    )
-    monkeypatch.setattr(Base, "viewer", property(lambda _self: viewer))
-
-    sidebar = SideBarRight(SimpleNamespace())
-
-    assert list(sidebar.system_panel.sections) == ["Grid and Units"]
-    assert isinstance(sidebar.grid_unit_setting, GridUnitSetting)
-
-    viewer.sidebar_items = [{"type": "MeasurementSetting"}]
-    with pytest.raises(ValueError, match="Use 'GridUnitSetting'"):
-        SideBarRight(SimpleNamespace())
-    assert app is not None

@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from uuid import UUID
 
+from PySide6.QtCore import QModelIndex
+from PySide6.QtCore import QPersistentModelIndex
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QAbstractItemView
 from PySide6.QtWidgets import QDialog
@@ -16,6 +18,7 @@ from PySide6.QtWidgets import QVBoxLayout
 from PySide6.QtWidgets import QWidget
 
 from compas.data import Data
+from compas.datastructures import Datastructure
 from compas.scene import Scene
 from compas_viewer.scene.parameters import inspect_object_parameters
 
@@ -73,6 +76,51 @@ def _display_value(value: object) -> str:
         return f"<unavailable: {type(error).__name__}>"
 
 
+def _safe_general_attributes(item: Datastructure) -> tuple[tuple[object, object], ...]:
+    """Read ordered general attributes while containing mapping failures."""
+    try:
+        attributes = item.attributes
+        names = tuple(attributes)
+    except Exception:
+        return ()
+
+    rows: list[tuple[object, object]] = []
+    for name in names:
+        try:
+            value = attributes[name]
+        except Exception as error:
+            value = f"<unavailable: {type(error).__name__}>"
+        rows.append((name, value))
+    return tuple(rows)
+
+
+def _read_only_table(headers: tuple[str, str], rows: tuple[tuple[object, object], ...]) -> QTableWidget:
+    """Build a read-only two-column snapshot table."""
+    table = QTableWidget(0, 2)
+    table.setHorizontalHeaderLabels(headers)
+    table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+    table.setAlternatingRowColors(True)
+    for name, value in rows:
+        row = table.rowCount()
+        table.insertRow(row)
+        table.setItem(row, 0, QTableWidgetItem(_display_value(name)))
+        table.setItem(row, 1, QTableWidgetItem(_display_value(value)))
+    return table
+
+
+class _ReadOnlyElementAttributesModel(_ElementAttributesModel):
+    """Contain component read and formatting failures in their display cell."""
+
+    def data(self, index: QModelIndex | QPersistentModelIndex, role: int = Qt.ItemDataRole.DisplayRole) -> object | None:
+        """Return one read-only cell value without propagating inspection errors."""
+        try:
+            return super().data(index, role)
+        except Exception as error:
+            if role == Qt.ItemDataRole.DisplayRole:
+                return f"<unavailable: {type(error).__name__}>"
+            return None
+
+
 class DataDetailsDialog(QDialog):
     """Show a read-only snapshot of one referenced data item."""
 
@@ -91,26 +139,17 @@ class DataDetailsDialog(QDialog):
         layout.addLayout(metadata)
 
         if record.item is not None:
-            domains = _element_domains(record.item)
-            if domains:
-                tabs = QTabWidget()
-                for domain in domains:
-                    table = QTableView()
-                    table.setModel(_ElementAttributesModel(domain, changed=lambda: None, failed=lambda _error: None, editable=False))
-                    table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
-                    table.setAlternatingRowColors(True)
-                    tabs.addTab(table, domain.title)
-                layout.addWidget(tabs)
-            else:
-                parameters = QTableWidget(0, 2)
-                parameters.setHorizontalHeaderLabels(["Parameter", "Value"])
-                parameters.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
-                for name, value in _safe_parameters(record.item):
-                    row = parameters.rowCount()
-                    parameters.insertRow(row)
-                    parameters.setItem(row, 0, QTableWidgetItem(name))
-                    parameters.setItem(row, 1, QTableWidgetItem(_display_value(value)))
-                layout.addWidget(parameters)
+            tabs = QTabWidget()
+            tabs.addTab(_read_only_table(("Parameter", "Value"), _safe_parameters(record.item)), "Parameters")
+            if isinstance(record.item, Datastructure):
+                tabs.addTab(_read_only_table(("Attribute", "Value"), _safe_general_attributes(record.item)), "General Attributes")
+            for domain in _element_domains(record.item):
+                table = QTableView()
+                table.setModel(_ReadOnlyElementAttributesModel(domain, changed=lambda: None, failed=lambda _error: None, editable=False))
+                table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+                table.setAlternatingRowColors(True)
+                tabs.addTab(table, domain.title)
+            layout.addWidget(tabs)
 
         buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
         buttons.rejected.connect(self.reject)

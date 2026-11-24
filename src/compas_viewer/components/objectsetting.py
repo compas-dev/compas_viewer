@@ -284,10 +284,70 @@ class ObjectSetting(Container):
             item = obj.item
         except SceneItemNotBoundError:
             item = None
-        parameter_lines = []
-        for name, parameter in inspect_object_parameters(item).items():
-            value = repr(parameter.value) if parameter.available else "<not exposed by object>"
-            parameter_lines.append(f"  {name}: {value}")
-        parameters = "\nParameters:\n" + "\n".join(parameter_lines) if parameter_lines else ""
-        item_type = type(item).__name__ if item is not None else "Unresolved"
-        return f"Name: {obj.name}\nType: {item_type}\nVisible: {obj.show}{parameters}"
+            item_resolution_error: Exception | None = None
+        except Exception as error:
+            item = None
+            item_resolution_error = error
+        else:
+            item_resolution_error = None
+
+        if item_resolution_error is not None:
+            represented_type = status = _unavailable(item_resolution_error)
+        elif item is None:
+            represented_type = status = "Unresolved"
+        else:
+            represented_type = type(item).__name__
+            status = "Bound"
+        lines = [
+            "Identity",
+            "--------",
+            f"Name: {_safe_attribute_format(obj, 'name', str)}",
+            f"Scene Object Type: {type(obj).__name__}",
+            f"Scene Object GUID: {_safe_attribute_format(obj, 'guid', str)}",
+            f"Represented Type: {represented_type}",
+            f"Item GUID: {_safe_attribute_format(obj, 'item_guid', str)}",
+            f"Status: {status}",
+            "",
+            "General Scene State",
+            "-------------------",
+            f"Visible: {_safe_attribute_format(obj, 'show', repr)}",
+            f"Base Color: {_safe_attribute_format(obj, 'color', repr)}",
+            f"Opacity: {_safe_attribute_format(obj, 'opacity', repr)}",
+            f"Local Transformation: {_safe_attribute_format(obj, 'transformation', repr)}",
+            "",
+            "Type-Specific Scene State",
+            "-------------------------",
+        ]
+        for namespace, fields in type(obj).scene_state_fields().items():
+            for field in fields:
+                value = _safe_attribute_format(obj, field.attribute, repr)
+                lines.append(f"{namespace}.{field.name}: {value}")
+
+        if item is not None:
+            lines.extend(("", "Represented Item Parameters", "---------------------------"))
+            for name, parameter in inspect_object_parameters(item).items():
+                value = _safe_format(parameter.value, repr) if parameter.available else "<not exposed by object>"
+                lines.append(f"{name}: {value}")
+        return "\n".join(lines)
+
+
+def _safe_attribute_format(obj: object, name: str, formatter: Callable[[object], str]) -> str:
+    """Format one attribute without allowing its failure to hide other rows."""
+    try:
+        value = getattr(obj, name)
+    except Exception as error:
+        return _unavailable(error)
+    return _safe_format(value, formatter)
+
+
+def _safe_format(value: object, formatter: Callable[[object], str]) -> str:
+    """Format one value as display text with a stable failure marker."""
+    try:
+        return formatter(value)
+    except Exception as error:
+        return _unavailable(error)
+
+
+def _unavailable(error: Exception) -> str:
+    """Return the stable display marker for one unavailable value."""
+    return f"<unavailable: {type(error).__name__}>"

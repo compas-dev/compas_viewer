@@ -126,8 +126,9 @@ nav:
       - UI:
           - Overview: examples/ui.md
           - Side-dock Controls: examples/ui/sidedock.md
+          - Viewer Settings and Content Domains: examples/ui/viewer_settings.md
           - Camera Controls: examples/ui/camera.md
-          - Object and Attribute Inspection: examples/ui/object_inspection.md
+          - Object and Data Inspection: examples/ui/object_inspection.md
           - Distance Measurements: examples/ui/measurements.md
           - Scale and Legend Overlays: examples/ui/overlays.md
       - Configuration:

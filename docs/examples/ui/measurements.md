@@ -85,7 +85,9 @@ Measurement** to cancel.
 The unit is a label only: it never rescales coordinates. Precision controls
 display formatting only and is not a geometric tolerance. Transient inspection
 labels use the current values from the **Grid and Units** section of the
-**System** tab.
+modeless **Viewer Settings** window. See [Viewer Settings and content
+domains](viewer_settings.md) for the complete lifecycle and programmatic
+navigation contract.
 
 Completed dimensions render in a final persistent-annotation pass without
 depth testing or depth writes, so scene geometry cannot hide them.

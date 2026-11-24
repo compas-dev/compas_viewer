@@ -39,15 +39,16 @@ The main window consists of:
   scene or its annotations.
 - An **Annotations** sidebar tab with the ordered annotation list and details
   for the selected annotation.
-- A **System** sidebar tab with Camera, Display, and Grid and Units
-  sections.
+- A modeless **Viewer Settings** window with Camera, Display, and Grid and
+  Units sections, opened through **View → Viewer Settings…**.
 - A visible toolbar with zoom, capture, and measurement controls.
 - A grouped **View** control over the top-right of the viewport for standard
   views and render modes.
 - Menus for creating Scene geometry, selecting objects, changing the view, and loading or saving scenes.
 
 The sidebar and toolbar are visible by default. Use **View → Sidebar** or
-**View → Toolbar** to hide or restore them.
+**View → Toolbar** to hide or restore them. Viewer Settings starts hidden;
+opening it again raises the same window rather than creating another one.
 
 ## Navigate the viewport
 
@@ -116,16 +117,21 @@ changes only annotation selection.
 The **Data** tab is a flat, read-only view of the current scene's referenced
 items. Shared items appear once with their number of references; unresolved
 references remain visible without being loaded. Select a row and use
-**Details** to inspect its GUID, binding status, referrers, and public
-parameters. Mesh and Graph details expose their declared element-attribute
-tables lazily and read-only. Data-row selection is temporary and independent
-from Scene and Annotations selection.
+**Details** to inspect its GUID, binding status, referrers, and safe public
+constructor parameters. Every Core `Datastructure` also exposes its ordered
+general `attributes` mapping. Mesh and Graph additionally provide lazy
+read-only component tables: Mesh uses Vertices, Edges, and Faces; Graph uses
+Nodes and Edges. Component columns come only from declared default mappings and
+display effective defaults and local overrides. Sparse undeclared attributes
+are omitted. Data-row selection is temporary and independent from Scene and
+Annotations selection. The dialog does not load, resolve, edit, delete, or take
+ownership of an item.
 
 Delete follows the active interaction domain and never removes both selections.
 Focus in the Scene tree or viewport removes spatial objects; focus in the
 annotation list or details removes annotations. Menu activation follows the
-active sidebar tab. The action is disabled in System, and text or numeric
-editors retain their local Delete behavior.
+active sidebar tab. Data owns no deletion domain, and text or numeric editors
+retain their local Delete behavior.
 
 Deleting a selected group removes its complete scene subtree but does not
 delete the independently owned geometry or data. Deletion is not part of the
@@ -141,8 +147,14 @@ Drag the Scene splitter to resize the hierarchy and detail areas; this does not
 resize the independent Annotations splitter. The details area no longer keeps
 a large inline description open. Select one or more objects and choose
 **Details** for a read-only modal snapshot of names, types, visibility, and
-available represented-object parameters. Editable controls remain in the
-sidebar, and Details is disabled when nothing is selected. Parametric
+available represented-object parameters. For a single object, the snapshot is
+ordered as Identity, General Scene State, Type-Specific Scene State, and
+Represented Item Parameters. Type-specific entries come only from that concrete
+scene-object type's declared state and use stable `namespace.field` labels;
+the dialog does not discover arbitrary properties or invoke setters. Multiple
+selection retains the compact count, represented types, and names summary.
+Editable controls remain in the sidebar, and Details is disabled when nothing
+is selected. Parametric
 representations expose **U Resolution** and, where used, **V Resolution** in
 this area: cones and cylinders use U; spheres, tori, and capsules use U and V;
 parametric surfaces use both; boxes and unrecognized shapes expose neither.
@@ -433,7 +445,9 @@ Assigning a `Color` makes the background explicit, so later appearance changes
 do not alter it. Grid, selection, explicit scene-object appearance, existing
 annotations, legends, and overlays retain their existing ownership.
 
-The **Display** section of the **System** tab controls:
+Open **View → Viewer Settings…**. The modeless window remains available while
+you orbit, pan, zoom, and select in the main Viewer. Its **Display** section
+controls:
 
 - Shaded, lighted, ghosted, and wireframe rendering.
 - Perspective, orthographic, and standard views.
@@ -448,7 +462,7 @@ Display section, or Python API update every other surface. Set
 `config.ui.toolbar.show = False` before constructing the Viewer to start with
 the toolbar hidden.
 
-The **Grid and Units** section of the **System** tab controls:
+The **Grid and Units** section of Viewer Settings controls:
 
 - Grid visibility, axes, mode, color, extents, and divisions.
 - **Coordinate Unit** declares the unit suffix shown with measurement labels.
@@ -459,17 +473,34 @@ The unit declaration does not convert coordinates, and display precision is
 not a geometry tolerance. These presentation settings do not control snapping
 or component association, and the unit does not change grid spacing. Global
 `compas.tolerance.TOL` remains available to computational code but is not a
-Viewer control or System-sidebar field. A persistent dimension snapshots the
+Viewer control or Viewer Settings field. A persistent dimension snapshots the
 unit and precision when it is completed. A transient inspection uses the
 current settings whenever it is drawn. Later Grid and Units changes affect
 only transient measurements and dimensions created afterward; they do not
 rewrite existing dimensions.
 
 Camera, Display, and Grid and Units use the same two-column field layout:
-labels are left-aligned and editors share one right-hand column.
+labels are left-aligned and editors share one right-hand column. Opening Viewer
+Settings refreshes all three sections from current Viewer state. The Camera
+section is fully populated on the first open; it does not require a later
+refresh or resize to reveal its controls.
 
-The Camera section is fully populated when the System panel first appears; it
-does not require a later refresh or resize to reveal its controls.
+Closing Viewer Settings hides it without destroying it. Pressing `Escape` in
+the settings window hides only that window; it does not cancel an active
+measurement or clear spatial or annotation selection. Editors retain their
+local Escape behavior.
+
+Scripts can open the same window and optionally focus a section:
+
+```python
+viewer.ui.settings.show()
+viewer.ui.settings.show("Camera")
+```
+
+The supported section names are `"Camera"`, `"Display"`, and
+`"Grid and Units"`. Unsupported names raise `ValueError`. Window visibility,
+geometry, scroll position, and focused section are transient and are not part
+of Viewer configuration or scene serialization.
 
 ## Configure the viewer in Python
 
@@ -678,7 +709,7 @@ therefore accept only the default background values and do not show the group.
 Pressing `Delete` while the annotation list or annotation details has focus
 removes selected annotations only. The same command removes spatial objects
 when focus is in the Scene tree or viewport. **Edit → Delete Selected** follows
-the active Scene or Annotations tab and is disabled in System. Neither path
+the active Scene or Annotations tab. Data dispatches no deletion. Neither path
 crosses into the other collection.
 
 Scripts use `viewer.state.annotation_selection` for annotations and

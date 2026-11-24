@@ -18,7 +18,12 @@ class SingletonMeta(type):
         if key_class not in cls._instances:
             instance = cast(Any, cls.__new__)(cls)
             cls._instances[key_class] = instance
-            instance.__init__(*args, **kwargs)
+            try:
+                instance.__init__(*args, **kwargs)
+            except BaseException:
+                if cls._instances.get(key_class) is instance:
+                    del cls._instances[key_class]
+                raise
         return cls._instances[key_class]
 
 

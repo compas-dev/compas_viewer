@@ -16,32 +16,35 @@ from PySide6.QtWidgets import QVBoxLayout
 from PySide6.QtWidgets import QWidget
 
 from compas_viewer.components.annotationpanel import AnnotationPanel
-from compas_viewer.components.camerasetting import CameraSetting
 from compas_viewer.components.component import Component
 from compas_viewer.components.datapanel import DataPanel
 from compas_viewer.components.datastructureattributes import DatastructureAttributes
-from compas_viewer.components.displaysetting import DisplaySetting
-from compas_viewer.components.gridunitsetting import GridUnitSetting
 from compas_viewer.components.objectsetting import ObjectSetting
 from compas_viewer.components.sceneform import SceneColumn
 from compas_viewer.components.sceneform import SceneTree
-from compas_viewer.components.systempanel import SystemPanel
-from compas_viewer.components.systempanel import SystemSection
 from compas_viewer.uidefinitions import UIItem
+from compas_viewer.uidefinitions import _validate_sidebar_items
 
 if TYPE_CHECKING:
     from .viewport import ViewPort
 
-SidebarTab = Literal["Scene", "Annotations", "Data", "System"]
-DeletionDomain = Literal["spatial", "annotations"]
+type SidebarTab = Literal["Scene", "Annotations", "Data"]
+type DeletionDomain = Literal["spatial", "annotations"]
 
 
 class SideBarRight(Component):
-    """Display Scene, Annotations, Data, and System sidebar domains."""
+    """Display the Scene, Data, and Annotations content domains.
 
-    TABS: tuple[SidebarTab, ...] = ("Scene", "Data", "Annotations", "System")
+    The sidebar owns content navigation only. Viewer-wide controls belong to
+    the separate Viewer Settings window. Scene and Annotations own contextual
+    deletion; Data remains read-only.
+
+    """
+
+    TABS: tuple[SidebarTab, ...] = ("Scene", "Data", "Annotations")
 
     def __init__(self, viewport: "ViewPort") -> None:
+        """Construct the closed content domains and consume sidebar definitions."""
         super().__init__()
         self.viewport = viewport
         self.widget = QTabWidget()
@@ -61,17 +64,24 @@ class SideBarRight(Component):
 
     @property
     def items(self) -> list[UIItem]:
-        """list[UIItem]: Runtime sidebar item definitions."""
+        """list[UIItem]: Setup-time definitions consumed by this sidebar."""
         return self.viewer.sidebar_items
 
     def load_items(self) -> None:
-        """Populate the three sidebar domains from the runtime definitions."""
+        """Populate the three content domains from setup-time definitions.
+
+        Raises
+        ------
+        ValueError
+            If an item type is unsupported or a scene-tree definition omits
+            its required columns.
+
+        """
+        _validate_sidebar_items(self.items)
         for item in self.items:
             itemtype = item.get("type")
             if itemtype in {"SceneTree", "Sceneform"}:
                 columns = item.get("columns")
-                if columns is None:
-                    raise ValueError("Please setup config for Sceneform")
                 self.sceneform = SceneTree(columns=cast(list[SceneColumn], columns))
             elif itemtype == "AnnotationPanel":
                 self.annotation_panel = AnnotationPanel()
@@ -81,19 +91,10 @@ class SideBarRight(Component):
                 self.object_setting = ObjectSetting()
             elif itemtype == "DatastructureAttributes":
                 self.datastructure_attributes = DatastructureAttributes()
-            elif itemtype == "CameraSetting":
-                self.camera_setting = CameraSetting(self.viewport)
-            elif itemtype == "DisplaySetting":
-                self.display_setting = DisplaySetting(self.viewport)
-            elif itemtype == "GridUnitSetting":
-                self.grid_unit_setting = GridUnitSetting()
-            elif itemtype == "MeasurementSetting":
-                raise ValueError("Unsupported sidebar item type: 'MeasurementSetting'. Use 'GridUnitSetting'.")
 
         self._compose_scene_page()
         self._compose_annotations_page()
         self._compose_data_page()
-        self._compose_system_page()
 
     def set_current_tab(self, tab: SidebarTab) -> None:
         """Activate one sidebar domain.
@@ -101,7 +102,7 @@ class SideBarRight(Component):
         Parameters
         ----------
         tab
-            One of `"Scene"`, `"Annotations"`, `"Data"`, or `"System"`.
+            One of `"Scene"`, `"Data"`, or `"Annotations"`.
 
         Raises
         ------
@@ -130,7 +131,7 @@ class SideBarRight(Component):
         Returns
         -------
         DeletionDomain | None
-            Selection domain to remove, or `None` for editor-local and System
+            Selection domain to remove, or `None` for editor-local and Data
             contexts.
 
         """
@@ -154,25 +155,6 @@ class SideBarRight(Component):
             return "spatial"
         return None
 
-    def focus_system_section(self, section: SystemSection) -> None:
-        """Activate System and reveal one configured settings section.
-
-        Parameters
-        ----------
-        section
-            One of `"Camera"`, `"Display"`, or `"Grid and Units"`.
-
-        Raises
-        ------
-        ValueError
-            If `section` is unsupported or not configured.
-
-        """
-        if section not in {"Camera", "Display", "Grid and Units"}:
-            raise ValueError(f"Unsupported system section: {section!r}.")
-        self.set_current_tab("System")
-        self.system_panel.focus_section(section)
-
     def update_spatial_selection(self) -> None:
         """Update only Scene controls affected by spatial selection."""
         if hasattr(self, "sceneform"):
@@ -193,10 +175,10 @@ class SideBarRight(Component):
         self.update_annotation_selection()
         if hasattr(self, "data_panel"):
             self.data_panel.update()
-        self.system_panel.update()
         self.widget.update()
 
     def _compose_scene_page(self) -> None:
+        """Compose the Scene hierarchy and optional details inspector."""
         layout = self._page_layouts["Scene"]
         details: list[tuple[str, Component]] = []
         if hasattr(self, "object_setting"):
@@ -235,6 +217,7 @@ class SideBarRight(Component):
             layout.addWidget(QLabel("No Scene controls configured"))
 
     def _compose_annotations_page(self) -> None:
+        """Compose the durable-annotation collection and details inspector."""
         layout = self._page_layouts["Annotations"]
         if hasattr(self, "annotation_panel"):
             layout.addWidget(self.annotation_panel.widget)
@@ -242,6 +225,7 @@ class SideBarRight(Component):
             layout.addWidget(QLabel("No Annotation controls configured"))
 
     def _compose_data_page(self) -> None:
+        """Compose the read-only referenced-data projection."""
         layout = self._page_layouts["Data"]
         if hasattr(self, "data_panel"):
             layout.addWidget(self.data_panel.widget)
@@ -249,19 +233,9 @@ class SideBarRight(Component):
             layout.addWidget(QLabel("No Data controls configured"))
 
     def _on_tab_changed(self, index: int) -> None:
+        """Refresh referenced data when its content domain becomes active."""
         if self.TABS[index] == "Data" and hasattr(self, "data_panel"):
             self.data_panel.update()
-
-    def _compose_system_page(self) -> None:
-        layout = self._page_layouts["System"]
-        self.system_panel = SystemPanel()
-        if hasattr(self, "camera_setting"):
-            self.system_panel.add_section("Camera", self.camera_setting)
-        if hasattr(self, "display_setting"):
-            self.system_panel.add_section("Display", self.display_setting)
-        if hasattr(self, "grid_unit_setting"):
-            self.system_panel.add_section("Grid and Units", self.grid_unit_setting)
-        layout.addWidget(self.system_panel.widget)
 
 
 __all__ = ["DeletionDomain", "SideBarRight", "SidebarTab"]

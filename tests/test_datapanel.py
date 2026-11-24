@@ -5,8 +5,9 @@ from uuid import uuid4
 import pytest
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication
-from PySide6.QtWidgets import QTableWidget
 from PySide6.QtWidgets import QTableView
+from PySide6.QtWidgets import QTableWidget
+from PySide6.QtWidgets import QTabWidget
 
 from compas.data import Data
 from compas.datastructures import Mesh
@@ -20,8 +21,8 @@ from compas_viewer.components.datapanel import DataDetailsDialog
 from compas_viewer.components.datapanel import DataPanel
 from compas_viewer.components.datapanel import _DataInventoryItem
 from compas_viewer.components.datapanel import _DataReference
+from compas_viewer.components.datapanel import _ReadOnlyElementAttributesModel
 from compas_viewer.components.datapanel import _data_inventory
-from compas_viewer.components.datastructureattributes import _ElementAttributesModel
 from compas_viewer.config import Config
 from compas_viewer.scene import ViewerScene
 from compas_viewer.state import ViewerState
@@ -97,14 +98,21 @@ def test_generic_details_never_reads_serialized_payload():
 
     dialog = DataDetailsDialog(record)
 
-    table = dialog.findChild(QTableWidget)
-    assert table is not None
+    tabs = dialog.findChild(QTabWidget)
+    assert tabs is not None
+    assert [tabs.tabText(index) for index in range(tabs.count())] == ["Parameters"]
+    table = tabs.widget(0)
+    assert isinstance(table, QTableWidget)
     assert table.item(0, 0).text() == "value"
     assert table.item(0, 1).text() == "42"
 
 
-def test_mesh_details_use_lazy_read_only_declared_domain_models(monkeypatch):
+def test_mesh_details_combine_parameters_general_attributes_and_lazy_domains(monkeypatch):
     mesh = Mesh.from_vertices_and_faces([[0, 0, 0], [1, 0, 0], [0, 1, 0]], [[0, 1, 2]])
+    mesh.attributes.update([("purpose", "inspection"), ("level", 2)])
+    mesh.update_default_vertex_attributes({"weight": 0.0})
+    mesh.update_default_edge_attributes({"crease": False})
+    mesh.update_default_face_attributes({"region": "default"})
     reads = []
     original = mesh.vertex_attribute
 
@@ -118,7 +126,22 @@ def test_mesh_details_use_lazy_read_only_declared_domain_models(monkeypatch):
     scene.add(mesh)
 
     dialog = DataDetailsDialog(_data_inventory(scene)[0])
-    models = [table.model() for table in dialog.findChildren(QTableView) if isinstance(table.model(), _ElementAttributesModel)]
+    tabs = dialog.findChild(QTabWidget)
+    assert tabs is not None
+    assert [tabs.tabText(index) for index in range(tabs.count())] == [
+        "Parameters",
+        "General Attributes",
+        "Vertices",
+        "Edges",
+        "Faces",
+    ]
+    parameters = tabs.widget(0)
+    general = tabs.widget(1)
+    assert isinstance(parameters, QTableWidget)
+    assert isinstance(general, QTableWidget)
+    assert [general.item(row, 0).text() for row in range(general.rowCount())] == ["purpose", "level"]
+    assert [general.item(row, 1).text() for row in range(general.rowCount())] == ["inspection", "2"]
+    models = [table.model() for table in dialog.findChildren(QTableView) if isinstance(table.model(), _ReadOnlyElementAttributesModel)]
 
     assert models
     assert reads == []
@@ -126,6 +149,90 @@ def test_mesh_details_use_lazy_read_only_declared_domain_models(monkeypatch):
     index = model.index(0, 1)
     assert not model.flags(index) & Qt.ItemFlag.ItemIsEditable
     assert not model.setData(index, 99)
+
+
+def test_general_attributes_are_limited_to_core_datastructures():
+    class AttributeBearingData(Data):
+        def __init__(self) -> None:
+            super().__init__()
+            self.attributes = {"must_not_appear": True}
+
+    item = AttributeBearingData()
+    record = _DataInventoryItem(item.guid, item, (_DataReference("Scene", uuid4(), "Generic"),))
+
+    dialog = DataDetailsDialog(record)
+
+    tabs = dialog.findChild(QTabWidget)
+    assert tabs is not None
+    assert [tabs.tabText(index) for index in range(tabs.count())] == ["Parameters"]
+
+
+def test_empty_datastructure_attributes_keep_an_empty_general_attributes_tab():
+    mesh = Mesh()
+    record = _DataInventoryItem(mesh.guid, mesh, (_DataReference("Scene", uuid4(), "Empty mesh"),))
+
+    dialog = DataDetailsDialog(record)
+
+    tabs = dialog.findChild(QTabWidget)
+    assert tabs is not None
+    assert tabs.tabText(1) == "General Attributes"
+    table = tabs.widget(1)
+    assert isinstance(table, QTableWidget)
+    assert table.rowCount() == 0
+
+
+def test_general_attribute_mapping_and_format_failures_are_isolated():
+    class BadString:
+        def __str__(self) -> str:
+            raise RuntimeError("cannot format")
+
+    class GuardedAttributes(dict):
+        def __getitem__(self, key):
+            if key == "unreadable":
+                raise LookupError("cannot read")
+            return super().__getitem__(key)
+
+    mesh = Mesh()
+    mesh.attributes = GuardedAttributes([("working", 1), ("unreadable", 2), ("unprintable", BadString())])
+    record = _DataInventoryItem(mesh.guid, mesh, (_DataReference("Scene", uuid4(), "Guarded mesh"),))
+
+    dialog = DataDetailsDialog(record)
+
+    tabs = dialog.findChild(QTabWidget)
+    assert tabs is not None
+    table = tabs.widget(1)
+    assert isinstance(table, QTableWidget)
+    assert [table.item(row, 0).text() for row in range(table.rowCount())] == ["working", "unreadable", "unprintable"]
+    assert [table.item(row, 1).text() for row in range(table.rowCount())] == [
+        "1",
+        "<unavailable: LookupError>",
+        "<unavailable: RuntimeError>",
+    ]
+
+
+def test_component_value_failures_are_isolated_to_the_affected_cell(monkeypatch):
+    mesh = Mesh.from_vertices_and_faces([[0, 0, 0]], [])
+    mesh.update_default_vertex_attributes({"broken": 0, "working": 1})
+    original = mesh.vertex_attribute
+
+    def guarded(key, name, *args):
+        if not args and name == "broken":
+            raise RuntimeError("cannot inspect")
+        return original(key, name, *args)
+
+    monkeypatch.setattr(mesh, "vertex_attribute", guarded)
+    record = _DataInventoryItem(mesh.guid, mesh, (_DataReference("Scene", uuid4(), "Mesh"),))
+
+    dialog = DataDetailsDialog(record)
+
+    tabs = dialog.findChild(QTabWidget)
+    assert tabs is not None
+    table = next(tabs.widget(index) for index in range(tabs.count()) if tabs.tabText(index) == "Vertices")
+    assert isinstance(table, QTableView)
+    model = table.model()
+    assert isinstance(model, _ReadOnlyElementAttributesModel)
+    assert model.data(model.index(0, 4)) == "<unavailable: RuntimeError>"
+    assert model.data(model.index(0, 5)) == "1"
 
 
 def test_binding_refreshes_only_data_projection_without_renderer_work():
@@ -269,8 +376,10 @@ def test_generic_details_isolate_raising_properties_and_string_formatters():
 
     dialog = DataDetailsDialog(record)
 
-    table = dialog.findChild(QTableWidget)
-    assert table is not None
+    tabs = dialog.findChild(QTabWidget)
+    assert tabs is not None
+    table = tabs.widget(0)
+    assert isinstance(table, QTableWidget)
     assert table.rowCount() == 1
     assert table.item(0, 0).text() == "printable"
     assert table.item(0, 1).text() == "<unavailable: RuntimeError>"

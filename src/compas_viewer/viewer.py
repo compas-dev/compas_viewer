@@ -1,3 +1,5 @@
+"""Primary Viewer application facade."""
+
 import sys
 from collections.abc import Callable
 from collections.abc import Iterable
@@ -55,7 +57,10 @@ from compas_viewer.singleton import Singleton
 from compas_viewer.state import ViewerState
 from compas_viewer.ui import UI
 from compas_viewer.uidefinitions import UIItem
+from compas_viewer.uidefinitions import _validate_settings_items
+from compas_viewer.uidefinitions import _validate_sidebar_items
 from compas_viewer.uidefinitions import default_menu_items
+from compas_viewer.uidefinitions import default_settings_items
 from compas_viewer.uidefinitions import default_sidebar_items
 from compas_viewer.uidefinitions import default_toolbar_items
 
@@ -86,15 +91,49 @@ class Viewer(Singleton):
     ----------
     config
         Viewer configuration. A default configuration is created when omitted.
+    sidebar_items
+        Setup-time content-sidebar definitions. The iterable is shallow-copied
+        before the interface is constructed. The built-in Scene, Data, and
+        Annotations composition is used when omitted.
+    settings_items
+        Setup-time Viewer Settings definitions. The iterable is shallow-copied
+        before the interface is constructed. The built-in Camera, Display, and
+        Grid and Units composition is used when omitted.
     **kwargs
         Reserved keyword arguments for compatibility with viewer subclasses.
 
+    Raises
+    ------
+    ValueError
+        If a sidebar or settings definition has an unsupported item type, a
+        required field is missing, or a settings item type is repeated.
+
+    Notes
+    -----
+    `Viewer` is a process-local singleton. Sidebar and settings definitions are
+    consumed only by the first `Viewer` construction in a process; later
+    `Viewer(...)` calls return the cached instance and do not apply new
+    composition arguments. Mutating `sidebar_items` or `settings_items` after
+    construction does not recompose the existing Qt interface.
+
     """
 
-    def __init__(self, config: Config | None = None, **kwargs: Any) -> None:
+    def __init__(
+        self,
+        config: Config | None = None,
+        *,
+        sidebar_items: Iterable[UIItem] | None = None,
+        settings_items: Iterable[UIItem] | None = None,
+        **kwargs: Any,
+    ) -> None:
+        """Initialize Viewer state and consume the setup-time UI composition."""
         ensure_scene_objects_registered()
         self._config = config if config is not None else Config()
         self._config.validate()
+        self.sidebar_items = list(sidebar_items) if sidebar_items is not None else default_sidebar_items()
+        self.settings_items = list(settings_items) if settings_items is not None else default_settings_items()
+        _validate_sidebar_items(self.sidebar_items)
+        _validate_settings_items(self.settings_items)
         self.app = self.create_app()
         self.running = False
         self._scene: ViewerScene | None = None
@@ -111,7 +150,6 @@ class Viewer(Singleton):
         self.commands = CommandRegistry(builtin_commands())
         self.menu_items: list[UIItem] = default_menu_items()
         self.toolbar_items: list[UIItem] = default_toolbar_items()
-        self.sidebar_items: list[UIItem] = default_sidebar_items()
         self.app.styleHints().colorSchemeChanged.connect(self._on_system_color_scheme_changed)
         self.set_appearance(self.config.ui.appearance)
         self.timer = QTimer()
@@ -1028,7 +1066,7 @@ class Viewer(Singleton):
         return path
 
     def on(self, interval: int, frames: int | None = None) -> Callable[[Callable[[int], object]], Callable[[int], object]]:
-        """Decorator for callbacks of a dynamic drawing process with fixed intervals.
+        """Decorate callbacks of a dynamic drawing process with fixed intervals.
 
         Parameters
         ----------
