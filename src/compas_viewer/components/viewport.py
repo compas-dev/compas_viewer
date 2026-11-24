@@ -274,7 +274,7 @@ class _ViewControl(QWidget, Base):
         if not self._focus_listener_connected:
             window.installEventFilter(self)
             app = QGuiApplication.instance()
-            if app is not None:
+            if isinstance(app, QGuiApplication):
                 app.focusWindowChanged.connect(self._restore_renderer_focus_if_ready)
             self._focus_listener_connected = True
             self._focus_window = window
@@ -306,7 +306,7 @@ class _ViewControl(QWidget, Base):
         if self._focus_listener_connected and self._focus_window is not None:
             self._focus_window.removeEventFilter(self)
             app = QGuiApplication.instance()
-            if app is not None:
+            if isinstance(app, QGuiApplication):
                 app.focusWindowChanged.disconnect(self._restore_renderer_focus_if_ready)
             self._focus_listener_connected = False
             self._focus_window = None

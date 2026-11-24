@@ -843,7 +843,7 @@ class Viewer(Singleton):
     def _system_appearance(self) -> Literal["light", "dark"]:
         """Return the effective appearance reported by the platform."""
         app = getattr(self, "app", None) or QApplication.instance()
-        if app is None:
+        if not isinstance(app, QApplication):
             return "light"
         scheme = app.styleHints().colorScheme()
         if scheme == Qt.ColorScheme.Dark:
