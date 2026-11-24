@@ -136,7 +136,7 @@ def test_partial_headless_viewer_uses_deterministic_light_defaults(monkeypatch):
     viewer.running = False
     scene = ViewerScene()
     scene.attach(viewer)
-    monkeypatch.setattr("compas_viewer.viewer.QApplication", SimpleNamespace(instance=lambda: None))
+    monkeypatch.setattr("compas_viewer.viewer.QApplication.instance", lambda: None)
 
     sceneobject = scene.add(Sphere(1.0))
 
